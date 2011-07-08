@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mule 
+	xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
+	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+	xmlns:management="http://www.mulesource.org/schema/mule/management/2.2"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.mulesource.org/schema/mule/core/2.2       http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+		http://www.mulesource.org/schema/mule/https/2.2		 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
+		http://www.mulesource.org/schema/mule/jms/2.2        http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+		http://www.mulesource.org/schema/mule/management/2.2 http://www.mulesource.org/schema/mule/management/2.2/mule-management.xsd
+	">
+
+	<spring:bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<spring:property name="ignoreResourceNotFound" value="true" />
+		<spring:property name="locations">
+			<spring:list>
+				<!-- Only available in development env, e.g. Eclipse -->
+				<spring:value>classpath:vp-security.properties</spring:value>
+				<spring:value>classpath:vp-config.properties</spring:value>
+				
+				<!-- Only available when deployed to a servlet container -->
+				<spring:value>file:${app.home}/vp/config/vp-security.properties</spring:value>
+				<spring:value>file:${app.home}/vp/config/vp-config.properties</spring:value>
+			</spring:list>
+		</spring:property>
+	</spring:bean>
+
+<!-- 
+    <management:jmx-default-config port="${JMX_PORT}" registerMx4jAdapter="false" >
+        <management:credentials>
+            <spring:entry key="${JMX_USER}" value="${JMX_PWD}"/>
+        </management:credentials>
+    </management:jmx-default-config> 
+ -->
+    
+	<!--  Allow tests to register dynamic listeners by specifying dynamic="true" -->
+	<!-- TODO: Is there a performance hit with this that is not acceptable in runtime?
+	           Then we maybe need a teststub-common-xml file in the end... -->
+  
+   	<notifications dynamic="true">
+		<notification event="COMPONENT-MESSAGE"/>
+		<notification event="ENDPOINT-MESSAGE"/>
+		<notification event="CONTEXT"/>
+  		<notification-listener ref="muleStartupNotification"/>
+	</notifications>
+  
+
+    <!-- Common connectors and endpoints, i.e. that not needs to be changed for different config-files (local unit-test, integration-test or production environments) -->
+  	<https:connector name="myHttpsConnector" clientSoTimeout="${TP_HTTPS_CLIENT_TIMEOUT}" >
+ 		<https:tls-client    class="${TP_TLS_STORE_CLIENT_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CLIENT_FILE}" storePassword="${TP_TLS_STORE_CLIENT_PASSWORD}"/> 
+		<https:tls-key-store class="${TP_TLS_STORE_SERVER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_SERVER_FILE}" storePassword="${TP_TLS_STORE_SERVER_PASSWORD}" keyPassword="${TP_TLS_STORE_SERVER_KEY_PASSWORD}" /> 
+		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
+	</https:connector>
+
+    <spring:beans>
+  		<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
+			<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_URL}"/>
+			<spring:property name="addressDelimiter" value="#"/>
+		</spring:bean>
+		
+		<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
+			<spring:property name="vagvalAgent" ref="vagvalAgent"/>	
+		</spring:bean>
+    </spring:beans>
+
+	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>
+
+	<custom-transformer name="createCorrId"  class="org.soitoolkit.commons.mule.log.correlationid.CreateCorrelationIdTransformer" />
+	<custom-transformer name="saveCorrId"    class="org.soitoolkit.commons.mule.log.correlationid.SaveCorrelationIdTransformer" />
+	<custom-transformer name="restoreCorrId" class="org.soitoolkit.commons.mule.log.correlationid.RestoreCorrelationIdTransformer" />
+
+	<custom-transformer name="objToXml" class="org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer">
+		<spring:property name="contextPath"  value="
+			"/>
+	</custom-transformer>
+
+	<custom-transformer name="xmlToObj" class="org.soitoolkit.commons.mule.jaxb.XmlToJaxbObjectTransformer">
+		<spring:property name="contextPath"  value="
+			"/>
+	</custom-transformer>
+
+	<custom-transformer name="mimeToStr" class="org.soitoolkit.commons.mule.mime.MimeToStringTransformer" />
+
+    <custom-transformer name="logMsgIn" class="org.soitoolkit.commons.mule.log.LogTransformer">
+		<spring:property name="logType"  value="msg-in"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+    </custom-transformer>
+
+    <custom-transformer name="logMsgOut" class="org.soitoolkit.commons.mule.log.LogTransformer">
+		<spring:property name="logType"  value="msg-out"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+    </custom-transformer>
+
+    <custom-transformer name="logReqIn" class="org.soitoolkit.commons.mule.log.LogTransformer">
+		<spring:property name="logType"  value="req-in"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+    </custom-transformer>
+
+    <custom-transformer name="logReqOut" class="org.soitoolkit.commons.mule.log.LogTransformer">
+		<spring:property name="logType"  value="req-out"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+    </custom-transformer>
+
+    <custom-transformer name="logRespIn" class="org.soitoolkit.commons.mule.log.LogTransformer">
+		<spring:property name="logType"  value="resp-in"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+    </custom-transformer>
+
+    <custom-transformer name="logRespOut" class="org.soitoolkit.commons.mule.log.LogTransformer">
+		<spring:property name="logType"  value="resp-out"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+    </custom-transformer>  
+
+    <!-- TODO: Add global definitions here -->
+
+</mule>
