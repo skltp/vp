@@ -47,7 +47,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 		
 		<dependency>
 			<groupId>se.skl.tp</groupId>
-			<artifactId>itintegration-monitoring-schemas</artifactId>
+			<artifactId>pingforconfiguration-schemas</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 </dependencies> 
