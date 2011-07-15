@@ -57,6 +57,7 @@ import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.dashboard.ServiceStatistics;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
+import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 
 public class VagvalRouter extends AbstractRecipientList {
@@ -188,8 +189,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		VagvalInput vagvalInput = new VagvalInput();
 
-
-		vagvalInput.senderId = getSenderIdFromCertificate(message);
+		vagvalInput.senderId = VPUtil.getSenderIdFromCertificate(message, this.pattern);
 		message.setProperty(SENDER_ID, vagvalInput.senderId);
 
 		vagvalInput.receiverId = message.getProperty(RECEIVER_ID).toString();
@@ -286,56 +286,6 @@ public class VagvalRouter extends AbstractRecipientList {
 		adress = "cxf:" + adress;
 
 		return adress;
-	}
-
-	private String getSenderIdFromCertificate(MuleMessage message) {
-
-		String senderId = null;
-		Certificate[] peerCertificateChain = (Certificate[]) message
-				.getProperty("PEER_CERTIFICATES");
-
-		if (peerCertificateChain != null) {
-			// Check type of first certificate in the chain, this should be the
-			// clients certificate
-			if (peerCertificateChain[0] instanceof X509Certificate) {
-				X509Certificate cert = (X509Certificate) peerCertificateChain[0];
-				String principalName = cert.getSubjectX500Principal().getName();
-				Matcher matcher = pattern.matcher(principalName);
-				if (matcher.find()) {
-					senderId = matcher.group(1);
-				} else {
-					String errorMessage = ("VP002 No senderId found in Certificate: " + principalName);
-					logger.info(errorMessage);
-					throw new VpSemanticException(errorMessage);
-
-				}
-			} else {
-				String errorMessage = ("VP002 No senderId found in Certificate: First certificate in chain is not X509Certificate: " + peerCertificateChain[0]);
-				logger.info(errorMessage);
-				throw new VpSemanticException(errorMessage);
-			}
-		} else {
-			String errorMessage = ("VP002 No senderId found in Certificate: No certificate chain found from client");
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
-		
-		// Check if this is coded in hex (HCC Funktionscertifikat does that!)
-		if (senderId.startsWith("#")) {
-			return convertFromHexToString(senderId.substring(5));
-		} else {
-			return senderId;			
-		}
-	}
-
-	private String convertFromHexToString(String hexString) {
-		byte [] txtInByte = new byte [hexString.length() / 2];
-		int j = 0;
-		for (int i = 0; i < hexString.length(); i += 2)
-		{
-			txtInByte[j++] = Byte.parseByte(hexString.substring(i, i + 2), 16);
-		}
-		return new String(txtInByte);
 	}
 	
 	

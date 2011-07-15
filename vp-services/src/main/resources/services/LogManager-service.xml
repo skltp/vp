@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule 
+	xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jdbc="http://www.mulesource.org/schema/mule/vm/2.2"
+	xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
+	xmlns:smooks="http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.mulesource.org/schema/mule/core/2.2  http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+		http://www.mulesource.org/schema/mule/http/2.2   http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.mulesource.org/schema/mule/jms/2.2   http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
+		http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2 http://dist.muleforge.org/smooks/schema/mule-module-smooks/1.2/mule-module-smooks.xsd
+	">
+	
+	<spring:beans>
+		<spring:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<spring:property name="url" value="jdbc:mysql://${LOGMANAGER_DB_HOST}:${LOGMANAGER_DB_PORT}/${LOGMANAGER_DB_NAME}" />
+			<spring:property name="username" value="${LOGMANAGER_DB_USER}"/>
+			<spring:property name="password" value="${LOGMANAGER_DB_PASSWORD}"/>
+		</spring:bean>
+	</spring:beans>
+	
+	<custom-transformer name="jmsToLogEvent" class="se.skl.tp.vp.logmanager.JmsToLogEventTransformer" />
+	
+	<model name="LogManager-model">
+	
+		<service name="LogManager-service">
+			<inbound>
+				<jms:inbound-endpoint address="jms://${SOITOOLKIT_LOG_INFO_QUEUE}" transformer-refs="jmsToLogEvent"/>
+			</inbound>
+			<component>
+				<singleton-object class="se.skl.tp.vp.logmanager.LogManager">
+					<property key="dataSource" value-ref="dataSource" />
+					<property key="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+				</singleton-object>
+			</component>
+		</service>
+	</model>
+	
+</mule>

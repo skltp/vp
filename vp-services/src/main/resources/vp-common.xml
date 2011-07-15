@@ -48,7 +48,6 @@
 		<notification event="CONTEXT"/>
   		<notification-listener ref="muleStartupNotification"/>
 	</notifications>
-  
 
     <!-- Common connectors and endpoints, i.e. that not needs to be changed for different config-files (local unit-test, integration-test or production environments) -->
   	<https:connector name="myHttpsConnector" clientSoTimeout="${TP_HTTPS_CLIENT_TIMEOUT}" >
@@ -75,43 +74,43 @@
 	<custom-transformer name="restoreCorrId" class="org.soitoolkit.commons.mule.log.correlationid.RestoreCorrelationIdTransformer" />
 
 	<custom-transformer name="objToXml" class="org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer">
-		<spring:property name="contextPath"  value="
-			"/>
+		<spring:property name="contextPath"  value="org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1"/>
 	</custom-transformer>
 
 	<custom-transformer name="xmlToObj" class="org.soitoolkit.commons.mule.jaxb.XmlToJaxbObjectTransformer">
-		<spring:property name="contextPath"  value="
-			"/>
+		<spring:property name="contextPath"  value="org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1" />
 	</custom-transformer>
+
+<!-- 		org.soitoolkit.commons.logentry.schema.v1:org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1"/> -->
 
 	<custom-transformer name="mimeToStr" class="org.soitoolkit.commons.mule.mime.MimeToStringTransformer" />
 
-    <custom-transformer name="logMsgIn" class="org.soitoolkit.commons.mule.log.LogTransformer">
+    <custom-transformer name="logMsgIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="msg-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
     </custom-transformer>
 
-    <custom-transformer name="logMsgOut" class="org.soitoolkit.commons.mule.log.LogTransformer">
+    <custom-transformer name="logMsgOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="msg-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
     </custom-transformer>
 
-    <custom-transformer name="logReqIn" class="org.soitoolkit.commons.mule.log.LogTransformer">
+    <custom-transformer name="logReqIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="req-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
     </custom-transformer>
 
-    <custom-transformer name="logReqOut" class="org.soitoolkit.commons.mule.log.LogTransformer">
+    <custom-transformer name="logReqOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="req-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
     </custom-transformer>
 
-    <custom-transformer name="logRespIn" class="org.soitoolkit.commons.mule.log.LogTransformer">
+    <custom-transformer name="logRespIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="resp-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
     </custom-transformer>
 
-    <custom-transformer name="logRespOut" class="org.soitoolkit.commons.mule.log.LogTransformer">
+    <custom-transformer name="logRespOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="resp-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
     </custom-transformer>  
