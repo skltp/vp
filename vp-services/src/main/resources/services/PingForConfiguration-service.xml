@@ -17,6 +17,10 @@
 
     <custom-transformer name="createSoapFaultIfException" class="org.soitoolkit.commons.mule.soap.CreateSoapFaultIfExceptionTransformer"/>
 
+	<message-properties-transformer name="Add-riv-version-PingForConfiguration">
+        <add-message-property key="rivversion" value="RIVTABP20"/>
+    </message-properties-transformer>
+
 	<model name="PingForConfiguration-model">
 	
 		<service name="PingForConfiguration-service-rivtabp20">
@@ -26,17 +30,25 @@
                     wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl"
                     serviceName="PingForConfigurationResponderService"
                     namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"                 
-                    proxy="false"
+                    proxy="true"
+                    payload="envelope"
                     synchronous="true"
                     applyTransformersToProtocol="false"
-                    transformer-refs="logReqIn"
-                    responseTransformer-refs="logRespOut"
+                    transformer-refs="createCorrId saveCorrId logReqIn"
+                    responseTransformer-refs="logRespIn"
                 />
  
  				<!-- Removed createSoapFault... transformer. Turn this on later... -->
  
             </inbound>
-            <component class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRiv20" />
+<!--             <component class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRiv20" /> -->
+			<outbound>
+                <pass-through-router>
+        			<outbound-endpoint address="vm://vagval-router" 
+        			synchronous="true"
+        			transformer-refs="Add-riv-version-PingForConfiguration logReqOut" responseTransformer-refs="logRespOut"/>
+                </pass-through-router>
+			</outbound>
 		</service>
 		
 	</model>

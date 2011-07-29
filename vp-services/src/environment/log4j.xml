@@ -57,7 +57,6 @@
 		<level value="INFO" />
 	</logger>
 
-
 	<!-- Message logging -->
 	<logger name="org.soitoolkit.commons.mule.messageLogger">
 		<level value="DEBUG" />

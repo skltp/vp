@@ -98,22 +98,38 @@
     <custom-transformer name="logReqIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="req-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
     </custom-transformer>
 
     <custom-transformer name="logReqOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="req-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
     </custom-transformer>
 
     <custom-transformer name="logRespIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="resp-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
     </custom-transformer>
 
     <custom-transformer name="logRespOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="resp-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-    </custom-transformer>  
+		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+    </custom-transformer>
+    
+    <custom-transformer name="logReqVagval" class="se.skl.tp.vp.util.LogTransformer">
+		<spring:property name="logType"  value="vagval-req-in"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+    </custom-transformer>
+
+    <custom-transformer name="logRespVagval" class="se.skl.tp.vp.util.LogTransformer">
+		<spring:property name="logType"  value="vagval-resp-out"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+    </custom-transformer>
 
     <!-- TODO: Add global definitions here -->
 

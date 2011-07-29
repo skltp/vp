@@ -76,14 +76,25 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				if (logger.isDebugEnabled()) {
 					logger.debug("entering VagvalsAgent.init");
 				}
+				
 				try {
+					
+					logger.info("Fetch all permissions...");
+					
 					HamtaAllaAnropsBehorigheterResponseType respAllaAnropsBehorigheter = getPort()
 							.hamtaAllaAnropsBehorigheter(null);
 
+					logger.info("Fetch all virtualizations...");
+					
 					HamtaAllaVirtualiseringarResponseType respAllaVirtualiseringar = getPort()
 							.hamtaAllaVirtualiseringar(null);
 
+					logger.info("Fetch request permission information.");
+					
 					anropsBehorighetsInfo = respAllaAnropsBehorigheter.getAnropsBehorighetsInfo();
+					
+					logger.info("Fetch virtualization information");
+					
 					virtualiseringsInfo = respAllaVirtualiseringar.getVirtualiseringsInfo();
 					if (logger.isDebugEnabled()) {
 						logger.info("init loaded " + anropsBehorighetsInfo.size()
@@ -92,6 +103,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 								+ " VirtualiseradTjansteproducent");
 					}
 				} catch (RuntimeException e) {
+					
+					e.printStackTrace();
+					
 					logger.error("Exception in VagvalsAgewn.init() caused by" + e.toString());
 				}
 			}

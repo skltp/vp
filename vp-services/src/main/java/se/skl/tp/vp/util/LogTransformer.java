@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
@@ -39,6 +40,8 @@ import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.util.MuleUtil;
 
+import se.skl.tp.vp.exceptions.VpSemanticException;
+
 
 /**
  * Transformer used to log messages passing a specific endpoint using the event-logger
@@ -54,6 +57,15 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
 
 	private final EventLogger eventLogger;
+	
+	private Pattern pattern;
+	private String senderIdPropertyName;
+	
+	public void setSenderIdPropertyName(String senderIdPropertyName) {
+		this.senderIdPropertyName = senderIdPropertyName;
+		pattern = Pattern.compile(senderIdPropertyName + "=([^,]+)");
+	}
+	
 
 	// FIXME: Mule 3.1. To be removed since it's already in base class for Mule 3.1
 	/*
@@ -144,6 +156,23 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 
     		// FIXME: Added from ST v0.4.1
     		Map<String, String> evaluatedExtraInfo  = evaluateMapInfo(extraInfo, message);
+    		
+    		/*
+    		 * Fetch senderid from certificate and append it
+    		 * as extra info
+    		 */
+    		if (evaluatedExtraInfo == null) {
+    			evaluatedExtraInfo = new HashMap<String, String>();
+    		}
+    		
+    		try {
+    			final String senderId = VPUtil.getSenderIdFromCertificate(message, this.pattern);
+    			log.debug("Sender extracted from certificate {}", senderId);
+    			
+    			evaluatedExtraInfo.put("senderId", senderId);
+    		} catch (final VpSemanticException e) {
+    			log.debug("Could not extract sender id from certificate.");
+    		}
     		
     		switch (logLevel) {
 			case INFO:
