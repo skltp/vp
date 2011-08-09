@@ -20,19 +20,13 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -45,7 +39,6 @@ import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
-import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.routing.outbound.AbstractRecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +108,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException {
 
-		String receiverId = getReceiverId(message);
+		String receiverId = VPUtil.getReceiverId(message);
 		message.setProperty(RECEIVER_ID, receiverId);
 
 		long beforeCall = System.currentTimeMillis();
@@ -303,104 +296,5 @@ public class VagvalRouter extends AbstractRecipientList {
 		vvR.setTidpunkt(tidPunkt);
 
 		return vvR;
-	}
-
-	/**
-	 * Returns the elements from the RIV Header that are required by the
-	 * VagvalAgent.
-	 * 
-	 * @param message
-	 * @return
-	 */
-	private String getReceiverId(MuleMessage message) {
-
-		Object payload = message.getPayload();
-		//DepthXMLStreamReader dxsr = (DepthXMLStreamReader) payload;
-		ReversibleXMLStreamReader rxsr = (ReversibleXMLStreamReader) payload;//dxsr.getReader();
-
-		// Start caching events from the XML documents
-		if (logger.isDebugEnabled()) {
-			logger.debug("Start caching events from the XML docuement parsing");
-		}
-		rxsr.setTracking(true);
-
-		try {
-
-			return doGetReceiverIdFromPayload(rxsr);
-
-		} catch (XMLStreamException e) {
-			throw new VpTechnicalException(e);
-
-		} finally {
-			// Go back to the beginning of the XML document
-			if (logger.isDebugEnabled()) {
-				logger.debug("Go back to the beginning of the XML document");
-			}
-			rxsr.reset();
-		}
-	}
-
-	/**
-	 * Uses the StAX - API to get the elements from the SOAP Header.
-	 * 
-	 * @param reader
-	 * @return
-	 * @throws XMLStreamException
-	 */
-	private String doGetReceiverIdFromPayload(XMLStreamReader reader)
-			throws XMLStreamException {
-
-		String receiverId = null;
-		boolean headerFound = false;
-
-		int event = reader.getEventType();
-
-		while (reader.hasNext()) {
-			switch (event) {
-			
-			case XMLStreamConstants.START_ELEMENT:
-				String local = reader.getLocalName();
-
-				if (local.equals("Header")) {
-					headerFound = true;
-				}
-
-				if (local.equals("To") && headerFound) {
-					reader.next();
-					receiverId = reader.getText();
-					if (logger.isDebugEnabled()) {
-						logger.debug("found To in Header= " + receiverId);
-					}
-				}
-
-				break;
-
-			case XMLStreamConstants.END_ELEMENT:
-				if (reader.getLocalName().equals("Header")) {
-					// We have found the end element of the Header, i.e. we
-					// are done. Let's bail out!
-					if (logger.isDebugEnabled()) {
-						logger.debug("We have found the end element of the Header, i.e. we are done.");
-					}
-					return receiverId;
-				}
-				break;
-
-			case XMLStreamConstants.CHARACTERS:
-				break;
-
-			case XMLStreamConstants.START_DOCUMENT:
-			case XMLStreamConstants.END_DOCUMENT:
-			case XMLStreamConstants.ATTRIBUTE:
-			case XMLStreamConstants.NAMESPACE:
-				break;
-
-			default:
-				break;
-			}
-			event = reader.next();
-		}
-
-		return receiverId;
 	}
 }

@@ -563,7 +563,6 @@ public class EventLogger implements MuleContextAware {
 			lm.setException(lme);
 		}
 
-
 		// Create the log entry object
 		LogEntryType logEntry = new LogEntryType();
 		logEntry.setMetadataInfo(lmi);
@@ -571,6 +570,9 @@ public class EventLogger implements MuleContextAware {
 		logEntry.setMessageInfo(lm);
 		logEntry.setPayload(payloadASstring);
 
+		//final String receiver = VPUtil.getReceiverId(message);
+		//extraInfo.put("receiver", receiver);
+		
 		// Add any extra info
 		if (extraInfo != null) {
 			Set<Entry<String, String>> entries = extraInfo.entrySet();

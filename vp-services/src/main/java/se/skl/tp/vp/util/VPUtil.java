@@ -5,15 +5,56 @@ import java.security.cert.X509Certificate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.mule.api.MuleMessage;
+import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.exceptions.VpTechnicalException;
 
 public final class VPUtil {
 
 	private static Logger log = LoggerFactory.getLogger(VPUtil.class);
+	
+	/**
+	 * Returns the elements from the RIV Header that are required by the
+	 * VagvalAgent.
+	 * 
+	 * @param message
+	 * @return
+	 */
+	public static String getReceiverId(MuleMessage message) {
+
+		Object payload = message.getPayload();
+		//DepthXMLStreamReader dxsr = (DepthXMLStreamReader) payload;
+		ReversibleXMLStreamReader rxsr = (ReversibleXMLStreamReader) payload;//dxsr.getReader();
+
+		// Start caching events from the XML documents
+		if (log.isDebugEnabled()) {
+			log.debug("Start caching events from the XML docuement parsing");
+		}
+		rxsr.setTracking(true);
+
+		try {
+
+			return doGetReceiverIdFromPayload(rxsr);
+
+		} catch (XMLStreamException e) {
+			throw new VpTechnicalException(e);
+
+		} finally {
+			// Go back to the beginning of the XML document
+			if (log.isDebugEnabled()) {
+				log.debug("Go back to the beginning of the XML document");
+			}
+			rxsr.reset();
+		}
+	}
 	
 	public static String getSenderIdFromCertificate(MuleMessage message, final Pattern pattern) {
 
@@ -53,6 +94,70 @@ public final class VPUtil {
 		} else {
 			return senderId;			
 		}
+	}
+	
+	/**
+	 * Uses the StAX - API to get the elements from the SOAP Header.
+	 * 
+	 * @param reader
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	private static String doGetReceiverIdFromPayload(XMLStreamReader reader)
+			throws XMLStreamException {
+
+		String receiverId = null;
+		boolean headerFound = false;
+
+		int event = reader.getEventType();
+
+		while (reader.hasNext()) {
+			switch (event) {
+			
+			case XMLStreamConstants.START_ELEMENT:
+				String local = reader.getLocalName();
+
+				if (local.equals("Header")) {
+					headerFound = true;
+				}
+
+				if (local.equals("To") && headerFound) {
+					reader.next();
+					receiverId = reader.getText();
+					if (log.isDebugEnabled()) {
+						log.debug("found To in Header= " + receiverId);
+					}
+				}
+
+				break;
+
+			case XMLStreamConstants.END_ELEMENT:
+				if (reader.getLocalName().equals("Header")) {
+					// We have found the end element of the Header, i.e. we
+					// are done. Let's bail out!
+					if (log.isDebugEnabled()) {
+						log.debug("We have found the end element of the Header, i.e. we are done.");
+					}
+					return receiverId;
+				}
+				break;
+
+			case XMLStreamConstants.CHARACTERS:
+				break;
+
+			case XMLStreamConstants.START_DOCUMENT:
+			case XMLStreamConstants.END_DOCUMENT:
+			case XMLStreamConstants.ATTRIBUTE:
+			case XMLStreamConstants.NAMESPACE:
+				break;
+
+			default:
+				break;
+			}
+			event = reader.next();
+		}
+
+		return receiverId;
 	}
 	
 	private static String convertFromHexToString(final String hexString) {
