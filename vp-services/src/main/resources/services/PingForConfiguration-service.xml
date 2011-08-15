@@ -34,7 +34,7 @@
                     payload="envelope"
                     synchronous="true"
                     applyTransformersToProtocol="false"
-                    transformer-refs="createCorrId saveCorrId logReqIn"
+                    transformer-refs="createCorrId logReqIn"
                     responseTransformer-refs="logRespIn"
                 />
  
@@ -46,7 +46,7 @@
                 <pass-through-router>
         			<outbound-endpoint address="vm://vagval-router" 
         			synchronous="true"
-        			transformer-refs="Add-riv-version-PingForConfiguration logReqOut" responseTransformer-refs="logRespOut"/>
+        			transformer-refs="Add-riv-version-PingForConfiguration logReqVagval" responseTransformer-refs="logRespVagval"/>
                 </pass-through-router>
 			</outbound>
 		</service>

@@ -2,10 +2,12 @@ package se.skl.tp.vp.logmanager;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -35,6 +37,7 @@ public class LogManager implements Callable {
 	
 	public synchronized LogEvent storeLogEventInDatabase(final LogEvent logEvent, final MuleMessage muleMessage) throws Exception {
 		
+		final Date ts = this.getDateFromLogEntry(logEvent);
 		final String logState = logEvent.getLogEntry().getMessageInfo().getMessage();
 		String msgId = logEvent.getLogEntry().getRuntimeInfo().getMessageId();
 		
@@ -53,7 +56,7 @@ public class LogManager implements Callable {
 			final String insertWaypoint = "insert into session_waypoint (waypoint, timestamp, request_xml, response_xml, response_xml_producer, session_id) values (" +
 					"?, ?, ?, ?, ?, ?)";
 			
-			int waypoint = this.jdbcTemplate.update(insertWaypoint, new Object[] { logState, new Date(System.currentTimeMillis()), null, null, null, msgId});
+			int waypoint = this.jdbcTemplate.update(insertWaypoint, new Object[] { logState, ts.getTime(), null, null, null, msgId});
 			if (waypoint == 1) {
 				log.info("Inserted waypoint entry for msgId {}", msgId);
 			}
@@ -73,6 +76,8 @@ public class LogManager implements Callable {
 		final String endpoint = msgMeta.getEndpoint();
 		final String msgId = msgRt.getMessageId();
 		final String logState = msgType.getMessage();
+		
+		final Date ts = this.getDateFromLogEntry(logEvent);
 		
 		final URI uri = new URI(endpoint);
 		final String ctxPath = uri.getPath();
@@ -123,7 +128,7 @@ public class LogManager implements Callable {
 			 * Insert new request record
 			 */
 			final String insertRequest = "insert into session (session_id, sender_id, riv_version, contract, receiver, timestamp) values (?,?,?,?,?,?)";
-			int update = this.jdbcTemplate.update(insertRequest, new Object[] {msgId, senderId, rivVersion, contract, "12345", new Date(System.currentTimeMillis())});
+			int update = this.jdbcTemplate.update(insertRequest, new Object[] {msgId, senderId, rivVersion, contract, "12345", ts.getTime()});
 			if (update != 1) {
 				log.warn("Could not insert main request entry.");
 			}
@@ -142,6 +147,20 @@ public class LogManager implements Callable {
 			return false;
 		}
 		
+	}
+	
+	Date getDateFromLogEntry(final LogEvent le) {
+		final XMLGregorianCalendar timestamp = le.getLogEntry().getRuntimeInfo().getTimestamp();
+		
+		final Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, timestamp.getHour());
+		c.set(Calendar.MINUTE, timestamp.getMinute());
+		c.set(Calendar.SECOND, timestamp.getSecond());
+		c.set(Calendar.MILLISECOND, timestamp.getMillisecond());
+		c.set(Calendar.YEAR, timestamp.getYear());
+		c.set(Calendar.MONTH, timestamp.getMonth());
+		c.set(Calendar.DAY_OF_MONTH, timestamp.getDay());
+		return c.getTime();
 	}
 
 	@Override
