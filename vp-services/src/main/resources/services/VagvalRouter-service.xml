@@ -21,18 +21,21 @@
  		TODO:	
  		Use standard SOI-toolkit transformers?
  	 -->
-    <custom-transformer name="fixTransformer" class="se.skl.tp.vp.vagvalrouter.ObjectArrayToXMLStreamReaderTransformer"/>
-    <custom-transformer name="exceptionTransformer" class="se.skl.tp.vp.vagvalrouter.ExceptionTransformer"/>
+<!--     <custom-transformer name="fixTransformer" class="se.skl.tp.vp.vagvalrouter.ObjectArrayToXMLStreamReaderTransformer"/> -->
+    
+    <custom-transformer name="rivTransformer" class="se.skl.tp.vp.vagvalrouter.RivTransformer">
+    	<spring:property name="vagvalAgent" ref="vagvalAgent" />
+    	<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+    </custom-transformer>
 
 	<model name="VagvalRouter-model">
 	
 		<service name="VagvalRouter-service">
             <inbound>
-				<inbound-endpoint address="vm://vagval-router" synchronous="true" transformer-refs="logReqOut fixTransformer" responseTransformer-refs="exceptionTransformer logRespOut" />
+				<inbound-endpoint address="vm://vagval-router" synchronous="true" transformer-refs="rivTransformer logReqOut" responseTransformer-refs="exceptionTransformer logRespOut" />
             </inbound>
 
 			<outbound>
-<!-- 				<custom-outbound-router class="se.skl.tp.vp.vagvalrouter.VagvalRouter" transformer-refs="logReqOut" responseTransformer-refs="logRespIn"> -->
 				<custom-outbound-router class="se.skl.tp.vp.vagvalrouter.VagvalRouter">
 					<spring:property name="vagvalAgent" ref="vagvalAgent" />
 					<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />

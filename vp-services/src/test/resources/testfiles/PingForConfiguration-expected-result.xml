@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="urn:riv:itintegration:registry:1" xmlns:urn="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1">
+   <soapenv:Header>
+      <add:LogicalAddress>local-ping-producer</add:LogicalAddress>
+   </soapenv:Header>
+   <soapenv:Body>
+      <urn:PingForConfiguration>
+         <!--You may enter ANY elements at this point-->
+      </urn:PingForConfiguration>
+   </soapenv:Body>
+</soapenv:Envelope>

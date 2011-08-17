@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import org.mortbay.log.Log;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -43,24 +42,16 @@ import org.mule.routing.outbound.AbstractRecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.dashboard.ServiceStatistics;
-import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.VPUtil;
-import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 
 public class VagvalRouter extends AbstractRecipientList {
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalRouter.class);
-
-	public static String RECEIVER_ID = "receiverid";
-	public static String SENDER_ID = "senderid";
-	public static String RIV_VERSION = "rivversion";
-	public static String SERVICE_NAMESPACE = "namespace";
 
 	private VisaVagvalsInterface vagvalAgent;
 
@@ -72,7 +63,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
-		pattern = Pattern.compile(senderIdPropertyName + "=([^,]+)");
+		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
 		if (logger.isInfoEnabled()) {
 			logger.info("senderIdPropertyName set to: " + senderIdPropertyName);
 		}
@@ -93,10 +84,10 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("VagvalRouter directs call at serviceNamespace: "
-					+ message.getProperty(SERVICE_NAMESPACE) + ", receiverId: "
-					+ message.getProperty(RECEIVER_ID) + ", senderId: "
-					+ message.getProperty(SENDER_ID) + " rivVersion: "
-					+ message.getProperty(RIV_VERSION) + "to adress: " + address);
+					+ message.getProperty(VPUtil.SERVICE_NAMESPACE) + ", receiverId: "
+					+ message.getProperty(VPUtil.RECEIVER_ID) + ", senderId: "
+					+ message.getProperty(VPUtil.SENDER_ID) + " rivVersion: "
+					+ message.getProperty(VPUtil.RIV_VERSION) + "to adress: " + address);
 		}
 		return list;
 	}
@@ -108,12 +99,14 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException {
 
+		Log.info("RIV VERSION IN ROUTER {}", message.getProperty(VPUtil.RIV_VERSION));
+		
 		String receiverId = VPUtil.getReceiverId(message);
-		message.setProperty(RECEIVER_ID, receiverId);
+		message.setProperty(VPUtil.RECEIVER_ID, receiverId);
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = message.getProperty(SERVICE_NAMESPACE) + "-"
-				+ message.getProperty(RECEIVER_ID);
+		String serviceId = message.getProperty(VPUtil.SERVICE_NAMESPACE) + "-"
+				+ message.getProperty(VPUtil.RECEIVER_ID);
 
 		synchronized (statistics) {
 
@@ -138,7 +131,17 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		// Do the actual routing
 		MuleMessage replyMessage = super.route(message, session);
-
+		
+		/*
+		 * Restore properties
+		 */
+		for (final Object prop: message.getPropertyNames()) {
+			replyMessage.setProperty((String) prop, message.getProperty((String) prop));
+		}
+		
+		
+		//replyMessage.setProperty(PropertyNames.SOITOOLKIT_CORRELATION_ID, message.getProperty(PropertyNames.SOITOOLKIT_CORRELATION_ID));
+		
 		synchronized (statistics) {
 			ServiceStatistics serverStatistics = statistics.get(serviceId);
 			serverStatistics.noOfSuccesfullCalls++;
@@ -147,6 +150,7 @@ public class VagvalRouter extends AbstractRecipientList {
 			serverStatistics.averageDuration = serverStatistics.totalDuration
 					/ serverStatistics.noOfSuccesfullCalls;
 		}
+		
 		return replyMessage;
 	}
 
@@ -179,18 +183,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * @return
 	 */
 	String getAddress(MuleMessage message) {
-
-		VagvalInput vagvalInput = new VagvalInput();
-
-		vagvalInput.senderId = VPUtil.getSenderIdFromCertificate(message, this.pattern);
-		message.setProperty(SENDER_ID, vagvalInput.senderId);
-
-		vagvalInput.receiverId = message.getProperty(RECEIVER_ID).toString();
-		vagvalInput.rivVersion = message.getProperty(RIV_VERSION).toString();
-		vagvalInput.serviceNamespace = message.getProperty(SERVICE_NAMESPACE).toString();
-
+		VagvalInput vagvalInput = VPUtil.createRequestToServiceDirectory(message, this.pattern);
 		return getAddressFromAgent(vagvalInput);
-
 	}
 
 	/**
@@ -201,100 +195,22 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * @return
 	 */
 	String getAddressFromAgent(VagvalInput vagvalInput) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Calling vagvalAgent with serviceNamespace:"
-					+ vagvalInput.serviceNamespace + ", receiverId:" + vagvalInput.receiverId
-					+ ", senderId: " + vagvalInput.senderId);
-		}
-		if (vagvalInput.rivVersion == null) {
-			String errorMessage = ("VP001 No Riv-version configured in tp-virtuell-tjanst-config, transformer-refs with property name 'rivversion' missing");
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
-		if (vagvalInput.senderId == null) {
-			String errorMessage = ("VP002 No senderId found in Certificate");
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
-		if (vagvalInput.receiverId == null) {
-			String errorMessage = ("VP003 No receiverId found in RivHeader");
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
+		
+		/*
+		 * Make some assertions before we
+		 * continue
+		 */
+		VPUtil.verifyRequestToServiceDirectory(vagvalInput);
 
-		VisaVagvalResponse vvResponse = vagvalAgent.visaVagval(createVisaVagvalRequest(
+		VisaVagvalResponse vvResponse = vagvalAgent.visaVagval(VPUtil.createVisaVagvalRequest(
 				vagvalInput.senderId, vagvalInput.receiverId, vagvalInput.serviceNamespace));
 
-		List<VirtualiseringsInfoType> virtualiseringar = vvResponse.getVirtualiseringsInfo();
-		if (logger.isDebugEnabled()) {
-			logger.debug("VagvalAgent response count: " + virtualiseringar.size());
-			for (VirtualiseringsInfoType vvInfo : virtualiseringar) {
-				logger.debug("VagvalAgent response item RivProfil: " + vvInfo.getRivProfil()
-						+ ", Address: " + vvInfo.getAdress());
-			}
-		}
-		if (virtualiseringar.size() == 0) {
-			String errorMessage = "VP004 No Logical Adress found for serviceNamespace:"
-					+ vagvalInput.serviceNamespace + ", receiverId:" + vagvalInput.receiverId;
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
+		/*
+		 * Get virtualized services based on
+		 * the input.
+		 */
+		List<VirtualiseringsInfoType> virtualiseringar = VPUtil.getVirtualizedServices(vagvalInput, vvResponse);
 
-		String adress = null;
-		int noOfMatchingAdresses = 0;
-		for (VirtualiseringsInfoType vvInfo : virtualiseringar) {
-			if (vvInfo.getRivProfil().equals(vagvalInput.rivVersion)) {
-				adress = vvInfo.getAdress();
-				noOfMatchingAdresses++;
-			}
-		}
-
-		if (noOfMatchingAdresses == 0) {
-			String errorMessage = ("VP005 No Logical Adress with matching Riv-version found for serviceNamespace :"
-					+ vagvalInput.serviceNamespace
-					+ ", receiverId:"
-					+ vagvalInput.receiverId
-					+ "RivVersion" + vagvalInput.rivVersion);
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
-
-		if (noOfMatchingAdresses > 1) {
-			String errorMessage = "VP006 More than one Logical Adress with matching Riv-version found for serviceNamespace:"
-					+ vagvalInput.serviceNamespace + ", receiverId:" + vagvalInput.receiverId;
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
-
-		if (adress == null || adress.trim().length() == 0) {
-			String errorMessage = ("VP010 Physical Adress field is empty in Service Producer for serviceNamespace :"
-					+ vagvalInput.serviceNamespace
-					+ ", receiverId:"
-					+ vagvalInput.receiverId
-					+ "RivVersion" + vagvalInput.rivVersion);
-			logger.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
-		}
-
-		adress = "cxf:" + adress;
-
-		return adress;
-	}
-	
-	
-	private VisaVagvalRequest createVisaVagvalRequest(String senderId, String receiverId,
-			String tjansteGranssnitt) {
-		VisaVagvalRequest vvR = new VisaVagvalRequest();
-
-		vvR.setSenderId(senderId);
-
-		vvR.setReceiverId(receiverId);
-
-		vvR.setTjanstegranssnitt(tjansteGranssnitt);
-
-		XMLGregorianCalendar tidPunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		vvR.setTidpunkt(tidPunkt);
-
-		return vvR;
+		return VPUtil.getAddressToVirtualizedService(vagvalInput, virtualiseringar);
 	}
 }

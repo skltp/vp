@@ -70,8 +70,6 @@
 	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>
 
 	<custom-transformer name="createCorrId"  class="org.soitoolkit.commons.mule.log.correlationid.CreateCorrelationIdTransformer" />
-	<custom-transformer name="saveCorrId"    class="org.soitoolkit.commons.mule.log.correlationid.SaveCorrelationIdTransformer" />
-	<custom-transformer name="restoreCorrId" class="org.soitoolkit.commons.mule.log.correlationid.RestoreCorrelationIdTransformer" />
 
 	<custom-transformer name="objToXml" class="org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer">
 		<spring:property name="contextPath"  value="org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1"/>
@@ -81,8 +79,9 @@
 		<spring:property name="contextPath"  value="org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1" />
 	</custom-transformer>
 
-<!-- 		org.soitoolkit.commons.logentry.schema.v1:org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1"/> -->
-
+	<custom-transformer name="exceptionTransformer" class="se.skl.tp.vp.vagvalrouter.ExceptionTransformer"/>
+<!-- 	<custom-transformer name="createSoapFaultIfException" class="org.soitoolkit.commons.mule.soap.CreateSoapFaultIfExceptionTransformer"/> -->
+	
 	<custom-transformer name="mimeToStr" class="org.soitoolkit.commons.mule.mime.MimeToStringTransformer" />
 
     <custom-transformer name="logMsgIn" class="se.skl.tp.vp.util.LogTransformer">
@@ -115,18 +114,6 @@
 
     <custom-transformer name="logRespOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="resp-out"/>
-		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-    </custom-transformer>
-    
-    <custom-transformer name="logReqVagval" class="se.skl.tp.vp.util.LogTransformer">
-		<spring:property name="logType"  value="vagval-req-in"/>
-		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-    </custom-transformer>
-
-    <custom-transformer name="logRespVagval" class="se.skl.tp.vp.util.LogTransformer">
-		<spring:property name="logType"  value="vagval-resp-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
     </custom-transformer>

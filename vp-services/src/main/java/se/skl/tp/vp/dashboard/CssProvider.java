@@ -31,11 +31,10 @@ class CssProvider {
     private final String css;
 
     public CssProvider() throws IOException {
-    	css = null;
-//        css =
-//                FileCopyUtils.copyToString(new InputStreamReader(
-//                        Thread.currentThread().getContextClassLoader().getResourceAsStream(
-//                                "dashboard.css"), Charset.defaultCharset()));
+        css =
+                FileCopyUtils.copyToString(new InputStreamReader(
+                        Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                                "dashboard.css"), Charset.defaultCharset()));
     }
 
     public String getContent() {

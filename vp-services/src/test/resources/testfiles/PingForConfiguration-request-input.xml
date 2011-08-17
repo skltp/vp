@@ -1,4 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<sample xmlns="urn:org.soitoolkit.refapps.sd.sample.schema:v1">
-	<id>1234567890</id>
-</sample>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1">
+   <soapenv:Header>
+      <add:To>local-ping-producer</add:To>
+   </soapenv:Header>
+   <soapenv:Body>
+      <urn:PingForConfiguration>
+         <!--You may enter ANY elements at this point-->
+      </urn:PingForConfiguration>
+   </soapenv:Body>
+</soapenv:Envelope>

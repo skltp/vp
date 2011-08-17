@@ -63,7 +63,7 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 	
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
-		pattern = Pattern.compile(senderIdPropertyName + "=([^,]+)");
+		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
 	}
 	
 
@@ -169,10 +169,14 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
     			final String senderId = VPUtil.getSenderIdFromCertificate(message, this.pattern);
     			log.debug("Sender extracted from certificate {}", senderId);
     			
-    			evaluatedExtraInfo.put("senderId", senderId);
+    			evaluatedExtraInfo.put(VPUtil.SENDER_ID, senderId);
     		} catch (final VpSemanticException e) {
     			log.debug("Could not extract sender id from certificate.");
     		}
+    		
+    		evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID));
+    		evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION));
+    		evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE, (String) message.getProperty(VPUtil.SERVICE_NAMESPACE));
     		
     		switch (logLevel) {
 			case INFO:

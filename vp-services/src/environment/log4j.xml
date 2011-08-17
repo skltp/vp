@@ -25,7 +25,7 @@
 	-->
 
 	<logger name="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<level value="TRACE" />
+		<level value="INFO" />
 	</logger>
 
 	<logger name="org.springframework.core.io.support.PropertiesLoaderSupport">
@@ -55,6 +55,10 @@
 	
 	<logger name="se.skl.tp.vp">
 		<level value="INFO" />
+	</logger>
+	
+	<logger name="se.skl.tp.vp.util">
+		<level value="WARN" />
 	</logger>
 
 	<!-- Message logging -->

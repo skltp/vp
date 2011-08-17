@@ -21,7 +21,7 @@ public class JmsToLogEventTransformer extends AbstractTransformer {
 	protected Object doTransform(Object arg0, String arg1)
 			throws TransformerException {
 		
-		log.info("Transforming {} to log event object", arg0.getClass().getName());
+		log.debug("Transforming {} to log event object", arg0.getClass().getName());
 		
 		if (arg0 instanceof ActiveMQTextMessage) {
 			

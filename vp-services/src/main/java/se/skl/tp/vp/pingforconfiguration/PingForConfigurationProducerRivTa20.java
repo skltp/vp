@@ -25,12 +25,6 @@ import java.util.Date;
 
 import javax.jws.WebService;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 import org.w3.wsaddressing10.AttributedURIType;
 
 import se.riv.itintegration.monitoring.v1.PingForConfigurationResponderInterface;
@@ -43,10 +37,8 @@ import se.riv.itintegration.monitoring.v1.PingForConfigurationType;
 		portName = "PingForConfigurationResponderPort", 
 		targetNamespace = "urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20",
 		wsdlLocation = "schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl")
-public class PingForConfigurationProducerRiv20 implements PingForConfigurationResponderInterface {
+public class PingForConfigurationProducerRivTa20 implements PingForConfigurationResponderInterface {
 
-	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationProducerRiv20.class);
-	
 	public PingForConfigurationResponseType pingForConfiguration(final AttributedURIType logicalAddress, final PingForConfigurationType parameters) {
 		PingForConfigurationResponseType response = new PingForConfigurationResponseType();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddhhmmss");

@@ -33,8 +33,6 @@ import org.mule.api.lifecycle.InitialisationException;
 
 public class HtmlDashboard implements Callable, Initialisable {
 
-	private Map tresholdValues;
-
 	private int refreshPeriod = 60;
 
 	private HtmlDashboardRenderer htmlDashboardRenderer;
@@ -44,17 +42,6 @@ public class HtmlDashboard implements Callable, Initialisable {
 	public void setRefreshPeriod(final int refreshPeriod) {
 		this.refreshPeriod = refreshPeriod;
 	}
-
-//	public void initialise() throws InitialisationException {
-//		try {
-//			htmlDashboardRenderer = new HtmlDashboardRenderer(refreshPeriod);
-//			cssProvider = new CssProvider();
-//		} catch (final UnknownHostException uhe) {
-//			throw new InitialisationException(uhe, this);
-//		} catch (final IOException ioe) {
-//			throw new InitialisationException(ioe, this);
-//		}
-//	}
 	
 	public void initialise() throws InitialisationException {
 		try {
@@ -79,6 +66,7 @@ public class HtmlDashboard implements Callable, Initialisable {
 		return content;
 	}
 
+	@SuppressWarnings("unchecked")
 	private String getContentAndSetResponseContentType(final MuleEventContext eventContext)
 			throws Exception {
 

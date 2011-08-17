@@ -1,6 +1,5 @@
 package se.skl.tp.vp.logmanager;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,11 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.logentry.schema.v1.LogEntryType;
 import org.soitoolkit.commons.logentry.schema.v1.LogEntryType.ExtraInfo;
 import org.soitoolkit.commons.logentry.schema.v1.LogEvent;
-import org.soitoolkit.commons.logentry.schema.v1.LogMessageType;
-import org.soitoolkit.commons.logentry.schema.v1.LogMetadataInfoType;
 import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+
+import se.skl.tp.vp.util.VPUtil;
 
 
 public class LogManager implements Callable {
@@ -39,7 +38,9 @@ public class LogManager implements Callable {
 		
 		final Date ts = this.getDateFromLogEntry(logEvent);
 		final String logState = logEvent.getLogEntry().getMessageInfo().getMessage();
-		String msgId = logEvent.getLogEntry().getRuntimeInfo().getMessageId();
+		final String payload = logEvent.getLogEntry().getPayload();
+		
+		String msgId = logEvent.getLogEntry().getRuntimeInfo().getBusinessCorrelationId();
 		
 		/*
 		 * Create main request if it's a new request
@@ -49,72 +50,100 @@ public class LogManager implements Callable {
 			msgId = this.createMainRequestEntry(logEvent, muleMessage);
 		}
 		
+		String rivVersion = null;
+		final List<ExtraInfo> infos = logEvent.getLogEntry().getExtraInfo();
+		for (final ExtraInfo info : infos) {
+			if (info.getName().equalsIgnoreCase(VPUtil.RIV_VERSION)) {
+				rivVersion = info.getValue();
+				break;
+			}
+		}
+		
+		if (rivVersion == null) {
+			rivVersion = "";
+		}
+		
 		/*
 		 * Insert waypoint
 		 */
 		if (msgId != null) {
-			final String insertWaypoint = "insert into session_waypoint (waypoint, timestamp, request_xml, response_xml, response_xml_producer, session_id) values (" +
-					"?, ?, ?, ?, ?, ?)";
+			final String insertWaypoint = "insert into session_waypoint (waypoint, timestamp, payload, session_id, riv_version) values (" +
+					"?, ?, ?, ?, ?)";
 			
-			int waypoint = this.jdbcTemplate.update(insertWaypoint, new Object[] { logState, ts.getTime(), null, null, null, msgId});
+			int waypoint = this.jdbcTemplate.update(insertWaypoint, new Object[] { logState, ts.getTime(), payload, msgId, rivVersion});
 			if (waypoint == 1) {
-				log.info("Inserted waypoint entry for msgId {}", msgId);
+				log.debug("Inserted waypoint entry for msgId {}", msgId);
 			}
 		} else {
 			log.error("Could not insert waypoint record because no log request entry could be found. Log event is: {}", logEvent);
 		}
 		
+		/*
+		 * Handle update of receiver, sender etc
+		 */
+		log.debug("Updating main request values...");
+		this.updateMainRequest(logEvent.getLogEntry(), msgId);
+		log.debug("Done updating values.");
+		
 		return logEvent;
+	}
+	
+	void updateMainRequest(final LogEntryType msg, final String msgId) {
+		this.updateField(VPUtil.SERVICE_NAMESPACE, "contract", msg, msgId);
+		this.updateField(VPUtil.RECEIVER_ID, "receiver", msg, msgId);
+		this.updateField(VPUtil.SENDER_ID, "sender_id", msg, msgId);
+	}
+	
+	void updateField(final String item, final String column, final LogEntryType msg, final String msgId) {
+		
+		final String sql = "select " + column + " from session where session_id='" + msgId + "'";
+		final String updateSql = "update session set " + column + " = ? where session_id = '" + msgId + "'";
+		
+		String value = null;
+		for (final ExtraInfo s : msg.getExtraInfo()) {
+			if (s.getName().equals(item)) {
+				value = s.getValue();
+				break;
+			}
+		}
+		
+		log.trace("Checking property {}. Value was {}.", new Object[] { item, value});
+		if (value != null) {
+			final String currentContract = this.jdbcTemplate.queryForObject(sql, String.class);
+			
+			if ((currentContract == null) || (!currentContract.equals(value)) ){
+				log.trace("Updating main request value ({}). Previous: {}, New: {}", new Object[] {item, currentContract, value});
+				this.jdbcTemplate.update(updateSql, value);
+				
+				return;
+			}
+		}
+	}
+	
+	boolean isWhitespace(final String s) {
+		if (s == null) {
+			return true;
+		}
+		
+		final String s2 = s.trim();
+		return s2.length() == 0 && s2.equals("");
 	}
 	
 	String createMainRequestEntry(final LogEvent logEvent, final MuleMessage msg) throws URISyntaxException {
 		final LogEntryType logEntry = logEvent.getLogEntry();
-		final LogMessageType msgType = logEntry.getMessageInfo();
-		final LogMetadataInfoType msgMeta = logEntry.getMetadataInfo();
 		final LogRuntimeInfoType msgRt = logEntry.getRuntimeInfo();
 		
-		final String endpoint = msgMeta.getEndpoint();
-		final String msgId = msgRt.getMessageId();
-		final String logState = msgType.getMessage();
+		final String msgId = msgRt.getBusinessCorrelationId();
 		
 		final Date ts = this.getDateFromLogEntry(logEvent);
 		
-		final URI uri = new URI(endpoint);
-		final String ctxPath = uri.getPath();
-		
-		final String[] split = ctxPath.split("/");
-		
 		/*
-		 * [0] =
-		 * [1] = vp
-		 * [2] = contract
-		 * [3] = version
-		 * [4] = riv_version
-		 */
-		String contract = "";
-		String rivVersion = "";
-		if (split.length == 5) {
-			contract = split[2];
-			rivVersion = split[4];
-		}
-		
-		/*
-		 * Get senderId
+		 * Blank these fields initially and let them
+		 * be updated by waypoint entries
 		 */
 		String senderId = "";
-		final List<ExtraInfo> infos = logEntry.getExtraInfo();
-		for (final ExtraInfo ei : infos) {
-			if (ei.getName().equals("senderId")) {
-				senderId = ei.getValue();
-			}
-		}
-		log.debug("SENDER_ID: {}", senderId);
-		
-		/*
-		 * Get receiver (riv:LogicalAddress or wsa:To)
-		 */
-		final String receiver = "";
-		
+		String receiver = "";
+		String contract = "";
 		
 		/*
 		 * Find out whether we must insert a new main
@@ -122,13 +151,13 @@ public class LogManager implements Callable {
 		 */
 		try {
 			final String find = "select session_id from session where session_id=?";
-			final String result = this.jdbcTemplate.queryForObject(find, String.class, msgId);
+			this.jdbcTemplate.queryForObject(find, String.class, msgId);
 		} catch (final DataAccessException e) {
 			/*
 			 * Insert new request record
 			 */
-			final String insertRequest = "insert into session (session_id, sender_id, riv_version, contract, receiver, timestamp) values (?,?,?,?,?,?)";
-			int update = this.jdbcTemplate.update(insertRequest, new Object[] {msgId, senderId, rivVersion, contract, "12345", ts.getTime()});
+			final String insertRequest = "insert into session (session_id, sender_id, contract, receiver, timestamp) values (?,?,?,?,?)";
+			int update = this.jdbcTemplate.update(insertRequest, new Object[] {msgId, senderId, contract, receiver, ts.getTime()});
 			if (update != 1) {
 				log.warn("Could not insert main request entry.");
 			}
@@ -166,7 +195,7 @@ public class LogManager implements Callable {
 	@Override
 	public Object onCall(MuleEventContext arg0) throws Exception {
 		final Object payload = arg0.getMessage().getPayload();
-		log.info("Log manager received request about storing log event into database");
+		log.debug("Log manager received request about storing log event into database");
 		
 		this.storeLogEventInDatabase((LogEvent) payload, arg0.getMessage());
 		return payload;
