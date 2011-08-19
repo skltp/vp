@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.mortbay.log.Log;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -98,8 +97,6 @@ public class VagvalRouter extends AbstractRecipientList {
 	 */
 	@Override
 	public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException {
-
-		Log.info("RIV VERSION IN ROUTER {}", message.getProperty(VPUtil.RIV_VERSION));
 		
 		String receiverId = VPUtil.getReceiverId(message);
 		message.setProperty(VPUtil.RECEIVER_ID, receiverId);

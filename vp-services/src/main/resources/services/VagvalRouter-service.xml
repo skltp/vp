@@ -32,7 +32,7 @@
 	
 		<service name="VagvalRouter-service">
             <inbound>
-				<inbound-endpoint address="vm://vagval-router" synchronous="true" transformer-refs="rivTransformer logReqOut" responseTransformer-refs="exceptionTransformer logRespOut" />
+				<inbound-endpoint address="vm://vagval-router" synchronous="true" transformer-refs="createCorrId logReqIn rivTransformer logReqOut" responseTransformer-refs="logRespOut exceptionTransformer logRespIn" />
             </inbound>
 
 			<outbound>

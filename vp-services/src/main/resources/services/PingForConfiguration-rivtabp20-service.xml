@@ -19,7 +19,7 @@
 		<service name="PingForConfiguration-rivtabp20-service">
             <inbound>
                 <cxf:inbound-endpoint 
-                	address="https://${tp.host}:23001/${tp.baseUri}/PingForConfiguration/1/rivtabp20"
+                	address="https://${tp.host}:${PINGFORCONFIGURATIONSERVICE_RIVTABP20_PORT}/${tp.baseUri}/${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_URI}"
                     wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl"
                     serviceName="PingForConfigurationResponderService"
                     namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"                 
