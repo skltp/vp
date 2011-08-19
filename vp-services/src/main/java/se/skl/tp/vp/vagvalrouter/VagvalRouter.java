@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.xml.namespace.QName;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -81,13 +83,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		List<String> list = new ArrayList<String>();
 		list.add(address);
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("VagvalRouter directs call at serviceNamespace: "
-					+ message.getProperty(VPUtil.SERVICE_NAMESPACE) + ", receiverId: "
+		//if (logger.isDebugEnabled()) {
+			logger.info("VagvalRouter directs call at serviceNamespace: "
+					+ VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)) + ", receiverId: "
 					+ message.getProperty(VPUtil.RECEIVER_ID) + ", senderId: "
 					+ message.getProperty(VPUtil.SENDER_ID) + " rivVersion: "
 					+ message.getProperty(VPUtil.RIV_VERSION) + "to adress: " + address);
-		}
+		//}
 		return list;
 	}
 
@@ -98,11 +100,11 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException {
 		
-		String receiverId = VPUtil.getReceiverId(message);
+		final String receiverId = VPUtil.getReceiverId(message);
 		message.setProperty(VPUtil.RECEIVER_ID, receiverId);
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = message.getProperty(VPUtil.SERVICE_NAMESPACE) + "-"
+		String serviceId = VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)) + "-"
 				+ message.getProperty(VPUtil.RECEIVER_ID);
 
 		synchronized (statistics) {

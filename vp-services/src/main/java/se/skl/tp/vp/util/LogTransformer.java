@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import javax.xml.namespace.QName;
+
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
@@ -176,7 +178,7 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
     		
     		evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID));
     		evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION));
-    		evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE, (String) message.getProperty(VPUtil.SERVICE_NAMESPACE));
+    		evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE, VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)));
     		
     		switch (logLevel) {
 			case INFO:

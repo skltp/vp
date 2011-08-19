@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -90,11 +91,14 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 		 * Check if virtualized service is a
 		 * 2.0 service
 		 */
-		final String tns = (String) msg.getProperty(VPUtil.SERVICE_NAMESPACE);
-		final String[] split = tns.split(":");
-		final String rivVersion = split[split.length - 1];
+		String rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION);
+		if (rivVersion == null || rivVersion.equals("")) {
+			final String tns = VPUtil.extractNamespaceFromService((QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE));
+			final String[] split = tns.split(":");
+			
+			rivVersion = split[split.length - 1];
+		}
 		
-		log.info("SETTING RIV VERSION TO {}", rivVersion.toUpperCase());
 		msg.setProperty(VPUtil.RIV_VERSION, rivVersion.toUpperCase());
 		
 		/*

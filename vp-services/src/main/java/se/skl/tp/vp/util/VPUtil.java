@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -33,7 +34,11 @@ public final class VPUtil {
 	public static String RECEIVER_ID = "receiverid";
 	public static String SENDER_ID = "senderid";
 	public static String RIV_VERSION = "rivversion";
-	public static String SERVICE_NAMESPACE = "namespace";
+	public static String SERVICE_NAMESPACE = "cxf_service";
+	
+	public static String extractNamespaceFromService(final QName qname) {
+		return qname.getNamespaceURI();
+	}
 	
 	/**
 	 * Returns the elements from the RIV Header that are required by the
@@ -219,7 +224,7 @@ public final class VPUtil {
 
 		vagvalInput.receiverId = (String) msg.getProperty(VPUtil.RECEIVER_ID);
 		vagvalInput.rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION);
-		vagvalInput.serviceNamespace = (String) msg.getProperty(VPUtil.SERVICE_NAMESPACE);
+		vagvalInput.serviceNamespace = VPUtil.extractNamespaceFromService((QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE));
 		
 		return vagvalInput;
 	}
