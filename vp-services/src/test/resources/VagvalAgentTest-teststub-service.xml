@@ -19,7 +19,7 @@
 	<spring:bean name="vagvalInputs" class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput" />
 
 	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
-		<spring:property name="endpointAddress" value="http://localhost:8080/tp-vagval-admin-services/SokVagvalsInfo" />
+		<spring:property name="endpointAddress" value="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
 		<spring:property name="addressDelimiter" value="#" />
 	</spring:bean>
 
@@ -31,7 +31,7 @@
 		<service name="SokVagvalsInfoStubService">
 			<inbound>
 				<cxf:inbound-endpoint
-					address="http://localhost:8080/tp-vagval-admin-services/SokVagvalsInfo"
+					address="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo"
 					wsdlLocation="classpath:/schemas/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-1.0.wsdl" />
 			</inbound>
 			<component>
