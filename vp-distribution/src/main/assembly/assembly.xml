@@ -7,13 +7,11 @@
 		<format>tar.gz</format>
 		<!-- format>zip</format -->
 	</formats>
-	<files>
-		<file>
-			<source>src/resources/wrapper.conf</source>
-			<outputDirectory>conf</outputDirectory>
-		</file>
-	</files>
 	<fileSets>
+		<fileSet>
+			<directory>src/resources</directory>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}/bundle</directory>
 			<outputDirectory>lib/user</outputDirectory>
