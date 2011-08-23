@@ -66,6 +66,8 @@
 			<spring:property name="vagvalAgent" ref="vagvalAgent"/>	
 		</spring:bean>
     </spring:beans>
+    
+    <custom-transformer name="fixTransformer" class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
 
 	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>
 

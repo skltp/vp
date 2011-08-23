@@ -15,37 +15,26 @@
 		http://www.mulesource.org/schema/mule/jms/2.2   http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
 		http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2 http://dist.muleforge.org/smooks/schema/mule-module-smooks/1.2/mule-module-smooks.xsd
 	">
-	
-	<spring:beans>
-		<spring:bean id="tpadmin-dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-			<spring:property name="url" value="jdbc:mysql://${GETSUPPORTEDSERVICECONTRACTS_DB_HOST}:${GETSUPPORTEDSERVICECONTRACTS_DB_PORT}/${GETSUPPORTEDSERVICECONTRACTS_DB_NAME}" />
-			<spring:property name="username" value="${GETSUPPORTEDSERVICECONTRACTS_DB_USER}"/>
-			<spring:property name="password" value="${GETSUPPORTEDSERVICECONTRACTS_DB_PASSWORD}"/>
-		</spring:bean>
-	</spring:beans>
 
 	<model name="GetSupportedServiceContracts-model">
 	
 		<service name="GetSupportedServiceContracts-service-rivtabp21">
-            <inbound>
-                <cxf:inbound-endpoint 
-                	address="https://${tp.host}:${tp.port}/${tp.baseUri}/GetSupportedServiceContracts/1/rivtabp21"
-                    wsdlLocation="classpath:/schemas/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
-                    serviceName="GetSupportedServiceContractsResponderService"
-                    namespace="urn:riv:itintegration:registry:GetSupportedServiceContracts:1:rivtabp21"                 
-                    proxy="false"
-                    synchronous="true"
-                    applyTransformersToProtocol="false"
-                />
- 
- 				<!-- Removed createSoapFault... transformer. Turn this on later... -->
- 
-            </inbound>
-            <component>
-            	<singleton-object class="se.skl.tp.vp.getsupportedservicecontracts.GetSupportedServiceContractsImpl">
-            		<property key="dataSource" value-ref="tpadmin-dataSource"/>
-            	</singleton-object>
-            </component>
+			<inbound>
+				<cxf:inbound-endpoint address="https://${tp.host}:${tp.port}/${tp.baseUri}/GetSupportedServiceContracts/1/rivtabp21"
+					proxy="true" 
+					synchronous="true" 
+					wsdlLocation="classpath:/schemas/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
+					serviceName="GetSupportedServiceContractsResponderService"
+					namespace="urn:riv:itintegration:registry:GetSupportedServiceContracts:1:rivtabp21"
+					/>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<cxf:outbound-endpoint address="http://${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_HOST}:${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_PORT}/${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_URI}"
+						proxy="true" synchronous="true" />
+				</pass-through-router>
+			</outbound>
+
 		</service>
 		
 	</model>
