@@ -1,0 +1,17 @@
+<assembly>
+  <id>bin</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+  	<fileSet>
+  		<directory>resources/conf</directory>
+  		<outputDirectory>conf</outputDirectory>
+  	</fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/bundle</directory>
+      <outputDirectory>lib/user</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>
