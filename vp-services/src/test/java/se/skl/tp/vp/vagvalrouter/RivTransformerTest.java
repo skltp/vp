@@ -27,6 +27,22 @@ public class RivTransformerTest extends TestCase {
 		
 		this.transformer = new RivTransformer();
 	}
+	
+	public void testRiv21To20Transformer() throws Exception {
+		final URL resource = Thread.currentThread().getContextClassLoader().getResource("testfiles/PingForConfiguration-request-rivtabp21-input.xml");
+		final XMLStreamReader xstream = XMLInputFactory.newInstance().createXMLStreamReader(resource.openStream());
+		
+		final URL resultFile = Thread.currentThread().getContextClassLoader().getResource("testfiles/PingForConfiguration-expected-rivtabp20-result.xml");
+		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
+		
+		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream)
+		, RivTransformer.RIV21_NS
+		, RivTransformer.RIV20_NS
+		, RivTransformer.RIV21_ELEM
+		, RivTransformer.RIV20_ELEM);
+		
+		this.executeComparison(data, expected);
+	}
 
 	public void testRiv20To21Transformer() throws Exception {
 		final URL resource = Thread.currentThread().getContextClassLoader().getResource("testfiles/PingForConfiguration-request-input.xml");
@@ -36,12 +52,18 @@ public class RivTransformerTest extends TestCase {
 		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
 		
 		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream)
-			, RivTransformer.RIV20_NS
-			, RivTransformer.RIV21_NS
-			, RivTransformer.RIV20_ELEM
-			, RivTransformer.RIV21_ELEM);
+		, RivTransformer.RIV20_NS
+		, RivTransformer.RIV21_NS
+		, RivTransformer.RIV20_ELEM
+		, RivTransformer.RIV21_ELEM);
 		
-		final XMLEventReader result = XMLInputFactory.newInstance().createXMLEventReader(new ByteArrayInputStream(data.toByteArray()));
+		this.executeComparison(data, expected);
+		
+	}
+	
+	private void executeComparison(final ByteArrayOutputStream transformed, final XMLEventReader expected) throws Exception {
+		
+		final XMLEventReader result = XMLInputFactory.newInstance().createXMLEventReader(new ByteArrayInputStream(transformed.toByteArray()));
 		
 		System.out.println("Comparing xml results");
 		while (expected.hasNext()) {
@@ -59,7 +81,9 @@ public class RivTransformerTest extends TestCase {
 				assertEquals(se1.getName().getPrefix(), se2.getName().getPrefix());
 				assertEquals(se1.getName().getNamespaceURI(), se2.getName().getNamespaceURI());
 				
+				@SuppressWarnings("rawtypes")
 				final Iterator ns1 = se1.getNamespaces();
+				@SuppressWarnings("rawtypes")
 				final Iterator ns2 = se2.getNamespaces();
 				
 				while (ns1.hasNext()) {
@@ -74,7 +98,6 @@ public class RivTransformerTest extends TestCase {
 				}
 			}
 			
-			
 			if (e1.isEndElement()) {
 				
 				final EndElement ee1 = e1.asEndElement();
@@ -85,9 +108,7 @@ public class RivTransformerTest extends TestCase {
 				assertEquals(ee1.getName().getLocalPart(), ee2.getName().getLocalPart());
 				assertEquals(ee1.getName().getPrefix(), ee2.getName().getPrefix());
 				assertEquals(ee1.getName().getNamespaceURI(), ee2.getName().getNamespaceURI());
-				
 			}
 		}
-		
 	}
 }
