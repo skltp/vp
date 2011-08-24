@@ -98,7 +98,52 @@
 									<version>1.0</version>
 								</artifactItem>
 							</artifactItems>
+							<outputDirectory>${project.build.directory}/bundle/lib</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+				</configuration>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
 							<outputDirectory>${project.build.directory}/bundle</outputDirectory>
+							<resources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>src/resources</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-vp-configuration-files</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/bundle/vp-config</outputDirectory>
+							<resources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>../vp-services/src/environment</directory>
+									<includes>
+										<include>vp-config.properties</include>
+										<include>vp-security.properties</include>
+									</includes>
+								</resource>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>
@@ -107,7 +152,9 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.2.1</version>
 				<configuration>
-					<descriptor>src/main/assembly/assembly.xml</descriptor>
+					<descriptors>
+						<descriptor>src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
 				</configuration>
 				<executions>
 					<execution>

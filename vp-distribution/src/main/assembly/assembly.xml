@@ -8,12 +8,8 @@
 	</formats>
 	<fileSets>
 		<fileSet>
-			<directory>src/resources</directory>
-			<outputDirectory>conf</outputDirectory>
-		</fileSet>
-		<fileSet>
 			<directory>${project.build.directory}/bundle</directory>
-			<outputDirectory>lib/user</outputDirectory>
+			<outputDirectory></outputDirectory>
 		</fileSet>
 	</fileSets>
 </assembly>
