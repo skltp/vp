@@ -53,6 +53,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	</modules>
 	
 	<build>
+		<finalName>${project.artifactId}-${project.version}-${buildNumber}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -72,11 +73,13 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 						<id>create-build-number</id>
 						<phase>validate</phase>
 						<goals>
-							<goal>create-timestamp</goal>
+							<goal>create</goal>
 						</goals>
 						<configuration>
-							<doCheck>true</doCheck>
-							<doUpdate>true</doUpdate>
+							<format>{0,date,yyyyMMddHHmmss}</format>
+							<items>
+								<item>timestamp</item>
+							</items>
 						</configuration>
 					</execution>
 				</executions>
