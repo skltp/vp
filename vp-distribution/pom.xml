@@ -85,12 +85,12 @@
 								<artifactItem>
 									<groupId>se.skl.tp</groupId>
 									<artifactId>vagval-schemas</artifactId>
-									<version>1.3.0-SNAPSHOT</version>
+									<version>1.0</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>se.skl.tp</groupId>
 									<artifactId>getsupportedservicecontracts-schemas</artifactId>
-									<version>1.3.0-SNAPSHOT</version>
+									<version>1.0</version>
 								</artifactItem>
 								<artifactItem>
 									<groupId>se.skl.tp</groupId>
