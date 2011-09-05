@@ -59,8 +59,14 @@ public class VagvalRouter extends AbstractRecipientList {
 	private Pattern pattern;
 
 	private String senderIdPropertyName;
+	
+	private String httpsConsumerConnectorName;
 
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
+
+	public void setHttpsConsumerConnectorName(String httpsConsumerConnectorName) {
+		this.httpsConsumerConnectorName = httpsConsumerConnectorName;
+	}
 
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
@@ -163,6 +169,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		HashMap<String, String> properties = new HashMap<String, String>();
 		properties.put("proxy", "true");
 		properties.put("payload", "envelope");
+		properties.put("protocolConnector", httpsConsumerConnectorName);
 		eb.setProperties(properties);
 
 		try {
