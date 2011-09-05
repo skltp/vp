@@ -33,6 +33,7 @@
 				<custom-outbound-router class="se.skl.tp.vp.vagvalrouter.VagvalRouter">
 					<spring:property name="vagvalAgent" ref="vagvalAgent" />
 					<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+					<spring:property name="httpsConsumerConnectorName" value="${VAGVALROUTER_HTTPSCONSUMERCONNECTORNAME}" />
 				</custom-outbound-router>
 			</outbound>     
 		</service>
