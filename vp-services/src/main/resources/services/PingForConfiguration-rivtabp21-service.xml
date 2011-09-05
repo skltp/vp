@@ -29,6 +29,7 @@
                     applyTransformersToProtocol="false"
                     transformer-refs="createCorrId logReqIn"
                     responseTransformer-refs="logRespIn"
+					protocolConnector="VPProducerConnector"
                 />
             </inbound>
 			<component>

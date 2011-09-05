@@ -26,6 +26,7 @@
 					wsdlLocation="classpath:/schemas/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
 					serviceName="GetSupportedServiceContractsResponderService"
 					namespace="urn:riv:itintegration:registry:GetSupportedServiceContracts:1:rivtabp21"
+					protocolConnector="VPProducerConnector"
 					/>
 			</inbound>
 			<outbound>
