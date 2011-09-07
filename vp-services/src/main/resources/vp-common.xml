@@ -76,6 +76,11 @@
 		</spring:bean>
     </spring:beans>
     
+    <configuration>
+		<default-dispatcher-threading-profile maxThreadsActive=${TP_DISPATCH_MAX_THREADS_ACTIVE} maxThreadsIdle=${TP_DISPATCH_MAX_THREADS_IDLE} threadTTL=${TP_DISPATCH_MAX_THREADS_TTL}/>
+		<default-receiver-threading-profile maxThreadsActive=${TP_RECEIVE_MAX_THREADS_ACTIVE} maxThreadsIdle=${TP_RECEIVE_MAX_THREADS_IDLE} threadTTL=${TP_RECEIVE_MAX_THREADS_TTL}/>
+	</configuration>
+    
     <custom-transformer name="fixTransformer" class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
 
 	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>
