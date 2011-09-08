@@ -63,6 +63,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	private String httpsConsumerConnectorName;
 
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
+	
+	private boolean isHttps = true;
 
 	public void setHttpsConsumerConnectorName(String httpsConsumerConnectorName) {
 		this.httpsConsumerConnectorName = httpsConsumerConnectorName;
@@ -169,7 +171,9 @@ public class VagvalRouter extends AbstractRecipientList {
 		HashMap<String, String> properties = new HashMap<String, String>();
 		properties.put("proxy", "true");
 		properties.put("payload", "envelope");
-		properties.put("protocolConnector", httpsConsumerConnectorName);
+		if (isHttps) {
+			properties.put("protocolConnector", httpsConsumerConnectorName);
+		}
 		eb.setProperties(properties);
 
 		try {
@@ -190,7 +194,11 @@ public class VagvalRouter extends AbstractRecipientList {
 	 */
 	String getAddress(MuleMessage message) {
 		VagvalInput vagvalInput = VPUtil.createRequestToServiceDirectory(message, this.pattern);
-		return getAddressFromAgent(vagvalInput);
+		String address = getAddressFromAgent(vagvalInput);
+		if (address.contains("http://")) {
+			isHttps = false;
+		}
+		return address;
 	}
 
 	/**
