@@ -16,17 +16,22 @@
 		http://www.mulesource.org/schema/mule/jms/2.2   http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
 		http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2 http://dist.muleforge.org/smooks/schema/mule-module-smooks/1.2/mule-module-smooks.xsd
 	">
-	
-    <custom-transformer name="rivTransformer" class="se.skl.tp.vp.vagvalrouter.RivTransformer">
-    	<spring:property name="vagvalAgent" ref="vagvalAgent" />
-    	<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-    </custom-transformer>
 
 	<model name="VagvalRouter-model">
 	
 		<service name="VagvalRouter-service">
             <inbound>
-				<inbound-endpoint address="vm://vagval-router" synchronous="true" transformer-refs="createCorrId fixTransformer logReqIn rivTransformer logReqOut" responseTransformer-refs="logRespOut exceptionTransformer logRespIn" />
+				<inbound-endpoint address="vm://vagval-router" synchronous="true" responseTransformer-refs="logRespOut exceptionTransformer logRespIn">
+					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
+					<transformer ref="createCorrId"/>
+					<transformer ref="fixTransformer" />
+					<transformer ref="logReqIn" />
+					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivTransformer">
+						<spring:property name="vagvalAgent" ref="vagvalAgent" />
+						<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+					</custom-transformer>
+					<transformer ref="logReqOut" />
+				</inbound-endpoint>
             </inbound>
 
 			<outbound>

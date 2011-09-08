@@ -26,9 +26,8 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	<name>vp</name>
 
 	<scm>
-		<connection>scm:svn:https://my-subversion-server/svn/vp/trunk</connection>
-		<developerConnection>scm:svn:https://my-subversion-server/svn/vp/trunk</developerConnection>
-		<url>https://my-subversion-server/svn/vp/trunk</url>
+		<connection>scm:svn:https://svn.forge.osor.eu/svn/skltp/tp/vp/trunk</connection>
+		<developerConnection>scm:svn:https://svn.forge.osor.eu/svn/skltp/tp/vp/trunk</developerConnection>
 	</scm>
 	
 	<distributionManagement>
@@ -84,6 +83,39 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Build>${buildNumber}</Implementation-Build>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Build>${buildNumber}</Implementation-Build>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			
 		</plugins>
 	</build>
 

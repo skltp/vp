@@ -77,14 +77,15 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 	public void setSenderIdPropertyName(final String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
 		this.pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
-		if (logger.isInfoEnabled()) {
-			logger.info("senderIdPropertyName set to: " + senderIdPropertyName);
+		if (logger.isDebugEnabled()) {
+			logger.debug("senderIdPropertyName set to: " + senderIdPropertyName);
 		}
 	}
 
 	@Override
 	public Object transform(MuleMessage msg, String encoding)
 			throws TransformerException {
+		
 		log.info("Riv transformer executing");
 		
 		/*
