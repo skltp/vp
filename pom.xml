@@ -6,10 +6,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 [soi-toolkit.gen.createDate=2011-06-30T14:55:14.006+02:00]
 [soi-toolkit.gen.artifactId=vp]
 -->
-<project 
-	xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -21,14 +18,15 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	
 	<groupId>se.skl.tp</groupId>
 	<artifactId>vp</artifactId>
-	<version>1.4.0-SNAPSHOT</version>
+	<version>1.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>vp</name>
 
 	<scm>
-		<connection>scm:svn:https://svn.forge.osor.eu/svn/skltp/tp/vp/trunk</connection>
-		<developerConnection>scm:svn:https://svn.forge.osor.eu/svn/skltp/tp/vp/trunk</developerConnection>
-	</scm>
+		<connection>scm:svn:https://svn.forge.osor.eu/svn/skltp/tp/vp/branches/vp-1.3.0-RB</connection>
+		<developerConnection>scm:svn:https://svn.forge.osor.eu/svn/skltp/tp/vp/branches/vp-1.3.0-RB</developerConnection>
+	  <url>http://svn.sonatype.org/spice/branches/vp-1.3.0-RB</url>
+  </scm>
 	
 	<distributionManagement>
         <snapshotRepository>
