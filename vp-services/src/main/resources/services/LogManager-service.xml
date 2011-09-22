@@ -17,10 +17,15 @@
 	">
 	
 	<spring:beans>
-		<spring:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<spring:bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 			<spring:property name="url" value="jdbc:mysql://${LOGMANAGER_DB_HOST}:${LOGMANAGER_DB_PORT}/${LOGMANAGER_DB_NAME}" />
 			<spring:property name="username" value="${LOGMANAGER_DB_USER}"/>
 			<spring:property name="password" value="${LOGMANAGER_DB_PASSWORD}"/>
+			<spring:property name="initialSize" value="${LOGMANAGER_POOL_INITIALIZE}" />
+			<spring:property name="maxActive" value="${LOGMANAGER_POOL_MAX_ACTIVE}" />
+			<spring:property name="maxIdle" value="${LOGMANAGER_POOL_MAX_IDLE}" />
+			<spring:property name="minIdle" value="${LOGMANAGER_POOL_MIN_IDLE}" />
+			<spring:property name="maxWait" value="${LOGMANAGER_POOL_MAX_WAIT}" />
 		</spring:bean>
 	</spring:beans>
 	
