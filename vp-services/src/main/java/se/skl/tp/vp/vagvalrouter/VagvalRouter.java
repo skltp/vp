@@ -60,14 +60,14 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private String senderIdPropertyName;
 	
-	private String httpsConsumerConnectorName;
+	private String responseTimeout;
 
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 	
 	private static final String IS_HTTPS = "isHttps";
 	
-	public void setHttpsConsumerConnectorName(String httpsConsumerConnectorName) {
-		this.httpsConsumerConnectorName = httpsConsumerConnectorName;
+	public void setResponseTimeout(final String responseTimeout) {
+		this.responseTimeout = responseTimeout;
 	}
 
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
@@ -91,13 +91,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		List<String> list = new ArrayList<String>();
 		list.add(address);
 
-		//if (logger.isDebugEnabled()) {
-			logger.info("VagvalRouter directs call at serviceNamespace: "
+		if (logger.isDebugEnabled()) {
+			logger.debug("VagvalRouter directs call at serviceNamespace: "
 					+ VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)) + ", receiverId: "
 					+ message.getProperty(VPUtil.RECEIVER_ID) + ", senderId: "
 					+ message.getProperty(VPUtil.SENDER_ID) + " rivVersion: "
 					+ message.getProperty(VPUtil.RIV_VERSION) + "to adress: " + address);
-		//}
+		}
 		return list;
 	}
 
@@ -168,11 +168,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder((String) recipient),
 				muleContext);
 		eb.setSynchronous(true);
+		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
+		
 		HashMap<String, String> properties = new HashMap<String, String>();
 		properties.put("proxy", "true");
 		properties.put("payload", "envelope");
 		if (message.getBooleanProperty(IS_HTTPS, false)) {
-			properties.put("protocolConnector", httpsConsumerConnectorName);
+			properties.put("protocolConnector", VPUtil.CONSUMER_CONNECTOR_NAME);
 			logger.debug("Https protocolConnector set");
 		}
 		eb.setProperties(properties);

@@ -50,6 +50,8 @@ import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
 import se.skl.tp.vp.util.VPUtil;
 
 /**
+ * Transforms messages between RIVTABP20 and RIVTABP21 and
+ * vice versa.
  * 
  * @author Marcus Krantz [marcus.krantz@callistaenterprise.se]
  */

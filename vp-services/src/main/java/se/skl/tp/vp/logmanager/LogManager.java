@@ -1,3 +1,19 @@
+/* 
+ * Licensed to the soi-toolkit project under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The soi-toolkit project licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package se.skl.tp.vp.logmanager;
 
 import java.net.URISyntaxException;
@@ -22,7 +38,11 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import se.skl.tp.vp.util.VPUtil;
 
-
+/**
+ * 
+ * @author Marcus Krantz [marcus.krantz@callistaenterpris.se]
+ *
+ */
 public class LogManager implements Callable {
 
 	private final static Logger log = LoggerFactory.getLogger(LogManager.class);
@@ -30,8 +50,12 @@ public class LogManager implements Callable {
 	private SimpleJdbcTemplate jdbcTemplate;
 	
 	public void setDataSource(final DataSource dataSource) {
-		log.info("DataSource set.");
+		log.debug("DataSource set.");
 		this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	}
+	
+	void setJdbcTemplate(final SimpleJdbcTemplate template) {
+		this.jdbcTemplate = template;
 	}
 	
 	public synchronized LogEvent storeLogEventInDatabase(final LogEvent logEvent, final MuleMessage muleMessage) throws Exception {
@@ -45,23 +69,15 @@ public class LogManager implements Callable {
 		/*
 		 * Create main request if it's a new request
 		 */
-		boolean requestExists = this.mainRequestExists(msgId);
+		final boolean requestExists = this.mainRequestExists(msgId);
 		if (!requestExists) {
 			msgId = this.createMainRequestEntry(logEvent, muleMessage);
 		}
 		
-		String rivVersion = null;
-		final List<ExtraInfo> infos = logEvent.getLogEntry().getExtraInfo();
-		for (final ExtraInfo info : infos) {
-			if (info.getName().equalsIgnoreCase(VPUtil.RIV_VERSION)) {
-				rivVersion = info.getValue();
-				break;
-			}
-		}
-		
-		if (rivVersion == null) {
-			rivVersion = "";
-		}
+		/*
+		 * find the RIV version
+		 */
+		final String rivVersion = this.getRivVersionFromLogEntry(logEvent);
 		
 		/*
 		 * Insert waypoint
@@ -85,13 +101,79 @@ public class LogManager implements Callable {
 		this.updateMainRequest(logEvent.getLogEntry(), msgId);
 		log.debug("Done updating values.");
 		
+		/*
+		 * Delete payload if we are successful
+		 */
+		final boolean success = this.isSessionSuccess(logState, logEvent);
+		if (success) {
+			
+			/*
+			 * This deletetion may not delete all waypoint entries due
+			 * to synchronization. I.e the log event for the response on the
+			 * inbound endpoint may be processed before the response on the
+			 * outbound for example.
+			 * 
+			 * There should be an external job that deletes the payload for
+			 * successful sessions on a regular basis. But this is good enough
+			 * for now.
+			 */
+			log.debug("Deleting payload for message {} since the session was successful.", msgId);
+			this.deletePayloadForMessageId(msgId);
+		}
+		
 		return logEvent;
+	}
+	
+	private void deletePayloadForMessageId(final String msgId) {
+		final String sql = "update session_waypoint set payload = '' where session_id=?";
+		this.jdbcTemplate.update(sql, msgId);
+	}
+	
+	private String getRivVersionFromLogEntry(final LogEvent logEvent) {
+		String rivVersion = null;
+		final List<ExtraInfo> infos = logEvent.getLogEntry().getExtraInfo();
+		for (final ExtraInfo info : infos) {
+			if (info.getName().equalsIgnoreCase(VPUtil.RIV_VERSION)) {
+				rivVersion = info.getValue();
+				
+			}
+		}
+		
+		if (rivVersion == null) {
+			rivVersion = "";
+		}
+		
+		return rivVersion;
+	}
+	
+	private boolean isSessionSuccess(final String waypoint, final LogEvent logEvent) {
+		if (waypoint.equals("resp-in")) {
+			
+			final List<ExtraInfo> infos = logEvent.getLogEntry().getExtraInfo();
+			String error = null;
+			for (final ExtraInfo info : infos) {
+				if (info.getName().equalsIgnoreCase(VPUtil.SESSION_ERROR)) {
+					error = info.getValue();
+					break;
+				}
+			}
+			
+			if (error != null && error.equals("false")) {
+				return true;
+			}
+			
+		}
+		
+		return false;
 	}
 	
 	void updateMainRequest(final LogEntryType msg, final String msgId) {
 		this.updateField(VPUtil.SERVICE_NAMESPACE, "contract", msg, msgId);
 		this.updateField(VPUtil.RECEIVER_ID, "receiver", msg, msgId);
 		this.updateField(VPUtil.SENDER_ID, "sender_id", msg, msgId);
+		this.updateField(VPUtil.SESSION_ERROR, "status", msg, msgId);
+		this.updateField(VPUtil.SESSION_ERROR_DESCRIPTION, "error_description", msg, msgId);
+		this.updateField(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, "technical_error_description", msg, msgId);
 	}
 	
 	void updateField(final String item, final String column, final LogEntryType msg, final String msgId) {
@@ -187,7 +269,12 @@ public class LogManager implements Callable {
 		c.set(Calendar.SECOND, timestamp.getSecond());
 		c.set(Calendar.MILLISECOND, timestamp.getMillisecond());
 		c.set(Calendar.YEAR, timestamp.getYear());
-		c.set(Calendar.MONTH, timestamp.getMonth());
+		
+		/*
+		 * In XMLGregorianCalendar months are represented through 1-12 while
+		 * they are represented 0-11 on the Java platform. Subtract
+		 */
+		c.set(Calendar.MONTH, timestamp.getMonth() - 1);
 		c.set(Calendar.DAY_OF_MONTH, timestamp.getDay());
 		return c.getTime();
 	}

@@ -32,7 +32,7 @@
 			<outbound>
 				<pass-through-router>
 					<cxf:outbound-endpoint address="http://${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_HOST}:${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_PORT}/${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_URI}"
-						proxy="true" synchronous="true" />
+						proxy="true" synchronous="true" responseTimeout="${SERVICE_TIMEOUT_MS}"/>
 				</pass-through-router>
 			</outbound>
 

@@ -180,6 +180,13 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
     		evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION));
     		evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE, VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)));
     		
+    		final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR);
+    		if (error != null) {
+    			evaluatedExtraInfo.put(VPUtil.SESSION_ERROR, error.toString());
+    			evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_DESCRIPTION, (String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION));
+    			evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, (String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION));
+    		}
+    		
     		switch (logLevel) {
 			case INFO:
 			case DEBUG:

@@ -31,13 +31,16 @@ import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
+import se.skl.tp.vp.util.VPUtil;
 
 public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
+	private static final String ERR_MSG = "VP009 Exception when calling the service producer!";
+	private static final String ERR_MSG_CON_CLOSED = "VP009 Exception when calling the service producer, connection closed"; 
+	
 	public ExceptionTransformer()  {
-		registerSourceType(Object.class);
 		setReturnClass(Object.class);
 	}
 
@@ -45,6 +48,9 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 	public Object transform(MuleMessage msg, String encoding) throws TransformerException {
 		// Check if any error
 		if (msg.getExceptionPayload() != null) {
+			
+			msg.setBooleanProperty(VPUtil.SESSION_ERROR, Boolean.TRUE);
+			
 			logger.debug("Exception payload detected!");
 			if (msg.getExceptionPayload().getException() instanceof ServiceException ||
 				msg.getExceptionPayload().getException() instanceof HttpException) {
@@ -52,32 +58,50 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 				// Check for defined TP exceptions
 				if (msg.getExceptionPayload().getException() instanceof ServiceException &&
 					msg.getExceptionPayload().getException().getCause() != null ) {
-					if (msg.getExceptionPayload().getException().getCause() instanceof VpSemanticException || 
-						msg.getExceptionPayload().getException().getCause() instanceof VpTechnicalException) {
+					
+					final Throwable exception = msg.getExceptionPayload().getException();
+					
+					if (exception.getCause() instanceof VpSemanticException || 
+						exception.getCause() instanceof VpTechnicalException) {
+						
+						this.setErrorProperties(msg, exception.getCause().getMessage(), exception.getCause().getMessage());
 						return createSoapFault(msg, msg.getExceptionPayload().getException().getCause().getMessage());
 					}					
 				}
 				// Check if we got any payload if so return it!
 				if (msg.getPayload() instanceof org.mule.transport.NullPayload) {
+					
 					logger.debug("Nullpayload detected!");
-					return createSoapFault(msg, "VP009 Exception when calling the service producer, connection closed");					
+					this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
+					return createSoapFault(msg, ERR_MSG);					
 				} else {
 					logger.debug("Payload detected!");
 					msg.setExceptionPayload(null);
 					return msg.getPayload();	
 				}								
 			} else if (msg.getExceptionPayload().getException() instanceof RoutingException) {
+				
 				// Here we could get some data in payload but don't use it!
 				logger.debug("Routingexception detected!");
-				return createSoapFault(msg, "VP009 Exception when calling the service producer!");					
+				
+				this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
+				return createSoapFault(msg, ERR_MSG);					
 			}
 			// No defined exception above or TP exception found
-			return createSoapFault(msg, "VP009 Exception when calling the service producer!");
+			this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
+			return createSoapFault(msg, ERR_MSG);
 		} else if (msg.getPayload() instanceof org.mule.transport.NullPayload) {
+			
+			msg.setBooleanProperty(VPUtil.SESSION_ERROR, Boolean.TRUE);
+			
 			// No exception pauload and no message payload
 			logger.debug("Nullpayload detected in message!");
-			return createSoapFault(msg, "VP009 Exception when calling the service producer, connection closed");
+			
+			this.setErrorProperties(msg, ERR_MSG_CON_CLOSED, "Nullpayload detected in message");
+			return createSoapFault(msg, ERR_MSG_CON_CLOSED);
 		}
+		
+		msg.setBooleanProperty(VPUtil.SESSION_ERROR, Boolean.FALSE);
 		
 		// No error, return incoming payload!
 		return msg.getPayload();
@@ -120,5 +144,10 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 		envelope.append("</soap:Body>");
 		envelope.append("</soap:Envelope>");
 		return envelope;
+	}
+	
+	private void setErrorProperties(final MuleMessage msg, final String vpError, final String errorDescription) {
+		msg.setStringProperty(VPUtil.SESSION_ERROR_DESCRIPTION, vpError);
+		msg.setStringProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, errorDescription);
 	}
 }

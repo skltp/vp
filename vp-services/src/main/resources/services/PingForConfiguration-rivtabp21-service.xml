@@ -30,6 +30,7 @@
                     transformer-refs="createCorrId logReqIn"
                     responseTransformer-refs="logRespIn"
 					protocolConnector="VPProducerConnector"
+					responseTimeout="${SERVICE_TIMEOUT_MS}"
                 />
             </inbound>
 			<component>
