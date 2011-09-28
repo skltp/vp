@@ -102,32 +102,39 @@ public class LogManager implements Callable {
 		log.debug("Done updating values.");
 		
 		/*
-		 * Delete payload if we are successful
+		 * NOTE:
+		 * This code should be removed later on. For now, it is commented out
+		 * since we want to solve this by having a job.
+		 * See note below.
 		 */
-		final boolean success = this.isSessionSuccess(logState, logEvent);
-		if (success) {
-			
-			/*
-			 * This deletetion may not delete all waypoint entries due
-			 * to synchronization. I.e the log event for the response on the
-			 * inbound endpoint may be processed before the response on the
-			 * outbound for example.
-			 * 
-			 * There should be an external job that deletes the payload for
-			 * successful sessions on a regular basis. But this is good enough
-			 * for now.
-			 */
-			log.debug("Deleting payload for message {} since the session was successful.", msgId);
-			this.deletePayloadForMessageId(msgId);
-		}
+//		
+//		/*
+//		 * Delete payload if we are successful
+//		 */
+//		final boolean success = this.isSessionSuccess(logState, logEvent);
+//		if (success) {
+//			
+//			/*
+//			 * This deletetion may not delete all waypoint entries due
+//			 * to synchronization. I.e the log event for the response on the
+//			 * inbound endpoint may be processed before the response on the
+//			 * outbound for example.
+//			 * 
+//			 * There should be an external job that deletes the payload for
+//			 * successful sessions on a regular basis. But this is good enough
+//			 * for now.
+//			 */
+//			log.debug("Deleting payload for message {} since the session was successful.", msgId);
+//			this.deletePayloadForMessageId(msgId);
+//		}
 		
 		return logEvent;
 	}
 	
-	private void deletePayloadForMessageId(final String msgId) {
-		final String sql = "update session_waypoint set payload = '' where session_id=?";
-		this.jdbcTemplate.update(sql, msgId);
-	}
+//	private void deletePayloadForMessageId(final String msgId) {
+//		final String sql = "update session_waypoint set payload = '' where session_id=?";
+//		this.jdbcTemplate.update(sql, msgId);
+//	}
 	
 	private String getRivVersionFromLogEntry(final LogEvent logEvent) {
 		String rivVersion = null;
@@ -146,26 +153,26 @@ public class LogManager implements Callable {
 		return rivVersion;
 	}
 	
-	private boolean isSessionSuccess(final String waypoint, final LogEvent logEvent) {
-		if (waypoint.equals("resp-in")) {
-			
-			final List<ExtraInfo> infos = logEvent.getLogEntry().getExtraInfo();
-			String error = null;
-			for (final ExtraInfo info : infos) {
-				if (info.getName().equalsIgnoreCase(VPUtil.SESSION_ERROR)) {
-					error = info.getValue();
-					break;
-				}
-			}
-			
-			if (error != null && error.equals("false")) {
-				return true;
-			}
-			
-		}
-		
-		return false;
-	}
+//	private boolean isSessionSuccess(final String waypoint, final LogEvent logEvent) {
+//		if (waypoint.equals("resp-in")) {
+//			
+//			final List<ExtraInfo> infos = logEvent.getLogEntry().getExtraInfo();
+//			String error = null;
+//			for (final ExtraInfo info : infos) {
+//				if (info.getName().equalsIgnoreCase(VPUtil.SESSION_ERROR)) {
+//					error = info.getValue();
+//					break;
+//				}
+//			}
+//			
+//			if (error != null && error.equals("false")) {
+//				return true;
+//			}
+//			
+//		}
+//		
+//		return false;
+//	}
 	
 	void updateMainRequest(final LogEntryType msg, final String msgId) {
 		this.updateField(VPUtil.SERVICE_NAMESPACE, "contract", msg, msgId);
