@@ -20,7 +20,7 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +43,12 @@ import org.mule.routing.outbound.AbstractRecipientList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.dashboard.ServiceStatistics;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.util.helper.AddressingHelper;
+import se.skl.tp.vp.util.helper.PayloadHelper;
 
 public class VagvalRouter extends AbstractRecipientList {
 
@@ -86,19 +86,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException {
-
-		String address = getAddress(message);
-		List<String> list = new ArrayList<String>();
-		list.add(address);
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("VagvalRouter directs call at serviceNamespace: "
-					+ VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)) + ", receiverId: "
-					+ message.getProperty(VPUtil.RECEIVER_ID) + ", senderId: "
-					+ message.getProperty(VPUtil.SENDER_ID) + " rivVersion: "
-					+ message.getProperty(VPUtil.RIV_VERSION) + "to adress: " + address);
-		}
-		return list;
+		final AddressingHelper addrHelper = new AddressingHelper(message, vagvalAgent, pattern);
+		return Collections.singletonList(addrHelper.getAddress());
 	}
 
 	/**
@@ -108,7 +97,9 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException {
 		
-		final String receiverId = VPUtil.getReceiverId(message);
+		final PayloadHelper routerHelper = new PayloadHelper(message);
+		
+		final String receiverId = routerHelper.extractReceiverFromPayload();
 		message.setProperty(VPUtil.RECEIVER_ID, receiverId);
 
 		long beforeCall = System.currentTimeMillis();
@@ -145,9 +136,6 @@ public class VagvalRouter extends AbstractRecipientList {
 		for (final Object prop: message.getPropertyNames()) {
 			replyMessage.setProperty((String) prop, message.getProperty((String) prop));
 		}
-		
-		
-		//replyMessage.setProperty(PropertyNames.SOITOOLKIT_CORRELATION_ID, message.getProperty(PropertyNames.SOITOOLKIT_CORRELATION_ID));
 		
 		synchronized (statistics) {
 			ServiceStatistics serverStatistics = statistics.get(serviceId);
@@ -186,46 +174,5 @@ public class VagvalRouter extends AbstractRecipientList {
 		} catch (EndpointException e) {
 			throw new VpTechnicalException(e);
 		}
-	}
-
-
-	/**
-	 * Returns the address determined by input data (senderId, receiverId, RIV version and namespace)
-	 * 
-	 * @param message
-	 * @return
-	 */
-	String getAddress(MuleMessage message) {
-		VagvalInput vagvalInput = VPUtil.createRequestToServiceDirectory(message, this.pattern);
-		String address = getAddressFromAgent(vagvalInput);
-		message.setBooleanProperty(IS_HTTPS, address.contains("https") ? true:false);
-		return address;
-	}
-
-	/**
-	 * Not private to make the method testable...
-	 * 
-	 * @param serviceNamespace
-	 * @param vagvalInput
-	 * @return
-	 */
-	String getAddressFromAgent(VagvalInput vagvalInput) {
-		
-		/*
-		 * Make some assertions before we
-		 * continue
-		 */
-		VPUtil.verifyRequestToServiceDirectory(vagvalInput);
-
-		VisaVagvalResponse vvResponse = vagvalAgent.visaVagval(VPUtil.createVisaVagvalRequest(
-				vagvalInput.senderId, vagvalInput.receiverId, vagvalInput.serviceNamespace));
-
-		/*
-		 * Get virtualized services based on
-		 * the input.
-		 */
-		List<VirtualiseringsInfoType> virtualiseringar = VPUtil.getVirtualizedServices(vagvalInput, vvResponse);
-
-		return VPUtil.getAddressToVirtualizedService(vagvalInput, virtualiseringar);
 	}
 }

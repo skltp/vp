@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright 2009 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ -->
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+	xsi:schemaLocation="
+               http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+               http://www.mulesource.org/schema/mule/cxf/2.2  http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
+
+	<description>
+		Test konfiguration för att simulera Tjänstekatalogen
+    </description>
+
+ 	<spring:bean name="vagvalInfo" class="se.skl.tp.vp.vagvalrouter.VagvalInfo"/>
+
+	<model name="SokVagvalsInfoStub">
+		<service name="SokVagvalsInfoStubService">
+			<inbound>
+				<cxf:inbound-endpoint 
+					address="${TP_SOKVAGVALSINFO_URL}"
+					wsdlLocation="classpath:/schemas/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-1.0.wsdl"/> 
+			</inbound>
+			<component>
+				<singleton-object class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub" >
+					<property key="vagvalInfo" value-ref="vagvalInfo"/>
+				</singleton-object>
+			</component>
+		</service>
+	</model>
+</mule>

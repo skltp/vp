@@ -48,6 +48,8 @@ import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
 import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.util.helper.AddressingHelper;
+import se.skl.tp.vp.util.helper.PayloadHelper;
 
 /**
  * Transforms messages between RIVTABP20 and RIVTABP21 and
@@ -88,7 +90,10 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 	public Object transform(MuleMessage msg, String encoding)
 			throws TransformerException {
 		
-		log.info("Riv transformer executing");
+		log.debug("Riv transformer executing");
+		
+		final PayloadHelper routerHelper = new PayloadHelper(msg);
+		final AddressingHelper addrHelper = new AddressingHelper(msg, vagvalAgent, pattern);
 		
 		/*
 		 * Check if virtualized service is a
@@ -107,13 +112,13 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 		/*
 		 * Get the receiver BEFORE any transformation
 		 */
-		msg.setProperty(VPUtil.RECEIVER_ID, VPUtil.getReceiverId(msg));
+		msg.setProperty(VPUtil.RECEIVER_ID, routerHelper.extractReceiverFromPayload());
 		
 		/*
 		 * Get the available RIV version from the service directory, and if the
 		 * version doesn't match, update to the producer version and transform
 		 */
-		final String rivProfile = VPUtil.getAvailableRivProfile(this.vagvalAgent, msg, this.pattern);
+		final String rivProfile = addrHelper.getAvailableRivProfile();
 		msg.setProperty(VPUtil.RIV_VERSION, rivProfile);
 		
 		if (rivVersion.equalsIgnoreCase(RIV20) && rivProfile.equalsIgnoreCase(RIV21)) {

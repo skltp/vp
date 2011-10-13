@@ -178,7 +178,7 @@ public class LogManager implements Callable {
 		this.updateField(VPUtil.SERVICE_NAMESPACE, "contract", msg, msgId);
 		this.updateField(VPUtil.RECEIVER_ID, "receiver", msg, msgId);
 		this.updateField(VPUtil.SENDER_ID, "sender_id", msg, msgId);
-		this.updateField(VPUtil.SESSION_ERROR, "status", msg, msgId);
+		this.updateField(VPUtil.SESSION_ERROR, "error", msg, msgId);
 		this.updateField(VPUtil.SESSION_ERROR_DESCRIPTION, "error_description", msg, msgId);
 		this.updateField(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, "technical_error_description", msg, msgId);
 	}

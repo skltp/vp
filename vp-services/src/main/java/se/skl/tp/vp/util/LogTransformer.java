@@ -18,6 +18,7 @@ package se.skl.tp.vp.util;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
 
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.util.MuleUtil;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.helper.CertificateHelper;
 
 
 /**
@@ -168,7 +170,10 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
     		}
     		
     		try {
-    			final String senderId = VPUtil.getSenderIdFromCertificate(message, this.pattern);
+    			final CertificateHelper certHelper = new CertificateHelper(message);
+    			final X509Certificate cert = certHelper.extractCertificate();
+    			
+    			final String senderId = certHelper.extractSenderIdFromCertificate(cert, this.pattern);
     			log.debug("Sender extracted from certificate {}", senderId);
     			
     			evaluatedExtraInfo.put(VPUtil.SENDER_ID, senderId);

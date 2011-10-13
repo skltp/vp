@@ -39,6 +39,7 @@
 					<spring:property name="vagvalAgent" ref="vagvalAgent" />
 					<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
 					<spring:property name="responseTimeout" value="${SERVICE_TIMEOUT_MS}" />
+<!-- 					<spring:property name="reverseProxy" value="${REVERSE_PROXY_MODE}" /> -->
 				</custom-outbound-router>
 			</outbound>     
 		</service>
