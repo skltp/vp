@@ -65,6 +65,8 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 	private Pattern pattern;
 	private String senderIdPropertyName;
 	
+	private String whiteList;
+	
 	static final String RIV20 = "RIVTABP20";
 	static final String RIV21 = "RIVTABP21";
 	
@@ -73,6 +75,10 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 	
 	static final String RIV21_NS = "urn:riv:itintegration:registry:1";
 	static final String RIV21_ELEM = "LogicalAddress";
+	
+	public void setWhiteList(final String whiteList) {
+		this.whiteList = whiteList;
+	}
 	
 	public void setVagvalAgent(final VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
@@ -93,7 +99,7 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 		log.debug("Riv transformer executing");
 		
 		final PayloadHelper routerHelper = new PayloadHelper(msg);
-		final AddressingHelper addrHelper = new AddressingHelper(msg, vagvalAgent, pattern);
+		final AddressingHelper addrHelper = new AddressingHelper(msg, vagvalAgent, pattern, this.whiteList);
 		
 		/*
 		 * Check if virtualized service is a

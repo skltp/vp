@@ -64,6 +64,11 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 	
 	private Pattern pattern;
 	private String senderIdPropertyName;
+	private String whiteList;
+	
+	public void setWhiteList(final String whiteList) {
+		this.whiteList = whiteList;
+	}
 	
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
@@ -170,10 +175,10 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
     		}
     		
     		try {
-    			final CertificateHelper certHelper = new CertificateHelper(message);
+    			final CertificateHelper certHelper = new CertificateHelper(message, this.pattern, this.whiteList);
     			final X509Certificate cert = certHelper.extractCertificate();
     			
-    			final String senderId = certHelper.extractSenderIdFromCertificate(cert, this.pattern);
+    			final String senderId = certHelper.extractSenderIdFromCertificate(cert);
     			log.debug("Sender extracted from certificate {}", senderId);
     			
     			evaluatedExtraInfo.put(VPUtil.SENDER_ID, senderId);

@@ -21,8 +21,8 @@ public class CertificateHelper extends VPHelperSupport {
 
 	private static Logger log = LoggerFactory.getLogger(CertificateHelper.class);
 	
-	public CertificateHelper(MuleMessage muleMessage) {
-		super(muleMessage);
+	public CertificateHelper(MuleMessage muleMessage, final Pattern pattern, final String whiteList) {
+		super(muleMessage, pattern, whiteList);
 	}
 	
 	/**
@@ -31,7 +31,7 @@ public class CertificateHelper extends VPHelperSupport {
 	 * @param pattern
 	 * @return
 	 */
-	public String extractSenderIdFromCertificate(final X509Certificate certificate, final Pattern pattern) {
+	public String extractSenderIdFromCertificate(final X509Certificate certificate) {
 		
 		log.debug("Extracting sender id from certificate.");
 		
@@ -39,12 +39,12 @@ public class CertificateHelper extends VPHelperSupport {
 			throw new NullPointerException("Cannot extract any sender because the certificate was null");
 		}
 		
-		if (pattern == null) {
+		if (this.getPattern() == null) {
 			throw new NullPointerException("Cannot extract any sender becuase the pattern used to find it was null");
 		}
 		
 		final String principalName = certificate.getSubjectX500Principal().getName();
-		final Matcher matcher = pattern.matcher(principalName);
+		final Matcher matcher = this.getPattern().matcher(principalName);
 		
 		if (matcher.find()) {
 			final String senderId = matcher.group(1);
@@ -97,6 +97,14 @@ public class CertificateHelper extends VPHelperSupport {
 	 */
 	private X509Certificate extractCertFromHeader() {
 		log.debug("Extracting from http header...");
+		
+		/*
+		 * First check whether the caller is on the white list
+		 */
+		if(!this.isCallerOnWhiteList()) {
+			throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses.");
+		}
+		
 		/*
 		 * Try to get the certificate from
 		 * http header
@@ -106,6 +114,28 @@ public class CertificateHelper extends VPHelperSupport {
 		} catch (final ClassCastException e) {
 			throw new VpSemanticException("VP002 Exception caught when trying to extract certificate from VP_CERTIFICATE http header. Expected a X509Certificate");
 		}
+	}
+	
+	private boolean isCallerOnWhiteList() {
+		final String ip = (String) this.getMuleMessage().getProperty("REMOTE_ADDR");
+		
+		if (VPUtil.isWhitespace(ip)) {
+			throw new VpSemanticException("Could not extract the IP address of the caller. Cannot check whether caller is on the white list");
+		}
+		
+		if (VPUtil.isWhitespace(this.getWhiteList())) {
+			throw new VpSemanticException("Could not check whether the caller is on the white list because the white list was empty.");
+		}
+		
+		final String[] ips = this.getWhiteList().split(",");
+		
+		for (final String s : ips) {
+			if (s.trim().equals(ip.trim())) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	private String convertFromHexToString(final String hexString) {

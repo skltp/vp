@@ -27,13 +27,65 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("127.0.0.1");
 		
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, null, "127.0.0.1");
 		final X509Certificate certificate = helper.extractCertificate();
 		
 		Mockito.verify(msg, Mockito.times(2)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
 		
 		assertNotNull(certificate);
+	}
+	
+	public void testExtractCertificateFromHeaderAndInWhiteList() throws Exception {
+		final X509Certificate cert = Mockito.mock(X509Certificate.class);
+		final MuleMessage msg = Mockito.mock(MuleMessage.class);
+		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("192.168.0.109");
+		
+		final CertificateHelper helper = new CertificateHelper(msg, null, "192.168.0.109, 127.0.0.1, localhost");
+		helper.extractCertificate();
+		
+		Mockito.verify(msg, Mockito.times(2)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.PEER_CERTIFICATES);
+	}
+	
+	public void testExtractCertificateFromHeaderAndNotInWhiteList() throws Exception {
+		
+		final X509Certificate cert = Mockito.mock(X509Certificate.class);
+		final MuleMessage msg = Mockito.mock(MuleMessage.class);
+		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("192.168.0.109");
+		
+		final CertificateHelper helper = new CertificateHelper(msg, null, "192.168.0.108, 127.0.0.1, localhost");
+		try {
+			helper.extractCertificate();
+			
+			fail("Exception not thrown when caller was not in the ip white list");
+		} catch (final VpSemanticException e) {
+			// OK
+			assertEquals("Caller was not on the white list of accepted IP-addresses.", e.getMessage());
+		}
+		
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.PEER_CERTIFICATES);
+	}
+	
+	public void testExtractCertificateWithSingleWhiteListEntry() throws Exception {
+		final X509Certificate cert = Mockito.mock(X509Certificate.class);
+		final MuleMessage msg = Mockito.mock(MuleMessage.class);
+		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("192.168.0.109");
+		
+		final CertificateHelper helper = new CertificateHelper(msg, null, "192.168.0.109");
+		helper.extractCertificate();
+		
+		Mockito.verify(msg, Mockito.times(2)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.PEER_CERTIFICATES);
 	}
 	
 	/**
@@ -46,8 +98,9 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("127.0.0.1");
 		
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, null, "127.0.0.1");
 		try { 
 			helper.extractCertificate();
 			
@@ -57,6 +110,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		}
 		
 		Mockito.verify(msg, Mockito.times(2)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
 	}
 	
 	/**
@@ -72,11 +126,12 @@ public class CertificateHelperUnitTest extends TestCase {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.PEER_CERTIFICATES)).thenReturn(certs);
 		
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, null, "127.0.0.1");
 		final X509Certificate certificate = helper.extractCertificate();
 		
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR);
 		
 		assertNotNull(certificate);
 	}
@@ -85,7 +140,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, null, "127.0.0.1");
 		try {
 			helper.extractCertificate();
 			
@@ -97,6 +152,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR);
 	}
 	
 	public void testExtractNoX509CertificateFromChain() throws Exception {
@@ -109,7 +165,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.PEER_CERTIFICATES)).thenReturn(certs);
 		
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, null, "127.0.0.1");
 		
 		try {
 			helper.extractCertificate();
@@ -123,6 +179,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR);
 	}
 	
 	public void testExtractSenderFromCertificate() throws Exception {
@@ -136,8 +193,8 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		
-		final CertificateHelper helper = new CertificateHelper(msg);
-		final String sender = helper.extractSenderIdFromCertificate(cert, pattern);
+		final CertificateHelper helper = new CertificateHelper(msg, pattern, "127.0.0.1");
+		final String sender = helper.extractSenderIdFromCertificate(cert);
 		
 		assertNotNull(sender);
 		assertEquals("marcus", sender);
@@ -150,10 +207,10 @@ public class CertificateHelperUnitTest extends TestCase {
 	
 	public void testExtractSenderWithNullCert() throws Exception {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, null, null);
 		
 		try {
-			helper.extractSenderIdFromCertificate(null, null);
+			helper.extractSenderIdFromCertificate(null);
 			fail("Exception not thrown when certificate was null");
 		} catch (final NullPointerException e) {
 			assertEquals("Cannot extract any sender because the certificate was null", e.getMessage());
@@ -164,10 +221,10 @@ public class CertificateHelperUnitTest extends TestCase {
 	
 	public void testExtractSenderWithNullPattern() throws Exception {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, null, null);
 		
 		try {
-			helper.extractSenderIdFromCertificate(Mockito.mock(X509Certificate.class), null);
+			helper.extractSenderIdFromCertificate(Mockito.mock(X509Certificate.class));
 			fail("No exception was thrown when pattern was null");
 		} catch (final NullPointerException e) {
 			assertEquals("Cannot extract any sender becuase the pattern used to find it was null", e.getMessage());
@@ -185,10 +242,10 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		
-		final CertificateHelper helper = new CertificateHelper(msg);
+		final CertificateHelper helper = new CertificateHelper(msg, pattern, null);
 		
 		try {
-			helper.extractSenderIdFromCertificate(cert, pattern);
+			helper.extractSenderIdFromCertificate(cert);
 			fail("Did not expect a sender id in certificate");
 		} catch (final VpSemanticException e) {
 			// Ok

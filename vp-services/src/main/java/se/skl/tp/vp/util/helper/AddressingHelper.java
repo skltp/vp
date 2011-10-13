@@ -28,13 +28,11 @@ import se.skl.tp.vp.vagvalrouter.VagvalInput;
 public class AddressingHelper extends VPHelperSupport {
 
 	private VisaVagvalsInterface agent;
-	private Pattern pattern;
 	
-	public AddressingHelper(MuleMessage muleMessage, final VisaVagvalsInterface agent, final Pattern pattern) {
-		super(muleMessage);
+	public AddressingHelper(MuleMessage muleMessage, final VisaVagvalsInterface agent, final Pattern pattern, final String whiteList) {
+		super(muleMessage, pattern, whiteList);
 		
 		this.agent = agent;
-		this.pattern = pattern;
 	}
 	
 	public String getAvailableRivProfile() {
@@ -99,10 +97,10 @@ public class AddressingHelper extends VPHelperSupport {
 	private VagvalInput createRequestToServiceDirectory() {
 		VagvalInput vagvalInput = new VagvalInput();
 
-		final CertificateHelper certHelper = new CertificateHelper(this.getMuleMessage());
+		final CertificateHelper certHelper = new CertificateHelper(this.getMuleMessage(), this.getPattern(), this.getWhiteList());
 		final X509Certificate cert = certHelper.extractCertificate();
 		
-		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate(cert, pattern);
+		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate(cert);
 		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId);
 
 		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID);

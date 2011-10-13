@@ -41,6 +41,7 @@
 				<singleton-object class="se.skl.tp.vp.logmanager.LogManager">
 					<property key="dataSource" value-ref="dataSource" />
 					<property key="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+					<property key="whiteList" value="${IP_WHITE_LIST}" />
 				</singleton-object>
 			</component>
 		</service>

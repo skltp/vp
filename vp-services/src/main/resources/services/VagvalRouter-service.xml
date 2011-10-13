@@ -29,6 +29,7 @@
 					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivTransformer">
 						<spring:property name="vagvalAgent" ref="vagvalAgent" />
 						<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+						<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
 					</custom-transformer>
 					<transformer ref="logReqOut" />
 				</inbound-endpoint>
@@ -39,7 +40,7 @@
 					<spring:property name="vagvalAgent" ref="vagvalAgent" />
 					<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
 					<spring:property name="responseTimeout" value="${SERVICE_TIMEOUT_MS}" />
-<!-- 					<spring:property name="reverseProxy" value="${REVERSE_PROXY_MODE}" /> -->
+					<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
 				</custom-outbound-router>
 			</outbound>     
 		</service>

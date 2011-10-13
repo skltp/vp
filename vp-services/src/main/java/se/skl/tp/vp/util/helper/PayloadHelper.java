@@ -18,7 +18,7 @@ import se.skl.tp.vp.util.VPUtil;
 public class PayloadHelper extends VPHelperSupport {
 	
 	public PayloadHelper(MuleMessage muleMessage) {
-		super(muleMessage);
+		super(muleMessage, null, null);
 	}
 	
 	/**

@@ -24,6 +24,8 @@ import javax.xml.namespace.QName;
  */
 public final class VPUtil {
 	
+	public static final String REMOTE_ADDR = "REMOTE_ADDR";
+	
 	public static final String CONSUMER_CONNECTOR_NAME = "VPConsumerConnector";
 	
 	public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
@@ -40,5 +42,13 @@ public final class VPUtil {
 	
 	public static String extractNamespaceFromService(final QName qname) {
 		return qname.getNamespaceURI();
+	}
+	
+	public static boolean isWhitespace(final String s) {
+		if (s == null) {
+			return true;
+		}
+		
+		return s.trim().length() == 0;
 	}
 }

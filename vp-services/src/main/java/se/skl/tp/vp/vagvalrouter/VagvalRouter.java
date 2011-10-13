@@ -60,11 +60,17 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private String senderIdPropertyName;
 	
+	private String whiteList;
+	
 	private String responseTimeout;
 
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 	
 	private static final String IS_HTTPS = "isHttps";
+	
+	public void setWhiteList(final String whiteList) {
+		this.whiteList = whiteList;
+	}
 	
 	public void setResponseTimeout(final String responseTimeout) {
 		this.responseTimeout = responseTimeout;
@@ -86,7 +92,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException {
-		final AddressingHelper addrHelper = new AddressingHelper(message, vagvalAgent, pattern);
+		final AddressingHelper addrHelper = new AddressingHelper(message, vagvalAgent, pattern, this.whiteList);
 		return Collections.singletonList(addrHelper.getAddress());
 	}
 
