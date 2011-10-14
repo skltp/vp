@@ -50,7 +50,7 @@ public class CertificateHelper extends VPHelperSupport {
 			final String senderId = matcher.group(1);
 			
 			log.debug("Found sender id: {}", senderId);
-			return senderId.startsWith("#") ? this.convertFromHexToString(senderId) : senderId;
+			return senderId.startsWith("#") ? this.convertFromHexToString(senderId.substring(5)) : senderId;
 		} else {
 			throw new VpSemanticException("VP002 No senderId found in Certificate: " + principalName);
 		}

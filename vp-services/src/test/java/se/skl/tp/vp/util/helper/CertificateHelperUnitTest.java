@@ -204,6 +204,28 @@ public class CertificateHelperUnitTest extends TestCase {
 		Mockito.verify(cert, Mockito.times(1)).getSubjectX500Principal();
 	}
 	
+	public void testExtractSenderFromCertificateInHexMode() throws Exception {
+		final String sender = "#131048534153455256494345532d31303358";
+		
+		final X500Principal principal = new X500Principal("OU="+sender);
+		
+		final X509Certificate cert = Mockito.mock(X509Certificate.class);
+		Mockito.when(cert.getSubjectX500Principal()).thenReturn(principal);
+		
+		final Pattern pattern = Pattern.compile("OU=([^,]+)");
+		
+		final MuleMessage msg = Mockito.mock(MuleMessage.class);
+		
+		final CertificateHelper helper = new CertificateHelper(msg, pattern, "127.0.0.1");
+		final String s = helper.extractSenderIdFromCertificate(cert);
+		
+		System.out.println("Sender: " + s);
+		
+		assertNotNull(s);
+		
+		
+	}
+	
 	public void testExtractSenderWithNullCert() throws Exception {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		final CertificateHelper helper = new CertificateHelper(msg, null, null);
