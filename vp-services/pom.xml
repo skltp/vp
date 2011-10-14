@@ -59,23 +59,23 @@
 			<version>5.1.17</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>se.skl.tp</groupId>
-			<artifactId>PingForConfiguration-virtualisering</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>se.skl.tp</groupId> -->
+<!-- 			<artifactId>PingForConfiguration-virtualisering</artifactId> -->
+<!-- 			<version>1.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		
-		<dependency>
-			<groupId>se.skl.tp</groupId>
-			<artifactId>PingForConfiguration-test-producer</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-jdk14</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>se.skl.tp</groupId> -->
+<!-- 			<artifactId>PingForConfiguration-test-producer</artifactId> -->
+<!-- 			<version>1.0-SNAPSHOT</version> -->
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 					<artifactId>slf4j-jdk14</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
 		
 		<dependency>
 			<groupId>org.mockito</groupId>

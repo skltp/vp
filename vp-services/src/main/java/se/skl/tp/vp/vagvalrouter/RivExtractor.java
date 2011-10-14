@@ -18,7 +18,7 @@ public class RivExtractor extends AbstractMessageAwareTransformer {
 	public Object transform(MuleMessage msg, String arg1)
 			throws TransformerException {
 		
-		log.info("Extracting RIV-version");
+		log.debug("Extracting RIV-version");
 		
 		final String tns = VPUtil.extractNamespaceFromService((QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE));
 		final String[] split = tns.split(":");

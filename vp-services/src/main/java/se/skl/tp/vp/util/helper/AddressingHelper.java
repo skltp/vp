@@ -72,7 +72,10 @@ public class AddressingHelper extends VPHelperSupport {
 		 * Create parameters from message
 		 */
 		final VagvalInput input = this.createRequestToServiceDirectory();
-		
+		return this.getAddressFromAgent(input);
+	}
+	
+	public String getAddressFromAgent(final VagvalInput input) {
 		/*
 		 * Validate the parameters
 		 */

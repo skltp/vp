@@ -18,13 +18,15 @@ package se.skl.tp.vp.util;
 
 import javax.xml.namespace.QName;
 
+import org.mule.api.config.MuleProperties;
+
 /**
  * Utility class for the virtualization platform
  * @author Marcus Krantz [marcus.krantz@callistaenterprise.se]
  */
 public final class VPUtil {
 	
-	public static final String REMOTE_ADDR = "REMOTE_ADDR";
+	public static final String REMOTE_ADDR = MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 	
 	public static final String CONSUMER_CONNECTOR_NAME = "VPConsumerConnector";
 	
@@ -42,6 +44,11 @@ public final class VPUtil {
 	
 	public static String extractNamespaceFromService(final QName qname) {
 		return qname.getNamespaceURI();
+	}
+	
+	public static String extractIpAddress(final String remoteAddress) {
+		final String s = remoteAddress.split(":")[0];
+		return s.substring(1, s.length());
 	}
 	
 	public static boolean isWhitespace(final String s) {

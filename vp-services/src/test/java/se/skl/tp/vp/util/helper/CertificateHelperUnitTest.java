@@ -22,12 +22,11 @@ public class CertificateHelperUnitTest extends TestCase {
 	 * @throws Exception
 	 */
 	public void testExtractCertificateFromHeader() throws Exception {
-	
 		final X509Certificate cert = Mockito.mock(X509Certificate.class);
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
-		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("127.0.0.1");
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/127.0.0.1:12345");
 		
 		final CertificateHelper helper = new CertificateHelper(msg, null, "127.0.0.1");
 		final X509Certificate certificate = helper.extractCertificate();
@@ -42,7 +41,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		final X509Certificate cert = Mockito.mock(X509Certificate.class);
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
-		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("192.168.0.109");
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/192.168.0.109:12345");
 		
 		final CertificateHelper helper = new CertificateHelper(msg, null, "192.168.0.109, 127.0.0.1, localhost");
 		helper.extractCertificate();
@@ -57,7 +56,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		final X509Certificate cert = Mockito.mock(X509Certificate.class);
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
-		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("192.168.0.109");
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/192.168.0.109:12345");
 		
 		final CertificateHelper helper = new CertificateHelper(msg, null, "192.168.0.108, 127.0.0.1, localhost");
 		try {
@@ -78,7 +77,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		final X509Certificate cert = Mockito.mock(X509Certificate.class);
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
-		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("192.168.0.109");
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/192.168.0.109:12345");
 		
 		final CertificateHelper helper = new CertificateHelper(msg, null, "192.168.0.109");
 		helper.extractCertificate();
@@ -98,7 +97,7 @@ public class CertificateHelperUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
-		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("127.0.0.1");
+		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/127.0.0.1:12345");
 		
 		final CertificateHelper helper = new CertificateHelper(msg, null, "127.0.0.1");
 		try { 

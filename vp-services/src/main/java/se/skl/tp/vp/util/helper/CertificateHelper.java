@@ -117,7 +117,7 @@ public class CertificateHelper extends VPHelperSupport {
 	}
 	
 	private boolean isCallerOnWhiteList() {
-		final String ip = (String) this.getMuleMessage().getProperty("REMOTE_ADDR");
+		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR));
 		
 		if (VPUtil.isWhitespace(ip)) {
 			throw new VpSemanticException("Could not extract the IP address of the caller. Cannot check whether caller is on the white list");
