@@ -23,6 +23,17 @@
 2.4 Lägg till följande properties
 
 	#
+	# If behind a reverse proxy, a client auth
+	# certificate is expected to be in the
+	# x-vp-auth-cert http header.
+	# If a certificate is found, the caller ip
+	# address must be in a white list of IP-addresses.
+	# This property is used to define this list
+	# Example: IP_WHITE_LIST=localhost, 127.0.0.1, 192.168.0.15
+	# 
+	IP_WHITE_LIST=
+
+	#
 	# Connection pool configuration for
 	# LogManager that reads from JMS queue and
 	# writes to log database.
