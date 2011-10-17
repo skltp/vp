@@ -93,6 +93,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException {
 		final AddressingHelper addrHelper = new AddressingHelper(message, vagvalAgent, pattern, this.whiteList);
+		message.setBooleanProperty(IS_HTTPS, addrHelper.getAddress().contains("https") ? true:false);
 		return Collections.singletonList(addrHelper.getAddress());
 	}
 
