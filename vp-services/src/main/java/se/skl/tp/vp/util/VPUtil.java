@@ -42,6 +42,8 @@ public final class VPUtil {
 	public static final String RIV_VERSION = "rivversion";
 	public static final String SERVICE_NAMESPACE = "cxf_service";
 	
+	public static final String IS_HTTPS = "isHttps";
+	
 	public static String extractNamespaceFromService(final QName qname) {
 		return qname.getNamespaceURI();
 	}

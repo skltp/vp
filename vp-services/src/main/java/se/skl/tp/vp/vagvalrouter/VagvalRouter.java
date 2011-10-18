@@ -66,7 +66,13 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 	
-	private static final String IS_HTTPS = "isHttps";
+	private AddressingHelper addrHelper;
+	
+	void setAddressingHelper(final AddressingHelper helper) {
+		if (this.addrHelper == null) {
+			this.addrHelper = helper;
+		}
+	}
 	
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
@@ -92,9 +98,12 @@ public class VagvalRouter extends AbstractRecipientList {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException {
-		final AddressingHelper addrHelper = new AddressingHelper(message, vagvalAgent, pattern, this.whiteList);
-		message.setBooleanProperty(IS_HTTPS, addrHelper.getAddress().contains("https") ? true:false);
-		return Collections.singletonList(addrHelper.getAddress());
+		this.setAddressingHelper(new AddressingHelper(message, vagvalAgent, pattern, whiteList));
+		
+		final String addr = this.addrHelper.getAddress();
+		message.setBooleanProperty(VPUtil.IS_HTTPS, addr.contains("https") ? true:false);
+		
+		return Collections.singletonList(addr);
 	}
 
 	/**
@@ -168,7 +177,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		HashMap<String, String> properties = new HashMap<String, String>();
 		properties.put("proxy", "true");
 		properties.put("payload", "envelope");
-		if (message.getBooleanProperty(IS_HTTPS, false)) {
+		if (message.getBooleanProperty(VPUtil.IS_HTTPS, false)) {
 			properties.put("protocolConnector", VPUtil.CONSUMER_CONNECTOR_NAME);
 			logger.debug("Https protocolConnector set");
 		}
