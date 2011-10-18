@@ -33,7 +33,7 @@ public class VagvalRouterUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		
-		final List receipients = router.getRecipients(msg);
+		final List<?> receipients = router.getRecipients(msg);
 		assertNotNull(receipients);
 		assertEquals(1, receipients.size());
 		assertEquals(url, receipients.get(0));

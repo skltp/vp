@@ -65,7 +65,7 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 						exception.getCause() instanceof VpTechnicalException) {
 						
 						this.setErrorProperties(msg, exception.getCause().getMessage(), exception.getCause().getMessage());
-						return createSoapFault(msg, msg.getExceptionPayload().getException().getCause().getMessage());
+						return createSoapFault(msg, msg.getExceptionPayload().getException().getCause().getMessage(), exception.getCause().getMessage());
 					}					
 				}
 				// Check if we got any payload if so return it!
@@ -73,7 +73,7 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 					
 					logger.debug("Nullpayload detected!");
 					this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
-					return createSoapFault(msg, ERR_MSG);					
+					return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());					
 				} else {
 					logger.debug("Payload detected!");
 					msg.setExceptionPayload(null);
@@ -85,20 +85,22 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 				logger.debug("Routingexception detected!");
 				
 				this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
-				return createSoapFault(msg, ERR_MSG);					
+				return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());					
 			}
+			
 			// No defined exception above or TP exception found
 			this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
-			return createSoapFault(msg, ERR_MSG);
-		} else if (msg.getPayload() instanceof org.mule.transport.NullPayload) {
+			return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
 			
+		} else if (msg.getPayload() instanceof org.mule.transport.NullPayload) {
+			final String errMsg = "Nullpayload detected in message";
 			msg.setBooleanProperty(VPUtil.SESSION_ERROR, Boolean.TRUE);
 			
 			// No exception pauload and no message payload
-			logger.debug("Nullpayload detected in message!");
+			logger.debug(errMsg);
 			
-			this.setErrorProperties(msg, ERR_MSG_CON_CLOSED, "Nullpayload detected in message");
-			return createSoapFault(msg, ERR_MSG_CON_CLOSED);
+			this.setErrorProperties(msg, ERR_MSG_CON_CLOSED, errMsg);
+			return createSoapFault(msg, ERR_MSG_CON_CLOSED, errMsg);
 		}
 		
 		msg.setBooleanProperty(VPUtil.SESSION_ERROR, Boolean.FALSE);
@@ -107,10 +109,10 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 		return msg.getPayload();
 	}
 
-	private Object createSoapFault(MuleMessage msg, String srcCause) {
+	private Object createSoapFault(MuleMessage msg, String srcCause, final String rootCause) {
 		StringBuffer result = new StringBuffer();
 		
-		createSoapFault(result, srcCause);
+		createSoapFault(result, srcCause, rootCause);
 				
 		// Now wrap it into a soap-envelope
 		result = createSoapEnvelope(result);
@@ -128,10 +130,10 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 		return result.toString();
 	}
 
-	private void createSoapFault(StringBuffer result, String faultString) {
+	private void createSoapFault(StringBuffer result, String faultString, String rootCause) {
 		result.append("<soap:Fault>");
 		result.append("<faultcode>soap:Server</faultcode>");
-		result.append("<faultstring>" + faultString + "</faultstring>");
+		result.append("<faultstring>" + faultString + "\n" + rootCause + "</faultstring>");
 		result.append("</soap:Fault>");
 	}
 	
