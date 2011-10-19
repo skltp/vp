@@ -33,15 +33,19 @@ public class VagvalRouterUnitTest extends TestCase {
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		
+		Mockito.when(helper.getMuleMessage()).thenReturn(msg);
+		
 		final List<?> receipients = router.getRecipients(msg);
 		assertNotNull(receipients);
 		assertEquals(1, receipients.size());
 		assertEquals(url, receipients.get(0));
 		
-		Mockito.verify(helper, Mockito.only()).getAddress();
+		Mockito.verify(helper, Mockito.times(1)).getMuleMessage();
 		Mockito.verify(helper, Mockito.times(1)).getAddress();
+		Mockito.verifyNoMoreInteractions(helper);
 		
 		Mockito.verify(msg, Mockito.only()).setBooleanProperty(VPUtil.IS_HTTPS, expectedResult);
 		Mockito.verify(msg, Mockito.times(1)).setBooleanProperty(VPUtil.IS_HTTPS, expectedResult);
+		Mockito.verifyNoMoreInteractions(msg);
 	}
 }

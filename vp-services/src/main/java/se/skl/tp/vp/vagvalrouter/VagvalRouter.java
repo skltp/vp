@@ -69,9 +69,20 @@ public class VagvalRouter extends AbstractRecipientList {
 	private AddressingHelper addrHelper;
 	
 	void setAddressingHelper(final AddressingHelper helper) {
+		this.addrHelper = helper;
+	}
+	
+	public AddressingHelper getAddressingHelper(final MuleMessage msg) {
+		
 		if (this.addrHelper == null) {
-			this.addrHelper = helper;
+			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent, pattern, whiteList));
 		}
+		
+		if (!this.addrHelper.getMuleMessage().equals(msg)) {
+			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent, pattern, whiteList));
+		}
+		
+		return this.addrHelper;
 	}
 	
 	public void setWhiteList(final String whiteList) {
@@ -98,9 +109,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException {
-		this.setAddressingHelper(new AddressingHelper(message, vagvalAgent, pattern, whiteList));
-		
-		final String addr = this.addrHelper.getAddress();
+		final String addr = this.getAddressingHelper(message).getAddress();
 		message.setBooleanProperty(VPUtil.IS_HTTPS, addr.contains("https") ? true:false);
 		
 		return Collections.singletonList(addr);
