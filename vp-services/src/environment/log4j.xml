@@ -19,9 +19,9 @@
 		</layout>
 	</appender>
 	
-<!-- 	<appender name="DEVNULL" class="org.apache.log4j.FileAppender"> -->
-<!-- 		<param name="file" value="/dev/null"/> -->
-<!-- 	</appender> -->
+	<appender name="DEVNULL" class="org.apache.log4j.FileAppender">
+		<param name="file" value="/dev/null"/>
+	</appender>
 
 	<!--
 		Loglevels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL} See:
@@ -62,12 +62,12 @@
 	</logger>
 	
 	<logger name="se.skl.tp.vp.util">
-		<level value="WARN" />
+		<level value="DEBUG" />
 	</logger>
 
-<!-- 	<category name="org.soitoolkit.commons.mule.messageLogger" additivity="false"> -->
-<!-- 		<level value="DEBUG" /> -->
-<!-- 	</category> -->
+	<category name="org.soitoolkit.commons.mule.messageLogger" additivity="false">
+		<level value="DEBUG" />
+	</category>
 
 	<!-- Message logging -->
 	<logger name="org.soitoolkit.commons.mule.messageLogger" additivity="false">
@@ -77,7 +77,7 @@
 	<root>
 		<priority value="WARN" />
 		<appender-ref ref="CONSOLE" />
-<!-- 		<appender-ref ref="DEVNULL"/> -->
+		<appender-ref ref="DEVNULL"/>
 		<!--
 		<appender-ref ref="ROLLINGFILE"/>
 		-->

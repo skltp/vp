@@ -22,14 +22,13 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
 import org.mule.RequestContext;
-import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -139,14 +138,18 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 	}
 	
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException {
-
+				
     	try {
+    		
+    		/*
+    		 * Don't skip in NTjP
+    		 */
 			// Skip logging if an error has occurred, then the error is logged by an error handler
-    		ExceptionPayload exp = message.getExceptionPayload();
-    		if (exp != null) {
-    			log.debug("Skip logging message, exception detected! " + exp.getException().getMessage());
-    			return message;
-    		}
+//    		ExceptionPayload exp = message.getExceptionPayload();
+//    		if (exp != null) {
+//    			log.debug("Skip logging message, exception detected! " + exp.getException().getMessage());
+//    			return message;
+//    		}
 
     		// Skip logging if service name starts with "_cxfServiceComponent" (Mule 2.2.1) or ends with "_cxfComponent" (Mule 2.2.5) and endpoint contains "?wsdl" or "?xsd", then it's just tons of WSDL and XSD lookup calls, nothing to log...
             MuleEventContext event       = RequestContext.getEventContext();

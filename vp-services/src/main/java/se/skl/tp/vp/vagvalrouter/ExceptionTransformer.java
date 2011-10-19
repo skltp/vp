@@ -80,6 +80,9 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 					
 					this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getMessage());
 					
+					logger.debug("Exception: {}", msg.getExceptionPayload().getMessage());
+					logger.debug("Root exception: {}", msg.getExceptionPayload().getRootException().getMessage());
+					
 					logger.debug("Payload detected!");
 					msg.setExceptionPayload(null);
 					return msg.getPayload();	
@@ -91,7 +94,7 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 				logger.debug("Routingexception detected!");
 				
 				this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getMessage());
-				return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getMessage());					
+				return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());					
 			}
 			
 			// No defined exception above or TP exception found
@@ -118,8 +121,9 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 	private Object createSoapFault(MuleMessage msg, String srcCause, final String rootCause) {
 		StringBuffer result = new StringBuffer();
 		
+		final String escapedCause = StringEscapeUtils.escapeXml(srcCause);
 		final String escapedRoot = StringEscapeUtils.escapeXml(rootCause);
-		createSoapFault(result, srcCause, escapedRoot);
+		createSoapFault(result, escapedCause, escapedRoot);
 				
 		// Now wrap it into a soap-envelope
 		result = createSoapEnvelope(result);
