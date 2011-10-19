@@ -18,6 +18,10 @@
 			<param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
 		</layout>
 	</appender>
+	
+<!-- 	<appender name="DEVNULL" class="org.apache.log4j.FileAppender"> -->
+<!-- 		<param name="file" value="/dev/null"/> -->
+<!-- 	</appender> -->
 
 	<!--
 		Loglevels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL} See:
@@ -54,21 +58,26 @@
 	</logger>
 	
 	<logger name="se.skl.tp.vp">
-		<level value="INFO" />
+		<level value="DEBUG" />
 	</logger>
 	
 	<logger name="se.skl.tp.vp.util">
 		<level value="WARN" />
 	</logger>
 
+<!-- 	<category name="org.soitoolkit.commons.mule.messageLogger" additivity="false"> -->
+<!-- 		<level value="DEBUG" /> -->
+<!-- 	</category> -->
+
 	<!-- Message logging -->
-	<logger name="org.soitoolkit.commons.mule.messageLogger">
+	<logger name="org.soitoolkit.commons.mule.messageLogger" additivity="false">
 		<level value="DEBUG" />
 	</logger>
 	
 	<root>
 		<priority value="WARN" />
 		<appender-ref ref="CONSOLE" />
+<!-- 		<appender-ref ref="DEVNULL"/> -->
 		<!--
 		<appender-ref ref="ROLLINGFILE"/>
 		-->

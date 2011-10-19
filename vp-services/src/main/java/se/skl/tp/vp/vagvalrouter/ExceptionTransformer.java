@@ -21,10 +21,12 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.ServiceException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +42,13 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 	private static final String ERR_MSG = "VP009 Exception when calling the service producer!";
 	private static final String ERR_MSG_CON_CLOSED = "VP009 Exception when calling the service producer, connection closed"; 
 	
-	public ExceptionTransformer()  {
-		setReturnClass(Object.class);
-	}
+	public ExceptionTransformer()  {}
 
 	@Override
 	public Object transform(MuleMessage msg, String encoding) throws TransformerException {
+		
+		logger.debug("Exception transformer executing...");
+		
 		// Check if any error
 		if (msg.getExceptionPayload() != null) {
 			
@@ -75,17 +78,21 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 					this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
 					return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());					
 				} else {
+					
+					this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getMessage());
+					
 					logger.debug("Payload detected!");
 					msg.setExceptionPayload(null);
 					return msg.getPayload();	
-				}								
+				}
+				
 			} else if (msg.getExceptionPayload().getException() instanceof RoutingException) {
 				
 				// Here we could get some data in payload but don't use it!
 				logger.debug("Routingexception detected!");
 				
-				this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
-				return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());					
+				this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getMessage());
+				return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getMessage());					
 			}
 			
 			// No defined exception above or TP exception found
@@ -112,7 +119,8 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 	private Object createSoapFault(MuleMessage msg, String srcCause, final String rootCause) {
 		StringBuffer result = new StringBuffer();
 		
-		createSoapFault(result, srcCause, rootCause);
+		final String escapedRoot = StringEscapeUtils.escapeXml(rootCause);
+		createSoapFault(result, srcCause, escapedRoot);
 				
 		// Now wrap it into a soap-envelope
 		result = createSoapEnvelope(result);
@@ -122,7 +130,7 @@ public class ExceptionTransformer extends AbstractMessageAwareTransformer {
 		
 		// Tell Mule that we have returned a SoapFault
 		logger.debug("SoapFault returned: " + result);
-						
+		
 		// Set payload explict ??
 		msg.setPayload(result.toString());
 		
