@@ -26,7 +26,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.ServiceException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.message.DefaultExceptionPayload;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
