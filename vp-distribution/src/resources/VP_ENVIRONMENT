@@ -1,6 +1,0 @@
-#!/bin/bash
-
-export JAVA_HOME=~/vp/jdk1.6.0_27
-export MULE_HOME=~/vp/mule-standalone-2.2.8
-
-export PATH=${PATH}:${JAVA_HOME}/bin
