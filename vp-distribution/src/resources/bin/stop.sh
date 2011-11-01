@@ -1,7 +1,6 @@
 #!/bin/bash
 
-d=`dirname $0`/..
-export VP_HOME=`pwd $d`
+export VP_HOME="$( cd -P "$( dirname $0 )"/.. && pwd )"
 export MULE_HOME=${VP_HOME}/mule-standalone-2.2.8
 
 echo -n "Stopping Mule 2.2.8..."
