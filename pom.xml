@@ -23,7 +23,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	<name>vp</name>
 
 	<scm>
-		<connection>scm:svn:https://skltp.googlecode.com/svn/skltp/tp/vp/trunk</connection>
+		<connection>scm:svn:http://skltp.googlecode.com/svn/skltp/tp/vp/trunk</connection>
 		<developerConnection>scm:svn:https://skltp.googlecode.com/svn/skltp/tp/vp/trunk</developerConnection>
 	  <url>http://svn.sonatype.org/spice/tags/soitoolkit-0.3.1/vp</url>
   </scm>
