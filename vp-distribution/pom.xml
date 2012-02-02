@@ -93,9 +93,9 @@
 								</artifactItem>
 								<artifactItem>
 									<groupId>se.skl.tp</groupId>
-									<artifactId>getsupportedservicecontracts-schemas</artifactId>
-									<version>1.0</version>
-								</artifactItem>
+									<artifactId>itintegration-registry-schemas</artifactId>
+									<version>1.0-SNAPSHOT</version>
+								</artifactItem>	
 								<artifactItem>
 									<groupId>se.skl.tp</groupId>
 									<artifactId>pingforconfiguration-schemas</artifactId>
