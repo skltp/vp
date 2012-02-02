@@ -40,7 +40,6 @@
 	<modules>
 		<module>vp-mule-2.2.8-dependencies</module>
 		<module>vp-services</module>
-		<module>vp-teststub-web</module>
 		<module>vp-distribution</module>
 	</modules>
 
