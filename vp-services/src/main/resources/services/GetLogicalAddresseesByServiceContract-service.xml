@@ -16,22 +16,22 @@
 		http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2 http://dist.muleforge.org/smooks/schema/mule-module-smooks/1.2/mule-module-smooks.xsd
 	">
 
-	<model name="GetSupportedServiceContracts-model">
+	<model name="GetLogicalAddresseesByServiceContract-model">
 	
-		<service name="GetSupportedServiceContracts-service-rivtabp21">
+		<service name="GetLogicalAddresseesByServiceContract-service-rivtabp21">
 			<inbound>
-				<cxf:inbound-endpoint address="https://${tp.host}:${tp.port}/${tp.baseUri}/GetSupportedServiceContracts/1/rivtabp21"
+				<cxf:inbound-endpoint address="https://${tp.host}:${tp.port}/${tp.baseUri}/GetLogicalAddresseesByServiceContract/1/rivtabp21"
 					proxy="true" 
 					synchronous="true" 
-					wsdlLocation="classpath:/schemas/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
-					serviceName="GetSupportedServiceContractsResponderService"
-					namespace="urn:riv:itintegration:registry:GetSupportedServiceContracts:1:rivtabp21"
+					wsdlLocation="classpath:/schemas/interactions/GetLogicalAddresseesByServiceContractInteraction/GetLogicalAddresseesByServiceContractInteraction_1.0_RIVTABP21.wsdl"
+					serviceName="GetLogicalAddresseesByServiceContractResponderService"
+					namespace="urn:riv:itintegration:registry:GetLogicalAddresseesByServiceContract:1:rivtabp21"
 					protocolConnector="VPProducerConnector"
 					/>
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<cxf:outbound-endpoint address="http://${TK_HOST}:${TK_PORT}/${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_URI}"
+					<cxf:outbound-endpoint address="http://${TK_HOST}:${TK_PORT}/${GETLOGICALADDRESSESBYSERVICECONTRACT_OUTBOUND_URI}"
 						proxy="true" synchronous="true" responseTimeout="${SERVICE_TIMEOUT_MS}"/>
 				</pass-through-router>
 			</outbound>

@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>se.skl.tp</groupId>
 		<artifactId>vp</artifactId>
-		<version>1.3.1-SNAPSHOT</version>
+		<version>1.3.2</version>
 	</parent>
 
 	<artifactId>vp-services</artifactId>
@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
 			<artifactId>vp-mule-2.2.8-dependencies</artifactId>
-			<version>1.3.0</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -43,8 +43,8 @@
 
 		<dependency>
 			<groupId>se.skl.tp</groupId>
-			<artifactId>getsupportedservicecontracts-schemas</artifactId>
-			<version>1.0</version>
+			<artifactId>itintegration-registry-schemas</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
