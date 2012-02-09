@@ -51,7 +51,10 @@ Denna instruktion förutsätter att version 1.3.1 är installerad enligt anvisni
 	
 4.2 Kopiera jar-filer till Mule lib/user katalog
 	cp -rf *.jar ~/vp/mule-standalone-2.2.8/lib/user
-	
+
+4.3 Ta bort jarfiler
+	Ta bort ~/vp/mule-standalone-2.2.8/lib/user/getsupportedservicecontracts-schemas.jar
+
 5. Uppdatera log properties
 
 5.1 Editera log4j.properties
