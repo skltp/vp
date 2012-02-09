@@ -1,0 +1,80 @@
+# Installera vp-1.3.1
+
+Denna instruktion förutsätter att version 1.3.1 är installerad enligt anvisningen vp-1.3.1-installationsanvisningar.txt
+
+	
+1. Uppdatera vp-config.properties
+
+1.1 Navigera till config katalog
+
+	cd ~/vp/vp-home/vp/config
+	
+1.2 Editera property fil
+
+	nano -w vp-config.properties (i windows öppna med tex notepad)
+	
+1.3 Uppdatera följande properties
+	
+	# Inga uppdateringar
+	
+2.4 Lägg till följande properties
+
+	# Dessa properties ersätter GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_HOST och GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_PORT, för att
+	få ett tydligare namn.
+	  
+	TK_HOST=localhost
+	TK_PORT=8080
+	
+	# Denna property är en ny service som finns tillgänglig i tjänsteplattformen
+
+	GETLOGICALADDRESSESBYSERVICECONTRACT_OUTBOUND_URI=tp-vagval-admin-services/GetLogicalAddresseesByServiceContract
+	
+2.5 Ta bort följande properties
+
+	# Dessa ersätts av TK_HOST och TK_PORT, se ovan
+	
+	GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_HOST=localhost
+	GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_PORT=8080
+	
+3. Stoppa mule
+
+3.1 Navigera till bin katalog
+	cd ~/bin
+	
+3.2 Stoppa mule
+	sh stop.sh
+	
+4. Uppgradera VP
+
+4.1 Navigera till katalog där vp-distribution är upppackad
+	cd vp-distribution-1.3.2/lib
+	
+4.2 Kopiera jar-filer till Mule lib/user katalog
+	cp -rf *.jar ~/vp/mule-standalone-2.2.8/lib/user
+	
+5. Uppdatera log properties
+
+5.1 Editera log4j.properties
+	nano -w ~/vp/mule-standalone-2.2.8/conf/log4j.properties (i windows öppna med tex notepad)
+	
+5.2 Lägg till följande rader om de inte redan finns
+
+	log4j.category.org.soitoolkit.commons.mule.messageLogger=DEBUG, devnull
+	log4j.additivity.org.soitoolkit.commons.mule.messageLogger=false
+	
+	log4j.appender.devnull=org.apache.log4j.FileAppender
+	log4j.appender.devnull.File=/dev/null
+	log4j.appender.devnull.layout=orgpache.log4j.PatternLayout
+	log4j.appender.devnull.layout.ConversionPattern=%-5p %d [%t] %c: %m%n
+	
+6. Starta mule
+
+6.1 Navigera till bin katalog
+	cd ~/bin
+	
+6.2 Starta Mule
+	sh start.sh && tail -f ~/vp/mule-standalone-2.2.8/logs/vp.log
+	
+6.3 Verifiera att mule startat upp
+	Se README fil för tjänster som man kan anropa för att verifiera att plattformen startat
+	

@@ -44,3 +44,10 @@ Note:   The jmx.password must be read only only to the owner. Do this by:
 lib/
 The libraries that are required to start mule with the virtualization platform. 
 These must be put in <mule-home>/lib/user
+
+
+NOTES
+Following services provided when deploying the platform:
+
+https://host:port/vp/GetLogicalAddresseesByServiceContract/1/rivtabp21?wsdl
+https://host:port/vp/GetSupportedServiceContracts/1/rivtabp21?wsdl
