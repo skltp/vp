@@ -82,9 +82,9 @@ public class VpFullServiceTestConsumer {
 		
 		
 		// Needed for accessing the WSDL file from an https URL
-		System.setProperty("javax.net.ssl.keyStore", "certs/tp.jks");
+		System.setProperty("javax.net.ssl.keyStore", "..(certs/tp.jks");
 		System.setProperty("javax.net.ssl.keyStorePassword", "password");
-		System.setProperty("javax.net.ssl.trustStore", "certs/truststore.jks");
+		System.setProperty("javax.net.ssl.trustStore", "../certs/truststore.jks");
 		System.setProperty("javax.net.ssl.trustStorePassword", "password");
 		
 		Tjanst1Service ts = new Tjanst1Service(ClientUtil
