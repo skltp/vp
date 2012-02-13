@@ -112,7 +112,7 @@ public class CertificateHelper extends VPHelperSupport {
 		try {
 			return (X509Certificate) this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
 		} catch (final ClassCastException e) {
-			throw new VpSemanticException("VP002 Exception caught when trying to extract certificate from VP_CERTIFICATE http header. Expected a X509Certificate");
+			throw new VpSemanticException("VP002 Exception caught when trying to extract certificate from " + VPUtil.REVERSE_PROXY_HEADER_NAME  + " http header. Expected a X509Certificate");
 		}
 	}
 	
