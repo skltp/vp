@@ -17,12 +17,17 @@
 		http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2 http://dist.muleforge.org/smooks/schema/mule-module-smooks/1.2/mule-module-smooks.xsd
 	">
 
+	<message-properties-transformer name="deleteHttpContent-type">
+		<delete-message-property key="Content-type"/>
+	</message-properties-transformer>           
+
 	<model name="VagvalRouter-model">
-	
+		
 		<service name="VagvalRouter-service">
             <inbound>
 				<inbound-endpoint address="vm://vagval-router" synchronous="true" responseTransformer-refs="logRespOut exceptionTransformer logRespIn">
 					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
+					<transformer ref="deleteHttpContent-type"/>
 					<transformer ref="createCorrId"/>
 					<transformer ref="fixTransformer" />
 					<transformer ref="logReqIn" />
