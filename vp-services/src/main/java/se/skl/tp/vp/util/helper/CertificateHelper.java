@@ -1,6 +1,12 @@
 package se.skl.tp.vp.util.helper;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +26,9 @@ import se.skl.tp.vp.util.VPUtil;
 public class CertificateHelper extends VPHelperSupport {
 
 	private static Logger log = LoggerFactory.getLogger(CertificateHelper.class);
-	
+	private static final String BEGIN_HEADER = "-----BEGIN CERTIFICATE-----";
+    private static final String END_HEADER = "-----END CERTIFICATE-----";
+    
 	public CertificateHelper(MuleMessage muleMessage, final Pattern pattern, final String whiteList) {
 		super(muleMessage, pattern, whiteList);
 	}
@@ -105,16 +113,37 @@ public class CertificateHelper extends VPHelperSupport {
 			throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses.");
 		}
 		
+//		/*
+//		 * Try to get the certificate from
+//		 * http header
+//		 */
+//		try {
+//			return (X509Certificate) this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+//		} catch (final ClassCastException e) {
+//			throw new VpSemanticException("VP002 Exception caught when trying to extract certificate from " + VPUtil.REVERSE_PROXY_HEADER_NAME  + " http header. Expected a X509Certificate");
+//		}
+		
 		/*
-		 * Try to get the certificate from
-		 * http header
-		 */
+		* Try to get the certificate from
+		* http header
+		*/
 		try {
-			return (X509Certificate) this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
-		} catch (final ClassCastException e) {
-			throw new VpSemanticException("VP002 Exception caught when trying to extract certificate from " + VPUtil.REVERSE_PROXY_HEADER_NAME  + " http header. Expected a X509Certificate");
+		   Object certificate = this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+
+		   if(certificate instanceof X509Certificate) {
+			   log.debug("Found X509Certificate in httpheader: {}", VPUtil.REVERSE_PROXY_HEADER_NAME);
+			   return (X509Certificate)certificate;
+		   } else if(certificate instanceof String) {
+			   log.debug("Found possible PEM-encoded certificate httpheader {}, trying to convert...", VPUtil.REVERSE_PROXY_HEADER_NAME);
+			   return convertPossiblePEMFormattedCertificate(certificate);
+		   } else {
+			   throw new CertificateParsingException();			   
+		   }
+		} catch (final Exception e) {
+			log.error("Found X509Certificate in httpheader: {}", VPUtil.REVERSE_PROXY_HEADER_NAME);
+			throw new VpSemanticException("VP002 Exception caught when trying to extract certificate from http header:" + VPUtil.REVERSE_PROXY_HEADER_NAME);
 		}
-	}
+	}	
 	
 	private boolean isCallerOnWhiteList() {
 		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR));
@@ -151,4 +180,55 @@ public class CertificateHelper extends VPHelperSupport {
 	private boolean isReverseProxy() {
 		return this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME) != null;
 	}
-}
+	
+	private X509Certificate convertPossiblePEMFormattedCertificate(Object possibleCertificate) throws Exception
+	{
+		log.debug("Converting PEM-formatted certificate to X509Certificate...");
+
+
+		if(log.isDebugEnabled()) {
+			log.debug("Got possible PEM-encoded certificate : " +possibleCertificate);
+		}
+
+
+		// We have a string formatted certificate. Insert newlines after
+		// BEGIN_HEADER and before END_HEADER to make it readable for the
+		// CertificateFactory
+		//
+		String cert = (String)possibleCertificate;
+
+		int begin = cert.indexOf(BEGIN_HEADER);
+		int end = cert.indexOf(END_HEADER);
+
+		if(begin != -1 && end != -1) {
+			StringBuffer formattedCert = new StringBuffer();
+			formattedCert.append(BEGIN_HEADER);
+			formattedCert.append("\n");
+			// Take the content between BEGIN_HEADER and END_HEADER and remove all whitespace...
+
+			formattedCert.append(cert.substring(BEGIN_HEADER.length(),  end).replaceAll("\\s+", ""));
+			formattedCert.append("\n");
+			formattedCert.append(END_HEADER);
+			cert = formattedCert.toString();
+			InputStream is = new ByteArrayInputStream(((String)cert).getBytes() );
+			BufferedInputStream bis = new BufferedInputStream(is);
+			CertificateFactory factory = CertificateFactory.getInstance("X.509");
+			possibleCertificate = factory.generateCertificate(bis);
+
+			// Check before casting...
+			if(possibleCertificate instanceof X509Certificate) {
+				log.debug("Certificate converted to X509Certificate!");
+				log.debug("Certificate principalname: " +
+						((X509Certificate)possibleCertificate).getSubjectX500Principal().getName());
+
+				// Return the converted X509Certificate
+				return (X509Certificate)possibleCertificate;
+			} else {
+				throw new CertificateException();				
+			}
+		} else {
+			throw new CertificateParsingException();				
+		}
+	}
+} 
+
