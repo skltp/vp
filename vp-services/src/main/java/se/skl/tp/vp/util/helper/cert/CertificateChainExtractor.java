@@ -20,15 +20,9 @@ public class CertificateChainExtractor extends CertificateExtractorBase implemen
 	}
 
 	@Override
-	public X509Certificate extractCertificate() throws VpSemanticException {
-		log.debug("Extracting X509Certificate from chain...");
-		return this.extraxtCertFromChain();
-	}
-
-	@Override
 	public String extractSenderIdFromCertificate() {
-		log.debug("Extracting X509Certificate senderId from header");
-		X509Certificate certificate = extractCertificate();
+		log.debug("Extracting X509Certificate senderId from chain");
+		X509Certificate certificate = extraxtCertFromChain();
 		return extractSenderIdFromCertificate(certificate);
 	}
 

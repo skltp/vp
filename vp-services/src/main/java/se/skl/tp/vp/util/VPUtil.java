@@ -44,6 +44,8 @@ public final class VPUtil {
 	
 	public static final String IS_HTTPS = "isHttps";
 	
+	public static final String CERT_SENDERID_PATTERN = "=([^,]+)";
+	
 	public static String extractNamespaceFromService(final QName qname) {
 		return qname.getNamespaceURI();
 	}

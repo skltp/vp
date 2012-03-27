@@ -71,7 +71,7 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
-		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
+		pattern = Pattern.compile(this.senderIdPropertyName + VPUtil.CERT_SENDERID_PATTERN);
 	}
 
 	// FIXME: Mule 3.1. To be removed since it's already in base class for Mule
@@ -184,7 +184,7 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 			try {
 				CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message,
 						this.pattern, this.whiteList);
-				
+
 				CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
 				final String senderId = certHelper.extractSenderIdFromCertificate();
 				log.debug("Sender extracted from certificate {}", senderId);

@@ -12,7 +12,8 @@ import se.skl.tp.vp.util.VPUtil;
 
 /**
  * 
- * Extract certificate information from the http header.
+ * Extract certificate information from the http header
+ * VPUtil.REVERSE_PROXY_HEADER_NAME.
  */
 public class CertificateHeaderExtractor extends CertificateExtractorBase implements CertificateExtractor {
 
@@ -23,15 +24,9 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 	}
 
 	@Override
-	public X509Certificate extractCertificate() throws VpSemanticException {
-		log.debug("Extracting X509Certificate from header");
-		return this.extractCertFromHeader();
-	}
-
-	@Override
 	public String extractSenderIdFromCertificate() {
 		log.debug("Extracting X509Certificate senderId from header");
-		X509Certificate certificate = extractCertificate();
+		X509Certificate certificate = extractCertFromHeader();
 		return extractSenderIdFromCertificate(certificate);
 	}
 

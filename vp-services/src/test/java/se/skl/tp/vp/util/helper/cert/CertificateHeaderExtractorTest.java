@@ -6,6 +6,9 @@ import static org.junit.Assert.fail;
 
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.regex.Pattern;
+
+import javax.security.auth.x500.X500Principal;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -15,6 +18,8 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 
 public class CertificateHeaderExtractorTest {
+
+	private Pattern pattern = Pattern.compile("OU" + VPUtil.CERT_SENDERID_PATTERN);
 
 	/**
 	 * Test that we can extract a certificate when it comes in the http header.
@@ -26,21 +31,22 @@ public class CertificateHeaderExtractorTest {
 	public void testExtractX509CertificateCertificateFromHeader() throws Exception {
 		final MuleMessage msg = mockCertAndRemoteAddress();
 
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, null, "192.168.0.109");
-		final X509Certificate certificate = helper.extractCertificate();
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "192.168.0.109");
+		final String senderId = helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
 
-		assertNotNull(certificate);
+		assertNotNull(senderId);
+		assertEquals("Harmony", senderId);
 	}
 
 	@Test
 	public void testExtractX509CertificateCertificateFromHeaderAndInWhiteList() throws Exception {
 		final MuleMessage msg = mockCertAndRemoteAddress();
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, null,
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern,
 				"192.168.0.109, 127.0.0.1, localhost");
-		helper.extractCertificate();
+		helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
@@ -52,10 +58,10 @@ public class CertificateHeaderExtractorTest {
 
 		final MuleMessage msg = mockCertAndRemoteAddress();
 
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, null,
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern,
 				"192.168.0.108, 127.0.0.1, localhost");
 		try {
-			helper.extractCertificate();
+			helper.extractSenderIdFromCertificate();
 
 			fail("Exception not thrown when caller was not in the ip white list");
 		} catch (final VpSemanticException e) {
@@ -72,8 +78,8 @@ public class CertificateHeaderExtractorTest {
 	public void testExtractX509CertificateCertificateWithSingleWhiteListEntry() throws Exception {
 		final MuleMessage msg = mockCertAndRemoteAddress();
 
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, null, "192.168.0.109");
-		helper.extractCertificate();
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "192.168.0.109");
+		helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
@@ -92,9 +98,9 @@ public class CertificateHeaderExtractorTest {
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
 		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/127.0.0.1:12345");
 
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, null, "127.0.0.1");
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "127.0.0.1");
 		try {
-			helper.extractCertificate();
+			helper.extractSenderIdFromCertificate();
 
 			fail("No exception thrown when certificate was of wrong type");
 		} catch (final VpSemanticException e) {
@@ -106,10 +112,17 @@ public class CertificateHeaderExtractorTest {
 	}
 
 	private MuleMessage mockCertAndRemoteAddress() {
+
+		X500Principal principal = new X500Principal(
+				"CN=Hermione Granger, O=Apache Software Foundation, OU=Harmony, L=Hogwarts, ST=Hants, C=GB");
+
 		final X509Certificate cert = Mockito.mock(X509Certificate.class);
+		Mockito.when(cert.getSubjectX500Principal()).thenReturn(principal);
+
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
 		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/192.168.0.109:12345");
+
 		return msg;
 	}
 
