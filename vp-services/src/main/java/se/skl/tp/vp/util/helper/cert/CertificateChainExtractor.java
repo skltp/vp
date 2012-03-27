@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 
+/**
+ * Extractor used when extracting certificate from the certificate chain.
+ * 
+ */
 public class CertificateChainExtractor extends CertificateExtractorBase implements CertificateExtractor {
 
 	private static Logger log = LoggerFactory.getLogger(CertificateChainExtractor.class);

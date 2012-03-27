@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.helper.VPHelperSupport;
 
+/**
+ * Base class for certificate extractors.
+ * 
+ */
 public class CertificateExtractorBase extends VPHelperSupport {
 
 	private static Logger log = LoggerFactory.getLogger(CertificateExtractorBase.class);

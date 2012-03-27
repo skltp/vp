@@ -12,9 +12,10 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 
 /**
+ * Extractor used when extracting certificate from header
+ * VPUtil.REVERSE_PROXY_HEADER_NAME. This is used when running in reverse proxy
+ * mode.
  * 
- * Extract certificate information from the http header
- * VPUtil.REVERSE_PROXY_HEADER_NAME.
  */
 public class CertificateHeaderExtractor extends CertificateExtractorBase implements CertificateExtractor {
 
