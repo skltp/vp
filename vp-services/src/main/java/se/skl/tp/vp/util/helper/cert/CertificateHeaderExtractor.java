@@ -107,6 +107,8 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 	private boolean isCallerOnWhiteList() {
 		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR));
 
+		log.debug("Check if caller {} is in white list..", ip);
+
 		if (VPUtil.isWhitespace(ip)) {
 			throw new VpSemanticException(
 					"Could not extract the IP address of the caller. Cannot check whether caller is on the white list");
@@ -121,10 +123,12 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 		for (final String s : ips) {
 			if (s.trim().equals(ip.trim())) {
+				log.debug("Caller found in white list");
 				return true;
 			}
 		}
 
+		log.debug("Caller NOT found in white list");
 		return false;
 	}
 
