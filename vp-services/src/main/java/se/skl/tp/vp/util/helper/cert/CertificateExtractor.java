@@ -25,6 +25,6 @@ public interface CertificateExtractor {
 	 * @param certificate
 	 * @return
 	 */
-	public String extractSenderIdFromCertificate(final X509Certificate certificate);
+	public String extractSenderIdFromCertificate();
 
 }

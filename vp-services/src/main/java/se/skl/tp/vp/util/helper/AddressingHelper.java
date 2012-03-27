@@ -1,6 +1,5 @@
 package se.skl.tp.vp.util.helper;
 
-import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -103,10 +102,9 @@ public class AddressingHelper extends VPHelperSupport {
 
 		CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(
 				this.getMuleMessage(), this.getPattern(), this.getWhiteList());
-		CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
 
-		final X509Certificate cert = certHelper.extractCertificate();
-		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate(cert);
+		CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
+		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate();
 		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId);
 
 		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID);

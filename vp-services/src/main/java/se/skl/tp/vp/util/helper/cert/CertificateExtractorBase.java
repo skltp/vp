@@ -19,7 +19,7 @@ public class CertificateExtractorBase extends VPHelperSupport {
 		super(muleMessage, pattern, whiteList);
 	}
 
-	public String extractSenderIdFromCertificate(final X509Certificate certificate) {
+	String extractSenderIdFromCertificate(final X509Certificate certificate) {
 
 		log.debug("Extracting sender id from certificate.");
 

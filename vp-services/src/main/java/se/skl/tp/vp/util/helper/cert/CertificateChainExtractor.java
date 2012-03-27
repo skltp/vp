@@ -25,6 +25,13 @@ public class CertificateChainExtractor extends CertificateExtractorBase implemen
 		return this.extraxtCertFromChain();
 	}
 
+	@Override
+	public String extractSenderIdFromCertificate() {
+		log.debug("Extracting X509Certificate senderId from header");
+		X509Certificate certificate = extractCertificate();
+		return extractSenderIdFromCertificate(certificate);
+	}
+
 	/**
 	 * Extract the certificate from the cert chain
 	 * 

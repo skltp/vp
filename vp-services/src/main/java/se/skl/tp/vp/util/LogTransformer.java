@@ -18,7 +18,6 @@ package se.skl.tp.vp.util;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
 
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,10 +184,9 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 			try {
 				CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message,
 						this.pattern, this.whiteList);
+				
 				CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
-
-				final X509Certificate cert = certHelper.extractCertificate();
-				final String senderId = certHelper.extractSenderIdFromCertificate(cert);
+				final String senderId = certHelper.extractSenderIdFromCertificate();
 				log.debug("Sender extracted from certificate {}", senderId);
 
 				evaluatedExtraInfo.put(VPUtil.SENDER_ID, senderId);
