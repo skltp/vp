@@ -108,12 +108,16 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 	private static BufferedInputStream extractCerticate(String pemCertString) {
 
-		int beginHeader = pemCertString.indexOf(BEGIN_HEADER);
+		int beginHeader = pemCertString.indexOf(BEGIN_HEADER) + BEGIN_HEADER.length();
 		int endHeader = pemCertString.indexOf(END_HEADER);
 
 		StringBuffer formattedCert = new StringBuffer();
-		formattedCert.append(pemCertString.substring(beginHeader, endHeader));
+		formattedCert.append(BEGIN_HEADER);
+		formattedCert.append("\n");
+		formattedCert.append(pemCertString.substring(beginHeader, endHeader).replaceAll("\\s+", ""));
+		formattedCert.append("\n");
 		formattedCert.append(END_HEADER);
+
 		pemCertString = formattedCert.toString();
 
 		InputStream is = new ByteArrayInputStream(((String) pemCertString).getBytes());

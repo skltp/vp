@@ -115,7 +115,14 @@ public class CertificateHeaderExtractorTest {
 
 	@Test
 	public void extractPEMCertificate() throws Exception {
-		String pemCertContent = readPemCertificateFile();
+		String pemCertContent = readPemCertificateFile("certs/client.pem");
+		final X509Certificate certificate = CertificateHeaderExtractor.buildCertificateFromPem(pemCertContent);
+		assertNotNull(certificate);
+	}
+	
+	@Test
+	public void extractPEMCertificateIncludingWhiteSpaces() throws Exception {
+		String pemCertContent = readPemCertificateFile("certs/clientPemWithWhiteSpaces.pem");
 		final X509Certificate certificate = CertificateHeaderExtractor.buildCertificateFromPem(pemCertContent);
 		assertNotNull(certificate);
 	}
@@ -129,7 +136,7 @@ public class CertificateHeaderExtractorTest {
 
 	@Test
 	public void commonNameIsCorrectWhenExtractingPEMCertificate() throws Exception {
-		String pemCertContent = readPemCertificateFile();
+		String pemCertContent = readPemCertificateFile("certs/client.pem");
 
 		final X509Certificate certificate = CertificateHeaderExtractor.buildCertificateFromPem(pemCertContent);
 		final X509Principal issuer = PrincipalUtil.getIssuerX509Principal(certificate);
@@ -140,7 +147,7 @@ public class CertificateHeaderExtractorTest {
 
 	@Test
 	public void organizationUnitNameIsCorrectWhenExtractingPEMCertificate() throws Exception {
-		String pemCertContent = readPemCertificateFile();
+		String pemCertContent = readPemCertificateFile("certs/client.pem");
 
 		final X509Certificate certificate = CertificateHeaderExtractor.buildCertificateFromPem(pemCertContent);
 		final X509Principal subject = PrincipalUtil.getSubjectX509Principal(certificate);
@@ -149,8 +156,8 @@ public class CertificateHeaderExtractorTest {
 		assertEquals("VP", organizationalUnitName);
 	}
 
-	private String readPemCertificateFile() throws IOException {
-		URL filePath = CertificateHeaderExtractorTest.class.getClassLoader().getResource("certs/client.pem");
+	private String readPemCertificateFile(String pemFile) throws IOException {
+		URL filePath = CertificateHeaderExtractorTest.class.getClassLoader().getResource(pemFile);
 		File file = FileUtils.toFile(filePath);
 		String pemCertContent = FileUtils.readFileToString(file);
 		return pemCertContent;
