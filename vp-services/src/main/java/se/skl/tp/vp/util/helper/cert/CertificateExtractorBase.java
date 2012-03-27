@@ -32,6 +32,19 @@ public class CertificateExtractorBase extends VPHelperSupport {
 		}
 
 		final String principalName = certificate.getSubjectX500Principal().getName();
+		return extractSenderFromPrincipal(principalName);
+	}
+
+	private String convertFromHexToString(final String hexString) {
+		byte[] txtInByte = new byte[hexString.length() / 2];
+		int j = 0;
+		for (int i = 0; i < hexString.length(); i += 2) {
+			txtInByte[j++] = Byte.parseByte(hexString.substring(i, i + 2), 16);
+		}
+		return new String(txtInByte);
+	}
+
+	protected String extractSenderFromPrincipal(String principalName) {
 		final Matcher matcher = this.getPattern().matcher(principalName);
 
 		if (matcher.find()) {
@@ -42,15 +55,6 @@ public class CertificateExtractorBase extends VPHelperSupport {
 		} else {
 			throw new VpSemanticException("VP002 No senderId found in Certificate: " + principalName);
 		}
-	}
-
-	private String convertFromHexToString(final String hexString) {
-		byte[] txtInByte = new byte[hexString.length() / 2];
-		int j = 0;
-		for (int i = 0; i < hexString.length(); i += 2) {
-			txtInByte[j++] = Byte.parseByte(hexString.substring(i, i + 2), 16);
-		}
-		return new String(txtInByte);
 	}
 
 }

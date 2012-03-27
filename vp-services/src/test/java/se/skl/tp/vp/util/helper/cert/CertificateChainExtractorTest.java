@@ -38,6 +38,7 @@ public class CertificateChainExtractorTest {
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR);
 
 		assertNotNull(senderId);
+		assertEquals("Harmony", senderId);
 	}
 
 	@Test
