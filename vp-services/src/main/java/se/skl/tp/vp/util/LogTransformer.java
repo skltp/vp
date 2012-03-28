@@ -191,7 +191,7 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 
 				evaluatedExtraInfo.put(VPUtil.SENDER_ID, senderId);
 			} catch (final VpSemanticException e) {
-				log.debug("Could not extract sender id from certificate.");
+				log.debug("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
 			}
 
 			evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID));
