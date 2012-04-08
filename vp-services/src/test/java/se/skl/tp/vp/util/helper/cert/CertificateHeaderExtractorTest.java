@@ -111,43 +111,6 @@ public class CertificateHeaderExtractorTest {
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
 	}
 
-	@Test
-	public void extractSenderIdfromPlainX500PrincipalStringWithSlashes() {
-
-		String cert = "/C=se/DC=Services/DC=Nod1/O=165565594230/OU=TP/CN=tk_qa.tp.cybercom.carelink.sjunet.org/serialNumber=HSASERVICES-100M";
-
-		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
-		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/192.168.0.109:12345");
-
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "192.168.0.109");
-		final String senderId = helper.extractSenderIdFromCertificate();
-
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
-
-		assertNotNull(senderId);
-		assertEquals("TP", senderId);
-	}
-
-	@Test
-	public void extractSenderIdfromPlainX500PrincipalStringWithComma() {
-		String cert = "C=se,DC=Services,DC=Nod1,O=165565594230,OU=TP,CN=tk_qa.tp.cybercom.carelink.sjunet.org,serialNumber=HSASERVICES-100M";
-
-		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME)).thenReturn(cert);
-		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR)).thenReturn("/192.168.0.109:12345");
-
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "192.168.0.109");
-		final String senderId = helper.extractSenderIdFromCertificate();
-
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
-
-		assertNotNull(senderId);
-		assertEquals("TP", senderId);
-	}
-
 	private MuleMessage mockCertAndRemoteAddress() {
 
 		X500Principal principal = new X500Principal(

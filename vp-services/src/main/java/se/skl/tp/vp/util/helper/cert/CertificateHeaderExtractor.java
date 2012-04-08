@@ -43,8 +43,6 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 				return extractFromX509Certificate(certificate);
 			} else if (PemConverter.isPEMCertificate(certificate)) {
 				return extractFromPemFormatCertificate(certificate);
-			} else if (isCertificateInPlainX500PrincipalString(certificate)) {
-				return extractFromPlainX500PrincipalStringFormat(certificate);
 			} else {
 				log.error("Unkown certificate type found in httpheader: {}", VPUtil.REVERSE_PROXY_HEADER_NAME);
 				throw new VpSemanticException("VP002 Exception, unkown certificate type found in httpheader "
@@ -58,11 +56,6 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 	}
 
-	private String extractFromPlainX500PrincipalStringFormat(Object certificate) {
-		certificate = replaceUnwantedCharactersInString((String) certificate);
-		return extractSenderIdFromPlainX500PrincipalString((String) certificate);
-	}
-
 	private String extractFromPemFormatCertificate(Object certificate) throws CertificateException {
 		X509Certificate x509Certificate = PemConverter.buildCertificate(certificate);
 		return extractSenderIdFromCertificate(x509Certificate);
@@ -73,32 +66,9 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 		return extractSenderIdFromCertificate(x509Certificate);
 	}
 
-	static String replaceUnwantedCharactersInString(String certificate) {
-		return certificate.replaceAll("/", ",");
-	}
-
-	private String extractSenderIdFromPlainX500PrincipalString(String certificate) {
-		return extractSenderFromPrincipal(certificate);
-	}
-
-	boolean isCertificateInPlainX500PrincipalString(Object certificate) {
-		if (containsCorrectCertInformation(certificate)) {
-			log.debug("Found plain string certificate information in httpheader: {}", VPUtil.REVERSE_PROXY_HEADER_NAME);
-			return true;
-		}
-		return false;
-	}
-
 	static boolean isX509Certificate(Object certificate) {
 		if (certificate instanceof X509Certificate) {
 			log.debug("Found X509Certificate in httpheader: {}", VPUtil.REVERSE_PROXY_HEADER_NAME);
-			return true;
-		}
-		return false;
-	}
-
-	boolean containsCorrectCertInformation(Object certificate) {
-		if (certificate != null && certificate instanceof String) {
 			return true;
 		}
 		return false;
