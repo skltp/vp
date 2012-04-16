@@ -91,6 +91,36 @@ public class RivTransformerTest {
 
 		this.executeComparison(data, expected);
 	}
+	
+	@Test
+	public void riv21To20WhenNamsespaceIsInHeaderElement() throws Exception {
+		final URL resource = Thread.currentThread().getContextClassLoader().getResource("testfiles/Rivta21RequestNamespaceInHeader.xml");
+		final XMLStreamReader xstream = XMLInputFactory.newInstance().createXMLStreamReader(resource.openStream());
+
+		final URL resultFile = Thread.currentThread().getContextClassLoader()
+				.getResource("testfiles/Rivta20RequestNamespaceInHeader.xml");
+		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
+
+		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+				RivTransformer.RIV21_NS, RivTransformer.RIV20_NS, RivTransformer.RIV21_ELEM, RivTransformer.RIV20_ELEM);
+
+		this.executeComparison(data, expected);
+	}
+
+	@Test
+	public void riv20To21WhenNamsespaceIsInHeaderElement() throws Exception {
+		final URL resource = Thread.currentThread().getContextClassLoader().getResource("testfiles/Rivta20RequestNamespaceInHeader.xml");
+		final XMLStreamReader xstream = XMLInputFactory.newInstance().createXMLStreamReader(resource.openStream());
+
+		final URL resultFile = Thread.currentThread().getContextClassLoader()
+				.getResource("testfiles/Rivta21RequestNamespaceInHeader.xml");
+		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
+
+		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+				RivTransformer.RIV20_NS, RivTransformer.RIV21_NS, RivTransformer.RIV20_ELEM, RivTransformer.RIV21_ELEM);
+
+		this.executeComparison(data, expected);
+	}
 
 	private void executeComparison(final ByteArrayOutputStream transformed, final XMLEventReader expected)
 			throws Exception {

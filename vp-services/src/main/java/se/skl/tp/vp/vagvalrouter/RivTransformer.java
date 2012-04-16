@@ -176,6 +176,13 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 					continue elementLoop;
 				}
 
+				if (isHeaderElement(startElement)) {
+					addStartElement(writer, factory, startElement);
+					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
+							startElement);
+					continue elementLoop;
+				}
+
 				if (isAdressingElement(fromAddressingElement, startElement)) {
 					replaceAddressingElement(toAddressingNs, toAddressingElement, writer, factory, startElement);
 					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
@@ -196,6 +203,10 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 
 		writer.flush();
 		return out;
+	}
+
+	private boolean isHeaderElement(StartElement startElement) {
+		return startElement.getName().getLocalPart().equals("Header");
 	}
 
 	private boolean isAddressingElement(final String fromAddressingElement, final EndElement endElement) {
