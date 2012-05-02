@@ -63,7 +63,8 @@ Denna instruktion förutsätter att version 1.3.1 är installerad enligt anvisni
 	cp -rf *.jar ~/vp/mule-standalone-2.2.8/lib/user
 
 4.3 Ta bort jarfiler
-	Ta bort ~/vp/mule-standalone-2.2.8/lib/user/getsupportedservicecontracts-schemas.jar
+	-Ta bort ~/vp/mule-standalone-2.2.8/lib/user/getsupportedservicecontracts-schemas.jar
+	-Ta bort tidigare release av VP, ~/vp/mule-standalone-2.2.8/lib/user/vp-services-1.3.1.jar (eller vp-services-1.3.1-SNAPSHOT)
 
 5. Uppdatera log properties
 
