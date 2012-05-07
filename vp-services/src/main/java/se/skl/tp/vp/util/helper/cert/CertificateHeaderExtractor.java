@@ -31,7 +31,8 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 		log.debug("Extracting from http header...");
 
 		if (!this.isCallerOnWhiteList()) {
-			throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses.");
+			final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR));
+			throw new VpSemanticException("Caller " + ip + " was not on the white list of accepted IP-addresses.");
 		}
 
 		log.debug("Extracting X509Certificate senderId from header");

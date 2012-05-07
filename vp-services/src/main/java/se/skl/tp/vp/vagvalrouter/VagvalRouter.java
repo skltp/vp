@@ -20,6 +20,7 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.mule.api.routing.RoutingException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.routing.outbound.AbstractRecipientList;
+import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,36 +61,36 @@ public class VagvalRouter extends AbstractRecipientList {
 	private Pattern pattern;
 
 	private String senderIdPropertyName;
-	
+
 	private String whiteList;
-	
+
 	private String responseTimeout;
 
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
-	
+
 	private AddressingHelper addrHelper;
-	
+
 	void setAddressingHelper(final AddressingHelper helper) {
 		this.addrHelper = helper;
 	}
-	
+
 	public AddressingHelper getAddressingHelper(final MuleMessage msg) {
-		
+
 		if (this.addrHelper == null) {
 			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent, pattern, whiteList));
 		}
-		
+
 		if (!this.addrHelper.getMuleMessage().equals(msg)) {
 			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent, pattern, whiteList));
 		}
-		
+
 		return this.addrHelper;
 	}
-	
+
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
 	}
-	
+
 	public void setResponseTimeout(final String responseTimeout) {
 		this.responseTimeout = responseTimeout;
 	}
@@ -110,8 +112,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException {
 		final String addr = this.getAddressingHelper(message).getAddress();
-		message.setBooleanProperty(VPUtil.IS_HTTPS, addr.contains("https") ? true:false);
-		
+		message.setBooleanProperty(VPUtil.IS_HTTPS, addr.contains("https") ? true : false);
+
 		return Collections.singletonList(addr);
 	}
 
@@ -121,15 +123,15 @@ public class VagvalRouter extends AbstractRecipientList {
 	 */
 	@Override
 	public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException {
-		
+
 		final PayloadHelper routerHelper = new PayloadHelper(message);
-		
+
 		final String receiverId = routerHelper.extractReceiverFromPayload();
 		message.setProperty(VPUtil.RECEIVER_ID, receiverId);
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)) + "-"
-				+ message.getProperty(VPUtil.RECEIVER_ID);
+		String serviceId = VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE))
+				+ "-" + message.getProperty(VPUtil.RECEIVER_ID);
 
 		synchronized (statistics) {
 
@@ -154,35 +156,34 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		// Do the actual routing
 		MuleMessage replyMessage = super.route(message, session);
-		
+
 		/*
 		 * Restore properties
 		 */
-		for (final Object prop: message.getPropertyNames()) {
+		for (final Object prop : message.getPropertyNames()) {
 			replyMessage.setProperty((String) prop, message.getProperty((String) prop));
 		}
-		
+
 		synchronized (statistics) {
 			ServiceStatistics serverStatistics = statistics.get(serviceId);
 			serverStatistics.noOfSuccesfullCalls++;
 			long duration = System.currentTimeMillis() - beforeCall;
 			serverStatistics.totalDuration += duration;
-			serverStatistics.averageDuration = serverStatistics.totalDuration
-					/ serverStatistics.noOfSuccesfullCalls;
+			serverStatistics.averageDuration = serverStatistics.totalDuration / serverStatistics.noOfSuccesfullCalls;
 		}
-		
+
 		return replyMessage;
 	}
 
 	@Override
-	protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient)
-			throws RoutingException {
+	protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException {
 
-		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder((String) recipient),
-				muleContext);
+		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder((String) recipient), muleContext);
 		eb.setSynchronous(true);
 		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
-		
+
+		setOutboundTransformers(eb);
+
 		HashMap<String, String> properties = new HashMap<String, String>();
 		properties.put("proxy", "true");
 		properties.put("payload", "envelope");
@@ -190,6 +191,7 @@ public class VagvalRouter extends AbstractRecipientList {
 			properties.put("protocolConnector", VPUtil.CONSUMER_CONNECTOR_NAME);
 			logger.debug("Https protocolConnector set");
 		}
+
 		eb.setProperties(properties);
 
 		try {
@@ -199,5 +201,25 @@ public class VagvalRouter extends AbstractRecipientList {
 		} catch (EndpointException e) {
 			throw new VpTechnicalException(e);
 		}
+	}
+
+	/*
+	 * TP forwards properties in mule header that should not be forwarded. In
+	 * the case the producer is another instance of TP (serivce platform) this
+	 * can be problematic.
+	 * 
+	 * <message-properties-transformer name="deleteMuleHeaders">
+	 *   <delete-message-property key="x-vp-auth-cert"/>
+	 * </message-properties-transformer>
+	 */
+	private void setOutboundTransformers(EndpointBuilder eb) {
+		logger.info("Set outbound message transformers to update/add/remove mule message properties");
+
+		List<String> deleteProperties = new ArrayList<String>();
+		deleteProperties.add(VPUtil.REVERSE_PROXY_HEADER_NAME);
+
+		MessagePropertiesTransformer transformer = new MessagePropertiesTransformer();
+		transformer.setDeleteProperties(deleteProperties);
+		eb.addTransformer(transformer);
 	}
 }
