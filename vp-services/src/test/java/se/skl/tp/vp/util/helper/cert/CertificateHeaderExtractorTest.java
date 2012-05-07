@@ -66,11 +66,11 @@ public class CertificateHeaderExtractorTest {
 			fail("Exception not thrown when caller was not in the ip white list");
 		} catch (final VpSemanticException e) {
 			// OK
-			assertEquals("Caller was not on the white list of accepted IP-addresses.", e.getMessage());
+			assertEquals("Caller 192.168.0.109 was not on the white list of accepted IP-addresses.", e.getMessage());
 		}
 
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR);
+		Mockito.verify(msg, Mockito.times(2)).getProperty(VPUtil.REMOTE_ADDR);
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.PEER_CERTIFICATES);
 	}
 
