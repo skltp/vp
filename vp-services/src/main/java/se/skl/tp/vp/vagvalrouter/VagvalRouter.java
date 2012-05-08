@@ -209,17 +209,39 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * can be problematic.
 	 * 
 	 * <message-properties-transformer name="deleteMuleHeaders">
-	 *   <delete-message-property key="x-vp-auth-cert"/>
+	 * <delete-message-property key="x-vp-auth-cert"/>
 	 * </message-properties-transformer>
 	 */
 	private void setOutboundTransformers(EndpointBuilder eb) {
 		logger.info("Set outbound message transformers to update/add/remove mule message properties");
 
-		List<String> deleteProperties = new ArrayList<String>();
-		deleteProperties.add(VPUtil.REVERSE_PROXY_HEADER_NAME);
-
 		MessagePropertiesTransformer transformer = new MessagePropertiesTransformer();
-		transformer.setDeleteProperties(deleteProperties);
+		transformer.setMuleContext(muleContext);
+		transformer.setDeleteProperties(new ArrayList<String>());
+		transformer.setAddProperties(new HashMap<String, String>());
+
+		handleContentTypeHeaders(transformer);
+		handleReverseproxyHeaders(transformer);
+
 		eb.addTransformer(transformer);
 	}
+
+	@SuppressWarnings("unchecked")
+	private void handleContentTypeHeaders(MessagePropertiesTransformer transformer) {
+		logger.debug("Remove any existing content-type and set content-type=text/xml;charset=UTF-8 on outbound endpoint");
+
+		transformer.getDeleteProperties().add("content-type");
+		transformer.getDeleteProperties().add("Content-Type");
+		transformer.getDeleteProperties().add("Content-type");
+		transformer.getDeleteProperties().add("content-Type");
+
+		transformer.getAddProperties().put("Content-Type", "text/xml;charset=UTF-8");
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleReverseproxyHeaders(MessagePropertiesTransformer transformer) {
+		logger.debug("Remove reverse proxy header information on outbound endpoint");
+		transformer.getDeleteProperties().add(VPUtil.REVERSE_PROXY_HEADER_NAME);
+	}
+
 }
