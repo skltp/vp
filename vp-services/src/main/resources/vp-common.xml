@@ -52,13 +52,13 @@
     <!-- Common connectors and endpoints, i.e. that not needs to be changed for different config-files (local unit-test, integration-test or production environments) -->
     <!-- In the below configurations the https:tls-client element is never used! This may be a bug in 2.2.8... -->
     <!-- Https connector used when acting as a producer, ie receiving calls-->
-  	<https:connector name="VPProducerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" >
+  	<https:connector name="VPProducerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
 		<https:tls-key-store class="${TP_TLS_STORE_PRODUCER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_PRODUCER_FILE}" storePassword="${TP_TLS_STORE_PRODUCER_PASSWORD}" keyPassword="${TP_TLS_STORE_PRODUCER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
 
     <!-- Https connector used when acting as a consumer, ie making calls -->
-  	<https:connector name="VPConsumerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" >
+  	<https:connector name="VPConsumerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
 		<https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
@@ -112,24 +112,28 @@
 		<spring:property name="logType"  value="req-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
 
     <custom-transformer name="logReqOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="req-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
 
     <custom-transformer name="logRespIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="resp-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
 
     <custom-transformer name="logRespOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="resp-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
 
     <!-- TODO: Add global definitions here -->

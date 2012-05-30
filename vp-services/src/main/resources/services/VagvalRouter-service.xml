@@ -18,11 +18,12 @@
 	">
 
 	<model name="VagvalRouter-model">
-	
+		
 		<service name="VagvalRouter-service">
             <inbound>
 				<inbound-endpoint address="vm://vagval-router" synchronous="true" responseTransformer-refs="logRespOut exceptionTransformer logRespIn">
 					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
+				
 					<transformer ref="createCorrId"/>
 					<transformer ref="fixTransformer" />
 					<transformer ref="logReqIn" />

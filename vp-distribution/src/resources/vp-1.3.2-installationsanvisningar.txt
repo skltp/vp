@@ -20,14 +20,24 @@ Denna instruktion förutsätter att version 1.3.1 är installerad enligt anvisni
 2.4 Lägg till följande properties
 
 	# Dessa properties ersätter GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_HOST och GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_PORT, för att
-	få ett tydligare namn.
+	  få ett tydligare namn.
 	  
 	TK_HOST=localhost
 	TK_PORT=8080
 	
-	# Denna property är en ny service som finns tillgänglig i tjänsteplattformen
+	# Dessa property är för en ny service som finns tillgänglig i tjänsteplattformen
 
 	GETLOGICALADDRESSESBYSERVICECONTRACT_OUTBOUND_URI=tp-vagval-admin-services/GetLogicalAddresseesByServiceContract
+	GETLOGICALADDRESSESBYSERVICECONTRACT_PORT=23001
+	
+	# Denna property är för att kunna styra portnummer på en tillgänglig i tjänsteplattformen
+	
+	GETSUPPORTEDSERVICECONTRACTS_PORT=23001
+	
+	# Ett värde i millisekunder i fördröjning för att stänga en socket. Om det används är det rekommenderat att sätta högre än SERVICE_TIMEOUT_MS.
+	  Om det inte skall användas, sätt till 0. http://www.mulesoft.org/documentation/display/MULE2USER/TCP+Transport socketSoLinger.
+	
+	SOCKET_SO_LINGER_MS=<värde i millisekunder, 0 om den inte skall användas>
 	
 2.5 Ta bort följande properties
 
@@ -53,8 +63,9 @@ Denna instruktion förutsätter att version 1.3.1 är installerad enligt anvisni
 	cp -rf *.jar ~/vp/mule-standalone-2.2.8/lib/user
 
 4.3 Ta bort jarfiler
-	Ta bort ~/vp/mule-standalone-2.2.8/lib/user/getsupportedservicecontracts-schemas.jar
-	
+	-Ta bort ~/vp/mule-standalone-2.2.8/lib/user/getsupportedservicecontracts-schemas.jar
+	-Ta bort tidigare release av VP, ~/vp/mule-standalone-2.2.8/lib/user/vp-services-1.3.1.jar (eller vp-services-1.3.1-SNAPSHOT)
+
 5. Uppdatera log properties
 
 5.1 Editera log4j.properties

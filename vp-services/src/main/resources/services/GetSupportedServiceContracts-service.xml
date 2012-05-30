@@ -20,7 +20,7 @@
 	
 		<service name="GetSupportedServiceContracts-service-rivtabp21">
 			<inbound>
-				<cxf:inbound-endpoint address="https://${tp.host}:${tp.port}/${tp.baseUri}/GetSupportedServiceContracts/1/rivtabp21"
+				<cxf:inbound-endpoint address="https://${tp.host}:${GETSUPPORTEDSERVICECONTRACTS_PORT}/${tp.baseUri}/GetSupportedServiceContracts/1/rivtabp21"
 					proxy="true" 
 					synchronous="true" 
 					wsdlLocation="classpath:/schemas/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
