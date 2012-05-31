@@ -62,7 +62,7 @@ public class LogManager implements Callable {
 		
 		final Date ts = this.getDateFromLogEntry(logEvent);
 		final String logState = logEvent.getLogEntry().getMessageInfo().getMessage();
-		final String payload = logEvent.getLogEntry().getPayload();
+		String payload = logEvent.getLogEntry().getPayload();
 		
 		String msgId = logEvent.getLogEntry().getRuntimeInfo().getBusinessCorrelationId();
 		
@@ -86,6 +86,11 @@ public class LogManager implements Callable {
 			final String insertWaypoint = "insert into session_waypoint (waypoint, timestamp, payload, session_id, riv_version) values (" +
 					"?, ?, ?, ?, ?)";
 			
+			// Truncate long payloads...
+			if (payload != null && payload.length() > 2000) {
+				payload = payload.substring(0, 2000);
+				log.debug("Truncated payload!");
+			}
 			int waypoint = this.jdbcTemplate.update(insertWaypoint, new Object[] { logState, ts.getTime(), payload, msgId, rivVersion});
 			if (waypoint == 1) {
 				log.debug("Inserted waypoint entry for msgId {}", msgId);

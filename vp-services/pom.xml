@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>se.skl.tp</groupId>
 		<artifactId>vp</artifactId>
-		<version>1.3.2-RB</version>
+		<version>1.3.3-RB</version>
 	</parent>
 
 	<artifactId>vp-services</artifactId>
