@@ -222,6 +222,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		handleContentTypeHeaders(transformer);
 		handleReverseproxyHeaders(transformer);
+		handleMuleHeadersNotToBePropagated(transformer);
 
 		eb.addTransformer(transformer);
 	}
@@ -242,6 +243,14 @@ public class VagvalRouter extends AbstractRecipientList {
 	private void handleReverseproxyHeaders(MessagePropertiesTransformer transformer) {
 		logger.debug("Remove reverse proxy header information on outbound endpoint");
 		transformer.getDeleteProperties().add(VPUtil.REVERSE_PROXY_HEADER_NAME);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleMuleHeadersNotToBePropagated(MessagePropertiesTransformer transformer) {
+		logger.debug("Remove mule header information not to be propagated on outbound endpoint");
+		transformer.getDeleteProperties().add(VPUtil.SENDER_ID);
+		transformer.getDeleteProperties().add(VPUtil.RECEIVER_ID);
+		transformer.getDeleteProperties().add(VPUtil.RIV_VERSION);
 	}
 
 }
