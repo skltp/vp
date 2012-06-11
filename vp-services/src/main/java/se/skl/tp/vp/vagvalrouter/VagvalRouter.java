@@ -252,6 +252,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		transformer.getDeleteProperties().add(VPUtil.RECEIVER_ID);
 		transformer.getDeleteProperties().add(VPUtil.RIV_VERSION);
 		transformer.getDeleteProperties().add(VPUtil.SERVICE_NAMESPACE);
+		transformer.getDeleteProperties().add("namespace");
 	}
 
 }
