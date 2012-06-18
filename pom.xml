@@ -15,7 +15,7 @@
 
 	<groupId>se.skl.tp</groupId>
 	<artifactId>vp</artifactId>
-	<version>1.3.3-RB</version>
+	<version>1.3.3-R</version>
 	<packaging>pom</packaging>
 	<name>vp</name>
 
