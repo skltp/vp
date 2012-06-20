@@ -249,7 +249,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	private void handleMuleHeadersNotToBePropagated(MessagePropertiesTransformer transformer) {
 		logger.debug("Remove mule header information not to be propagated on outbound endpoint");
 		transformer.getDeleteProperties().add(VPUtil.SENDER_ID);
-		transformer.getDeleteProperties().add(VPUtil.RECEIVER_ID);
+		//transformer.getDeleteProperties().add(VPUtil.RECEIVER_ID);
 		transformer.getDeleteProperties().add(VPUtil.RIV_VERSION);
 		transformer.getDeleteProperties().add(VPUtil.SERVICE_NAMESPACE);
 		transformer.getDeleteProperties().add("namespace");
