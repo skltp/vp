@@ -25,10 +25,10 @@
 	
 		<service name="resetVagvalCache-service">
             <inbound>
-
                 <http:inbound-endpoint 
-                	address="http://${TP_HOST}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
+                	address="http://${tp.host}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
                     synchronous="true"
+                    responseTimeout="${SERVICE_TIMEOUT_MS}"
                 />
  
             </inbound>     

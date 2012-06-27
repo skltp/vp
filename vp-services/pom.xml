@@ -2,7 +2,8 @@
 <!-- DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT 
 	YOU ARE DOING! [soi-toolkit.gen.version=0.3.1] [soi-toolkit.gen.type=services] 
 	[soi-toolkit.gen.createDate=2011-06-30T14:55:14.318+02:00] [soi-toolkit.gen.artifactId=vp] -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -32,7 +33,7 @@
 		<dependency>
 			<groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
 			<artifactId>vp-mule-2.2.8-dependencies</artifactId>
-			<version>0.3.1</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -43,8 +44,8 @@
 
 		<dependency>
 			<groupId>se.skl.tp</groupId>
-			<artifactId>getsupportedservicecontracts-schemas</artifactId>
-			<version>1.0</version>
+			<artifactId>itintegration-registry-schemas</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -59,6 +60,25 @@
 			<version>5.1.17</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock-junit4</artifactId>
+			<version>2.5.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.9</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.8.5</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -70,6 +90,50 @@
 				<directory>${basedir}/src/environment</directory>
 			</testResource>
 		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>2.2.12</version>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sourceRoot>${basedir}/target/generated/src/test/java</sourceRoot>
+							<wsdlOptions>
+								<wsdlOption>
+									<extraargs>
+										<extraarg>-p</extraarg>
+										<!-- Note: be careful when changing this - must be in sync for 
+											all schemas generations in this namespace! -->
+										<extraarg>
+											urn:riv:v1=se.skl.riv.wsdl.v1
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											urn:skl:tjanst1:0.1=se.skl.tjanst1.wsdl
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											http://www.w3.org/2005/08/addressing=org.w3.wsaddressing10
+										</extraarg>
+									</extraargs>
+									<wsdl>src/test/resources/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl</wsdl>
+								</wsdlOption>
+
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
 	</build>
 
 </project>

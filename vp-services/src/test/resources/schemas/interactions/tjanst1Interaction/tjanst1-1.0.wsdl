@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+ * Copyright 2009 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ -->
+
+<wsdl:definitions name="Tjanst1"
+	xmlns:rivh="urn:riv:v1"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	targetNamespace="urn:skl:tjanst1:0.1"
+	xmlns="urn:skl:tjanst1:0.1">
+
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified">
+			<xsd:import schemaLocation="tjanst1-1.0.xsd" namespace="urn:skl:tjanst1:0.1"/>
+			<xsd:import schemaLocation="../../core_components/ws-addressing-1.0.xsd" namespace="http://www.w3.org/2005/08/addressing"/>
+		</xsd:schema>
+		
+	</wsdl:types>
+
+	<wsdl:message name="getProductDetailMsg">
+		<wsdl:part name="LogicalAddress" element="wsa:To" />
+		<wsdl:part name="parameters" element="getProductDetailElem" />
+	</wsdl:message>
+	<wsdl:message name="getProductDetailResponse">
+		<wsdl:part name="parameters" element="getProductDetailResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="listProductsMsg">
+		<wsdl:part name="LogicalAddress" element="wsa:To" />
+		<wsdl:part name="parameters" element="listProducts" />
+	</wsdl:message>
+	<wsdl:message name="listProductsResponse">
+		<wsdl:part name="parameters" element="listProductsResponse" />
+	</wsdl:message>
+	
+	<wsdl:portType name="Tjanst1Interface">
+		<wsdl:operation name="getProductDetail">
+			<wsdl:input message="getProductDetailMsg"/>
+			<wsdl:output message="getProductDetailResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="listProducts">
+			<wsdl:input message="listProductsMsg" />
+			<wsdl:output message="listProductsResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	
+	<wsdl:binding name="Tjanst1SoapBinding" type="Tjanst1Interface">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="getProductDetail">
+			<soap:operation soapAction="getProductDetail" />
+			<wsdl:input>
+		        <soap:header use="literal" message="getProductDetailMsg" part="LogicalAddress" />				
+				<soap:body use="literal" parts="parameters"  />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="listProducts">
+			<soap:operation soapAction="listProducts"/>
+			<wsdl:input>
+		        <soap:header use="literal" message="listProductsMsg" part="LogicalAddress" />				
+				<soap:body use="literal" parts="parameters" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:service name="Tjanst1Service">
+		<wsdl:port binding="Tjanst1SoapBinding" name="Tjanst1ImplPort">
+			<soap:address location="https://localhost:23000/nationell/tjanst1" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

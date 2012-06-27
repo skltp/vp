@@ -2,6 +2,7 @@ package se.skl.tp.vp.vagvalrouter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -10,6 +11,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mule.api.MuleMessage;
 
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
@@ -17,6 +20,7 @@ import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
+import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 public class VagvalRouterTest extends TestCase {
@@ -25,6 +29,8 @@ public class VagvalRouterTest extends TestCase {
 	VagvalAgent vagvalAgent;
 	VagvalInput vagvalInput;
 	String serviceNamespace;
+	
+	private AddressingHelper helper;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -40,17 +46,19 @@ public class VagvalRouterTest extends TestCase {
 		vagvalInput.senderId = "TP-TEST";
 		vagvalInput.rivVersion = "urn:riv:v1";
 		vagvalInput.serviceNamespace = "{urn:riv13606:v1}RIV";
-
+		
+		final MuleMessage msg = Mockito.mock(MuleMessage.class);
+		helper = new AddressingHelper(msg, this.vagvalAgent, Pattern.compile("OU=([^,]+)"), null);
 	}
 
 	@Test
 	public void testHappyDaysOneHit() throws Exception {
-
+		
 		vagvalAgent.virtualiseringsInfo.add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
-		String adress = vagvalRouter.getAddressFromAgent(vagvalInput);
+		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("cxf:https://adress", adress);
 
 	}
@@ -64,7 +72,7 @@ public class VagvalRouterTest extends TestCase {
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
-		String adress = vagvalRouter.getAddressFromAgent(vagvalInput);
+		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("cxf:https://adress1", adress);
 
 	}
@@ -75,7 +83,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.anropsBehorighetsInfo = null;
 		vagvalAgent.virtualiseringsInfo = null;
 		try {
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP008"));
@@ -94,7 +102,7 @@ public class VagvalRouterTest extends TestCase {
 				"VardgivareB"));
 
 		try {
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP005"));
@@ -113,7 +121,7 @@ public class VagvalRouterTest extends TestCase {
 				"VardgivareB"));
 
 		try {
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP006"));
@@ -127,7 +135,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.virtualiseringsInfo.add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
 		try {
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP007"));
@@ -140,7 +148,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.virtualiseringsInfo.add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1", "unknown",
 				"VardgivareB"));
 		try {
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP004"));
@@ -155,7 +163,7 @@ public class VagvalRouterTest extends TestCase {
 				"VardgivareB"));
 		try {
 			vagvalInput.receiverId = null;
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP003"));
@@ -170,7 +178,7 @@ public class VagvalRouterTest extends TestCase {
 				"VardgivareB"));
 		try {
 			vagvalInput.senderId = null;
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP002"));
@@ -185,7 +193,7 @@ public class VagvalRouterTest extends TestCase {
 				"VardgivareB"));
 		try {
 			vagvalInput.rivVersion = null;
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage().startsWith("VP001"));
@@ -201,7 +209,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		try {
-			vagvalRouter.getAddressFromAgent(vagvalInput);
+			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertTrue(e.getMessage(), e.getMessage().startsWith("VP010"));
@@ -218,7 +226,7 @@ public class VagvalRouterTest extends TestCase {
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
-		String adress = vagvalRouter.getAddressFromAgent(vagvalInput);
+		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("cxf:https://adress", adress);
 
 	}
@@ -232,7 +240,7 @@ public class VagvalRouterTest extends TestCase {
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
-		String adress = vagvalRouter.getAddressFromAgent(vagvalInput);
+		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("cxf:https://adress", adress);
 
 	}

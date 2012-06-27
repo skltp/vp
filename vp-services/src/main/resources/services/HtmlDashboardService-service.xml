@@ -25,8 +25,9 @@
             <inbound>
 
                 <http:inbound-endpoint 
-                	address="http://${TP_HOST}:${HTMLDASHBOARDSERVICE_PORT}/${HTMLDASHBOARDSERVICE_INBOUND_URI}"
+                	address="http://${tp.host}:${HTMLDASHBOARDSERVICE_PORT}/${HTMLDASHBOARDSERVICE_INBOUND_URI}"
                     synchronous="true"
+                    responseTimeout="${SERVICE_TIMEOUT_MS}"
                 />
  
             </inbound>
