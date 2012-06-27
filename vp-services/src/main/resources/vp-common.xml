@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <mule 
-	xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
-	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
-	xmlns:management="http://www.mulesource.org/schema/mule/management/2.2"
+	xmlns:https="http://www.mulesoft.org/schema/mule/https"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:management="http://www.mulesoft.org/schema/mule/management"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.mulesource.org/schema/mule/core/2.2       http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.mulesource.org/schema/mule/https/2.2		 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
-		http://www.mulesource.org/schema/mule/jms/2.2        http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
-		http://www.mulesource.org/schema/mule/management/2.2 http://www.mulesource.org/schema/mule/management/2.2/mule-management.xsd
+		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core		http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/jms			http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+		http://www.mulesoft.org/schema/mule/management	http://www.mulesoft.org/schema/mule/management/3.2/mule-management.xsd
 	">
 
 	<spring:bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

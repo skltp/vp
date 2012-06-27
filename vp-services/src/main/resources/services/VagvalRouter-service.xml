@@ -1,31 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<mule 
-	xmlns="http://www.mulesource.org/schema/mule/core/2.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jdbc="http://www.mulesource.org/schema/mule/vm/2.2"
-	xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
-	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
-	xmlns:smooks="http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2"
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.mulesource.org/schema/mule/core/2.2  http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.mulesource.org/schema/mule/http/2.2   http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
-		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.mulesource.org/schema/mule/jms/2.2   http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
-		http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2 http://dist.muleforge.org/smooks/schema/mule-module-smooks/1.2/mule-module-smooks.xsd
-	">
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd" >
 
 	<message-properties-transformer name="deleteHttpContent-type">
 		<delete-message-property key="Content-type"/>
-	</message-properties-transformer>           
+	</message-properties-transformer>
+
+	<!--
+	<flow name="vagval-router-flow" >
+	    
+        <inbound-endpoint
+            address="m://vagval-router"
+            exchange-pattern="request-response"
+            responseTransformer-refs="logRespOut exceptionTransformer logRespIn" >
+        </inbound-endpoint>
+
+            <custom-transformer class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
+
+            <transformer ref="deleteHttpContent-type" />
+
+            <transformer ref="createCorrId" />
+
+            <transformer ref="fixTransformer" />
+
+            <transformer ref="logReqIn" />
+
+            <custom-transformer class="se.skl.tp.vp.vagvalrouter.RivTransformer" >
+
+                <spring:property
+                    name="vagvalAgent"
+                    ref="vagvalAgent" />
+
+                <spring:property
+                    name="senderIdPropertyName"
+                    value="${VAGVALROUTER_SENDERID}" />
+
+                <spring:property
+                    name="whiteList"
+                    value="${IP_WHITE_LIST}" />
+            </custom-transformer>
+
+            <transformer ref="logReqOut" />
+        
+            
+        <custom-router class="se.skl.tp.vp.vagvalrouter.VagvalRouter" >
+            <spring:property
+                name="vagvalAgent"
+                ref="vagvalAgent" />
+
+            <spring:property
+                name="senderIdPropertyName"
+                value="${VAGVALROUTER_SENDERID}" />
+
+            <spring:property
+                name="responseTimeout"
+                value="${SERVICE_TIMEOUT_MS}" />
+
+            <spring:property
+                name="whiteList"
+                value="${IP_WHITE_LIST}" />
+        </custom-router>
+        
+    </flow>
+    
+ -->
 
 	<model name="VagvalRouter-model">
 		
 		<service name="VagvalRouter-service">
             <inbound>
-				<inbound-endpoint address="vm://vagval-router" synchronous="true" responseTransformer-refs="logRespOut exceptionTransformer logRespIn">
+				<inbound-endpoint address="vm://vagval-router" 
+				    exchange-pattern="request-response"
+				    responseTransformer-refs="logRespOut exceptionTransformer logRespIn">
 					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
 					<transformer ref="deleteHttpContent-type"/>
 					<transformer ref="createCorrId"/>

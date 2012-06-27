@@ -9,6 +9,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
@@ -105,12 +106,12 @@ public class AddressingHelper extends VPHelperSupport {
 
 		CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
 		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate();
-		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId);
+		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.INVOCATION);
 
-		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID);
-		vagvalInput.rivVersion = (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION);
+		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.INVOCATION);
+		vagvalInput.rivVersion = (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION);
 		vagvalInput.serviceNamespace = VPUtil.extractNamespaceFromService((QName) this.getMuleMessage().getProperty(
-				VPUtil.SERVICE_NAMESPACE));
+				VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION));
 
 		return vagvalInput;
 	}

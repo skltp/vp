@@ -18,34 +18,39 @@
  *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 
  *   Boston, MA 02111-1307  USA
- -->
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
-	xsi:schemaLocation="
-               http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-               http://www.mulesource.org/schema/mule/cxf/2.2  http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd" >
 
-	<description>
+    <description>
 		Test konfiguration för att simulera Tjänstekatalogen
     </description>
 
- 	<spring:bean name="vagvalInfo" class="se.skl.tp.vp.vagvalrouter.VagvalInfo"/>
+    <spring:bean
+        name="vagvalInfo"
+        class="se.skl.tp.vp.vagvalrouter.VagvalInfo" />
 
-	<model name="SokVagvalsInfoStub">
-		<service name="SokVagvalsInfoStubService">
-			<inbound>
-				<cxf:inbound-endpoint 
-					address="${TP_SOKVAGVALSINFO_URL}"
-					wsdlLocation="classpath:/schemas/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-1.0.wsdl"/> 
-			</inbound>
-			<component>
-				<singleton-object class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub" >
-					<property key="vagvalInfo" value-ref="vagvalInfo"/>
-				</singleton-object>
-			</component>
-		</service>
-	</model>
+    <flow name="tk-teststub-flow" >
+
+        <inbound-endpoint address="${TP_SOKVAGVALSINFO_URL}" />
+
+        <cxf:jaxws-service
+            serviceClass="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub"
+            wsdlLocation="classpath:/schemas/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-1.0.wsdl" />
+
+        <component>
+            <singleton-object class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub" >
+                <property
+                    key="vagvalInputs"
+                    value-ref="vagvalInputs" />
+            </singleton-object>
+        </component>
+    </flow>
+
 </mule>

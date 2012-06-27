@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 
 class HtmlDashboardRenderer {
 

@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
+import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheResponse;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
@@ -38,7 +39,7 @@ public class ResetVagvalCache implements Callable {
 	}
 
 	public Object onCall(final MuleEventContext eventContext) throws Exception {
-		eventContext.getMessage().clearProperties();
+		eventContext.getMessage().clearProperties(PropertyScope.INVOCATION);
 
 		final String content = getContentAndSetResponseContentType(eventContext);
 
@@ -53,7 +54,7 @@ public class ResetVagvalCache implements Callable {
 			throws Exception {
 
 		// Set some return info
-		eventContext.getMessage().setStringProperty("Content-Type", "text/html; charset=" + eventContext.getEncoding());
+		eventContext.getMessage().setProperty("Content-Type", "text/html; charset=" + eventContext.getEncoding(), PropertyScope.INBOUND);
 
 		// Reset cache
 		ResetVagvalCacheResponse result = vagvalAgent.resetVagvalCache(null);
@@ -65,8 +66,8 @@ public class ResetVagvalCache implements Callable {
 	private void setResponseContentLength(final MuleEventContext eventContext, final String content)
 			throws UnsupportedEncodingException {
 
-		eventContext.getMessage().setStringProperty("Content-Length",
-				Integer.toString(content.getBytes(eventContext.getEncoding()).length));
+		eventContext.getMessage().setProperty("Content-Length",
+				Integer.toString(content.getBytes(eventContext.getEncoding()).length), PropertyScope.INBOUND);
 	}
 	
 	private String getResultAsString(ResetVagvalCacheResponse result) {

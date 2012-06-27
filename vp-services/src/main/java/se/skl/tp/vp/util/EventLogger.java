@@ -24,6 +24,7 @@ import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_INTEGRAT
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,8 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsMessageUtils;
@@ -271,7 +272,7 @@ public class EventLogger implements MuleContextAware {
 				stackTrace.append('\n').append("\t at ").append(stLine);
 			}
 		}
-		return MessageFormatter.arrayFormat(LOG_STRING, new String[] {logEventName, integrationScenarioId, contractId, logMessage, serviceImplementation, HOST_NAME, HOST_IP, componentId, endpoint, messageId, businessCorrelationId, businessContextIdString, extraInfoString, payload, stackTrace.toString(), logEventName});
+		return MessageFormatter.arrayFormat(LOG_STRING, new String[] {logEventName, integrationScenarioId, contractId, logMessage, serviceImplementation, HOST_NAME, HOST_IP, componentId, endpoint, messageId, businessCorrelationId, businessContextIdString, extraInfoString, payload, stackTrace.toString(), logEventName}).getMessage();
 	}
 	
 	private String businessContextIdToString(List<BusinessContextId> businessContextIds) {
@@ -453,7 +454,7 @@ public class EventLogger implements MuleContextAware {
         MuleEventContext event       = RequestContext.getEventContext();
         if (event != null) {
 		    serviceImplementation   = MuleUtil.getServiceName(event);
-		    EndpointURI endpointURI = event.getEndpointURI();
+		    URI endpointURI = event.getEndpointURI();
 			endpoint                = (endpointURI == null)? "" : endpointURI.toString();
         }
 		
@@ -467,18 +468,18 @@ public class EventLogger implements MuleContextAware {
 
 			if (log.isDebugEnabled()) {
 				@SuppressWarnings("rawtypes")
-				Set names = message.getPropertyNames();
+				Set names = message.getPropertyNames(PropertyScope.INVOCATION);
 				for (Object object : names) {
-					Object value = message.getProperty(object.toString());
+					Object value = message.getProperty(object.toString(), PropertyScope.INVOCATION);
 					log.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
 				}
 			}
 			
 			messageId             = message.getUniqueId();
-			contractId            = message.getStringProperty(SOITOOLKIT_CONTRACT_ID, "");
-			businessCorrelationId = message.getStringProperty(SOITOOLKIT_CORRELATION_ID, "");
-			integrationScenarioId = message.getStringProperty(SOITOOLKIT_INTEGRATION_SCENARIO, "");
-			propertyBusinessContextId = message.getStringProperty(SOITOOLKIT_BUSINESS_CONTEXT_ID, null);
+			contractId            = message.getInvocationProperty(SOITOOLKIT_CONTRACT_ID, "");
+			businessCorrelationId = message.getInvocationProperty(SOITOOLKIT_CORRELATION_ID, "");
+			integrationScenarioId = message.getInvocationProperty(SOITOOLKIT_INTEGRATION_SCENARIO, "");
+			propertyBusinessContextId = message.getInvocationProperty(SOITOOLKIT_BUSINESS_CONTEXT_ID, null);
 		}
 
 		String componentId = getServerId();

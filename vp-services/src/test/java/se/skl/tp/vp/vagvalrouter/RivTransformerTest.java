@@ -22,8 +22,7 @@ import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 public class RivTransformerTest {
 
 	private RivTransformer transformer;
-	private static final String UTF8 = "UTF-8";
-
+	
 	@Before
 	public void setUp() throws Exception {
 		this.transformer = new RivTransformer();

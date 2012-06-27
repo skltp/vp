@@ -4,6 +4,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 
 import se.skl.tp.vp.exceptions.VpTechnicalException;
@@ -115,7 +116,7 @@ public class PayloadHelper extends VPHelperSupport {
 	}
 	
 	private String getRivVersion() {
-		return (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION);
+		return (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION);
 	}
 	
 	private ReversibleXMLStreamReader getPayload() {

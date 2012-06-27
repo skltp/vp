@@ -78,7 +78,7 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
 			throw new RuntimeException("PP01 Product Does Not Exist");
 		} else if (parameters.getProductId().equals("Timeout")) {
 			try {
-				Thread.currentThread().sleep(35000);
+				Thread.sleep(35000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

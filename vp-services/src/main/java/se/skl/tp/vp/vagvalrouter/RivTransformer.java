@@ -40,8 +40,9 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ import se.skl.tp.vp.util.helper.PayloadHelper;
  * 
  * @author Marcus Krantz [marcus.krantz@callistaenterprise.se]
  */
-public class RivTransformer extends AbstractMessageAwareTransformer {
+public class RivTransformer extends AbstractMessageTransformer {
 
 	private static Logger log = LoggerFactory.getLogger(RivTransformer.class);
 
@@ -91,7 +92,7 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 	}
 
 	@Override
-	public Object transform(MuleMessage msg, String encoding) throws TransformerException {
+	public Object transformMessage(MuleMessage msg, String encoding) throws TransformerException {
 
 		log.debug("Riv transformer executing");
 
@@ -101,27 +102,27 @@ public class RivTransformer extends AbstractMessageAwareTransformer {
 		/*
 		 * Check if virtualized service is a 2.0 service
 		 */
-		String rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION);
+		String rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION);
 		if (rivVersion == null || rivVersion.equals("")) {
-			final String tns = VPUtil.extractNamespaceFromService((QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE));
+			final String tns = VPUtil.extractNamespaceFromService((QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION));
 			final String[] split = tns.split(":");
 
 			rivVersion = split[split.length - 1];
 		}
 
-		msg.setProperty(VPUtil.RIV_VERSION, rivVersion.toUpperCase());
+		msg.setProperty(VPUtil.RIV_VERSION, rivVersion.toUpperCase(), PropertyScope.INVOCATION);
 
 		/*
 		 * Get the receiver BEFORE any transformation
 		 */
-		msg.setProperty(VPUtil.RECEIVER_ID, routerHelper.extractReceiverFromPayload());
+		msg.setProperty(VPUtil.RECEIVER_ID, routerHelper.extractReceiverFromPayload(), PropertyScope.INVOCATION);
 
 		/*
 		 * Get the available RIV version from the service directory, and if the
 		 * version doesn't match, update to the producer version and transform
 		 */
 		final String rivProfile = addrHelper.getAvailableRivProfile();
-		msg.setProperty(VPUtil.RIV_VERSION, rivProfile);
+		msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.INVOCATION);
 
 		if (rivVersion.equalsIgnoreCase(RIV20) && rivProfile.equalsIgnoreCase(RIV21)) {
 			this.doTransform(msg, RIV20_NS, RIV21_NS, RIV20_ELEM, RIV21_ELEM);

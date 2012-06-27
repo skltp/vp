@@ -5,6 +5,7 @@ import java.security.cert.X509Certificate;
 import java.util.regex.Pattern;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ public class CertificateChainExtractor extends CertificateExtractorBase implemen
 	 */
 	private X509Certificate extraxtCertFromChain() {
 		final Certificate[] certificateChain = (Certificate[]) this.getMuleMessage().getProperty(
-				VPUtil.PEER_CERTIFICATES);
+				VPUtil.PEER_CERTIFICATES, PropertyScope.INVOCATION);
 		if (certificateChain != null) {
 			try {
 				return (X509Certificate) certificateChain[0];

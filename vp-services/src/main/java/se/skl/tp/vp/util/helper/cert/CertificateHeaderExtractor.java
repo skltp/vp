@@ -5,6 +5,7 @@ import java.security.cert.X509Certificate;
 import java.util.regex.Pattern;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 		log.debug("Extracting X509Certificate senderId from header");
 
-		Object certificate = this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
+		Object certificate = this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION);
 
 		try {
 			if (isX509Certificate(certificate)) {
@@ -75,7 +76,7 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 	}
 
 	private boolean isCallerOnWhiteList() {
-		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR));
+		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INVOCATION));
 
 		log.debug("Check if caller {} is in white list..", ip);
 

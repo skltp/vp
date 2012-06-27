@@ -19,32 +19,26 @@
 
  *   Boston, MA 02111-1307  USA
  -->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd" >
+   
+      <flow name="vp-producer-teststub-flow" >
 
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
-	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
-	xsi:schemaLocation="
-               http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-               http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
-               http://www.mulesource.org/schema/mule/cxf/2.2  http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
+        <inbound-endpoint address="https://localhost:19000/vardgivare-b/tjanst1"  
+            connector-ref="VPProducerConnector"/>
 
- 	<model name="nationell-tjanst1-teststub-model">
-	
-		<service name="vardgivare-b-tjanst1">
-			<inbound>
-				<cxf:inbound-endpoint 
-					address="https://localhost:19000/vardgivare-b/tjanst1"
-					wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl"
-					synchronous="true"
-					protocolConnector="VPProducerConnector"/> 
-			</inbound>
-			<component>
-				<singleton-object class="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"/>
-			</component>
-		</service>
+        <cxf:jaxws-service
+            serviceClass="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"
+					wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
 
- 	</model>	
+        <component>
+            <singleton-object class="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"  />
+        </component>
+    </flow>
 </mule>

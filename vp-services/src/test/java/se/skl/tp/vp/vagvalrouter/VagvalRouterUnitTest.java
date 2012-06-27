@@ -5,10 +5,12 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.mockito.Mockito;
-import org.mule.api.MuleMessage;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
+
 
 public class VagvalRouterUnitTest extends TestCase {
 
@@ -31,11 +33,14 @@ public class VagvalRouterUnitTest extends TestCase {
 		
 		router.setAddressingHelper(helper);
 		
-		final MuleMessage msg = Mockito.mock(MuleMessage.class);
+		final DefaultMuleEvent event = Mockito.mock(DefaultMuleEvent.class);	
+		final DefaultMuleMessage msg = Mockito.mock(DefaultMuleMessage.class);
 		
+		Mockito.when(event.getMessage()).thenReturn(msg);
 		Mockito.when(helper.getMuleMessage()).thenReturn(msg);
+				
+		final List<?> receipients = router.getRecipients(event);
 		
-		final List<?> receipients = router.getRecipients(msg);
 		assertNotNull(receipients);
 		assertEquals(1, receipients.size());
 		assertEquals(url, receipients.get(0));
@@ -44,8 +49,8 @@ public class VagvalRouterUnitTest extends TestCase {
 		Mockito.verify(helper, Mockito.times(1)).getAddress();
 		Mockito.verifyNoMoreInteractions(helper);
 		
-		Mockito.verify(msg, Mockito.only()).setBooleanProperty(VPUtil.IS_HTTPS, expectedResult);
-		Mockito.verify(msg, Mockito.times(1)).setBooleanProperty(VPUtil.IS_HTTPS, expectedResult);
+		Mockito.verify(msg, Mockito.only()).setOutboundProperty(VPUtil.IS_HTTPS, expectedResult);
+		Mockito.verify(msg, Mockito.times(1)).setOutboundProperty(VPUtil.IS_HTTPS, expectedResult);
 		Mockito.verifyNoMoreInteractions(msg);
 	}
 }

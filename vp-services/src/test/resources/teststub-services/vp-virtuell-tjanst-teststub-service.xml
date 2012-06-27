@@ -19,49 +19,27 @@
 
  *   Boston, MA 02111-1307  USA
  -->
- 
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
-	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
-	xsi:schemaLocation="
-               http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-               http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-               http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
-               http://www.mulesource.org/schema/mule/cxf/2.2  http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd">
-<!-- TODO. ML ECLIPSE TEMPORARY FIX FOR SOAP HEADER PROBLEM UNTIL OFFICIAL RELEASE OF MULE v2.2.2 IS RELEASED
-     USE THIS LINE INSTEAD OF THE ONE ABOVE IN ECLIPSE
-     ALSO the cxf-https-client.xml file should be removed when we go to v2.2.2 
-               http://www.mulesource.org/schema/mule/cxf/2.2   mule-cxf.xsd">
- -->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd" >
 
-	<!--
-	Name of this file is mandatory and may not be changed. 
-	 -->           
- 
-	<model name="tjanst1-model">
-		
-		<service name="tjanst1">
-			<inbound>
-				<cxf:inbound-endpoint address="https://${tp.host}:${tp.port}/${tp.baseUri}/tjanst1"
-                    wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl"
-                    serviceName="Tjanst1Service"
-                    namespace="urn:skl:tjanst1:0.1"
-                    proxy="true" 
-                    payload="envelope"
-                    synchronous="true"
-                    protocolConnector="VPProducerConnector"
-					/>
-			</inbound>
-    
-			<outbound>
-                <pass-through-router>
-        			<outbound-endpoint address="vm://vagval-router" 
-        			    synchronous="true"/>
-                </pass-through-router>
-			</outbound>    		
-		</service>		
-				
- 	</model>	
+      <flow name="vp-virtuell-tjanst-teststub-flow" >
+        <inbound-endpoint connector-ref="VPProducerConnector" address="https://${tp.host}:${tp.port}/${tp.baseUri}/tjanst1"  
+ 			name="Tjanst1" />
+
+        <cxf:jaxws-service
+            serviceClass="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"
+			/>
+        
+        <outbound-endpoint address="vm://vagval-router" >
+        </outbound-endpoint>    
+        
+    </flow>
 </mule>

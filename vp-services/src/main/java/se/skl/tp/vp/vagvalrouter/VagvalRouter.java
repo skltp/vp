@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -38,6 +38,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.routing.outbound.AbstractRecipientList;
@@ -108,30 +109,29 @@ public class VagvalRouter extends AbstractRecipientList {
 		this.vagvalAgent = vagvalAgent;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException {
-		final String addr = this.getAddressingHelper(message).getAddress();
-		message.setBooleanProperty(VPUtil.IS_HTTPS, addr.contains("https") ? true : false);
+	protected List<Object >getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
+		final String addr = this.getAddressingHelper(event.getMessage()).getAddress();
+		event.getMessage().setOutboundProperty(VPUtil.IS_HTTPS, addr.contains("https") ? true : false);
 
-		return Collections.singletonList(addr);
+		return Collections.singletonList((Object)addr);
 	}
-
+	
 	/**
 	 * Override this method to be able to collect statistics per
 	 * Contract/Service Producer
 	 */
 	@Override
-	public MuleMessage route(MuleMessage message, MuleSession session) throws RoutingException {
+    public MuleEvent route(MuleEvent event) throws RoutingException {
 
-		final PayloadHelper routerHelper = new PayloadHelper(message);
+		final PayloadHelper routerHelper = new PayloadHelper(event.getMessage());
 
 		final String receiverId = routerHelper.extractReceiverFromPayload();
-		message.setProperty(VPUtil.RECEIVER_ID, receiverId);
+		event.getMessage().setProperty(VPUtil.RECEIVER_ID, receiverId, PropertyScope.INVOCATION);
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE))
-				+ "-" + message.getProperty(VPUtil.RECEIVER_ID);
+		String serviceId = VPUtil.extractNamespaceFromService((QName) event.getMessage().getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION))
+				+ "-" + event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.INVOCATION);
 
 		synchronized (statistics) {
 
@@ -155,13 +155,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 
 		// Do the actual routing
-		MuleMessage replyMessage = super.route(message, session);
+		MuleEvent replyEvent = super.route(event);
 
 		/*
 		 * Restore properties
 		 */
-		for (final Object prop : message.getPropertyNames()) {
-			replyMessage.setProperty((String) prop, message.getProperty((String) prop));
+		for (final Object prop : event.getMessage().getPropertyNames(PropertyScope.INVOCATION)) {
+			replyEvent.getMessage().setProperty((String) prop, event.getMessage().getProperty((String) prop, PropertyScope.INVOCATION), PropertyScope.INVOCATION);
 		}
 
 		synchronized (statistics) {
@@ -172,22 +172,22 @@ public class VagvalRouter extends AbstractRecipientList {
 			serverStatistics.averageDuration = serverStatistics.totalDuration / serverStatistics.noOfSuccesfullCalls;
 		}
 
-		return replyMessage;
+		return replyEvent;
 	}
 
 	@Override
 	protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException {
 
-		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder((String) recipient), muleContext);
-		eb.setSynchronous(true);
+		
+		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder((String) recipient, muleContext));
 		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
 
 		setOutboundTransformers(eb);
 
-		HashMap<String, String> properties = new HashMap<String, String>();
+		HashMap<Object, Object> properties = new HashMap<Object, Object>();
 		properties.put("proxy", "true");
 		properties.put("payload", "envelope");
-		if (message.getBooleanProperty(VPUtil.IS_HTTPS, false)) {
+		if (message.getOutboundProperty(VPUtil.IS_HTTPS, false)) {
 			properties.put("protocolConnector", VPUtil.CONSUMER_CONNECTOR_NAME);
 			logger.debug("Https protocolConnector set");
 		}
@@ -218,16 +218,15 @@ public class VagvalRouter extends AbstractRecipientList {
 		MessagePropertiesTransformer transformer = new MessagePropertiesTransformer();
 		transformer.setMuleContext(muleContext);
 		transformer.setDeleteProperties(new ArrayList<String>());
-		transformer.setAddProperties(new HashMap<String, String>());
+		transformer.setAddProperties(new HashMap<String, Object>());
 
 		handleContentTypeHeaders(transformer);
 		handleReverseproxyHeaders(transformer);
 		handleMuleHeadersNotToBePropagated(transformer);
 
-		eb.addTransformer(transformer);
+		eb.addMessageProcessor(transformer);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void handleContentTypeHeaders(MessagePropertiesTransformer transformer) {
 		logger.debug("Remove any existing content-type and set content-type=text/xml;charset=UTF-8 on outbound endpoint");
 
@@ -239,13 +238,11 @@ public class VagvalRouter extends AbstractRecipientList {
 		transformer.getAddProperties().put("Content-Type", "text/xml;charset=UTF-8");
 	}
 
-	@SuppressWarnings("unchecked")
 	private void handleReverseproxyHeaders(MessagePropertiesTransformer transformer) {
 		logger.debug("Remove reverse proxy header information on outbound endpoint");
 		transformer.getDeleteProperties().add(VPUtil.REVERSE_PROXY_HEADER_NAME);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void handleMuleHeadersNotToBePropagated(MessagePropertiesTransformer transformer) {
 		logger.debug("Remove mule header information not to be propagated on outbound endpoint");
 		transformer.getDeleteProperties().add(VPUtil.SENDER_ID);
@@ -254,5 +251,6 @@ public class VagvalRouter extends AbstractRecipientList {
 		transformer.getDeleteProperties().add(VPUtil.SERVICE_NAMESPACE);
 		transformer.getDeleteProperties().add("namespace");
 	}
+
 
 }

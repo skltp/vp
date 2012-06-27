@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>se.skl.tp</groupId>
 		<artifactId>vp</artifactId>
-		<version>1.4.0-SNAPSHOT</version>
+		<version>2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>vp-services</artifactId>
@@ -32,8 +32,8 @@
 
 		<dependency>
 			<groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
-			<artifactId>vp-mule-2.2.8-dependencies</artifactId>
-			<version>${project.version}</version>
+			<artifactId>soitoolkit-mule-3.2.1-dependencies</artifactId>
+			<version>${soitoolkit.version}</version>
 		</dependency>
 
 		<dependency>
@@ -79,6 +79,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+		  <groupId>org.bouncycastle</groupId>
+		  <artifactId>bcprov-jdk16</artifactId>
+		  <version>1.45</version>
+		</dependency>
+            
 	</dependencies>
 
 	<build>
@@ -95,7 +101,6 @@
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
-				<version>2.2.12</version>
 				<executions>
 					<execution>
 						<id>generate-sources</id>

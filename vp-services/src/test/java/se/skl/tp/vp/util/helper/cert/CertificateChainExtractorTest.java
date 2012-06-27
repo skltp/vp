@@ -12,7 +12,9 @@ import javax.security.auth.x500.X500Principal;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
@@ -33,9 +35,9 @@ public class CertificateChainExtractorTest {
 		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, pattern, "127.0.0.1");
 		final String senderId = helper.extractSenderIdFromCertificate();
 
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES);
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.INVOCATION);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INVOCATION);
 
 		assertNotNull(senderId);
 		assertEquals("Harmony", senderId);
@@ -56,9 +58,9 @@ public class CertificateChainExtractorTest {
 			assertEquals("VP002 no certificates. The certificate chain was null", e.getMessage());
 		}
 
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES);
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.INVOCATION);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INVOCATION);
 	}
 
 	@Test
@@ -70,7 +72,7 @@ public class CertificateChainExtractorTest {
 		certs[0] = cert;
 
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		Mockito.when(msg.getProperty(VPUtil.PEER_CERTIFICATES)).thenReturn(certs);
+		Mockito.when(msg.getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.INVOCATION)).thenReturn(certs);
 
 		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, null, "127.0.0.1");
 
@@ -85,9 +87,9 @@ public class CertificateChainExtractorTest {
 					e.getMessage());
 		}
 
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES);
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.INVOCATION);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INVOCATION);
 	}
 
 	private MuleMessage mockCert() {
@@ -101,8 +103,8 @@ public class CertificateChainExtractorTest {
 		final Certificate[] certs = new Certificate[1];
 		certs[0] = cert;
 
-		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		Mockito.when(msg.getProperty(VPUtil.PEER_CERTIFICATES)).thenReturn(certs);
+		final DefaultMuleMessage msg = Mockito.mock(DefaultMuleMessage.class);
+		Mockito.when(msg.getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.INVOCATION)).thenReturn(certs);
 
 		return msg;
 	}

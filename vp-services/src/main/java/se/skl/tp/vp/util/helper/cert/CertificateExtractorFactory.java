@@ -3,6 +3,7 @@ package se.skl.tp.vp.util.helper.cert;
 import java.util.regex.Pattern;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class CertificateExtractorFactory extends VPHelperSupport {
 	}
 
 	private boolean isReverseProxy() {
-		return this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME) != null;
+		return this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION) != null;
 	}
 
 }

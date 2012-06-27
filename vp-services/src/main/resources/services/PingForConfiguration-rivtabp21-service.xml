@@ -1,42 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<mule 
-	xmlns="http://www.mulesource.org/schema/mule/core/2.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jdbc="http://www.mulesource.org/schema/mule/vm/2.2"
-	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
-	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.2"
-	xmlns:smooks="http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.mulesource.org/schema/mule/core/2.2  http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.mulesource.org/schema/mule/cxf/2.2   http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
-		http://www.mulesource.org/schema/mule/jms/2.2   http://www.mulesource.org/schema/mule/jms/2.2/mule-jms.xsd
-		http://www.muleforge.org/smooks/schema/mule-module-smooks/1.2 http://dist.muleforge.org/smooks/schema/mule-module-smooks/1.2/mule-module-smooks.xsd
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core	http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf		http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
 	">
-
+	
 	<model name="PingForConfiguration-rivtabp21-model">
 		<service name="PingForConfiguration-rivtabp21-service">
-            <inbound>
-                <cxf:inbound-endpoint 
-                	address="https://${tp.host}:${PINGFORCONFIGURATIONSERVICE_RIVTABP21_PORT}/${tp.baseUri}/${PINGFORCONFIGURATIONSERVICE_RIVTABP21_INBOUND_URI}"
-                    wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl"
-                    serviceName="PingForConfigurationResponderService"
-                    namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21"                 
-                    proxy="false"
-                    payload="envelope"
-                    synchronous="true"
-                    applyTransformersToProtocol="false"
-                    transformer-refs="createCorrId logReqIn"
-                    responseTransformer-refs="logRespIn"
-					protocolConnector="VPProducerConnector"
-					responseTimeout="${SERVICE_TIMEOUT_MS}"
-                />
-            </inbound>
+			<inbound>
+				<inbound-endpoint
+					address="https://${tp.host}:${PINGFORCONFIGURATIONSERVICE_RIVTABP21_PORT}/${tp.baseUri}/${PINGFORCONFIGURATIONSERVICE_RIVTABP21_INBOUND_URI}"
+					name="PingForConfigurationResponderService" transformer-refs="createCorrId logReqIn"
+					responseTransformer-refs="logRespIn" exchange-pattern="request-response"
+					connector-ref="VPProducerConnector">
+					<cxf:proxy-service
+						wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl"
+						namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21"
+						payload="envelope" />
+				</inbound-endpoint>
+			</inbound>
 			<component>
-				<singleton-object class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa21" />
+				<singleton-object
+					class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa21" />
 			</component>
 		</service>
-		
 	</model>
 </mule>

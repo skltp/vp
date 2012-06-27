@@ -44,7 +44,7 @@ public class VpFullServiceTest extends FunctionalTestCase {
 	}
 	
 	public void testHappyDays() throws Exception {
-
+//
 //		vagvalInfo.addVagval("vp-test-producer", "tp", "RIVTABP20", "urn:skl:tjanst1:0.1",
 //				"https://localhost:19000/vardgivare-b/tjanst1");
 //

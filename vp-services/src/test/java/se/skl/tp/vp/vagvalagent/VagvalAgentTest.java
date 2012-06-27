@@ -25,7 +25,7 @@ public class VagvalAgentTest extends FunctionalTestCase {
 
 	@Override
 	protected String getConfigResources() {
-		return "VagvalAgentTest-teststub-service.xml";
+		return "teststub-services/VagvalAgentTest-teststub-service.xml";
 	}
 
 	@BeforeClass

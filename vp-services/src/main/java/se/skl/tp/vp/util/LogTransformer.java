@@ -18,6 +18,7 @@ package se.skl.tp.vp.util;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +29,12 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 
 import org.mule.RequestContext;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transport.PropertyScope;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
@@ -55,7 +55,7 @@ import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
  * 
  * @author Magnus Larsson
  */
-public class LogTransformer extends AbstractMessageAwareTransformer implements MuleContextAware {
+public class LogTransformer extends AbstractMessageTransformer implements MuleContextAware {
 
 	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
 
@@ -74,21 +74,6 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 		pattern = Pattern.compile(this.senderIdPropertyName + VPUtil.CERT_SENDERID_PATTERN);
 	}
 
-	// FIXME: Mule 3.1. To be removed since it's already in base class for Mule
-	// 3.1
-	/*
-	 * Property muleContext
-	 */
-	private MuleContext muleContext = null;
-
-	public void setMuleContext(MuleContext muleContext) {
-		log.debug("MuleContext injected");
-		this.muleContext = muleContext;
-
-		// Also inject the muleContext in the event-logger (since we create the
-		// event-logger for now)
-		eventLogger.setMuleContext(this.muleContext);
-	}
 
 	/*
 	 * Property logLevel
@@ -137,7 +122,7 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 		eventLogger.setJaxbToXml(jaxbToXml);
 	}
 
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException {
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 
 		try {
 
@@ -161,7 +146,7 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 			String serviceName = MuleUtil.getServiceName(event);
 			if (serviceName != null
 					&& (serviceName.startsWith("_cxfServiceComponent") || serviceName.endsWith("_cxfComponent"))) {
-				EndpointURI endpointURI = event.getEndpointURI();
+				URI endpointURI = event.getEndpointURI();
 				if (endpointURI != null) {
 					String ep = endpointURI.toString();
 					if ((ep.contains("?wsdl")) || (ep.contains("?xsd"))) {
@@ -194,18 +179,18 @@ public class LogTransformer extends AbstractMessageAwareTransformer implements M
 				log.debug("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
 			}
 
-			evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID));
-			evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION));
+			evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.INVOCATION));
+			evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION));
 			evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE,
-					VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE)));
+					VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION)));
 
-			final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR);
+			final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR, PropertyScope.INVOCATION);
 			if (error != null) {
 				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR, error.toString());
 				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_DESCRIPTION,
-						(String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION));
+						(String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.INVOCATION));
 				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION,
-						(String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION));
+						(String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.INVOCATION));
 			}
 
 			switch (logLevel) {

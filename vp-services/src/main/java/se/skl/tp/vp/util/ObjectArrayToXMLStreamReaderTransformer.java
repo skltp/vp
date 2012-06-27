@@ -31,6 +31,7 @@ public class ObjectArrayToXMLStreamReaderTransformer extends AbstractTransformer
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
+	@SuppressWarnings("deprecation")
 	public ObjectArrayToXMLStreamReaderTransformer() {
 //		registerSourceType(Object[].class);
 		setReturnClass(XMLStreamReader.class);

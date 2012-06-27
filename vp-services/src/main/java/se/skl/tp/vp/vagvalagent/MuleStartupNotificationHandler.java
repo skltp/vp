@@ -21,12 +21,11 @@
 package se.skl.tp.vp.vagvalagent;
 
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MuleStartupNotificationHandler implements MuleContextNotificationListener {
+public class MuleStartupNotificationHandler implements MuleContextNotificationListener<MuleContextNotification> {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MuleStartupNotificationHandler.class);
@@ -37,8 +36,9 @@ public class MuleStartupNotificationHandler implements MuleContextNotificationLi
 		this.vagvalAgent = vagvalAgent;
 	}
 
-	public void onNotification(ServerNotification notification) {
-		if (notification.getType().equalsIgnoreCase(ServerNotification.TYPE_INFO)
+	@Override
+	public void onNotification(MuleContextNotification notification) {
+		if (notification.getType().equalsIgnoreCase(MuleContextNotification.TYPE_INFO)
 				&& notification.getAction() == MuleContextNotification.CONTEXT_STARTED) {
 			logger.info("Mule started!!!, MuleStartupNotificationHandler initiates vagvalAgent");
 			vagvalAgent.init();

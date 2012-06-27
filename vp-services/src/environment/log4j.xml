@@ -21,6 +21,9 @@
 	
 	<appender name="DEVNULL" class="org.apache.log4j.FileAppender">
 		<param name="file" value="/dev/null"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
+		</layout>
 	</appender>
 
 	<!--
