@@ -7,11 +7,11 @@
 	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
 	xmlns:management="http://www.mulesoft.org/schema/mule/management"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.mulesoft.org/schema/mule/core		http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd
-		http://www.mulesoft.org/schema/mule/jms			http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
-		http://www.mulesoft.org/schema/mule/management	http://www.mulesoft.org/schema/mule/management/3.2/mule-management.xsd
+		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.mulesoft.org/schema/mule/core		http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
+		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/jms			http://www.mulesoft.org/schema/mule/jms/3.3/mule-jms.xsd
+		http://www.mulesoft.org/schema/mule/management	http://www.mulesoft.org/schema/mule/management/3.3/mule-management.xsd
 	">
 
 	<spring:bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -52,13 +52,15 @@
     <!-- In the below configurations the https:tls-client element is never used! This may be a bug in 2.2.8... -->
     <!-- Https connector used when acting as a producer, ie receiving calls-->
   	<https:connector name="VPProducerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
+		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
 		<https:tls-key-store class="${TP_TLS_STORE_PRODUCER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_PRODUCER_FILE}" storePassword="${TP_TLS_STORE_PRODUCER_PASSWORD}" keyPassword="${TP_TLS_STORE_PRODUCER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
 
     <!-- Https connector used when acting as a consumer, ie making calls -->
   	<https:connector name="VPConsumerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
-		<https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
+		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
+  	    <https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
 

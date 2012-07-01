@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.mulesoft.org/schema/mule/core	http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-		http://www.mulesoft.org/schema/mule/cxf		http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
-	">
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.mulesoft.org/schema/mule/core	http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
+		http://www.mulesoft.org/schema/mule/https	http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/cxf		http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd
+	" >
 
-	<model name="PingForConfiguration-rivtabp20-model">
-		<service name="PingForConfiguration-rivtabp20-service">
-			<inbound>
-				<inbound-endpoint
-					address="https://${tp.host}:${PINGFORCONFIGURATIONSERVICE_RIVTABP20_PORT}/${tp.baseUri}/${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_URI}"
-					name="PingForConfigurationResponderService" transformer-refs="createCorrId logReqIn"
-					responseTransformer-refs="logRespIn" exchange-pattern="request-response"
-					connector-ref="VPProducerConnector">
-					<cxf:proxy-service
-						wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl"
-						namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"
-						payload="envelope" />
-				</inbound-endpoint>
-			</inbound>
-			<component>
-				<singleton-object
-					class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa20" />
-			</component>
-		</service>
-	</model>
+    <flow name="PingForConfiguration-rivtabp20-flow" >
+        <https:inbound-endpoint
+            name="PingForConfigurationResponderRivtabp20Service"
+            address="https://${tp.host}:${PINGFORCONFIGURATIONSERVICE_RIVTABP20_PORT}/${tp.baseUri}/${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_URI}"
+            connector-ref="VPProducerConnector"
+            exchange-pattern="request-response"
+            responseTransformer-refs="logRespIn"
+            transformer-refs="createCorrId logReqIn" />
+
+        <cxf:jaxws-service
+            serviceClass="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa20"
+            wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl" />
+
+        <component>
+            <singleton-object class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa20" />
+        </component>
+    </flow>
+
 </mule>

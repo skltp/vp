@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:spring="http://www.springframework.org/schema/beans"
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.mulesoft.org/schema/mule/core	http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-		http://www.mulesoft.org/schema/mule/http	http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
-	">
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.mulesoft.org/schema/mule/core	http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
+	" >
 
-   <spring:bean id="resetVagvalCacheComponent" class="se.skl.tp.vp.vagvalagent.ResetVagvalCache">
-      <spring:property name="vagvalAgent" ref="vagvalAgent"/>
-   </spring:bean>
+    <spring:bean
+        id="resetVagvalCacheComponent"
+        class="se.skl.tp.vp.vagvalagent.ResetVagvalCache" >
+        <spring:property
+            name="vagvalAgent"
+            ref="vagvalAgent" />
+    </spring:bean>
 
-	<model name="resetVagvalCache-model">
-	
-		<service name="resetVagvalCache-service">
-            <inbound>
-                <http:inbound-endpoint 
-                	address="http://${tp.host}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
-                    responseTimeout="${SERVICE_TIMEOUT_MS}"
-                />
-            </inbound>     
- 			<component>
- 				<spring-object bean="resetVagvalCacheComponent" />
- 			</component>
-		</service>
-	</model>
+    <flow name="resetVagvalCache-flow" >
+
+        <inbound-endpoint
+            address="http://${tp.host}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
+            responseTimeout="${SERVICE_TIMEOUT_MS}" />
+
+        <component>
+            <spring-object bean="resetVagvalCacheComponent" />
+        </component>
+    </flow>
+
 </mule>
