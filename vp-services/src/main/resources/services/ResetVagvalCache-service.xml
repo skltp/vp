@@ -18,7 +18,7 @@
     <flow name="resetVagvalCache-flow" >
 
         <inbound-endpoint
-            address="http://${tp.host}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
+            address="http://${TP_HOST}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
             responseTimeout="${SERVICE_TIMEOUT_MS}" />
 
         <component>

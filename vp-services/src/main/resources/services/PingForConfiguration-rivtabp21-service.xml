@@ -14,7 +14,7 @@
 
         <https:inbound-endpoint
             name="PingForConfigurationResponderRivtabp21Service"
-            address="https://${tp.host}:${PINGFORCONFIGURATIONSERVICE_RIVTABP21_PORT}/${tp.baseUri}/${PINGFORCONFIGURATIONSERVICE_RIVTABP21_INBOUND_URI}"
+            address="https://${TP_HOST}:${PINGFORCONFIGURATIONSERVICE_RIVTABP21_PORT}/${TP_BASE_URI}/${PINGFORCONFIGURATIONSERVICE_RIVTABP21_INBOUND_URI}"
             connector-ref="VPProducerConnector"
             exchange-pattern="request-response"
             responseTransformer-refs="logRespIn"

@@ -31,7 +31,7 @@
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
 
       <flow name="vp-virtuell-tjanst-teststub-flow" >
-        <inbound-endpoint connector-ref="VPProducerConnector" address="https://${tp.host}:${tp.port}/${tp.baseUri}/tjanst1"  
+        <inbound-endpoint connector-ref="VPProducerConnector" address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"  
  			name="Tjanst1" />
 
         <cxf:jaxws-service

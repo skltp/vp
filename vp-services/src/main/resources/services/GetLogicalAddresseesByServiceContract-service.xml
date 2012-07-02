@@ -11,7 +11,7 @@
     <flow name="GetLogicalAddresseesByServiceContract-flow" >
 
         <https:inbound-endpoint
-            address="https://${tp.host}:${GETLOGICALADDRESSESBYSERVICECONTRACT_PORT}/${tp.baseUri}/GetLogicalAddresseesByServiceContract/1/rivtabp21"
+            address="https://${TP_HOST}:${GETLOGICALADDRESSESBYSERVICECONTRACT_RIVTABP21_PORT}/${TP_BASE_URI}/GetLogicalAddresseesByServiceContract/1/rivtabp21"
             connector-ref="VPProducerConnector"
             exchange-pattern="request-response" />
 

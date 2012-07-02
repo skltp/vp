@@ -13,7 +13,7 @@
     <flow name="PingForConfiguration-rivtabp20-flow" >
         <https:inbound-endpoint
             name="PingForConfigurationResponderRivtabp20Service"
-            address="https://${tp.host}:${PINGFORCONFIGURATIONSERVICE_RIVTABP20_PORT}/${tp.baseUri}/${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_URI}"
+            address="https://${TP_HOST}:${PINGFORCONFIGURATIONSERVICE_RIVTABP20_PORT}/${TP_BASE_URI}/${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_URI}"
             connector-ref="VPProducerConnector"
             exchange-pattern="request-response"
             responseTransformer-refs="logRespIn"

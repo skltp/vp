@@ -14,7 +14,7 @@
     <flow name="htmlDashboardService-flow" >
 
         <inbound-endpoint
-            address="http://${tp.host}:${HTMLDASHBOARDSERVICE_PORT}/${HTMLDASHBOARDSERVICE_INBOUND_URI}"
+            address="http://${TP_HOST}:${HTMLDASHBOARDSERVICE_PORT}/${HTMLDASHBOARDSERVICE_INBOUND_URI}"
             responseTimeout="${SERVICE_TIMEOUT_MS}" />
 
         <component>
