@@ -20,7 +20,7 @@
 	</parent>
 
 	<groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
-	<artifactId>soitoolkit-mule-3.2.1-dependencies</artifactId>
+	<artifactId>soitoolkit-mule-dependencies</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 
