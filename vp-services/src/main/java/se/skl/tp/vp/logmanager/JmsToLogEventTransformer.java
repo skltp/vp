@@ -68,7 +68,7 @@ public class JmsToLogEventTransformer extends AbstractTransformer {
 		}
 
 		throw new TransformerException(this, new IllegalStateException(
-				String.format("Object to transform is not an ActiveMQTextMessage but was: %s", payload.getClass().getName())));
+				String.format("Object to transform is not a String but was: %s", payload.getClass().getName())));
 	}
 
 }
