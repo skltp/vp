@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
-import se.skl.tp.vp.util.helper.PayloadHelper;
 
 /**
  * Transforms messages between RIVTABP20 and RIVTABP21 and vice versa.
@@ -95,7 +94,6 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 		log.debug("Riv transformer executing");
 
-		final PayloadHelper routerHelper = new PayloadHelper(msg);
 		final AddressingHelper addrHelper = new AddressingHelper(msg, vagvalAgent, pattern, this.whiteList);
 
 		/*
@@ -104,23 +102,20 @@ public class RivTransformer extends AbstractMessageTransformer {
 		String rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
 
 		/*
-		 * Get the receiver BEFORE any transformation
-		 */
-		msg.setProperty(VPUtil.RECEIVER_ID, routerHelper.extractReceiverFromPayload(), PropertyScope.SESSION);
-
-		/*
 		 * Get the available RIV version from the service directory, and if the
 		 * version doesn't match, update to the producer version and transform
 		 */
 		final String rivProfile = addrHelper.getAvailableRivProfile();
-		msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.SESSION);
+		log.debug("RivProfile set to session scope: " + rivProfile);
 
 		if (rivVersion.equalsIgnoreCase(RIV20) && rivProfile.equalsIgnoreCase(RIV21)) {
 			this.doTransform(msg, RIV20_NS, RIV21_NS, RIV20_ELEM, RIV21_ELEM);
+			msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.SESSION);
 		}
 
 		if (rivVersion.equalsIgnoreCase(RIV21) && rivProfile.equalsIgnoreCase(RIV20)) {
 			this.doTransform(msg, RIV21_NS, RIV20_NS, RIV21_ELEM, RIV20_ELEM);
+			msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.SESSION);
 		}
 
 		return msg;

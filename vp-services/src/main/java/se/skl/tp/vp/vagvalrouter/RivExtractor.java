@@ -38,8 +38,8 @@ public class RivExtractor extends AbstractMessageTransformer {
 
 		final String receiverId = payloadHelper.extractReceiverFromPayload();
 		log.debug("Receiver id (route to) set to session scope: " + receiverId);
-
 		msg.setProperty(VPUtil.RECEIVER_ID, receiverId, PropertyScope.SESSION);
+
 
 		return msg;
 	}
