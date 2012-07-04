@@ -49,28 +49,26 @@ public class JmsToLogEventTransformer extends AbstractTransformer {
 	}
 
 	@Override
-	protected Object doTransform(Object arg0, String arg1) throws TransformerException {
+	protected Object doTransform(Object payload, String encoding) throws TransformerException {
 
-		log.debug("Transforming {} to log event object", arg0.getClass().getName());
+		log.debug("Transforming {} to log event object", payload.getClass().getName());
 
-		if (arg0 instanceof ActiveMQTextMessage) {
+		if (payload instanceof String) {
 
-			final ActiveMQTextMessage msg = (ActiveMQTextMessage) arg0;
+			final String msg = (String) payload;
 
 			try {
 				final LogEvent le = (LogEvent) context.createUnmarshaller().unmarshal(
-						new ByteArrayInputStream(msg.getText().getBytes()));
+						new ByteArrayInputStream(msg.getBytes()));
 
 				return le;
-			} catch (JMSException e) {
-				throw new TransformerException(this, e);
 			} catch (JAXBException e) {
 				throw new TransformerException(this, e);
 			}
 		}
 
 		throw new TransformerException(this, new IllegalStateException(
-				"Object to transform is not an ActiveMQTextMessage but was: {}", arg0.getClass().getName()));
+				String.format("Object to transform is not an ActiveMQTextMessage but was: %s", payload.getClass().getName())));
 	}
 
 }

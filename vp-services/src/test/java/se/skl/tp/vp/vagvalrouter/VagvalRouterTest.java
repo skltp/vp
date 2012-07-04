@@ -59,7 +59,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
-		assertEquals("cxf:https://adress", adress);
+		assertEquals("https://adress", adress);
 
 	}
 
@@ -73,7 +73,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
-		assertEquals("cxf:https://adress1", adress);
+		assertEquals("https://adress1", adress);
 
 	}
 
@@ -227,7 +227,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
-		assertEquals("cxf:https://adress", adress);
+		assertEquals("https://adress", adress);
 
 	}
 
@@ -241,7 +241,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.anropsBehorighetsInfo.add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
-		assertEquals("cxf:https://adress", adress);
+		assertEquals("https://adress", adress);
 
 	}
 

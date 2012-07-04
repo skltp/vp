@@ -1,4 +1,5 @@
 /* 
+
  * Licensed to the soi-toolkit project under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -294,8 +295,12 @@ public class LogManager implements Callable {
 	@Override
 	public Object onCall(MuleEventContext arg0) throws Exception {
 		final Object payload = arg0.getMessage().getPayload();
-		log.debug("Log manager received request about storing log event into database");
-		
+		// FIXME: for testing
+		if (jdbcTemplate == null) {
+			log.debug("Skip logging: {}", payload);
+			return payload;
+		}
+		log.debug("Log manager received request about storing log event into database");		
 		this.storeLogEventInDatabase((LogEvent) payload, arg0.getMessage());
 		return payload;
 	}

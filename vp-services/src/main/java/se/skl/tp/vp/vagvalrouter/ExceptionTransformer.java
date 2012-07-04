@@ -52,7 +52,7 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 		// Check if any error
 		if (msg.getExceptionPayload() != null) {
 			
-			msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.INVOCATION);
+			msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.OUTBOUND);
 			
 			logger.debug("Exception payload detected!");
 			if (msg.getExceptionPayload().getException() instanceof ServiceException ||
@@ -104,7 +104,7 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 			
 		} else if (msg.getPayload() instanceof org.mule.transport.NullPayload) {
 			final String errMsg = "Nullpayload detected in message";
-			msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.INVOCATION);
+			msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.OUTBOUND);
 			
 			// No exception pauload and no message payload
 			logger.debug(errMsg);
@@ -113,7 +113,7 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 			return createSoapFault(msg, ERR_MSG_CON_CLOSED, errMsg);
 		}
 		
-		msg.setProperty(VPUtil.SESSION_ERROR, Boolean.FALSE, PropertyScope.INVOCATION);
+		msg.setProperty(VPUtil.SESSION_ERROR, Boolean.FALSE, PropertyScope.OUTBOUND);
 		
 		// No error, return incoming payload!
 		return msg.getPayload();
@@ -161,7 +161,7 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 	}
 	
 	private void setErrorProperties(final MuleMessage msg, final String vpError, final String errorDescription) {
-		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, vpError, PropertyScope.INVOCATION);
-		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, errorDescription, PropertyScope.INVOCATION);
+		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, vpError, PropertyScope.OUTBOUND);
+		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, errorDescription, PropertyScope.OUTBOUND);
 	}
 }

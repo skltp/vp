@@ -26,9 +26,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.xml.namespace.QName;
-
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -64,7 +63,7 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 	private Pattern pattern;
 	private String senderIdPropertyName;
 	private String whiteList;
-
+	
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
 	}
@@ -110,9 +109,14 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 	}
 
 	public LogTransformer() {
-		eventLogger = new EventLogger();
+		eventLogger = new EventLogger(this);
 	}
 
+		
+	public MuleContext getMuleContext() {
+		return super.muleContext;
+	}
+	
 	/**
 	 * Setter for the jaxbToXml property
 	 * 
@@ -179,18 +183,17 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 				log.debug("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
 			}
 
-			evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.INVOCATION));
-			evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION));
-			evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE,
-					VPUtil.extractNamespaceFromService((QName) message.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION)));
+			evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
+			evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION));
+			evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE, (String) message.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION));
 
-			final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR, PropertyScope.INVOCATION);
+			final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR, PropertyScope.SESSION);
 			if (error != null) {
 				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR, error.toString());
 				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_DESCRIPTION,
-						(String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.INVOCATION));
+						(String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.SESSION));
 				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION,
-						(String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.INVOCATION));
+						(String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.SESSION));
 			}
 
 			switch (logLevel) {

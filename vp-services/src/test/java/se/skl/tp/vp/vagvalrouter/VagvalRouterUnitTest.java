@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 import org.mockito.Mockito;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
@@ -49,8 +50,6 @@ public class VagvalRouterUnitTest extends TestCase {
 		Mockito.verify(helper, Mockito.times(1)).getAddress();
 		Mockito.verifyNoMoreInteractions(helper);
 		
-		Mockito.verify(msg, Mockito.only()).setOutboundProperty(VPUtil.IS_HTTPS, expectedResult);
-		Mockito.verify(msg, Mockito.times(1)).setOutboundProperty(VPUtil.IS_HTTPS, expectedResult);
 		Mockito.verifyNoMoreInteractions(msg);
 	}
 }

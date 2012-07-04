@@ -37,7 +37,7 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 		log.debug("Extracting X509Certificate senderId from header");
 
-		Object certificate = this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION);
+		Object certificate = this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
 
 		try {
 			if (isX509Certificate(certificate)) {
@@ -76,7 +76,7 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 	}
 
 	private boolean isCallerOnWhiteList() {
-		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INVOCATION));
+		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND));
 
 		log.debug("Check if caller {} is in white list..", ip);
 

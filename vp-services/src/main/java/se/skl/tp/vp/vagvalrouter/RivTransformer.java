@@ -25,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -102,27 +101,19 @@ public class RivTransformer extends AbstractMessageTransformer {
 		/*
 		 * Check if virtualized service is a 2.0 service
 		 */
-		String rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION);
-		if (rivVersion == null || rivVersion.equals("")) {
-			final String tns = VPUtil.extractNamespaceFromService((QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION));
-			final String[] split = tns.split(":");
-
-			rivVersion = split[split.length - 1];
-		}
-
-		msg.setProperty(VPUtil.RIV_VERSION, rivVersion.toUpperCase(), PropertyScope.INVOCATION);
+		String rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
 
 		/*
 		 * Get the receiver BEFORE any transformation
 		 */
-		msg.setProperty(VPUtil.RECEIVER_ID, routerHelper.extractReceiverFromPayload(), PropertyScope.INVOCATION);
+		msg.setProperty(VPUtil.RECEIVER_ID, routerHelper.extractReceiverFromPayload(), PropertyScope.SESSION);
 
 		/*
 		 * Get the available RIV version from the service directory, and if the
 		 * version doesn't match, update to the producer version and transform
 		 */
 		final String rivProfile = addrHelper.getAvailableRivProfile();
-		msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.INVOCATION);
+		msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.SESSION);
 
 		if (rivVersion.equalsIgnoreCase(RIV20) && rivProfile.equalsIgnoreCase(RIV21)) {
 			this.doTransform(msg, RIV20_NS, RIV21_NS, RIV20_ELEM, RIV21_ELEM);

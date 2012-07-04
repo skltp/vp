@@ -18,7 +18,7 @@ public class CertificateExtractorFactoryTest {
 	public void extractFromHeaderWhenReveresedProxyHeaderExist() throws Exception {
 
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION)).thenReturn("ANY VALUE");
+		Mockito.when(msg.getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND)).thenReturn("ANY VALUE");
 		Pattern pattern = null;
 
 		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, "127.0.0.1");

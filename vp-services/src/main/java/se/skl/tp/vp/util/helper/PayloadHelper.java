@@ -116,7 +116,7 @@ public class PayloadHelper extends VPHelperSupport {
 	}
 	
 	private String getRivVersion() {
-		return (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION);
+		return (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
 	}
 	
 	private ReversibleXMLStreamReader getPayload() {

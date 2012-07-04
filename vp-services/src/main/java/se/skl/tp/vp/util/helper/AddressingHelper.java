@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
@@ -97,21 +96,26 @@ public class AddressingHelper extends VPHelperSupport {
 		 */
 		return this.getAddressToVirtualService(services, input);
 	}
+	
+	private String getSessionProperty(String key) {
+		String value = (String) this.getMuleMessage().getProperty(key, PropertyScope.SESSION);
+		this.getLog().debug("session property {} = \"{}\"", key, value);
+		return value;
+	}
 
 	private VagvalInput createRequestToServiceDirectory() {
-		VagvalInput vagvalInput = new VagvalInput();
-
 		CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(
 				this.getMuleMessage(), this.getPattern(), this.getWhiteList());
 
 		CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
-		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate();
-		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.INVOCATION);
 
-		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.INVOCATION);
-		vagvalInput.rivVersion = (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.INVOCATION);
-		vagvalInput.serviceNamespace = VPUtil.extractNamespaceFromService((QName) this.getMuleMessage().getProperty(
-				VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION));
+		VagvalInput vagvalInput = new VagvalInput();
+		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate();
+		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.OUTBOUND);
+
+		vagvalInput.receiverId = getSessionProperty(VPUtil.RECEIVER_ID);
+		vagvalInput.rivVersion = getSessionProperty(VPUtil.RIV_VERSION);
+		vagvalInput.serviceNamespace = getSessionProperty(VPUtil.SERVICE_NAMESPACE);
 
 		return vagvalInput;
 	}
@@ -185,8 +189,6 @@ public class AddressingHelper extends VPHelperSupport {
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
-
-		adress = "cxf:" + adress;
 
 		return adress;
 	}

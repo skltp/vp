@@ -6,12 +6,6 @@
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd">
 
-	<custom-transformer name="rivTransformer"
-		class="se.skl.tp.vp.vagvalrouter.RivTransformer">
-		<spring:property name="vagvalAgent" ref="vagvalAgent" />
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-	</custom-transformer>
-
 	<spring:bean name="vagvalInputs"
 		class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput" />
 

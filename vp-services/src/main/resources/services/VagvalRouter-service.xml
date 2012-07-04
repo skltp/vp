@@ -4,52 +4,24 @@
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
     xmlns="http://www.mulesoft.org/schema/mule/core"
     xsi:schemaLocation="
-		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.mulesoft.org/schema/mule/core 	http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf 	http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
 
-	<message-properties-transformer name="deleteHttpContent-type">
-		<delete-message-property key="Content-type"/>
-	</message-properties-transformer>
+    <flow name="dynamic-vagval-routing" >
 
-	<!--
-	<flow name="vagval-router-flow" >
-	    
-        <inbound-endpoint
-            address="m://vagval-router"
-            exchange-pattern="request-response"
-            responseTransformer-refs="logRespOut exceptionTransformer logRespIn" >
-        </inbound-endpoint>
+        <transformer ref="rivExtractor" />
 
-            <custom-transformer class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
+        <transformer ref="createCorrId" />
 
-            <transformer ref="deleteHttpContent-type" />
+        <transformer ref="fixTransformer" />
 
-            <transformer ref="createCorrId" />
+        <transformer ref="rivTransformer" />
 
-            <transformer ref="fixTransformer" />
+        <cxf:proxy-client payload="envelope" />
 
-            <transformer ref="logReqIn" />
+        <custom-processor class="se.skl.tp.vp.vagvalrouter.VagvalRouter" >
 
-            <custom-transformer class="se.skl.tp.vp.vagvalrouter.RivTransformer" >
-
-                <spring:property
-                    name="vagvalAgent"
-                    ref="vagvalAgent" />
-
-                <spring:property
-                    name="senderIdPropertyName"
-                    value="${VAGVALROUTER_SENDERID}" />
-
-                <spring:property
-                    name="whiteList"
-                    value="${IP_WHITE_LIST}" />
-            </custom-transformer>
-
-            <transformer ref="logReqOut" />
-        
-            
-        <custom-router class="se.skl.tp.vp.vagvalrouter.VagvalRouter" >
             <spring:property
                 name="vagvalAgent"
                 ref="vagvalAgent" />
@@ -65,41 +37,7 @@
             <spring:property
                 name="whiteList"
                 value="${IP_WHITE_LIST}" />
-        </custom-router>
-        
+        </custom-processor>
     </flow>
-    
- -->
 
-	<model name="VagvalRouter-model">
-		
-		<service name="VagvalRouter-service">
-            <inbound>
-				<inbound-endpoint address="vm://vagval-router" 
-				    exchange-pattern="request-response"
-				    responseTransformer-refs="logRespOut exceptionTransformer logRespIn">
-					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
-					<transformer ref="deleteHttpContent-type"/>
-					<transformer ref="createCorrId"/>
-					<transformer ref="fixTransformer" />
-					<transformer ref="logReqIn" />
-					<custom-transformer class="se.skl.tp.vp.vagvalrouter.RivTransformer">
-						<spring:property name="vagvalAgent" ref="vagvalAgent" />
-						<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-						<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
-					</custom-transformer>
-					<transformer ref="logReqOut" />
-				</inbound-endpoint>
-            </inbound>
-
-			<outbound>
-				<custom-outbound-router class="se.skl.tp.vp.vagvalrouter.VagvalRouter">
-					<spring:property name="vagvalAgent" ref="vagvalAgent" />
-					<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-					<spring:property name="responseTimeout" value="${SERVICE_TIMEOUT_MS}" />
-					<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
-				</custom-outbound-router>
-			</outbound>     
-		</service>
-	</model>
 </mule>

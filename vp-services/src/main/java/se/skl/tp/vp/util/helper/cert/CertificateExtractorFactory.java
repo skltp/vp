@@ -40,7 +40,7 @@ public class CertificateExtractorFactory extends VPHelperSupport {
 	}
 
 	private boolean isReverseProxy() {
-		return this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INVOCATION) != null;
+		return this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND) != null;
 	}
 
 }

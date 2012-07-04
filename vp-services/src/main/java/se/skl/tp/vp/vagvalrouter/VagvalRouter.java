@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.xml.namespace.QName;
-
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -38,6 +37,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
@@ -51,7 +51,6 @@ import se.skl.tp.vp.dashboard.ServiceStatistics;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
-import se.skl.tp.vp.util.helper.PayloadHelper;
 
 public class VagvalRouter extends AbstractRecipientList {
 
@@ -110,9 +109,10 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 
 	@Override
-	protected List<Object >getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
-		final String addr = this.getAddressingHelper(event.getMessage()).getAddress();
-		event.getMessage().setOutboundProperty(VPUtil.IS_HTTPS, addr.contains("https") ? true : false);
+	protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
+		String addr = this.getAddressingHelper(event.getMessage()).getAddress();
+		
+		logger.debug("Endpoint address is {}", addr);		
 
 		return Collections.singletonList((Object)addr);
 	}
@@ -124,14 +124,10 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
     public MuleEvent route(MuleEvent event) throws RoutingException {
 
-		final PayloadHelper routerHelper = new PayloadHelper(event.getMessage());
-
-		final String receiverId = routerHelper.extractReceiverFromPayload();
-		event.getMessage().setProperty(VPUtil.RECEIVER_ID, receiverId, PropertyScope.INVOCATION);
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = VPUtil.extractNamespaceFromService((QName) event.getMessage().getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION))
-				+ "-" + event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.INVOCATION);
+		String serviceId = event.getMessage().getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION)
+		    + "-" + event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 
 		synchronized (statistics) {
 
@@ -160,8 +156,8 @@ public class VagvalRouter extends AbstractRecipientList {
 		/*
 		 * Restore properties
 		 */
-		for (final Object prop : event.getMessage().getPropertyNames(PropertyScope.INVOCATION)) {
-			replyEvent.getMessage().setProperty((String) prop, event.getMessage().getProperty((String) prop, PropertyScope.INVOCATION), PropertyScope.INVOCATION);
+		for (final Object prop : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND)) {
+			replyEvent.getMessage().setProperty((String) prop, event.getMessage().getProperty((String) prop, PropertyScope.OUTBOUND), PropertyScope.OUTBOUND);
 		}
 
 		synchronized (statistics) {
@@ -178,22 +174,24 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException {
 
-		
-		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder((String) recipient, muleContext));
-		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
+		logger.debug("EndpointBuilder URI: {}", recipient);
 
+		String url = (String) recipient;		
+		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
+		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
+		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+		//eb.setDisableTransportTransformer(true);
+		
 		setOutboundTransformers(eb);
 
-		HashMap<Object, Object> properties = new HashMap<Object, Object>();
-		properties.put("proxy", "true");
-		properties.put("payload", "envelope");
-		if (message.getOutboundProperty(VPUtil.IS_HTTPS, false)) {
-			properties.put("protocolConnector", VPUtil.CONSUMER_CONNECTOR_NAME);
-			logger.debug("Https protocolConnector set");
+		if (url.contains("https://")) {
+			Connector connector = muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_NAME);
+			eb.setConnector(connector);     
+			logger.debug("Https protocolConnector has been set {}", connector.getName());
 		}
-
-		eb.setProperties(properties);
-
+		
+		logger.debug("EndpointBuilder ready!");
+		
 		try {
 			return eb.buildOutboundEndpoint();
 		} catch (InitialisationException e) {

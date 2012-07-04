@@ -22,18 +22,21 @@ package se.skl.tp.vp.util;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.activemq.util.ByteArrayInputStream;
+import org.codehaus.jackson.util.ByteArrayBuilder;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.module.xml.stax.ReversibleXMLStreamReader;
+import org.mule.module.xml.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ObjectArrayToXMLStreamReaderTransformer extends AbstractTransformer {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
-	@SuppressWarnings("deprecation")
+	
 	public ObjectArrayToXMLStreamReaderTransformer() {
-//		registerSourceType(Object[].class);
+		super();
 		setReturnClass(XMLStreamReader.class);
 	}
 
@@ -52,13 +55,20 @@ public class ObjectArrayToXMLStreamReaderTransformer extends AbstractTransformer
 			if (reader != null) {
 				// We found a XMLStreamReader!
 				if (logger.isDebugEnabled()) {
-					logger.debug("Found a XMLStreamReader!");
+					logger.debug("Found a XMLStreamReader payload!");
 				}
 				result = reader;
 			}
 		}
-
+		
 		return result;
+	}
+	
+	private XMLStreamReader makeReversible(XMLStreamReader reader) {
+		if (reader instanceof ReversibleXMLStreamReader) {
+			return reader;
+		}
+		return null;
 	}
 
 	private XMLStreamReader getXMLStreamReader(Object payload) {

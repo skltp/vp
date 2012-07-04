@@ -80,6 +80,8 @@
 		<default-receiver-threading-profile maxThreadsActive="${TP_RECEIVE_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_RECEIVE_MAX_THREADS_IDLE}" threadTTL="${TP_RECEIVE_MAX_THREADS_TTL}"/>
 	</configuration>
     
+    <custom-transformer name="rivExtractor" class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
+    
     <custom-transformer name="fixTransformer" class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
 
 	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>
@@ -94,6 +96,18 @@
 		<spring:property name="contextPath"  value="org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1" />
 	</custom-transformer>
 
+	<custom-transformer name="rivTransformer" class="se.skl.tp.vp.vagvalrouter.RivTransformer" >
+        <spring:property
+            name="vagvalAgent"
+            ref="vagvalAgent" />
+        <spring:property
+            name="senderIdPropertyName"
+            value="${VAGVALROUTER_SENDERID}" />
+        <spring:property
+            name="whiteList"
+            value="${IP_WHITE_LIST}" />
+   </custom-transformer>
+	
 	<custom-transformer name="exceptionTransformer" class="se.skl.tp.vp.vagvalrouter.ExceptionTransformer"/>
 <!-- 	<custom-transformer name="createSoapFaultIfException" class="org.soitoolkit.commons.mule.soap.CreateSoapFaultIfExceptionTransformer"/> -->
 	

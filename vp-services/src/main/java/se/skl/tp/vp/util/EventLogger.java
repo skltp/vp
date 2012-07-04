@@ -44,11 +44,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.mule.RequestContext;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
@@ -77,7 +75,7 @@ import org.soitoolkit.commons.mule.util.XmlUtil;
  * @author Magnus Larsson
  *
  */
-public class EventLogger implements MuleContextAware {
+public class EventLogger {
 
 	private static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
 
@@ -102,7 +100,8 @@ public class EventLogger implements MuleContextAware {
 	private static String PROCESS_ID = "UNKNOWN";
 
 	private String serverId = null; // Can't read this one at class initialization because it is not set at that time. Can also be different for different loggers in the same JVM (e.g. multiple wars in one servlet container with shared classes?))
-
+	private LogTransformer logTransformer;
+	
 	// Used to transform payloads that are jaxb-objects into a xml-string
 	private JaxbObjectToXmlTransformer jaxbToXml = null;
 
@@ -117,18 +116,11 @@ public class EventLogger implements MuleContextAware {
 		}
 	}
 
-	public EventLogger() {
+	public EventLogger(LogTransformer logTransformer) {
+		this.logTransformer = logTransformer;
 	}
 
-
-	/*
-	 * Property muleContext 
-	 */
-	private MuleContext muleContext = null;
-	public void setMuleContext(MuleContext muleContext) {
-		log.debug("MuleContext injected");
-		this.muleContext = muleContext;
-	}
+	
 	
 	/**
 	 * Setter for the jaxbToXml property
@@ -219,7 +211,7 @@ public class EventLogger implements MuleContextAware {
 
 	private Session getSession() throws JMSException {
 //		JmsConnector jmsConn = (JmsConnector)MuleServer.getMuleContext().getRegistry().lookupConnector("soitoolkit-jms-connector");
-		JmsConnector jmsConn = (JmsConnector)MuleUtil.getSpringBean(muleContext, "soitoolkit-jms-connector");
+		JmsConnector jmsConn = (JmsConnector)MuleUtil.getSpringBean(logTransformer.getMuleContext(), "soitoolkit-jms-connector");
 		Connection c = jmsConn.getConnection();
 		Session s = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		return s;
@@ -301,9 +293,9 @@ public class EventLogger implements MuleContextAware {
 
 		if (serverId != null) return serverId;
 		
-		if (muleContext == null) return "UNKNOWN.MULE_CONTEXT"; 
+		if (logTransformer.getMuleContext() == null) return "UNKNOWN.MULE_CONTEXT"; 
 
-		MuleConfiguration mConf = muleContext.getConfiguration();
+		MuleConfiguration mConf = logTransformer.getMuleContext().getConfiguration();
 		if (mConf == null) return "UNKNOWN.MULE_CONFIGURATION"; 
 		
 		return serverId = mConf.getId();
@@ -468,9 +460,9 @@ public class EventLogger implements MuleContextAware {
 
 			if (log.isDebugEnabled()) {
 				@SuppressWarnings("rawtypes")
-				Set names = message.getPropertyNames(PropertyScope.INVOCATION);
+				Set names = message.getPropertyNames(PropertyScope.OUTBOUND);
 				for (Object object : names) {
-					Object value = message.getProperty(object.toString(), PropertyScope.INVOCATION);
+					Object value = message.getProperty(object.toString(), PropertyScope.OUTBOUND);
 					log.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
 				}
 			}

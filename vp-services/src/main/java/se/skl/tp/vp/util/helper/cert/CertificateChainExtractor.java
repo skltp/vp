@@ -38,7 +38,7 @@ public class CertificateChainExtractor extends CertificateExtractorBase implemen
 	 */
 	private X509Certificate extraxtCertFromChain() {
 		final Certificate[] certificateChain = (Certificate[]) this.getMuleMessage().getProperty(
-				VPUtil.PEER_CERTIFICATES, PropertyScope.INVOCATION);
+				VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND);
 		if (certificateChain != null) {
 			try {
 				return (X509Certificate) certificateChain[0];
