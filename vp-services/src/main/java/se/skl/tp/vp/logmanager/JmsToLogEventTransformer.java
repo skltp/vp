@@ -16,12 +16,10 @@
  */
 package se.skl.tp.vp.logmanager;
 
-import javax.jms.JMSException;
 import javax.resource.spi.IllegalStateException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.util.ByteArrayInputStream;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
