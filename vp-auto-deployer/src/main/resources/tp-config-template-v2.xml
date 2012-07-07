@@ -1,0 +1,44 @@
+<!--
+ * Copyright 2009-2012 Sjukvardsradgivningen * * This library is free software; 
+	you can redistribute it and/or modify * it under the terms of version 2.1 
+	of the GNU Lesser General Public * License as published by the Free Software 
+	Foundation. * * This library is distributed in the hope that it will be useful, 
+	* but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU Lesser General Public 
+	License for more details. * * You should have received a copy of the GNU 
+	Lesser General Public * License along with this library; if not, write to 
+	the * Free Software Foundation, Inc., 59 Temple Place, Suite 330, * Boston, 
+	MA 02111-1307 USA
+
+	Generated file by vp-auto-deployer at %s
+	Source WSDL: %s
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
+               http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
+               http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
+
+    <!-- Name of this file is mandatory and may not be changed. -->
+
+    <flow name="%s-%s-flow" >
+
+        <https:inbound-endpoint
+            address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/%s"
+            connector-ref="VPProducerConnector"
+            exchange-pattern="request-response" >
+        </https:inbound-endpoint>
+
+        <cxf:proxy-service
+            namespace="%s"
+            payload="envelope"
+            service="%s"
+            wsdlLocation="classpath:%s" />
+
+        <flow-ref name="vagval-dynamic-routing" />
+    </flow>
+
+</mule>

@@ -43,8 +43,8 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 
 	<modules>
 	    <module>soitoolkit-mule-dependencies</module>
-		<module>vp-services</module>
-		<module>vp-distribution</module>		
+	    <module>vp-services</module>
+	    <module>vp-distribution</module>
 	</modules>
 	
 	<build>

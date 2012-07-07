@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.ap\
+															     ache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>se.skl.tp</groupId>
+  <artifactId>vp-auto-deployer</artifactId>
+  <version>1.0</version>
+  <name>vp-auto-deployer</name>
+  <description>Generates Mule configuration deployment descriptor into a separate jar file (for RIV-TAWSDL service definitons only.. )</description>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>    
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-jar-plugin</artifactId>
+	<configuration>
+          <archive>
+            <manifest>
+              <mainClass>se.skl.tp.vp.deployer.DeployerMain</mainClass>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+	</configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
