@@ -4,7 +4,7 @@ export VP_HOME="$( cd -P "$( dirname $0 )"/.. && pwd )"
 export MULE_HOME=${VP_HOME}/mule-standalone-3.3.0
 
 echo -n "Generates virtual service deployment descriptors..."
-$JAVA_HOME/bin/java -jar vp-auto-deployer-1.0.jar -out $MULE_HOME/lib/user/virtual-riv-services.jar -overwrite $VP_HOME/vp/services/*.jar
+$JAVA_HOME/bin/java -jar vp-auto-deployer-1.0.jar -out $MULE_HOME/lib/user/virtual-riv-service-descriptors.jar -overwrite $VP_HOME/vp/services/*.jar
 if [ $? == 0 ]; then
 	echo "done."
 fi
