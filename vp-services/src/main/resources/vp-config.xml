@@ -17,7 +17,7 @@
         <spring:import resource="classpath:services/*-service.xml"/>
         
         <!-- Import virtual services -->
-        <spring:import resource="classpath*:tp-virtuell-tjanst-config.xml"/>
+        <spring:import resource="classpath*:tp2-service-mule-descriptor-*.xml"/>
         
     </spring:beans>
 
