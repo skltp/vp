@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -82,20 +83,25 @@ public class DeployerMain {
 
 	//
 	private DeployerMain initTemplate() {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		InputStream is = this.getClass().getResourceAsStream(MULE_TEMPLATE);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			for (int b; (b = is.read()) != -1; ) {
-				os.write(b);
-			}
+			close(copy(this.getClass().getResourceAsStream(MULE_TEMPLATE), out));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-		this.muleTemplate = os.toString();		
+		} 
+		this.muleTemplate = out.toString();		
 		return this;
 	}
 
-
+	//
+	private static InputStream copy(InputStream in, OutputStream out) throws IOException {
+		byte buf[] = new byte[1024];
+		for (int len; (len = in.read(buf)) != -1; ) {
+			out.write(buf, 0, len);
+		}
+		return in;
+	}
+	
 
 	//
 	private void writeDescriptor(String fileName, Info info) throws Exception {
@@ -125,7 +131,7 @@ public class DeployerMain {
 			throw new IllegalArgumentException("Unable to update jar file, permission denied");
 		}
 		if (!tmp.renameTo(src)) {
-			throw new IllegalArgumentException(String.format("Fatal error during update, check %s copy", tmp));			
+			throw new IllegalArgumentException(String.format("Fatal error during update, backup saved as: %s", tmp));			
 		}
 	}
 
@@ -153,11 +159,7 @@ public class DeployerMain {
 				continue;
 			}
 			jos.putNextEntry(entry);
-			InputStream in = jf.getInputStream(entry);
-			byte buf[] = new byte[1024];
-			for (int len; (len = in.read(buf)) != -1; ) {
-				jos.write(buf, 0, len);
-			}
+			copy(jf.getInputStream(entry), jos);
 		}
 	}
 
@@ -213,7 +215,9 @@ public class DeployerMain {
 	/**
 	 * Main program.
 	 * 
-	 * @param args program arguments.s
+	 * @param args program arguments.
+	 * 
+	 * @see usage()
 	 */
 	public static void main(String[] args) {
 		if (args.length < 1) {
@@ -226,7 +230,6 @@ public class DeployerMain {
 			n++;
 		}
 		DeployerMain deployer = new DeployerMain();
-
 		for (int i = n; i < args.length; i++) {
 			try {
 				if (!args[i].endsWith(".jar")) {
