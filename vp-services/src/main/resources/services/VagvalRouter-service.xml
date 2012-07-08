@@ -8,7 +8,7 @@
 		http://www.mulesoft.org/schema/mule/core 	http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
 		http://www.mulesoft.org/schema/mule/cxf 	http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
 
-    <flow name="dynamic-vagval-routing" >
+    <flow name="vagval-dynamic-routing-flow" >
 
 		<transformer ref="logReqIn" />
         <transformer ref="rivExtractor" />
