@@ -1,7 +1,5 @@
 package se.skl.tp.vp.deployer;
 
-import java.io.File;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,14 +14,11 @@ public class DeployerMainTest {
 	}
 	
 	@Test
-	public void init() throws Exception {
-		dm.open(new File("test-out.jar"));
+	public void deploy() throws Exception {
+		dm.deploy("src/test/resources/test.jar", false);
 	}
 	
 	@Test
 	public void parseJar() throws Exception {
-		dm.open(new File("test-out.jar"));
-		dm.prepare("src/test/resources/test.jar");
-		dm.close();
 	}
 }
