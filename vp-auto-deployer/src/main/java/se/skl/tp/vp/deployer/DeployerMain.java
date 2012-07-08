@@ -4,11 +4,9 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -21,7 +19,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Creates deployment descriptors to virtualized services.
+ * Creates deployment descriptors to virtualize RIV services. <p>
+ * 
+ * RIV services are currently packaged as jar files, and this program reads the WSDL definition and adds a
+ * mule deployment descriptor. <p>
+ * 
+ * <code>
+ * usage: java -jar vp-auto-deployer[-<version>]jar [-update] [jar files...]
+ * 		-update: force update even if the target jar already contains a descriptor.
+ * </code>
  * 
  * @author Peter
  */
@@ -142,6 +148,10 @@ public class DeployerMain {
 	private void addToJar(JarOutputStream jos, JarFile jf) throws IOException {
 		for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements(); ) {
 			JarEntry entry = e.nextElement();
+			// always skip deployment descriptor (for update mode)
+			if (DEPLOY_DESCRIPTOR_NAME.equals(entry.getName())) {
+				continue;
+			}
 			jos.putNextEntry(entry);
 			InputStream in = jf.getInputStream(entry);
 			byte buf[] = new byte[1024];
@@ -186,7 +196,7 @@ public class DeployerMain {
 		JarEntry wsdlEntry = getWSDLJarEntry(jarFile);
 		Info info = extractWSDL(wsdlEntry.getName(), jarFile.getInputStream(wsdlEntry));
 		JarEntry deployEntry = jarFile.getJarEntry(DEPLOY_DESCRIPTOR_NAME);
-		if (deployEntry == null) {
+		if (deployEntry == null || update) {
 			System.out.printf("Updating %s with deployment descriptor (%s)\n", fileName, DEPLOY_DESCRIPTOR_NAME);
 			writeDescriptor(fileName, info);
 		}
@@ -196,7 +206,7 @@ public class DeployerMain {
 	//
 	static void usage() {
 		System.out.println("usage: java -jar vp-auto-deployer.jar [-update] [jar files...]");
-		System.out.printf("\t-update: udpates existing deployment descriptors (%s).\n", DEPLOY_DESCRIPTOR_NAME);
+		System.out.printf("\t-update: force update of existing deployment descriptors (%s).\n", DEPLOY_DESCRIPTOR_NAME);
 		System.exit(1);		
 	}
 

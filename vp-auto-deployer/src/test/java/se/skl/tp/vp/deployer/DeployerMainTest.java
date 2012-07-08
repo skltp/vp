@@ -15,7 +15,7 @@ public class DeployerMainTest {
 	
 	@Test
 	public void deploy() throws Exception {
-		dm.deploy("src/test/resources/test.jar", false);
+		dm.deploy("src/test/resources/test.jar", true);
 	}
 	
 	@Test
