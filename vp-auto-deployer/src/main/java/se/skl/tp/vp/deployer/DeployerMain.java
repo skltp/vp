@@ -45,7 +45,7 @@ import org.w3c.dom.NodeList;
  * mule deployment descriptor. <p>
  * 
  * <code>
- * usage: java -jar vp-auto-deployer[-<version>].jar [-update] [jar files...]
+ * usage: java -jar vp-auto-deployer[-&lt;version&gt;].jar [-update] [jar files...]
  * 		-update: force update even if the target jar already contains a descriptor.
  * </code>
  * 
@@ -212,7 +212,16 @@ public class DeployerMain {
 	}
 
 
-	//
+	/**
+	 * Creates a mule deployment descriptor for RIV-TA service packed in a jar file.
+	 * 
+	 * @param fileName the jar file name with service WSDL definition.
+	 * @param update true if existing entries shall be updated, otherwise false.
+	 * 
+	 * @return instance.
+	 * 
+	 * @throws Exception on any kind of unexpected error.
+	 */
 	public DeployerMain deploy(String fileName, boolean update) throws Exception {
 		JarFile jarFile = new JarFile(fileName);
 		JarEntry wsdlEntry = getWSDLJarEntry(jarFile);
@@ -225,8 +234,10 @@ public class DeployerMain {
 		return this;
 	}
 
-	//
-	static void usage() {
+	/**
+	 * Prints usage information, and exits with exit code 1.
+	 */
+	public static void usage() {
 		System.out.println("vp-auto-deployer: Creates a VP R2 deployment descriptor to virtualize RIV services");
 		System.out.println("Be careful: for RIV standard virtualisations only, and also be aware of the fact that all");
 		System.out.println("input jars are modified by this utility program.");
@@ -236,11 +247,11 @@ public class DeployerMain {
 	}
 
 	/**
-	 * Main program.
+	 * Creates a mule deployment descriptor for all specified RIV-TA service packed jar files.
 	 * 
 	 * @param args program arguments.
 	 * 
-	 * @see usage()
+	 * @see #usage()
 	 */
 	public static void main(String[] args) {
 		if (args.length < 1) {
