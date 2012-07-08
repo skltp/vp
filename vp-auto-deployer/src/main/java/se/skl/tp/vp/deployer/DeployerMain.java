@@ -45,7 +45,7 @@ import org.w3c.dom.NodeList;
  * mule deployment descriptor. <p>
  * 
  * <code>
- * usage: java -jar vp-auto-deployer[-<version>]jar [-update] [jar files...]
+ * usage: java -jar vp-auto-deployer[-<version>].jar [-update] [jar files...]
  * 		-update: force update even if the target jar already contains a descriptor.
  * </code>
  * 
