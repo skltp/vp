@@ -5,17 +5,23 @@ export VP_HOME=$VP_BASE/vp-home
 export MULE_HOME=${VP_BASE}/mule-standalone-3.3.0
 export JAVA_HOME=$VP_BASE/jdk1.6.0_33
 
-echo -n "Stopping Mule 3.3.0..."
-cd ${MULE_HOME}/bin
-./mule stop -config vp-config.xml 2>&1 >/dev/null
+echo "Generates virtual service deployment descriptors..."
+$JAVA_HOME/bin/java -jar $( dirname $0 )/vp-auto-deployer-1.0.jar $VP_HOME/vp/services/*-virtualisering-*.jar
+if [ $? == 0 ]; then
+        echo "done."
+fi
+
+echo -n "Starting ActiveMQ 5.4.2..."
+cd ${VP_BASE}/apache-activemq-5.4.2/bin
+./activemq start &>/dev/null
 
 if [ $? == 0 ]; then
         echo "done."
 fi
 
-echo -n "Stopping ActiveMQ 5.4.2..."
-cd ${VP_BASE}/apache-activemq-5.4.2/bin
-./activemq stop &>/dev/null
+echo -n "Starting Mule 3.3.0..."
+cd ${MULE_HOME}/bin
+./mule start -config vp-config.xml 2>&1 >/dev/null
 
 if [ $? == 0 ]; then
         echo "done."
