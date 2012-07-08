@@ -207,7 +207,10 @@ public class DeployerMain {
 
 	//
 	static void usage() {
-		System.out.println("usage: java -jar vp-auto-deployer.jar [-update] [jar files...]");
+		System.out.println("vp-auto-deployer: Creates a VP R2 deployment descriptor to virtualize RIV services");
+		System.out.println("Be careful: for RIV standard virtualisations only, and also be aware of the fact that all");
+		System.out.println("input jars are modified by this utility program.");
+		System.out.println("\nusage: java -jar vp-auto-deployer[-<version>].jar [-update] [jar files...]");
 		System.out.printf("\t-update: force update of existing deployment descriptors (%s).\n", DEPLOY_DESCRIPTOR_NAME);
 		System.exit(1);		
 	}
