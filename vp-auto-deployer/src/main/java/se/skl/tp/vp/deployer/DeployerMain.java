@@ -71,7 +71,7 @@ public class DeployerMain {
 		String wsdl;
 		String version;
 		String profile;
-		String contract;
+		String method;
 		String path;
 
 		Info(String name, String namespace, String wsdl) {
@@ -87,10 +87,10 @@ public class DeployerMain {
 				throw new IllegalArgumentException("Invalid namespace: " + namespace);
 			}
 			int len = args.length;
-			this.contract = args[len-3];
+			this.method = args[len-3];
 			this.version = args[len-2];
 			this.profile = args[len-1];
-			this.path = this.contract + "/" + this.version + "/" + this.profile;
+			this.path = this.method + "/" + this.version + "/" + this.profile;
 		}
 	}
 
@@ -132,7 +132,8 @@ public class DeployerMain {
 		String content = String.format(this.muleTemplate, 
 				new Date(), 
 				info.wsdl,
-				info.contract, 
+				info.method, 
+				info.version,
 				info.profile, 
 				info.path,
 				info.namespace,
