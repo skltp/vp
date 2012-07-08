@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ 	xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="          
+				http://www.springframework.org/schema/beans	  http://www.springframework.org/schema/beans/spring-beans-3.1.xsd                                                                                                             
+                http://www.mulesoft.org/schema/mule/core      http://www.mulesoft.org/schema/mule/core/current/mule.xsd                      
+                http://www.mulesoft.org/schema/mule/vm        http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd                         
+                http://www.mulesoft.org/schema/mule/jdbc      http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd                 
+        " >
+
+    <spring:beans>
+		<spring:bean id="logDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+			<spring:property name="url" value="jdbc:mysql://${LOGMANAGER_DB_HOST}:${LOGMANAGER_DB_PORT}/${LOGMANAGER_DB_NAME}" />
+			<spring:property name="username" value="${LOGMANAGER_DB_USER}"/>
+			<spring:property name="password" value="${LOGMANAGER_DB_PASSWORD}"/>
+			<spring:property name="initialSize" value="0" />
+			<spring:property name="maxActive" value="1" />
+			<spring:property name="maxIdle" value="1" />
+			<spring:property name="minIdle" value="0" />
+			<spring:property name="maxWait" value="-1" />
+		</spring:bean>
+	</spring:beans>
+    
+    <jdbc:connector
+        name="jdbcConnector"
+        dataSource-ref="logDataSource"
+        pollingFrequency="${SOITOOLKIT_JDBC_CON_POLLING_MS}" >
+        <jdbc:query
+            key="activelogtrigger-export-query"
+            value="SELECT id, serviceUrl FROM ServiceProducer" />
+    </jdbc:connector>
+    
+    <!-- TODO: Add service specific definitions here -->
+
+    <flow name="activeLogTrigger-flow" >
+
+        <jdbc:inbound-endpoint
+            connector-ref="jdbcConnector"
+            queryKey="activelogtrigger-export-query"
+            transformer-refs="logMsgIn" />
+
+        <custom-transformer class="se.skl.tp.vp.supervisor.transformer.EndpointExtractionTransformer" />
+
+        <vm:outbound-endpoint
+            exchange-pattern="request-response"
+            path="${ACTIVELOGTRIGGER_OUT_VM_QUEUE}"
+            transformer-refs="logMsgOut" />
+
+        <custom-exception-strategy class="org.soitoolkit.commons.mule.error.ServiceExceptionStrategy" />
+    </flow>
+
+</mule>
