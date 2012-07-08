@@ -38,7 +38,7 @@
             service="%s"
             wsdlLocation="classpath:%s" />
 
-        <flow-ref name="vagval-dynamic-routing" />
+        <flow-ref name="vagval-dynamic-routing-flow" />
     </flow>
 
 </mule>
