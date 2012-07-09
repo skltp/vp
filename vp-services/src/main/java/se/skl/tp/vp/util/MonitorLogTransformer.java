@@ -1,0 +1,338 @@
+/* 
+ * Licensed to the soi-toolkit project under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The soi-toolkit project licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package se.skl.tp.vp.util;
+
+import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
+import org.mule.message.ExceptionMessage;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transport.http.HttpConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
+import org.soitoolkit.commons.mule.api.log.EventLogMessage;
+import org.soitoolkit.commons.mule.api.log.EventLogger;
+import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
+import org.soitoolkit.commons.mule.log.DefaultEventLogger;
+import org.soitoolkit.commons.mule.log.EventLoggerFactory;
+
+import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
+import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
+
+public class MonitorLogTransformer extends AbstractMessageTransformer implements MuleContextAware {
+
+	private static final Logger log = LoggerFactory.getLogger(MonitorLogTransformer.class);
+
+	private EventLogger eventLogger;
+
+	private Pattern pattern;
+	private String senderIdPropertyName;
+	private String whiteList;
+
+	public void setSenderIdPropertyName(String senderIdPropertyName) {
+		this.senderIdPropertyName = senderIdPropertyName;
+		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
+	}
+
+	//
+	public void setWhiteList(final String whiteList) {
+		this.whiteList = whiteList;
+	}
+
+
+	@Override
+	public void setMuleContext(MuleContext muleContext) {
+		super.setMuleContext(muleContext);
+
+		log.debug("MuleContext injected");
+
+		// Also inject the muleContext in the event-logger (since we create the event-logger for now)
+		if (eventLogger == null) {
+			eventLogger = EventLoggerFactory.getEventLogger(muleContext);
+		}
+	
+		// TODO: this is an ugly workaround for injecting the jaxbObjToXml dependency ...
+		if (eventLogger instanceof DefaultEventLogger) {
+			((DefaultEventLogger) eventLogger).setJaxbToXml(jaxbObjectToXml);
+		}
+	}
+
+	/*
+	 * Property logLevel
+	 */
+	private LogLevelType logLevel = INFO;
+
+	public void setLogLevel(LogLevelType logLevel) {
+		this.logLevel = logLevel;
+	}
+
+	/*
+	 * Property logType
+	 */
+	private String logType = "";
+
+	public void setLogType(String logType) {
+		this.logType = logType;
+	}
+
+	/*
+	 * Property integrationScenario
+	 */
+	private String integrationScenario = "";
+
+	public void setIntegrationScenario(String integrationScenario) {
+		this.integrationScenario = integrationScenario;
+	}
+
+	/*
+	 * Property contractId
+	 */
+	private String contractId = "";
+
+	public void setContractId(String contractId) {
+		this.contractId = contractId;
+	}
+
+	private Map<String, String> businessContextId;
+
+	public void setBusinessContextId(Map<String, String> businessContextId) {
+		this.businessContextId = businessContextId;
+	}
+
+	private Map<String, String> extraInfo;
+
+	public void setExtraInfo(Map<String, String> extraInfo) {
+		this.extraInfo = extraInfo;
+	}
+
+	/**
+	 * Setter for the jaxbToXml property
+	 * 
+	 * @param jaxbToXml
+	 */
+	private JaxbObjectToXmlTransformer jaxbObjectToXml;
+
+	public void setJaxbObjectToXml(JaxbObjectToXmlTransformer jaxbToXml) {
+		this.jaxbObjectToXml = jaxbToXml;
+		if (eventLogger instanceof DefaultEventLogger) {
+			((DefaultEventLogger) eventLogger).setJaxbToXml(this.jaxbObjectToXml);
+		}
+	}
+
+	@Override
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
+
+		Map<String, String> evaluatedExtraInfo  = null;
+		Map<String, String> evaluatedBusinessContextId = null;
+		try {
+			// Skip logging if an error has occurred, then the error is logged by an error handler
+			ExceptionPayload exp = message.getExceptionPayload();
+			if (exp != null) {
+				log.debug("Skip logging message, exception detected! " + exp.getException().getMessage());
+				return message;
+			}
+
+			String httpReq = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+			if (httpReq != null) {
+				if ((httpReq.endsWith("?wsdl")) || (httpReq.contains("?xsd"))) {
+					log.debug("Skip logging message, CXF ...?WSDL/XSD call detected!");
+					return message;
+				}
+			}
+
+			evaluatedExtraInfo = evaluateMapInfo(extraInfo, message);
+			evaluatedBusinessContextId = evaluateMapInfo(businessContextId, message);
+
+			/*
+			 * Fetch senderid from certificate and append it as extra info
+			 */
+			if (evaluatedExtraInfo == null) {
+				evaluatedExtraInfo = new HashMap<String, String>();
+			}
+
+			String senderId = null;
+			if (message.getPropertyNames(PropertyScope.SESSION).contains(VPUtil.SENDER_ID)) {
+				senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
+			} else {
+				try {
+					CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message,
+							this.pattern, this.whiteList);
+
+					CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
+					senderId = certHelper.extractSenderIdFromCertificate();
+					log.debug("Sender extracted from certificate {}", senderId);
+
+				} catch (final VpSemanticException  e) {
+					log.debug("Could not extract sender id from certificate.");
+				}
+			}
+
+			String producerId = (String) message.getProperty("producerId", PropertyScope.SESSION);
+			evaluatedExtraInfo.put("producerId", producerId);
+
+			if (log.isDebugEnabled()) {
+				log.debug(toDebugLogString(evaluatedExtraInfo, evaluatedBusinessContextId));
+			}
+
+			switch (logLevel) {
+			case INFO:
+			case DEBUG:
+			case TRACE:
+				// eventLogger.logInfoEvent(message, logType, integrationScenario, contractId, null, extraInfo);
+				EventLogMessage infoMsg = new EventLogMessage();
+				infoMsg.setMuleMessage(message);
+				infoMsg.setLogMessage(logType);
+				infoMsg.setIntegrationScenario(integrationScenario);
+				infoMsg.setContractId(contractId);
+				infoMsg.setBusinessContextId(evaluatedBusinessContextId);
+				infoMsg.setExtraInfo(evaluatedExtraInfo);
+
+				eventLogger.logInfoEvent(infoMsg);
+				break;
+
+			case FATAL:
+			case ERROR:
+			case WARNING:
+				// eventLogger.logErrorEvent(new RuntimeException(logType), message, integrationScenario, contractId,
+				// null, extraInfo);
+				EventLogMessage errorMsg = new EventLogMessage();
+				errorMsg.setMuleMessage(message);
+				// errorMsg.setLogMessage(logType);
+				errorMsg.setIntegrationScenario(integrationScenario);
+				errorMsg.setContractId(contractId);
+				errorMsg.setBusinessContextId(evaluatedBusinessContextId);
+				errorMsg.setExtraInfo(evaluatedExtraInfo);
+
+				if (message.getPayload() instanceof ExceptionMessage) {
+					ExceptionMessage me = (ExceptionMessage) message.getPayload();
+					Throwable ex = me.getException();
+					if (ex.getCause() != null) {
+						ex = ex.getCause();
+					}
+					eventLogger.logErrorEvent(ex, errorMsg);
+				} else {
+					String evaluatedLogType = evaluateValue("logType", logType, message);
+					eventLogger.logErrorEvent(new RuntimeException(evaluatedLogType), errorMsg);
+				}
+				break;
+			}
+
+		} catch (Exception e) {
+			log.error(toDebugLogString(evaluatedExtraInfo, evaluatedBusinessContextId), e);
+		}
+		
+		return message;
+
+	}
+
+	// returns a context log mesage
+	private String toDebugLogString(Map<String, String> evaluatedExtraInfo, Map<String, String> evaluatedBusinessContextId ) {
+		return String.format("LogEvent [logType: %s, intergrationScenario: %s, contractId: %s, %s, %s]",
+				logType, integrationScenario, contractId,
+				toString("businessContextId", evaluatedBusinessContextId),
+				toString("extraInfo", evaluatedExtraInfo));
+	}
+	
+ 	// returns a log string
+	private static String toString(String name, Map<String, String> map) {
+		StringBuilder b = new StringBuilder();
+		b.append(name);
+		b.append(": [");
+		if (map != null) {
+			boolean d = false;
+			for (Map.Entry<String, String> e : map.entrySet()) {
+				if (d) {
+					b.append(", ");
+				} else {
+					d = true;
+				}
+				b.append(String.format("[key: %s, value: %s]", e.getKey(), e.getValue()));
+			}
+		}
+		b.append("]");
+		return b.toString();	
+	}
+
+	//
+	private Map<String, String> evaluateMapInfo(Map<String, String> map, MuleMessage message) {
+
+		if (map == null)
+			return null;
+
+		Set<Entry<String, String>> ei = map.entrySet();
+		Map<String, String> evaluatedMap = new HashMap<String, String>();
+		for (Entry<String, String> entry : ei) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			value = evaluateValue(key, value, message);
+			evaluatedMap.put(key, value);
+		}
+		return evaluatedMap;
+	}
+
+	private String evaluateValue(String key, String value, MuleMessage message) {
+		try {
+			if (isValidExpression(value)) {
+				String before = value;
+				Object eval = muleContext.getExpressionManager().evaluate(value.toString(), message);
+
+				if (eval == null) {
+					value = "UNKNOWN";
+
+				} else if (eval instanceof List) {
+					@SuppressWarnings("rawtypes")
+					List l = (List) eval;
+					value = l.get(0).toString();
+
+				} else {
+					value = eval.toString();
+				}
+				if (log.isDebugEnabled()) {
+					log.debug("Evaluated extra-info for key: " + key + ", " + before + " ==> " + value);
+				}
+			}
+		} catch (Throwable ex) {
+			String errMsg = "Faild to evaluate expression: " + key + " = " + value;
+			log.warn(errMsg, ex);
+			value = errMsg + ", " + ex;
+		}
+		return value;
+	}
+
+	//
+	private boolean isValidExpression(String expression) {
+		try {
+			return muleContext.getExpressionManager().isValidExpression(expression);
+		} catch (Throwable ex) {
+			return false;
+		}
+	}
+}

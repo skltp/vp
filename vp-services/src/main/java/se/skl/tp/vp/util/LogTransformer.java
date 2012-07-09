@@ -228,9 +228,8 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 		if (map == null)
 			return null;
 
-		Set<Entry<String, String>> ei = map.entrySet();
 		Map<String, String> evaluatedMap = new HashMap<String, String>();
-		for (Entry<String, String> entry : ei) {
+		for (Entry<String, String> entry : map.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
 			value = evaluateValue(key, value, message);

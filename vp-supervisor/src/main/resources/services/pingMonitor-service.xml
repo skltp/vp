@@ -5,10 +5,10 @@
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns="http://www.mulesoft.org/schema/mule/core"
     xsi:schemaLocation="                                                                                                                 
-                http://www.mulesoft.org/schema/mule/core      http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd                          
-        		http://www.mulesoft.org/schema/mule/vm        http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd                                 
-                http://www.mulesoft.org/schema/mule/cxf       http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd                       
-        		http://www.mulesoft.org/schema/mule/https     http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd                           
+                http://www.mulesoft.org/schema/mule/core      http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd                          
+        		http://www.mulesoft.org/schema/mule/vm        http://www.mulesoft.org/schema/mule/vm/3.3/mule-vm.xsd                                 
+                http://www.mulesoft.org/schema/mule/cxf       http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd                       
+        		http://www.mulesoft.org/schema/mule/https     http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd                           
     " >
 
     <!-- TODO: Add service specific definitions here -->
@@ -18,8 +18,7 @@
         <vm:inbound-endpoint
             exchange-pattern="request-response"
             path="${ACTIVELOGTRIGGER_OUT_VM_QUEUE}"
-            responseTransformer-refs="logRespIn"
-            transformer-refs="createCorrId logReqIn" />
+            transformer-refs="createCorrId" />
 
         <custom-transformer class="se.skl.tp.vp.supervisor.transformer.PingForConfigurationTypeTransformer" />
 
@@ -39,8 +38,8 @@
             connector-ref="VPConsumerConnector"
             exchange-pattern="request-response"
             responseTimeout="${SERVICE_TIMEOUT_MS}"
-            responseTransformer-refs="exceptionTransformer logRespOut"
-            transformer-refs="logReqOut" >
+            responseTransformer-refs="exceptionTransformer activeLogOut"
+            transformer-refs="activeLogIn" >
         </https:outbound-endpoint>
 
         <custom-exception-strategy class="org.soitoolkit.commons.mule.error.ServiceExceptionStrategy" />

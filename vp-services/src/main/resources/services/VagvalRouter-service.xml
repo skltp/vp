@@ -15,7 +15,7 @@
         <transformer ref="createCorrId" />
         <transformer ref="fixTransformer" />
         <transformer ref="rivTransformer" />
-        
+               
         <cxf:proxy-client payload="envelope" />
 
         <custom-processor class="se.skl.tp.vp.vagvalrouter.VagvalRouter" >

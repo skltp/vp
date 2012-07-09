@@ -6,9 +6,9 @@
     xmlns="http://www.mulesoft.org/schema/mule/core"
     xsi:schemaLocation="          
 				http://www.springframework.org/schema/beans	  http://www.springframework.org/schema/beans/spring-beans-3.1.xsd                                                                                                             
-                http://www.mulesoft.org/schema/mule/core      http://www.mulesoft.org/schema/mule/core/current/mule.xsd                      
-                http://www.mulesoft.org/schema/mule/vm        http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd                         
-                http://www.mulesoft.org/schema/mule/jdbc      http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd                 
+                http://www.mulesoft.org/schema/mule/core      http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd                      
+                http://www.mulesoft.org/schema/mule/vm        http://www.mulesoft.org/schema/mule/vm/3.3/mule-vm.xsd                         
+                http://www.mulesoft.org/schema/mule/jdbc      http://www.mulesoft.org/schema/mule/jdbc/3.3/mule-jdbc.xsd                 
         " >
 
     <spring:beans>
@@ -39,15 +39,13 @@
 
         <jdbc:inbound-endpoint
             connector-ref="jdbcConnector"
-            queryKey="activelogtrigger-export-query"
-            transformer-refs="logMsgIn" />
+            queryKey="activelogtrigger-export-query" />
 
         <custom-transformer class="se.skl.tp.vp.supervisor.transformer.EndpointExtractionTransformer" />
 
         <vm:outbound-endpoint
             exchange-pattern="request-response"
-            path="${ACTIVELOGTRIGGER_OUT_VM_QUEUE}"
-            transformer-refs="logMsgOut" />
+            path="${ACTIVELOGTRIGGER_OUT_VM_QUEUE}" />
 
         <custom-exception-strategy class="org.soitoolkit.commons.mule.error.ServiceExceptionStrategy" />
     </flow>

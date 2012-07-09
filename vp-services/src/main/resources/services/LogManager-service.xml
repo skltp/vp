@@ -29,7 +29,7 @@
 	
 		<service name="LogManager-service">
 			<inbound>
-				<jms:inbound-endpoint address="jms://${SOITOOLKIT_LOG_INFO_QUEUE}" transformer-refs="jmsToLogEvent"/>
+				<jms:inbound-endpoint address="jms://${SOITOOLKIT_LOG_INFO_QUEUE}-legacy" transformer-refs="jmsToLogEvent"/>
 			</inbound>
 			<component>
 				<singleton-object class="se.skl.tp.vp.logmanager.LogManager">

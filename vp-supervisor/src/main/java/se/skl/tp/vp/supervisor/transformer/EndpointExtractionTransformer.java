@@ -44,7 +44,7 @@ public class EndpointExtractionTransformer extends AbstractMessageTransformer {
         message.setProperty("host", endpointUrl.getHost(), PropertyScope.OUTBOUND);
         message.setProperty("port", endpointUrl.getPort(), PropertyScope.OUTBOUND);
         message.setProperty("path", endpointUrl.getPath(), PropertyScope.OUTBOUND);
-        message.setProperty("producerId", producerId, PropertyScope.OUTBOUND);
+        message.setProperty("producerId", producerId, PropertyScope.SESSION);
 
         return message;
     }
