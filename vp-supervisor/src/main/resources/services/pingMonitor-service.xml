@@ -38,8 +38,8 @@
             connector-ref="VPConsumerConnector"
             exchange-pattern="request-response"
             responseTimeout="${SERVICE_TIMEOUT_MS}"
-            responseTransformer-refs="exceptionTransformer activeLogOut"
-            transformer-refs="activeLogIn" >
+            responseTransformer-refs="exceptionTransformer activeLogResponse"
+            transformer-refs="activeLogRequest" >
         </https:outbound-endpoint>
 
         <custom-exception-strategy class="org.soitoolkit.commons.mule.error.ServiceExceptionStrategy" />
