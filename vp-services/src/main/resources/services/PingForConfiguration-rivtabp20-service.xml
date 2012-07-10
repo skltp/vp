@@ -16,14 +16,12 @@
             address="https://${TP_HOST}:${PINGFORCONFIGURATIONSERVICE_RIVTABP20_PORT}/${TP_BASE_URI}/${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_URI}"
             connector-ref="VPProducerConnector"
             exchange-pattern="request-response"
-            responseTransformer-refs="logRespOut" />
+            responseTransformer-refs="logRespOut" 
+            transformer-refs="createCorrId logReqIn"/>
  
         <cxf:jaxws-service
             serviceClass="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa20"
             wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl" />
- 
-        <transformer ref="createCorrId" />
- 		<transformer ref="logReqIn" />
         
         <component>
             <singleton-object class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa20" />
