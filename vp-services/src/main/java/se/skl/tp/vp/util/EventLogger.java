@@ -181,7 +181,7 @@ public class EventLogger {
 	//----------------
 	
 	private void dispatchInfoEvent(String msg) {
-		dispatchEvent("SOITOOLKIT.LOG.INFO", msg);
+		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
 //		dispatchEvent("vm://soitoolkit-info-log", msg);
 //		dispatchEvent("soitoolkit-info-log-endpoint", msg);
 	}
