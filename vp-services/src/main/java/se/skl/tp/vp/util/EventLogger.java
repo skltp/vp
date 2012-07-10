@@ -139,7 +139,6 @@ public class EventLogger {
 		
 		if (messageLogger.isInfoEnabled()) {
 			LogEvent logEvent = createLogEntry(LogLevelType.INFO, message, logMessage, businessContextId, extraInfo, message.getPayload(), null);
-			
 			String xmlString = JAXB_UTIL.marshal(logEvent);
 			dispatchInfoEvent(xmlString);
 
@@ -468,10 +467,10 @@ public class EventLogger {
 			}
 			
 			messageId             = message.getUniqueId();
-			contractId            = message.getInvocationProperty(SOITOOLKIT_CONTRACT_ID, "");
-			businessCorrelationId = message.getInvocationProperty(SOITOOLKIT_CORRELATION_ID, "");
-			integrationScenarioId = message.getInvocationProperty(SOITOOLKIT_INTEGRATION_SCENARIO, "");
-			propertyBusinessContextId = message.getInvocationProperty(SOITOOLKIT_BUSINESS_CONTEXT_ID, null);
+			contractId            = message.getProperty(SOITOOLKIT_CONTRACT_ID, PropertyScope.SESSION, "");
+			businessCorrelationId = message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, "");
+			integrationScenarioId = message.getProperty(SOITOOLKIT_INTEGRATION_SCENARIO, PropertyScope.SESSION, "");
+			propertyBusinessContextId = message.getProperty(SOITOOLKIT_BUSINESS_CONTEXT_ID, null);
 		}
 
 		String componentId = getServerId();

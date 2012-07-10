@@ -13,9 +13,9 @@
 
     <spring:beans>
 		<spring:bean id="logDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-			<spring:property name="url" value="jdbc:mysql://${LOGMANAGER_DB_HOST}:${LOGMANAGER_DB_PORT}/${LOGMANAGER_DB_NAME}" />
-			<spring:property name="username" value="${LOGMANAGER_DB_USER}"/>
-			<spring:property name="password" value="${LOGMANAGER_DB_PASSWORD}"/>
+			<spring:property name="url" value="jdbc:mysql://${TK_HOST}:${TK_DB_PORT}/${PC_DB_NAME}?autoReconnect=true" />
+			<spring:property name="username" value="${PC_DB_USER}"/>
+			<spring:property name="password" value="${PC_DB_PASSWORD}"/>
 			<spring:property name="initialSize" value="0" />
 			<spring:property name="maxActive" value="1" />
 			<spring:property name="maxIdle" value="1" />

@@ -10,9 +10,9 @@
 
     <flow name="vagval-dynamic-routing-flow" >
 
-		<transformer ref="logReqIn" />
-        <transformer ref="rivExtractor" />
         <transformer ref="createCorrId" />
+ 		<transformer ref="logReqIn" />
+        <transformer ref="rivExtractor" />
         <transformer ref="fixTransformer" />
         <transformer ref="rivTransformer" />
                

@@ -197,6 +197,7 @@ public class MonitorLogTransformer extends AbstractMessageTransformer implements
 
 			String producerId = (String) message.getProperty("producerId", PropertyScope.SESSION);
 			evaluatedExtraInfo.put("producerId", producerId);
+			evaluatedExtraInfo.put("source", getClass().getName());
 
 			if (log.isDebugEnabled()) {
 				log.debug(toDebugLogString(evaluatedExtraInfo, evaluatedBusinessContextId));
