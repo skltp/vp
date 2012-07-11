@@ -36,6 +36,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transport.http.HttpConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soitoolkit.commons.logentry.schema.v1.LogEvent;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.api.log.EventLogMessage;
 import org.soitoolkit.commons.mule.api.log.EventLogger;
@@ -47,6 +48,12 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
 import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
 
+/**
+ * Transforms for active monitoring (PingForConfiguration).
+ * 
+ * @author Peter
+ *
+ */
 public class MonitorLogTransformer extends AbstractMessageTransformer implements MuleContextAware {
 
 	private static final Logger log = LoggerFactory.getLogger(MonitorLogTransformer.class);
@@ -56,7 +63,8 @@ public class MonitorLogTransformer extends AbstractMessageTransformer implements
 	private Pattern pattern;
 	private String senderIdPropertyName;
 	private String whiteList;
-
+	private PayloadToStringTransformer payloadToStringTransformer;
+	
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
 		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
@@ -81,7 +89,7 @@ public class MonitorLogTransformer extends AbstractMessageTransformer implements
 	
 		// TODO: this is an ugly workaround for injecting the jaxbObjToXml dependency ...
 		if (eventLogger instanceof DefaultEventLogger) {
-			((DefaultEventLogger) eventLogger).setJaxbToXml(jaxbObjectToXml);
+			((DefaultEventLogger) eventLogger).setJaxbToXml(payloadToStringTransformer.getJaxbObjectToXmlTransformer());
 		}
 	}
 
@@ -133,18 +141,12 @@ public class MonitorLogTransformer extends AbstractMessageTransformer implements
 		this.extraInfo = extraInfo;
 	}
 
-	/**
-	 * Setter for the jaxbToXml property
-	 * 
-	 * @param jaxbToXml
-	 */
-	private JaxbObjectToXmlTransformer jaxbObjectToXml;
 
 	public void setJaxbObjectToXml(JaxbObjectToXmlTransformer jaxbToXml) {
-		this.jaxbObjectToXml = jaxbToXml;
 		if (eventLogger instanceof DefaultEventLogger) {
-			((DefaultEventLogger) eventLogger).setJaxbToXml(this.jaxbObjectToXml);
+			((DefaultEventLogger) eventLogger).setJaxbToXml(jaxbToXml);
 		}
+		this.payloadToStringTransformer = new PayloadToStringTransformer(jaxbToXml);
 	}
 
 	@Override
@@ -207,15 +209,14 @@ public class MonitorLogTransformer extends AbstractMessageTransformer implements
 			case INFO:
 			case DEBUG:
 			case TRACE:
-				// eventLogger.logInfoEvent(message, logType, integrationScenario, contractId, null, extraInfo);
 				EventLogMessage infoMsg = new EventLogMessage();
-				infoMsg.setMuleMessage(message);
 				infoMsg.setLogMessage(logType);
+				infoMsg.setMuleMessage(message);
 				infoMsg.setIntegrationScenario(integrationScenario);
 				infoMsg.setContractId(contractId);
 				infoMsg.setBusinessContextId(evaluatedBusinessContextId);
 				infoMsg.setExtraInfo(evaluatedExtraInfo);
-
+				
 				eventLogger.logInfoEvent(infoMsg);
 				break;
 
@@ -226,7 +227,6 @@ public class MonitorLogTransformer extends AbstractMessageTransformer implements
 				// null, extraInfo);
 				EventLogMessage errorMsg = new EventLogMessage();
 				errorMsg.setMuleMessage(message);
-				// errorMsg.setLogMessage(logType);
 				errorMsg.setIntegrationScenario(integrationScenario);
 				errorMsg.setContractId(contractId);
 				errorMsg.setBusinessContextId(evaluatedBusinessContextId);

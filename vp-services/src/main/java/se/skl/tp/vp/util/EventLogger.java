@@ -103,7 +103,8 @@ public class EventLogger {
 	private LogTransformer logTransformer;
 	
 	// Used to transform payloads that are jaxb-objects into a xml-string
-	private JaxbObjectToXmlTransformer jaxbToXml = null;
+	private PayloadToStringTransformer payloadToStringTransformer;
+
 
 	{
 		try {
@@ -128,9 +129,10 @@ public class EventLogger {
 	 * @param jaxbToXml
 	 */
 	public void setJaxbToXml(JaxbObjectToXmlTransformer jaxbToXml) {
-		this.jaxbToXml  = jaxbToXml;
+		this.payloadToStringTransformer  = new PayloadToStringTransformer(jaxbToXml);
 	}
 
+	//
 	public void logInfoEvent (
 		MuleMessage message,
 		String      logMessage,
@@ -147,6 +149,7 @@ public class EventLogger {
 		}
 	}
 
+	//
 	public void logErrorEvent (
 		Throwable   error,
 		MuleMessage message,
@@ -300,129 +303,6 @@ public class EventLogger {
 		return serverId = mConf.getId();
 	}
 
-	private String getPayloadAsString(Object payload) {
-		String content = null;
-		if (payload instanceof Object[]) {
-			Object[] arr = (Object[]) payload;
-			int i = 0;
-			for (Object object : arr) {
-				String arrContent = "[" + i++ + "]: "
-						+ getContentAsString(object);
-				if (i == 1) {
-					content = arrContent;
-				} else {
-					content += "\n" + arrContent;
-				}
-			}
-
-		} else {
-			content = getContentAsString(payload);
-		}
-		return content;
-	}
-
-	private String getContentAsString(Object payload) {
-		String content = null;
-		
-		if (payload == null) {
-			return null;
-
-		} else if (payload instanceof DepthXMLStreamReader) {
-			final DepthXMLStreamReader dp = (DepthXMLStreamReader) payload;
-			content = XmlUtil.convertXMLStreamReaderToString(dp, "UTF-8");
-		} else if (payload instanceof byte[]) {
-			content = getByteArrayContentAsString(payload);
-
-		} else if (payload instanceof ReversibleXMLStreamReader) {
-			content = XmlUtil.convertReversibleXMLStreamReaderToString(
-					(ReversibleXMLStreamReader) payload, "UTF-8");
-
-		} else if (payload instanceof Message) {
-			content = convertJmsMessageToString(payload, "UTF-8");
-
-		} else if (isJabxObject(payload)) {
-			content = getJaxbContentAsString(payload, "UTF-8");
-
-			// } else if (payload instanceof ChunkedInputStream) {
-			// contents = message.getPayloadAsString();
-			// message.setPayload(contents);
-
-		} else {
-			// Using message.getPayloadAsString() consumes InputStreams causing
-			// exceptions after the logging...
-			// contents = message.getPayloadAsString();
-			content = payload.toString();
-		}
-
-		return content;
-	}
-
-	private String convertJmsMessageToString(Object payload, String outputEncoding) {
-		try {
-			return JmsMessageUtils.toObject((Message) payload, null,
-					outputEncoding).toString();
-		} catch (JMSException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private String getByteArrayContentAsString(Object payload) {
-		String content;
-		StringBuffer byteArray = new StringBuffer();
-		byte[] bytes = (byte[]) payload;
-		for (int i = 0; i < bytes.length; i++) {
-			byteArray.append((char) bytes[i]);
-		}
-		content = byteArray.toString();
-		return content;
-	}
-
-	private boolean isJabxObject(Object payload) {
-		return payload.getClass().isAnnotationPresent(XmlType.class);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private String getJaxbContentAsString(Object jaxbObject, String outputEncoding) {
-		String content;
-		if (jaxbToXml == null) {
-			content = "Missing jaxb2xml injection, can't marshal JAXB object of type: "
-					+ jaxbObject.getClass().getName();
-		} else {
-			JAXBElement wrapped = null;
-			if (!jaxbObject.getClass()
-					.isAnnotationPresent(XmlRootElement.class)) {
-				// We are missing element end namespace info, let's create a
-				// wrapper xml-root-element
-				QName wrapperQName = new QName("class:"
-						+ jaxbObject.getClass().getName(),
-						getJaxbWrapperElementName(jaxbObject));
-				wrapped = new JAXBElement(wrapperQName, jaxbObject
-						.getClass(), null, jaxbObject);
-				
-				log.info("Created root wrapper: {}", wrapped);
-			}
-
-			try {
-				content = (String) jaxbToXml.doTransform(wrapped,
-						outputEncoding);
-			} catch (TransformerException e) {
-				e.printStackTrace();
-				content = "JAXB object marshalling failed: " + e.getMessage();
-			}
-		}
-		
-		return content;
-	}
-
-	private String getJaxbWrapperElementName(Object payload) {
-		String name = payload.getClass().getSimpleName();
-		String elementName = name.substring(0, 1).toLowerCase()
-				+ name.substring(1);
-		return elementName;
-	}
-
 	private LogEvent createLogEntry(
 		LogLevelType logLevel,
 		MuleMessage message, 
@@ -475,8 +355,7 @@ public class EventLogger {
 
 		String componentId = getServerId();
 
-		// Only extract payload if debug is enabled!
-	    String payloadASstring = (messageLogger.isDebugEnabled())? getPayloadAsString(payload) : "";
+		String payloadAsString = payloadToStringTransformer.getPayloadAsString(payload);
 		
 
 	    // -------------------------
@@ -560,7 +439,7 @@ public class EventLogger {
 		logEntry.setMetadataInfo(lmi);
 		logEntry.setRuntimeInfo(lri);
 		logEntry.setMessageInfo(lm);
-		logEntry.setPayload(payloadASstring);
+		logEntry.setPayload(payloadAsString);
 
 		//final String receiver = VPUtil.getReceiverId(message);
 		//extraInfo.put("receiver", receiver);

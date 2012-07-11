@@ -62,7 +62,7 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 	private Pattern pattern;
 	private String senderIdPropertyName;
 	private String whiteList;
-	
+
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
 	}

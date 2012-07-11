@@ -11,11 +11,11 @@
     <flow name="vagval-dynamic-routing-flow" >
 
         <transformer ref="createCorrId" />
- 		<transformer ref="logReqIn" />
-        <transformer ref="rivExtractor" />
         <transformer ref="fixTransformer" />
+        <transformer ref="rivExtractor" />
+  		<transformer ref="logReqIn" />
         <transformer ref="rivTransformer" />
-               
+        
         <cxf:proxy-client payload="envelope" />
 
         <custom-processor class="se.skl.tp.vp.vagvalrouter.VagvalRouter" >

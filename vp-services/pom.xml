@@ -14,7 +14,7 @@
 	</parent>
 
 	<artifactId>vp-services</artifactId>
-	<packaging>jar</packaging>
+
 	<name>vp-services</name>
 
 	<dependencies>
