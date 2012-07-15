@@ -23,23 +23,29 @@ public class RivExtractor extends AbstractMessageTransformer {
 		
 		QName qname = (QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION);
 		final String tns = VPUtil.extractNamespaceFromService(qname);
-		final String[] split = tns.split(":");
-		
-		final String rivVersion = split[split.length - 1].toUpperCase();
-	
-		log.debug("RIV-version set to sessions scope: " + rivVersion);
-		msg.setProperty(VPUtil.RIV_VERSION, rivVersion, PropertyScope.SESSION);
-		
-		log.debug("Service namespave set to session scope: " + tns);
-		msg.setProperty(VPUtil.SERVICE_NAMESPACE, tns, PropertyScope.SESSION);
-		
+
+		if (tns != null) {
+			final String[] split = tns.split(":");
+
+			final String rivVersion = split[split.length - 1].toUpperCase();
+
+			log.debug("RIV-version set to sessions scope: " + rivVersion);
+			msg.setProperty(VPUtil.RIV_VERSION, rivVersion, PropertyScope.SESSION);
+
+			log.debug("Service namespave set to session scope: " + tns);
+			msg.setProperty(VPUtil.SERVICE_NAMESPACE, tns, PropertyScope.SESSION);
+		} else {
+			log.warn("No service namespace in invocation scope");			
+		}
 		
 		final PayloadHelper payloadHelper = new PayloadHelper(msg);
-
 		final String receiverId = payloadHelper.extractReceiverFromPayload();
-		log.debug("Receiver id (route to) set to session scope: " + receiverId);
-		msg.setProperty(VPUtil.RECEIVER_ID, receiverId, PropertyScope.SESSION);
-
+		if (receiverId != null) {
+			log.debug("Receiver id (route to) set to session scope: " + receiverId);
+			msg.setProperty(VPUtil.RECEIVER_ID, receiverId, PropertyScope.SESSION);
+		} else {
+			log.warn("Unable to extract receiverid from paylaod");			
+		}
 
 		return msg;
 	}

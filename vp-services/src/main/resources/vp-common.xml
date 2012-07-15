@@ -141,15 +141,15 @@
 		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
     
-    <!--  FIXME: do not chnage logType, beacuse it's a hard-coded type used by Evactor active monitoring sub-system -->
-    <custom-transformer name="activeLogRequest" class="se.skl.tp.vp.util.MonitorLogTransformer">
+    <!--  FIXME: do not change logType, beacuse it's a hard-coded type used by Evactor active monitoring sub-system -->
+    <custom-transformer name="monitorLogRequest" class="se.skl.tp.vp.util.MonitorLogTransformer">
 		<spring:property name="logType"  value="req-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
 		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
     
-    <custom-transformer name="activeLogResponse" class="se.skl.tp.vp.util.MonitorLogTransformer">
+    <custom-transformer name="monitorLogResponse" class="se.skl.tp.vp.util.MonitorLogTransformer">
 		<spring:property name="logType"  value="resp-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />

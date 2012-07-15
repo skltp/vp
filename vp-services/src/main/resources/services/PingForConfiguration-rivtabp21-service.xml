@@ -18,7 +18,7 @@
             connector-ref="VPProducerConnector"
             exchange-pattern="request-response"
  			responseTransformer-refs="logRespOut" 
-            transformer-refs="createCorrId logReqIn"/>
+            transformer-refs="createCorrId rivExtractor logReqIn"/>
  
         <cxf:jaxws-service
             serviceClass="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa21"

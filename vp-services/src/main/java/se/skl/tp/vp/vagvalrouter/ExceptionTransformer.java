@@ -112,9 +112,7 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 			this.setErrorProperties(msg, ERR_MSG_CON_CLOSED, errMsg);
 			return createSoapFault(msg, ERR_MSG_CON_CLOSED, errMsg);
 		}
-		
-		msg.setProperty(VPUtil.SESSION_ERROR, Boolean.FALSE, PropertyScope.SESSION);
-		
+				
 		// No error, return incoming payload!
 		return msg.getPayload();
 	}

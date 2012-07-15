@@ -16,9 +16,8 @@
  */
 package se.skl.tp.vp.util;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -43,8 +42,9 @@ import org.soitoolkit.commons.mule.util.XmlUtil;
 public class PayloadToStringTransformer {
 	private JaxbObjectToXmlTransformer jaxbToXml;
 
-	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
+	private static final Logger log = LoggerFactory.getLogger(PayloadToStringTransformer.class);
 
+	//
 	public PayloadToStringTransformer(JaxbObjectToXmlTransformer jaxbToXml) {
 		this.jaxbToXml = jaxbToXml;
 	}
@@ -58,90 +58,77 @@ public class PayloadToStringTransformer {
 	public String getPayloadAsString(Object payload) {
 		String content = null;
 		if (payload instanceof Object[]) {
-			Object[] arr = (Object[]) payload;
+			StringBuffer buf = new StringBuffer();
 			int i = 0;
-			for (Object object : arr) {
-				String arrContent = "[" + i++ + "]: "
-						+ getContentAsString(object);
-				if (i == 1) {
-					content = arrContent;
-				} else {
-					content += "\n" + arrContent;
+			for (Object object : (Object[]) payload) {
+				if (i > 0) {
+					buf.append("\n");
 				}
+				buf.append("[").append(i++).append("]: ").append(getContentAsString(object));
 			}
-
+			content = buf.toString();
 		} else {
 			content = getContentAsString(payload);
 		}
 		return content;
 	}
 
+	//
 	private String getContentAsString(Object payload) {
-		String content = null;
-		
 		if (payload == null) {
 			return null;
-
-		} else if (payload instanceof DepthXMLStreamReader) {
+		}
+		String content = null;
+		
+		if (payload instanceof DepthXMLStreamReader) {
 			final DepthXMLStreamReader dp = (DepthXMLStreamReader) payload;
 			content = XmlUtil.convertXMLStreamReaderToString(dp, "UTF-8");
-		} else if (payload instanceof byte[]) {
-			content = getByteArrayContentAsString(payload);
-
+		} else if (payload instanceof byte[]) {			
+			try {
+				content = new String((byte[])payload, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				content = payload.toString();
+				log.error("Unexpected error while converting byte array to string (ignored)", e);
+			}
 		} else if (payload instanceof ReversibleXMLStreamReader) {
 			content = XmlUtil.convertReversibleXMLStreamReaderToString(
 					(ReversibleXMLStreamReader) payload, "UTF-8");
-
 		} else if (payload instanceof Message) {
 			content = convertJmsMessageToString(payload, "UTF-8");
-
 		} else if (isJabxObject(payload)) {
 			content = getJaxbContentAsString(payload, "UTF-8");
-
-			// } else if (payload instanceof ChunkedInputStream) {
-			// contents = message.getPayloadAsString();
-			// message.setPayload(contents);
-
 		} else {
-			// Using message.getPayloadAsString() consumes InputStreams causing
-			// exceptions after the logging...
-			// contents = message.getPayloadAsString();
-			content = payload.toString();
+			content = payload.getClass().getName();
+			if (log.isDebugEnabled()) {
+				log.debug("Unable to convert payload of type {} to string", content);
+			}
 		}
 
 		return content;
 	}
 
-	private String convertJmsMessageToString(Object payload, String outputEncoding) {
+	//
+	private static String convertJmsMessageToString(Object payload, String outputEncoding) {
 		try {
 			return JmsMessageUtils.toObject((Message) payload, null,
 					outputEncoding).toString();
-		} catch (JMSException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 
-	private String getByteArrayContentAsString(Object payload) {
-		String content;
-		StringBuffer byteArray = new StringBuffer();
-		byte[] bytes = (byte[]) payload;
-		for (int i = 0; i < bytes.length; i++) {
-			byteArray.append((char) bytes[i]);
-		}
-		content = byteArray.toString();
-		return content;
-	}
 
-	private boolean isJabxObject(Object payload) {
+	//
+	private static boolean isJabxObject(Object payload) {
 		return payload.getClass().isAnnotationPresent(XmlType.class);
 	}
 
+	//
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private String getJaxbContentAsString(Object jaxbObject, String outputEncoding) {
 		String content;
 		if (this.jaxbToXml == null) {
+			log.error("Missing jaxb2xml injection, can't marshal JAXB objects");
 			content = "Missing jaxb2xml injection, can't marshal JAXB object of type: "
 					+ jaxbObject.getClass().getName();
 		} else {
@@ -163,7 +150,7 @@ public class PayloadToStringTransformer {
 				content = (String) this.jaxbToXml.doTransform(wrapped,
 						outputEncoding);
 			} catch (TransformerException e) {
-				e.printStackTrace();
+				log.error("JAXB object marshalling failed", e);
 				content = "JAXB object marshalling failed: " + e.getMessage();
 			}
 		}
@@ -171,7 +158,8 @@ public class PayloadToStringTransformer {
 		return content;
 	}
 
-	private String getJaxbWrapperElementName(Object payload) {
+	//
+	private static String getJaxbWrapperElementName(Object payload) {
 		String name = payload.getClass().getSimpleName();
 		String elementName = name.substring(0, 1).toLowerCase()
 				+ name.substring(1);

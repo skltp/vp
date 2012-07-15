@@ -23,11 +23,16 @@ public class PayloadHelper extends VPHelperSupport {
 	}
 	
 	/**
-	 * Get the receiver from the payload
-	 * @return
+	 * Get the receiver from the payload.
+	 * 
+	 * @return the receiver or null if payload can't be parsed.
 	 */
 	public String extractReceiverFromPayload() {
-		ReversibleXMLStreamReader reader = this.getPayload();
+		Object payload = getMuleMessage().getPayload();
+		if (!(payload instanceof ReversibleXMLStreamReader)) {
+			return null;
+		}
+		ReversibleXMLStreamReader reader = (ReversibleXMLStreamReader) payload;
 		
 		// Start caching events from the XML documents
 		if (this.getLog().isDebugEnabled()) {
@@ -49,7 +54,7 @@ public class PayloadHelper extends VPHelperSupport {
 		}
 	}
 
-	public String parsePayloadForReceiver(final ReversibleXMLStreamReader reader) throws XMLStreamException {
+	private String parsePayloadForReceiver(final ReversibleXMLStreamReader reader) throws XMLStreamException {
 		final String rivVersion = this.getRivVersion();
 		
 		String receiverId = null;
@@ -115,19 +120,9 @@ public class PayloadHelper extends VPHelperSupport {
 		return receiverId;
 	}
 	
+	//
 	private String getRivVersion() {
 		return (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
-	}
-	
-	private ReversibleXMLStreamReader getPayload() {
-		ReversibleXMLStreamReader reader = null;
-		try {
-			reader = (ReversibleXMLStreamReader) this.getMuleMessage().getPayload();
-		} catch (final ClassCastException e) {
-			throw new IllegalArgumentException("Payload was not of type: ReversibleXMLStreamReader");
-		}
-		
-		return reader;
 	}
 
 }

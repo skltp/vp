@@ -36,7 +36,6 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transport.http.HttpConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.soitoolkit.commons.logentry.schema.v1.LogEvent;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.api.log.EventLogMessage;
 import org.soitoolkit.commons.mule.api.log.EventLogger;
