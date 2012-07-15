@@ -22,12 +22,9 @@ package se.skl.tp.vp.util;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.activemq.util.ByteArrayInputStream;
-import org.codehaus.jackson.util.ByteArrayBuilder;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
-import org.mule.module.xml.util.XMLUtils;
+import org.mule.transformer.AbstractTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
