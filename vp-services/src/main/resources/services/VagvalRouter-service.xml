@@ -42,7 +42,10 @@
             <transformer ref="logRespOut" />
         </response>
         
-        <custom-exception-strategy class="org.soitoolkit.commons.mule.error.ServiceExceptionStrategy" />
+        <custom-exception-strategy class="se.skl.tp.vp.util.VPExceptionStrategy" >
+			<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+        </custom-exception-strategy>
+        
     </flow>
 
 </mule>

@@ -21,6 +21,7 @@
             transformer-refs="createCorrId rivExtractor logReqIn"/>
  
         <cxf:jaxws-service
+            namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21"
             serviceClass="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa21"
             wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl" />
   

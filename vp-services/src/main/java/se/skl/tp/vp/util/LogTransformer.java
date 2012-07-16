@@ -29,7 +29,6 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -53,7 +52,7 @@ import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
  * 
  * @author Magnus Larsson
  */
-public class LogTransformer extends AbstractMessageTransformer implements MuleContextAware {
+public class LogTransformer extends AbstractMessageTransformer {
 
 	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
 
@@ -62,6 +61,12 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 	private Pattern pattern;
 	private String senderIdPropertyName;
 	private String whiteList;
+
+	
+	public LogTransformer() {
+		this.eventLogger = new EventLogger();
+	}
+
 
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
@@ -72,6 +77,13 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 		pattern = Pattern.compile(this.senderIdPropertyName + VPUtil.CERT_SENDERID_PATTERN);
 	}
 
+	//
+	@Override
+	public void setMuleContext(MuleContext muleContext) {
+		log.debug("setMuleContext { muleContext: {} }", muleContext);
+		super.setMuleContext(muleContext);
+		this.eventLogger.setMuleContext(muleContext);
+	}
 
 	/*
 	 * Property logLevel
@@ -107,10 +119,6 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 		this.extraInfo = extraInfo;
 	}
 
-	public LogTransformer() {
-		eventLogger = new EventLogger(this);
-	}
-
 		
 	public MuleContext getMuleContext() {
 		return super.muleContext;
@@ -122,7 +130,7 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 	 * @param jaxbToXml
 	 */
 	public void setJaxbObjectToXml(JaxbObjectToXmlTransformer jaxbToXml) {
-		eventLogger.setJaxbToXml(jaxbToXml);
+		this.eventLogger.setJaxbToXml(jaxbToXml);
 	}
 
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
@@ -168,32 +176,15 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 			if (evaluatedExtraInfo == null) {
 				evaluatedExtraInfo = new HashMap<String, String>();
 			}
+			
+			String senderId = (String) message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
 
-			try {
-				CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message,
-						this.pattern, this.whiteList);
+			if (senderId == null) {
+				senderId = getSenderId(message);
+			} 	
 
-				CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
-				final String senderId = certHelper.extractSenderIdFromCertificate();
-				log.debug("Sender extracted from certificate {}", senderId);
-
-				evaluatedExtraInfo.put(VPUtil.SENDER_ID, senderId);
-			} catch (final VpSemanticException e) {
-				log.debug("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
-			}
-
-			evaluatedExtraInfo.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
-			evaluatedExtraInfo.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION));
-			evaluatedExtraInfo.put(VPUtil.SERVICE_NAMESPACE, (String) message.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION));
-
-			final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR, PropertyScope.SESSION);
-			if (error != null) {
-				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR, error.toString());
-				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_DESCRIPTION,
-						(String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.SESSION));
-				evaluatedExtraInfo.put(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION,
-						(String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.SESSION));
-			}
+			evaluatedExtraInfo.put("source", getClass().getName());
+			eventLogger.addSessionInfo(message, evaluatedExtraInfo);
 
 			switch (logLevel) {
 			case INFO:
@@ -237,6 +228,23 @@ public class LogTransformer extends AbstractMessageTransformer implements MuleCo
 		return evaluatedMap;
 	}
 
+	//
+	private String getSenderId(MuleMessage message) {
+		String senderId = "";
+		try {
+			CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message,
+					this.pattern, this.whiteList);
+			CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
+			senderId = certHelper.extractSenderIdFromCertificate();
+			message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
+			log.debug("Sender extracted from certificate {}", senderId);
+		} catch (final VpSemanticException e) {
+			log.warn("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
+		} 	
+		return senderId;
+	}
+	
+	
 	private String evaluateValue(String key, String value, MuleMessage message) {
 		try {
 			if (muleContext.getExpressionManager().isValidExpression(value.toString())) {

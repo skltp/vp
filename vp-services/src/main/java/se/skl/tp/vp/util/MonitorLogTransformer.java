@@ -17,6 +17,10 @@
 package se.skl.tp.vp.util;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
+import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_BUSINESS_CONTEXT_ID;
+import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CONTRACT_ID;
+import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
+import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_INTEGRATION_SCENARIO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +32,6 @@ import java.util.regex.Pattern;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.message.ExceptionMessage;
@@ -43,17 +46,13 @@ import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.log.DefaultEventLogger;
 import org.soitoolkit.commons.mule.log.EventLoggerFactory;
 
-import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
-
 /**
  * Transforms for active monitoring (PingForConfiguration).
  * 
  * @author Peter
  *
  */
-public class MonitorLogTransformer extends AbstractMessageTransformer implements MuleContextAware {
+public class MonitorLogTransformer extends AbstractMessageTransformer {
 
 	private static final Logger log = LoggerFactory.getLogger(MonitorLogTransformer.class);
 
@@ -172,34 +171,19 @@ public class MonitorLogTransformer extends AbstractMessageTransformer implements
 			evaluatedExtraInfo = evaluateMapInfo(extraInfo, message);
 			evaluatedBusinessContextId = evaluateMapInfo(businessContextId, message);
 
-			/*
-			 * Fetch senderid from certificate and append it as extra info
-			 */
 			if (evaluatedExtraInfo == null) {
 				evaluatedExtraInfo = new HashMap<String, String>();
-			}
-
-			String senderId = null;
-			if (message.getPropertyNames(PropertyScope.SESSION).contains(VPUtil.SENDER_ID)) {
-				senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
-			} else {
-				try {
-					CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message,
-							this.pattern, this.whiteList);
-
-					CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
-					senderId = certHelper.extractSenderIdFromCertificate();
-					log.debug("Sender extracted from certificate {}", senderId);
-
-				} catch (final VpSemanticException  e) {
-					log.debug("Could not extract sender id from certificate.");
-				}
 			}
 
 			String producerId = (String) message.getProperty("producerId", PropertyScope.SESSION);
 			evaluatedExtraInfo.put("producerId", producerId);
 			evaluatedExtraInfo.put("source", getClass().getName());
 
+			if (message.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION) == null) {
+				message.setProperty(VPUtil.SERVICE_NAMESPACE, "urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21", PropertyScope.SESSION);
+				message.setProperty(VPUtil.RIV_VERSION, "RIVTABP21", PropertyScope.SESSION);
+			}
+			
 			if (log.isDebugEnabled()) {
 				log.debug(toDebugLogString(evaluatedExtraInfo, evaluatedBusinessContextId));
 			}

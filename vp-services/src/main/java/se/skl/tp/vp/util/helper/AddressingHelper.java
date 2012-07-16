@@ -112,6 +112,7 @@ public class AddressingHelper extends VPHelperSupport {
 		VagvalInput vagvalInput = new VagvalInput();
 		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate();
 		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.OUTBOUND);
+		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.SESSION);
 
 		vagvalInput.receiverId = getSessionProperty(VPUtil.RECEIVER_ID);
 		vagvalInput.rivVersion = getSessionProperty(VPUtil.RIV_VERSION);

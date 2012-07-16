@@ -21,7 +21,6 @@ import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CONTRACT
 import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
 import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_INTEGRATION_SCENARIO;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.URI;
@@ -33,25 +32,17 @@ import java.util.Set;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
 
-import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleConfiguration;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transport.jms.JmsConnector;
-import org.mule.transport.jms.JmsMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -100,13 +91,13 @@ public class EventLogger {
 	private static String PROCESS_ID = "UNKNOWN";
 
 	private String serverId = null; // Can't read this one at class initialization because it is not set at that time. Can also be different for different loggers in the same JVM (e.g. multiple wars in one servlet container with shared classes?))
-	private LogTransformer logTransformer;
+	private MuleContext muleContext;
 	
 	// Used to transform payloads that are jaxb-objects into a xml-string
 	private PayloadToStringTransformer payloadToStringTransformer;
 
 
-	{
+	static {
 		try {
 			// Let's give it a try, fail silently...
 			HOST       = InetAddress.getLocalHost();
@@ -117,10 +108,19 @@ public class EventLogger {
 		}
 	}
 
-	public EventLogger(LogTransformer logTransformer) {
-		this.logTransformer = logTransformer;
+	public EventLogger() {		
 	}
-
+	
+	//
+	public EventLogger(MuleContext muleContext) {
+		setMuleContext(muleContext);
+	}
+	
+	
+	public void setMuleContext(MuleContext muleContext) {
+		log.debug("setMuleContext { muleContext: {} }", muleContext);
+		this.muleContext = muleContext;
+	}
 	
 	
 	/**
@@ -165,6 +165,7 @@ public class EventLogger {
 		dispatchErrorEvent(xmlString);
 	}
 
+	//
 	public void logErrorEvent (
 		Throwable   error,
 		Object      payload,
@@ -178,21 +179,16 @@ public class EventLogger {
 
 		String xmlString = JAXB_UTIL.marshal(logEvent);
 		dispatchErrorEvent(xmlString);
-
 	}
 
 	//----------------
 	
 	private void dispatchInfoEvent(String msg) {
 		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
-//		dispatchEvent("vm://soitoolkit-info-log", msg);
-//		dispatchEvent("soitoolkit-info-log-endpoint", msg);
 	}
 
 	private void dispatchErrorEvent(String msg) {
 		dispatchEvent("SOITOOLKIT.LOG.ERROR", msg);
-//		dispatchEvent("vm://soitoolkit-error-log", msg);
-//		dispatchEvent("soitoolkit-error-log-endpoint", msg);
 	}
 
 	private void dispatchEvent(String queue, String msg) {
@@ -213,7 +209,7 @@ public class EventLogger {
 
 	private Session getSession() throws JMSException {
 //		JmsConnector jmsConn = (JmsConnector)MuleServer.getMuleContext().getRegistry().lookupConnector("soitoolkit-jms-connector");
-		JmsConnector jmsConn = (JmsConnector)MuleUtil.getSpringBean(logTransformer.getMuleContext(), "soitoolkit-jms-connector");
+		JmsConnector jmsConn = (JmsConnector)MuleUtil.getSpringBean(this.muleContext, "soitoolkit-jms-connector");
 		Connection c = jmsConn.getConnection();
 		Session s = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		return s;
@@ -295,9 +291,10 @@ public class EventLogger {
 
 		if (serverId != null) return serverId;
 		
-		if (logTransformer.getMuleContext() == null) return "UNKNOWN.MULE_CONTEXT"; 
+		if (this.muleContext == null) return "UNKNOWN.MULE_CONTEXT"; 
 
-		MuleConfiguration mConf = logTransformer.getMuleContext().getConfiguration();
+		MuleConfiguration mConf = this.muleContext.getConfiguration();
+		
 		if (mConf == null) return "UNKNOWN.MULE_CONFIGURATION"; 
 		
 		return serverId = mConf.getId();
@@ -464,4 +461,21 @@ public class EventLogger {
 		return logEvent;
 	}
 
+
+	//
+	public void addSessionInfo(MuleMessage message, Map<String, String> map) {
+		map.put(VPUtil.SENDER_ID, (String) message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
+		map.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
+		map.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION));
+		map.put(VPUtil.SERVICE_NAMESPACE, (String) message.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION));
+
+		final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR, PropertyScope.SESSION);
+		if (Boolean.TRUE.equals(error)) {
+			map.put(VPUtil.SESSION_ERROR, error.toString());
+			map.put(VPUtil.SESSION_ERROR_DESCRIPTION,
+					(String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.SESSION));
+			map.put(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION,
+					(String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.SESSION));
+		}
+	}
 }

@@ -51,9 +51,7 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 		
 		// Check if any error
 		if (msg.getExceptionPayload() != null) {
-			
-			msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-			
+						
 			logger.debug("Exception payload detected!");
 			if (msg.getExceptionPayload().getException() instanceof ServiceException ||
 				msg.getExceptionPayload().getException() instanceof HttpException) {
@@ -159,6 +157,7 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 	}
 	
 	private void setErrorProperties(final MuleMessage msg, final String vpError, final String errorDescription) {
+		msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
 		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, vpError, PropertyScope.SESSION);
 		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, errorDescription, PropertyScope.SESSION);
 	}
