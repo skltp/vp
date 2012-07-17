@@ -39,6 +39,7 @@
         
         <response>
             <transformer ref="exceptionTransformer" />
+            <object-to-string-transformer /> 
             <transformer ref="logRespOut" />
         </response>
         

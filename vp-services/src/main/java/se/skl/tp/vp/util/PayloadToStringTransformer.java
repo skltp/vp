@@ -16,6 +16,10 @@
  */
 package se.skl.tp.vp.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.jms.Message;
@@ -27,6 +31,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
+import org.mule.transport.http.ReleasingInputStream;
 import org.mule.transport.jms.JmsMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,15 +85,17 @@ public class PayloadToStringTransformer {
 		}
 		String content = null;
 		
-		if (payload instanceof DepthXMLStreamReader) {
+		if (payload instanceof String) {
+			content = (String) payload;
+		} else if (payload instanceof DepthXMLStreamReader) {
 			final DepthXMLStreamReader dp = (DepthXMLStreamReader) payload;
 			content = XmlUtil.convertXMLStreamReaderToString(dp, "UTF-8");
 		} else if (payload instanceof byte[]) {			
 			try {
 				content = new String((byte[])payload, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				content = payload.toString();
-				log.error("Unexpected error while converting byte array to string (ignored)", e);
+				content = payload.getClass().getName();
+				log.warn("Unexpected error while converting byte array to string (ignored)", e);
 			}
 		} else if (payload instanceof ReversibleXMLStreamReader) {
 			content = XmlUtil.convertReversibleXMLStreamReaderToString(
@@ -106,6 +113,7 @@ public class PayloadToStringTransformer {
 
 		return content;
 	}
+
 
 	//
 	private static String convertJmsMessageToString(Object payload, String outputEncoding) {
