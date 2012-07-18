@@ -98,19 +98,6 @@ public class VagvalRouter extends AbstractRecipientList {
 	}));
 	
 	/**
-	 * Headers to be blocked when invoking producer.
-	 */
-	private static final List<String> BLOCKED_RESP_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
-			"SOAPAction",
-			"MULE_CORRELATION_GROUP_SIZE",
-			"MULE_CORRELATION_ID",
-			"MULE_ENCODING",
-			"http.method",
-			"http.status",
-			"#status#",
-	}));
-
-	/**
 	 * Headers to be added when invoking producer.
 	 */
 	private static final Map<String, Object> ADD_HEADERS;
@@ -214,16 +201,6 @@ public class VagvalRouter extends AbstractRecipientList {
 				replyEvent.getMessage().setProperty((String) prop, event.getMessage().getProperty((String) prop, PropertyScope.OUTBOUND), PropertyScope.OUTBOUND);
 			}
 		}
-
-		/**
-		 * Remove unwanted stuff.
-		 */
-		for (final String name : BLOCKED_RESP_HEADERS) {
-			replyEvent.getMessage().removeProperty(name, PropertyScope.OUTBOUND);
-		}		
-
-		// add correlation id, potentially used for tracing
-		replyEvent.getMessage().setProperty(X_VP_CORRELATION_ID, event.getMessage().getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION), PropertyScope.OUTBOUND);	
 		
 		synchronized (statistics) {
 			ServiceStatistics serverStatistics = statistics.get(serviceId);
