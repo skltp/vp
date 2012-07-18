@@ -20,7 +20,7 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +69,36 @@ public class VagvalRouter extends AbstractRecipientList {
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 
 	private AddressingHelper addrHelper;
+	
+	/**
+	 * Headers to be blocked when invoking producer.
+	 */
+	private static final List<String> BLOCKED_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
+			VPUtil.SENDER_ID,
+			//VPUtil.RECEIVER_ID,
+			VPUtil.RIV_VERSION,
+			VPUtil.SERVICE_NAMESPACE,
+			VPUtil.PEER_CERTIFICATES,
+			"LOCAL_CERTIFICATES",
+			"namespace",
+			VPUtil.REVERSE_PROXY_HEADER_NAME,
+			"http.disable.status.code.exception.check",
+			"content-type",
+			"Content-Type",
+			"Content-type",
+			"content-Type",
+	}));
+	
+	/**
+	 * Headers to be added when invoking producer.
+	 */
+	private static final Map<String, Object> ADD_HEADERS;
+	static {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("Content-Type", "text/xml;charset=UTF-8");	
+		ADD_HEADERS = Collections.unmodifiableMap(map);
+	}
+	
 
 	void setAddressingHelper(final AddressingHelper helper) {
 		this.addrHelper = helper;
@@ -215,40 +245,11 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		MessagePropertiesTransformer transformer = new MessagePropertiesTransformer();
 		transformer.setMuleContext(muleContext);
-		transformer.setDeleteProperties(new ArrayList<String>());
-		transformer.setAddProperties(new HashMap<String, Object>());
-
-		handleContentTypeHeaders(transformer);
-		handleReverseproxyHeaders(transformer);
-		handleMuleHeadersNotToBePropagated(transformer);
+		transformer.setOverwrite(true);
+		transformer.setScope(PropertyScope.OUTBOUND);
+		transformer.setDeleteProperties(BLOCKED_HEADERS);
+		transformer.setAddProperties(ADD_HEADERS);
 
 		eb.addMessageProcessor(transformer);
 	}
-
-	private void handleContentTypeHeaders(MessagePropertiesTransformer transformer) {
-		logger.debug("Remove any existing content-type and set content-type=text/xml;charset=UTF-8 on outbound endpoint");
-
-		transformer.getDeleteProperties().add("content-type");
-		transformer.getDeleteProperties().add("Content-Type");
-		transformer.getDeleteProperties().add("Content-type");
-		transformer.getDeleteProperties().add("content-Type");
-
-		transformer.getAddProperties().put("Content-Type", "text/xml;charset=UTF-8");
-	}
-
-	private void handleReverseproxyHeaders(MessagePropertiesTransformer transformer) {
-		logger.debug("Remove reverse proxy header information on outbound endpoint");
-		transformer.getDeleteProperties().add(VPUtil.REVERSE_PROXY_HEADER_NAME);
-	}
-
-	private void handleMuleHeadersNotToBePropagated(MessagePropertiesTransformer transformer) {
-		logger.debug("Remove mule header information not to be propagated on outbound endpoint");
-		transformer.getDeleteProperties().add(VPUtil.SENDER_ID);
-		//transformer.getDeleteProperties().add(VPUtil.RECEIVER_ID);
-		transformer.getDeleteProperties().add(VPUtil.RIV_VERSION);
-		transformer.getDeleteProperties().add(VPUtil.SERVICE_NAMESPACE);
-		transformer.getDeleteProperties().add("namespace");
-	}
-
-
 }
