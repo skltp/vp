@@ -24,12 +24,14 @@
 
     <!-- Name of this file is mandatory and may not be changed. -->
 
-    <flow name="%s-%s-%s-flow" >
+
+	<flow name="%s-%s-%s-flow" >
 
         <https:inbound-endpoint
             address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/%s"
             connector-ref="VPProducerConnector"
-            exchange-pattern="request-response" >
+            exchange-pattern="request-response" 
+            responseTransformer-refs="filterResponseHeaders">
         </https:inbound-endpoint>
 
         <cxf:proxy-service
