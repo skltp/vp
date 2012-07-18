@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -54,6 +55,15 @@ import se.skl.tp.vp.util.helper.AddressingHelper;
 
 public class VagvalRouter extends AbstractRecipientList {
 
+	/**
+	 * HTTP Header forwarded to producer
+	 */
+	private static final String X_VP_CONSUMER_ID = "x-vp-consumer-id";
+	/**
+	 * HTTP Header forwarded to consumer
+	 */
+	private static final String X_VP_CORRELATION_ID = "x-vp-correlation-id";
+
 	private static final Logger logger = LoggerFactory.getLogger(VagvalRouter.class);
 
 	private VisaVagvalsInterface vagvalAgent;
@@ -73,29 +83,41 @@ public class VagvalRouter extends AbstractRecipientList {
 	/**
 	 * Headers to be blocked when invoking producer.
 	 */
-	private static final List<String> BLOCKED_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
+	private static final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
 			VPUtil.SENDER_ID,
-			//VPUtil.RECEIVER_ID,
 			VPUtil.RIV_VERSION,
 			VPUtil.SERVICE_NAMESPACE,
+			VPUtil.REVERSE_PROXY_HEADER_NAME,
 			VPUtil.PEER_CERTIFICATES,
 			"LOCAL_CERTIFICATES",
-			"namespace",
-			VPUtil.REVERSE_PROXY_HEADER_NAME,
-			"http.disable.status.code.exception.check",
 			"content-type",
 			"Content-Type",
 			"Content-type",
 			"content-Type",
+			"http.disable.status.code.exception.check",
 	}));
 	
+	/**
+	 * Headers to be blocked when invoking producer.
+	 */
+	private static final List<String> BLOCKED_RESP_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
+			"SOAPAction",
+			"MULE_CORRELATION_GROUP_SIZE",
+			"MULE_CORRELATION_ID",
+			"MULE_ENCODING",
+			"http.method",
+			"http.status",
+			"#status#",
+	}));
+
 	/**
 	 * Headers to be added when invoking producer.
 	 */
 	private static final Map<String, Object> ADD_HEADERS;
 	static {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("Content-Type", "text/xml;charset=UTF-8");	
+		map.put("Content-Type", "text/xml;charset=UTF-8");
+		map.put("User-Agent", "SKLTP VP/2.0");
 		ADD_HEADERS = Collections.unmodifiableMap(map);
 	}
 	
@@ -180,16 +202,29 @@ public class VagvalRouter extends AbstractRecipientList {
 			serverStatistics.noOfCalls++;
 		}
 
+		
 		// Do the actual routing
 		MuleEvent replyEvent = super.route(event);
 
 		/*
 		 * Restore properties
 		 */
-		for (final Object prop : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND)) {
-			replyEvent.getMessage().setProperty((String) prop, event.getMessage().getProperty((String) prop, PropertyScope.OUTBOUND), PropertyScope.OUTBOUND);
+		for (final String prop : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND)) {
+			if (!BLOCKED_REQ_HEADERS.contains(prop)) {
+				replyEvent.getMessage().setProperty((String) prop, event.getMessage().getProperty((String) prop, PropertyScope.OUTBOUND), PropertyScope.OUTBOUND);
+			}
 		}
 
+		/**
+		 * Remove unwanted stuff.
+		 */
+		for (final String name : BLOCKED_RESP_HEADERS) {
+			replyEvent.getMessage().removeProperty(name, PropertyScope.OUTBOUND);
+		}		
+
+		// add correlation id, potentially used for tracing
+		replyEvent.getMessage().setProperty(X_VP_CORRELATION_ID, event.getMessage().getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION), PropertyScope.OUTBOUND);	
+		
 		synchronized (statistics) {
 			ServiceStatistics serverStatistics = statistics.get(serviceId);
 			serverStatistics.noOfSuccesfullCalls++;
@@ -210,10 +245,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
 		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-		//eb.setDisableTransportTransformer(true);
 		
-		setOutboundTransformers(eb);
-
+		MessagePropertiesTransformer mt = createOutboundTransformer();
+		mt.getAddProperties().put(X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
+		mt.getAddProperties().put(X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
+		
+		eb.addMessageProcessor(mt);
+		
 		if (url.contains("https://")) {
 			Connector connector = muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_NAME);
 			eb.setConnector(connector);     
@@ -240,16 +278,14 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * <delete-message-property key="x-vp-auth-cert"/>
 	 * </message-properties-transformer>
 	 */
-	private void setOutboundTransformers(EndpointBuilder eb) {
-		logger.info("Set outbound message transformers to update/add/remove mule message properties");
-
+	private MessagePropertiesTransformer createOutboundTransformer() {
+		logger.info("Create outbound message transformers to update/add/remove mule message properties");
 		MessagePropertiesTransformer transformer = new MessagePropertiesTransformer();
 		transformer.setMuleContext(muleContext);
 		transformer.setOverwrite(true);
 		transformer.setScope(PropertyScope.OUTBOUND);
-		transformer.setDeleteProperties(BLOCKED_HEADERS);
-		transformer.setAddProperties(ADD_HEADERS);
-
-		eb.addMessageProcessor(transformer);
+		transformer.setAddProperties(new HashMap<String, Object>(ADD_HEADERS));
+		transformer.setDeleteProperties(BLOCKED_REQ_HEADERS);
+		return transformer;
 	}
 }
