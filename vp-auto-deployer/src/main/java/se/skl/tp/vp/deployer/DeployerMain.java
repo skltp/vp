@@ -277,8 +277,7 @@ public class DeployerMain {
 				}
 				deployer.deploy(args[i], update);
 			} catch (Exception e) {
-				System.err.printf("Error: unexpected error while processing file: %s - %s (skipped)\n", args[i], e);
-				System.exit(1);
+				System.err.printf("Warning: unexpected error while processing file: %s - %s (skipped)\n", args[i], e);
 			}
 		}
 
