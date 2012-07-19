@@ -7,6 +7,12 @@ import org.slf4j.LoggerFactory;
 
 import riv.itintegration.monitoring.pingforconfigurationresponder._1.*;
 
+/**
+ * Creates a PingforConfiguration request payload..
+ * 
+ * @since VP-2.0
+ * @author Anders
+ */
 public class PingForConfigurationTypeTransformer extends AbstractTransformer {
 
 	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationTypeTransformer.class);
