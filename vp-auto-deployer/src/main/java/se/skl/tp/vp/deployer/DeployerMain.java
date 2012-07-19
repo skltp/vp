@@ -136,7 +136,7 @@ public class DeployerMain {
 		File tmp = new File(fileName + ".tmp");
 		JarOutputStream jos = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(tmp)));
 		addToJar(jos, new JarFile(src));
-		
+				
 		String content = String.format(this.muleTemplate, 
 				new Date(), 
 				info.wsdl,
