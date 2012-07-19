@@ -121,6 +121,14 @@ public class DeployerMain {
 		return in;
 	}
 	
+	//
+	private static String getBasename(String fileName) {
+		int n = fileName.lastIndexOf('.');
+		if (n > 0) {
+			return fileName.substring(0, n);
+		}
+		return fileName;
+	}
 
 	//
 	private void writeDescriptor(String fileName, Info info) throws Exception {
@@ -132,9 +140,7 @@ public class DeployerMain {
 		String content = String.format(this.muleTemplate, 
 				new Date(), 
 				info.wsdl,
-				info.method, 
-				info.version,
-				info.profile, 
+				getBasename(src.getName()), 
 				info.path,
 				info.namespace,
 				info.name,
