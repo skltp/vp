@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--  Invokes active monitoring endpoints, to check if the producer is up and running  -->
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  	xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
@@ -12,8 +13,6 @@
                 http://www.mulesoft.org/schema/mule/cxf       http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd                       
         		http://www.mulesoft.org/schema/mule/https     http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd                           
     " >
-
-    <!-- TODO: Add service specific definitions here -->
 
     <flow name="pingMonitor-flow" >
 
