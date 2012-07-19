@@ -12,6 +12,13 @@ import org.mule.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Extracts producer Endpoint from payload.
+ * 
+ * @since VP-2.0
+ * @author Anders
+ *
+ */
 public class EndpointExtractionTransformer extends AbstractMessageTransformer {
 
     private static final Logger log = LoggerFactory.getLogger(EndpointExtractionTransformer.class);
