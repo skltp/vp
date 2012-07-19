@@ -16,10 +16,6 @@
  */
 package se.skl.tp.vp.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.jms.Message;
@@ -31,7 +27,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
-import org.mule.transport.http.ReleasingInputStream;
 import org.mule.transport.jms.JmsMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +48,7 @@ public class PayloadToStringTransformer {
 	public PayloadToStringTransformer(JaxbObjectToXmlTransformer jaxbToXml) {
 		this.jaxbToXml = jaxbToXml;
 	}
-	
+
 	//
 	public JaxbObjectToXmlTransformer getJaxbObjectToXmlTransformer() {
 		return this.jaxbToXml;
@@ -61,7 +56,11 @@ public class PayloadToStringTransformer {
 
 	//
 	public String getPayloadAsString(Object payload) {
-		String content = null;
+		if (payload == null) {
+			return null;
+		}
+
+		String content;
 		if (payload instanceof Object[]) {
 			StringBuffer buf = new StringBuffer();
 			int i = 0;
@@ -75,16 +74,13 @@ public class PayloadToStringTransformer {
 		} else {
 			content = getContentAsString(payload);
 		}
+
 		return content;
 	}
 
 	//
 	private String getContentAsString(Object payload) {
-		if (payload == null) {
-			return null;
-		}
-		String content = null;
-		
+		String content;
 		if (payload instanceof String) {
 			content = (String) payload;
 		} else if (payload instanceof DepthXMLStreamReader) {
@@ -110,7 +106,6 @@ public class PayloadToStringTransformer {
 				log.debug("Unable to convert payload of type {} to string", content);
 			}
 		}
-
 		return content;
 	}
 
@@ -148,21 +143,19 @@ public class PayloadToStringTransformer {
 				QName wrapperQName = new QName("class:"
 						+ jaxbObject.getClass().getName(),
 						getJaxbWrapperElementName(jaxbObject));
-				wrapped = new JAXBElement(wrapperQName, jaxbObject
-						.getClass(), null, jaxbObject);
-				
+				wrapped = new JAXBElement(wrapperQName, jaxbObject.getClass(), null, jaxbObject);
+
 				log.info("Created root wrapper: {}", wrapped);
 			}
 
 			try {
-				content = (String) this.jaxbToXml.doTransform(wrapped,
-						outputEncoding);
+				content = (String) this.jaxbToXml.doTransform(wrapped, outputEncoding);
 			} catch (TransformerException e) {
 				log.error("JAXB object marshalling failed", e);
 				content = "JAXB object marshalling failed: " + e.getMessage();
 			}
 		}
-		
+
 		return content;
 	}
 
