@@ -67,14 +67,14 @@ public class VagvalRouter extends AbstractRecipientList {
 	/**
 	 * HTTP Header forwarded to producer. <p>
 	 * 
-	 * @since 2.0
+	 * @since VP-2.0
 	 */
 	private static final String X_VP_CONSUMER_ID = "x-vp-consumer-id";
 	
 	/**
 	 * HTTP Header forwarded to consumer
 	 * 
-	 * @since 2.0
+	 * @since VP-2.0
 	 */
 	private static final String X_VP_CORRELATION_ID = "x-vp-correlation-id";
 
