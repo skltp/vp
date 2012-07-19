@@ -14,6 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
+/**
+ * Logs error events on any kind of exception, and should be used for all VP services.
+ * 
+ * @author Peter
+ * @since VP-2.0
+ */
 public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
 	private static final Logger log = LoggerFactory.getLogger(VPExceptionStrategy.class);
 	
