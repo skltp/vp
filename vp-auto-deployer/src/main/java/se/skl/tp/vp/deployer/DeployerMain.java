@@ -44,12 +44,13 @@ import org.w3c.dom.NodeList;
  * RIV services are currently packaged as jar files, and this program reads the WSDL definition and adds a
  * mule deployment descriptor. <p>
  * 
- * <code>
+ * <pre>
  * usage: java -jar vp-auto-deployer[-&lt;version&gt;].jar [-update] [jar files...]
  * 		-update: force update even if the target jar already contains a descriptor.
- * </code>
+ * </pre>
  * 
  * @author Peter
+ * @since VP-2.0
  */
 public class DeployerMain {
 
