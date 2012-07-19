@@ -56,11 +56,25 @@ import se.skl.tp.vp.util.helper.AddressingHelper;
 public class VagvalRouter extends AbstractRecipientList {
 
 	/**
-	 * HTTP Header forwarded to producer
+	 * HTTP Header forwarded to producer <p>
+	 * 
+	 * FIXME:
+	 * This header should be prefixed by "x-", but right now we need to be backward compatible 
+	 * because the header is used in insurance transformations.
+	 */
+	private static final String X_VP_PRODUCER_ID = VPUtil.RECEIVER_ID;
+	
+	/**
+	 * HTTP Header forwarded to producer. <p>
+	 * 
+	 * @since 2.0
 	 */
 	private static final String X_VP_CONSUMER_ID = "x-vp-consumer-id";
+	
 	/**
 	 * HTTP Header forwarded to consumer
+	 * 
+	 * @since 2.0
 	 */
 	private static final String X_VP_CORRELATION_ID = "x-vp-correlation-id";
 
@@ -226,6 +240,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		MessagePropertiesTransformer mt = createOutboundTransformer();
 		mt.getAddProperties().put(X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
 		mt.getAddProperties().put(X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
+		mt.getAddProperties().put(X_VP_PRODUCER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
 		
 		eb.addMessageProcessor(mt);
 		
