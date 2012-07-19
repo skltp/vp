@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--  Reads Procucer URLs from TK database (JDBC) and Ids to perform active monitoring requests  -->
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  	xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
@@ -33,8 +34,6 @@
             value="SELECT id, serviceUrl FROM ServiceProducer" />
     </jdbc:connector>
     
-    <!-- TODO: Add service specific definitions here -->
-
     <flow name="activeLogTrigger-flow" >
 
         <jdbc:inbound-endpoint
