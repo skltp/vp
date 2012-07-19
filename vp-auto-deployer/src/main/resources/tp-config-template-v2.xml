@@ -25,7 +25,7 @@
     <!-- Name of this file is mandatory and may not be changed. -->
 
 
-	<flow name="%s-%s-%s-flow" >
+	<flow name="%s-flow" >
 
         <https:inbound-endpoint
             address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/%s"
