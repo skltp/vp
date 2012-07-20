@@ -83,7 +83,11 @@
     <custom-transformer name="rivExtractor" class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
     
     <custom-transformer name="fixTransformer" class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
-
+	
+	<custom-transformer name="XmlToXSR" class="org.mule.module.xml.transformer.XmlToXMLStreamReader">
+   		<spring:property name="reversible" value="true"/>
+	</custom-transformer>
+	
 	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>
 
 	<custom-transformer name="createCorrId"  class="org.soitoolkit.commons.mule.log.correlationid.CreateCorrelationIdTransformer"/>
