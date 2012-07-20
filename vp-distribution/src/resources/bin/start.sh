@@ -1,10 +1,11 @@
 #!/bin/bash
 
-export VP_BASE="$( cd -P "$( dirname $0 )"/../vp && pwd )"
+export VP_BASE="$( cd -P "$( dirname $0 )"/.. && pwd )"
 export VP_HOME=$VP_BASE/vp-home
 export MULE_HOME=${VP_BASE}/mule-standalone-3.3.0
 export JAVA_HOME=$VP_BASE/jdk1.6.0_33
-export PATH=${PATH}:${JAVA_HOME}/bin
+# default for activemq is 1G (way too high)
+export ACTIVEMQ_OPTS_MEMORY="-Xms384m -Xmx384m"
 
 echo "Generates virtual service deployment descriptors..."
 $JAVA_HOME/bin/java -jar $( dirname $0 )/vp-auto-deployer-1.0.jar $VP_HOME/vp/services/*-virtualisering-*.jar
