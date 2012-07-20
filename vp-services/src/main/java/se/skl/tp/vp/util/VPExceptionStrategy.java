@@ -13,6 +13,7 @@ import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
+import static se.skl.tp.vp.util.VPUtil.nvl;
 
 /**
  * Logs error events on any kind of exception, and should be used for all VP services.
@@ -38,6 +39,13 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
 	public void setJaxbObjectToXml(JaxbObjectToXmlTransformer jaxbToXml) {
 		this.eventLogger.setJaxbToXml(jaxbToXml);
 	}
+	
+	
+	//
+	static String nvl(String s) {
+		return (s == null) ? "" : s;
+	}
+
 
 	@Override
 	protected void logException(Throwable t) {
@@ -55,8 +63,8 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
         		Throwable ex = (me.getCause() == null ? me : me.getCause());
         		
         		msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-        		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, ex.getLocalizedMessage(), PropertyScope.SESSION);
-        		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, ex.toString(), PropertyScope.SESSION);
+        		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, nvl(ex.getMessage()), PropertyScope.SESSION);
+        		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, nvl(ex.toString()), PropertyScope.SESSION);
             	msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
 
         		Map<String, String> extraInfo = new HashMap<String, String>();
