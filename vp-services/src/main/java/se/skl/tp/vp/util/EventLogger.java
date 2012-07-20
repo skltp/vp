@@ -59,6 +59,7 @@ import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 import org.soitoolkit.commons.mule.util.MuleUtil;
 import org.soitoolkit.commons.mule.util.XmlUtil;
+import static se.skl.tp.vp.util.VPUtil.nvl;
 
 /**
  * Log events in a standardized way
@@ -460,8 +461,7 @@ public class EventLogger {
 		// We are actually done :-)
 		return logEvent;
 	}
-
-
+	
 	//
 	public void addSessionInfo(MuleMessage message, Map<String, String> map) {
 		map.put(VPUtil.SENDER_ID, (String) message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
@@ -473,9 +473,9 @@ public class EventLogger {
 		if (Boolean.TRUE.equals(error)) {
 			map.put(VPUtil.SESSION_ERROR, error.toString());
 			map.put(VPUtil.SESSION_ERROR_DESCRIPTION,
-					(String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.SESSION));
+					nvl((String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.SESSION)));
 			map.put(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION,
-					(String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.SESSION));
+					nvl((String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.SESSION)));
 		}
 	}
 }
