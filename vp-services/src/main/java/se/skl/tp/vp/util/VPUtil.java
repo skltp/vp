@@ -55,6 +55,11 @@ public final class VPUtil {
 		return s.substring(1, s.length());
 	}
 	
+	//
+	public static String nvl(String s) {
+		return (s == null) ? "" : s;
+	}
+
 	public static boolean isWhitespace(final String s) {
 		if (s == null) {
 			return true;
