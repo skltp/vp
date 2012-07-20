@@ -11,6 +11,7 @@
     <flow name="vagval-dynamic-routing-flow" >
 
         <transformer ref="createCorrId" />
+        <transformer ref="XmlToXSR" />
         <transformer ref="fixTransformer" />
         <transformer ref="rivExtractor" />
   		<transformer ref="logReqIn" />
