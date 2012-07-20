@@ -13,8 +13,8 @@ if [ $? == 0 ]; then
         echo "done."
 fi
 
-echo -n "Stopping ActiveMQ 5.4.2..."
-cd ${VP_BASE}/apache-activemq-5.4.2/bin
+echo -n "Stopping ActiveMQ 5.6.0..."
+cd ${VP_BASE}/apache-activemq-5.6.0/bin
 ./activemq stop &>/dev/null
 
 if [ $? == 0 ]; then
