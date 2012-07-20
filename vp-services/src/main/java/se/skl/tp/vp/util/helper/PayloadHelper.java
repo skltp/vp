@@ -4,11 +4,9 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 
 import se.skl.tp.vp.exceptions.VpTechnicalException;
-import se.skl.tp.vp.util.VPUtil;
 
 /**
  * Helper class for working with the
@@ -17,11 +15,11 @@ import se.skl.tp.vp.util.VPUtil;
  * @author Marcus Krantz [marcus.krantz@callistaenterprise.se]
  */
 public class PayloadHelper extends VPHelperSupport {
-	
+
 	public PayloadHelper(MuleMessage muleMessage) {
 		super(muleMessage, null, null);
 	}
-	
+
 	/**
 	 * Get the receiver from the payload.
 	 * 
@@ -30,17 +28,18 @@ public class PayloadHelper extends VPHelperSupport {
 	public String extractReceiverFromPayload() {
 		Object payload = getMuleMessage().getPayload();
 		if (!(payload instanceof ReversibleXMLStreamReader)) {
+			this.getLog().error("This error is Fatal unable to extract important RIV information (receiverid): { payload: {} }", payload);
 			return null;
 		}
 		ReversibleXMLStreamReader reader = (ReversibleXMLStreamReader) payload;
-		
+
 		// Start caching events from the XML documents
 		if (this.getLog().isDebugEnabled()) {
 			this.getLog().debug("Start caching events from the XML docuement parsing");
 		}
-		
+
 		reader.setTracking(true);
-		
+
 		try {
 			return this.parsePayloadForReceiver(reader);
 		} catch (final XMLStreamException e) {
@@ -55,8 +54,6 @@ public class PayloadHelper extends VPHelperSupport {
 	}
 
 	private String parsePayloadForReceiver(final ReversibleXMLStreamReader reader) throws XMLStreamException {
-		final String rivVersion = this.getRivVersion();
-		
 		String receiverId = null;
 		boolean headerFound = false;
 
@@ -64,7 +61,7 @@ public class PayloadHelper extends VPHelperSupport {
 
 		while (reader.hasNext()) {
 			switch (event) {
-			
+
 			case XMLStreamConstants.START_ELEMENT:
 				String local = reader.getLocalName();
 
@@ -72,20 +69,12 @@ public class PayloadHelper extends VPHelperSupport {
 					headerFound = true;
 				}
 
-				if (rivVersion.equals("RIVTABP20")) {
-					if (local.equals("To") && headerFound) {
-						reader.next();
-						receiverId = reader.getText();
-						if (this.getLog().isDebugEnabled()) {
-							this.getLog().debug("found To in Header= " + receiverId);
-						}
-					}
-				}
-				
-				if (rivVersion.equals("RIVTABP21")) {
-					if (local.equals("LogicalAddress") && headerFound) {
-						reader.next();
-						receiverId = reader.getText();
+				// Don't bother about riv-version in this code
+				if (headerFound && (local.equals("To") || local.equals("LogicalAddress"))) {
+					reader.next();
+					receiverId = reader.getText();
+					if (this.getLog().isDebugEnabled()) {
+						this.getLog().debug("found To in Header= " + receiverId);
 					}
 				}
 
@@ -119,10 +108,4 @@ public class PayloadHelper extends VPHelperSupport {
 
 		return receiverId;
 	}
-	
-	//
-	private String getRivVersion() {
-		return (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
-	}
-
 }
