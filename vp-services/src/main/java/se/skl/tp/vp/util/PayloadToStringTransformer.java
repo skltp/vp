@@ -80,6 +80,9 @@ public class PayloadToStringTransformer {
 
 	//
 	private String getContentAsString(Object payload) {
+		if (payload == null) {
+			return null;
+		}
 		String content;
 		if (payload instanceof String) {
 			content = (String) payload;
