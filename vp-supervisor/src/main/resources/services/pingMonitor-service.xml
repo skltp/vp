@@ -35,7 +35,7 @@
         -->
 
         <https:outbound-endpoint
-            address="https://#[header:INBOUND:host]:#[header:INBOUND:port]#[header:INBOUND:path]"
+            address="https://#[header:INBOUND:host]#[header:INBOUND:port]#[header:INBOUND:path]"
             connector-ref="VPConsumerConnector"
             exchange-pattern="request-response"
             responseTimeout="${SERVICE_TIMEOUT_MS}"
