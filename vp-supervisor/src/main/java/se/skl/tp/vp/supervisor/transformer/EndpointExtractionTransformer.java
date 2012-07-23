@@ -48,8 +48,13 @@ public class EndpointExtractionTransformer extends AbstractMessageTransformer {
             log.debug("doTransform(" + this.getClass().getSimpleName() + ", " + encoding + ") returns: " + message);
         }
 
+        message.setProperty("protocol", endpointUrl.getProtocol(), PropertyScope.OUTBOUND);
         message.setProperty("host", endpointUrl.getHost(), PropertyScope.OUTBOUND);
-        message.setProperty("port", endpointUrl.getPort(), PropertyScope.OUTBOUND);
+        if (endpointUrl.getPort() > 0) {
+        	message.setProperty("port", ":" + endpointUrl.getPort(), PropertyScope.OUTBOUND);
+        } else {
+        	message.setProperty("port", "", PropertyScope.OUTBOUND);
+        }
         message.setProperty("path", endpointUrl.getPath(), PropertyScope.OUTBOUND);
         message.setProperty("producerId", producerId, PropertyScope.SESSION);
 
