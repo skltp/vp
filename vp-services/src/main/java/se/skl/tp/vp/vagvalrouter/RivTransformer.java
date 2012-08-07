@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
+import javax.resource.spi.IllegalStateException;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -44,6 +45,7 @@ import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soitoolkit.commons.mule.util.XmlUtil;
 
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
 import se.skl.tp.vp.util.VPUtil;
@@ -128,29 +130,33 @@ public class RivTransformer extends AbstractMessageTransformer {
 				msg.getPayload().getClass().getName() });
 
 		try {
+
 			final ByteArrayOutputStream newContents = this.transformXml((ReversibleXMLStreamReader) msg.getPayload(),
 					fromNs, toNs, fromElem, toElem);
+			
 			msg.setPayload(new ReversibleXMLStreamReader(XMLInputFactory.newInstance().createXMLStreamReader(
 					new ByteArrayInputStream(newContents.toByteArray()))));
 
 			return msg;
 		} catch (final Exception e) {
-			log.error("Could not transform XML stream", e);
+			log.error("RIV version transformation failed", e);
+			throw new RuntimeException(e);
 		}
-
-		throw new IllegalStateException("Could not transform");
 	}
 
+	//
 	ByteArrayOutputStream transformXml(final XMLStreamReader originalReader, final String fromAddressingNs,
 			final String toAddressingNs, final String fromAddressingElement, final String toAddressingElement)
-			throws XMLStreamException {
+					throws XMLStreamException {
 
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		final XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(originalReader);
 		final XMLEventWriter writer = XMLOutputFactory.newInstance().createXMLEventWriter(out);
 		final XMLEventFactory factory = XMLEventFactory.newInstance();
 
-		elementLoop: while (reader.hasNext()) {
+				
+		while (reader.hasNext()) {
+			
 			final XMLEvent event = reader.nextEvent();
 
 			if (event.isStartElement()) {
@@ -160,21 +166,21 @@ public class RivTransformer extends AbstractMessageTransformer {
 					addStartElement(writer, factory, startElement);
 					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
 							startElement);
-					continue elementLoop;
+					continue;
 				}
 
 				if (isHeaderElement(startElement)) {
 					addStartElement(writer, factory, startElement);
 					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
 							startElement);
-					continue elementLoop;
+					continue;
 				}
 
 				if (isAdressingElement(fromAddressingElement, startElement)) {
 					replaceAddressingElement(toAddressingNs, toAddressingElement, writer, factory, startElement);
 					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
 							startElement);
-					continue elementLoop;
+					continue;
 				}
 			}
 
@@ -182,13 +188,15 @@ public class RivTransformer extends AbstractMessageTransformer {
 				final EndElement endElement = event.asEndElement();
 				if (isAddressingElement(fromAddressingElement, endElement)) {
 					addEndElement(toAddressingNs, toAddressingElement, writer, factory, endElement);
-					continue elementLoop;
+					continue;
 				}
 			}
+			
 			writer.add(event);
 		}
-
+			
 		writer.flush();
+		
 		return out;
 	}
 
