@@ -128,17 +128,17 @@ public class AddressingHelper extends VPHelperSupport {
 							+ request.receiverId + ", senderId: " + request.senderId);
 		}
 		if (request.rivVersion == null) {
-			String errorMessage = ("VP001 No Riv-version configured in tp-virtuell-tjanst-config, transformer-refs with property name 'rivversion' missing");
+			String errorMessage = ("VP001 No RIV version configured");
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
 		if (request.senderId == null) {
-			String errorMessage = ("VP002 No senderId found in Certificate");
+			String errorMessage = ("VP002 No sender ID (from_address) found in certificate");
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
 		if (request.receiverId == null) {
-			String errorMessage = ("VP003 No receiverId found in RivHeader");
+			String errorMessage = ("VP003 No receiver ID (to_address) found in message");
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
