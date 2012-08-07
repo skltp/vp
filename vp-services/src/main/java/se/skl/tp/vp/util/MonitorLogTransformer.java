@@ -17,10 +17,6 @@
 package se.skl.tp.vp.util;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_BUSINESS_CONTEXT_ID;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CONTRACT_ID;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_INTEGRATION_SCENARIO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -160,12 +156,10 @@ public class MonitorLogTransformer extends AbstractMessageTransformer {
 				return message;
 			}
 
-			String httpReq = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-			if (httpReq != null) {
-				if ((httpReq.endsWith("?wsdl")) || (httpReq.contains("?xsd"))) {
-					log.debug("Skip logging message, CXF ...?WSDL/XSD call detected!");
-					return message;
-				}
+			String httpQS = message.getInboundProperty(HttpConnector.HTTP_QUERY_STRING);
+			if ("wsdl".equalsIgnoreCase(httpQS) || "xsd".equalsIgnoreCase(httpQS)) {
+				log.debug("Skip logging message, wsdl or xsd call detected!");
+				return message;
 			}
 
 			evaluatedExtraInfo = evaluateMapInfo(extraInfo, message);
