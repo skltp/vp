@@ -18,25 +18,22 @@ package se.skl.tp.vp.util;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.mule.RequestContext;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transport.http.HttpConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
-import org.soitoolkit.commons.mule.util.MuleUtil;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
@@ -138,7 +135,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 		try {
 
 			/*
-			 * Don't skip in NTjP
+			 * Don't skip in TP
 			 */
 			// Skip logging if an error has occurred, then the error is logged
 			// by an error handler
@@ -149,22 +146,11 @@ public class LogTransformer extends AbstractMessageTransformer {
 			// return message;
 			// }
 
-			// Skip logging if service name starts with "_cxfServiceComponent"
-			// (Mule 2.2.1) or ends with "_cxfComponent" (Mule 2.2.5) and
-			// endpoint contains "?wsdl" or "?xsd", then it's just tons of WSDL
-			// and XSD lookup calls, nothing to log...
-			MuleEventContext event = RequestContext.getEventContext();
-			String serviceName = MuleUtil.getServiceName(event);
-			if (serviceName != null
-					&& (serviceName.startsWith("_cxfServiceComponent") || serviceName.endsWith("_cxfComponent"))) {
-				URI endpointURI = event.getEndpointURI();
-				if (endpointURI != null) {
-					String ep = endpointURI.toString();
-					if ((ep.contains("?wsdl")) || (ep.contains("?xsd"))) {
-						log.debug("Skip logging message, CXF ...?WSDL/XSD call detected!");
-						return message;
-					}
-				}
+			// skip wsdl and xsd requests
+			String httpQS = message.getInboundProperty(HttpConnector.HTTP_QUERY_STRING);
+			if ("wsdl".equalsIgnoreCase(httpQS) || "xsd".equalsIgnoreCase(httpQS)) {
+				log.debug("Skip logging message, wsdl or xsd call detected!");
+				return message;
 			}
 
 			// FIXME: Added from ST v0.4.1
