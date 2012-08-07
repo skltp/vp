@@ -162,7 +162,7 @@
     
     <!-- Transformer filters mule stuff out from HTTP response headers -->
     <message-properties-transformer name="filterResponseHeaders" scope="outbound">
-	    <add-message-property key="x-vp-correlation-id" value="#[header:SESSION:soitoolkit_correlationId]" />
+	    <add-message-property key="x-vp-correlation-id" value="#[groovy:message.getSessionProperty('soitoolkit_correlationId', 'none')]" />
 	    <delete-message-property key="SOAPAction" />
 	    <delete-message-property key="MULE_CORRELATION_GROUP_SIZE" />
 	    <delete-message-property key="MULE_CORRELATION_ID" />   	    	    
