@@ -10,7 +10,7 @@
 		<ns2:GetSubjectOfCareSchedule xmlns="urn:riv:interoperability:headers:1"
 			xmlns:ns2="urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"
 			xmlns:ns3="urn:riv:crm:scheduling:1" xmlns:ns4="urn:riv:crm:scheduling:1.1"
-			xmlns:ns5="http://www.w3.org/2005/08/addressing">
+			xmlns:ns5="urn:riv:itintegration:registry:1">
 			<ns2:healthcare_facility>SE2321000164-7381037590423
 			</ns2:healthcare_facility>
 			<ns2:subject_of_care>188803099368</ns2:subject_of_care>
