@@ -28,7 +28,7 @@ public class PayloadHelper extends VPHelperSupport {
 	public String extractReceiverFromPayload() {
 		Object payload = getMuleMessage().getPayload();
 		if (!(payload instanceof ReversibleXMLStreamReader)) {
-			this.getLog().error("This error is Fatal unable to extract important RIV information (receiverid): { payload: {} }", payload);
+			this.getLog().warn("Unable to extract important RIV information (receiverid): { payload: {} }", payload);
 			return null;
 		}
 		ReversibleXMLStreamReader reader = (ReversibleXMLStreamReader) payload;
