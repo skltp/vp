@@ -22,22 +22,16 @@ package se.skl.tp.vp.vagvalrouter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import javax.resource.spi.IllegalStateException;
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -45,7 +39,6 @@ import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.soitoolkit.commons.mule.util.XmlUtil;
 
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
 import se.skl.tp.vp.util.VPUtil;
@@ -75,6 +68,12 @@ public class RivTransformer extends AbstractMessageTransformer {
 	static final String RIV21_NS = "urn:riv:itintegration:registry:1";
 	static final String RIV21_ELEM = "LogicalAddress";
 
+    private static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+
+	public RivTransformer() {
+		super();
+	}
+	
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
 	}
@@ -119,7 +118,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 			this.doTransform(msg, RIV21_NS, RIV20_NS, RIV21_ELEM, RIV20_ELEM);
 			msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.SESSION);
 		}
-
+		
 		return msg;
 	}
 
@@ -128,133 +127,179 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 		log.info("Transforming {} -> {}. Payload is of type {}", new Object[] { fromNs, toNs,
 				msg.getPayload().getClass().getName() });
-
+		
 		try {
-
-			final ByteArrayOutputStream newContents = this.transformXml((ReversibleXMLStreamReader) msg.getPayload(),
-					fromNs, toNs, fromElem, toElem);
-			
+			ReversibleXMLStreamReader reader = (ReversibleXMLStreamReader) msg.getPayload();
+								
+			final ByteArrayOutputStream newContents = transformXml(reader, fromNs, toNs, fromElem, toElem);
+						
 			msg.setPayload(new ReversibleXMLStreamReader(XMLInputFactory.newInstance().createXMLStreamReader(
-					new ByteArrayInputStream(newContents.toByteArray()))));
+					new ByteArrayInputStream(newContents.toByteArray()), "UTF-8")));
 
 			return msg;
 		} catch (final Exception e) {
-			log.error("RIV version transformation failed", e);
+			log.error("RIV transformation failed", e);
 			throw new RuntimeException(e);
 		}
 	}
 
-	//
-	ByteArrayOutputStream transformXml(final XMLStreamReader originalReader, final String fromAddressingNs,
-			final String toAddressingNs, final String fromAddressingElement, final String toAddressingElement)
-					throws XMLStreamException {
-
-		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		final XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(originalReader);
-		final XMLEventWriter writer = XMLOutputFactory.newInstance().createXMLEventWriter(out);
-		final XMLEventFactory factory = XMLEventFactory.newInstance();
-
-				
-		while (reader.hasNext()) {
-			
-			final XMLEvent event = reader.nextEvent();
-
-			if (event.isStartElement()) {
-				final StartElement startElement = event.asStartElement();
-
-				if (isEnvelopeElement(startElement)) {
-					addStartElement(writer, factory, startElement);
-					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
-							startElement);
-					continue;
-				}
-
-				if (isHeaderElement(startElement)) {
-					addStartElement(writer, factory, startElement);
-					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
-							startElement);
-					continue;
-				}
-
-				if (isAdressingElement(fromAddressingElement, startElement)) {
-					replaceAddressingElement(toAddressingNs, toAddressingElement, writer, factory, startElement);
-					replaceNamespacesForAddressingElement(fromAddressingNs, toAddressingNs, writer, factory,
-							startElement);
-					continue;
-				}
-			}
-
-			if (event.isEndElement()) {
-				final EndElement endElement = event.asEndElement();
-				if (isAddressingElement(fromAddressingElement, endElement)) {
-					addEndElement(toAddressingNs, toAddressingElement, writer, factory, endElement);
-					continue;
-				}
-			}
-			
-			writer.add(event);
-		}
-			
-		writer.flush();
+	// alternative
+	static ByteArrayOutputStream transformXml(XMLStreamReader reader,
+			final String fromAddressingNs,
+			final String toAddressingNs, final String fromAddressingElement, 
+			final String toAddressingElement) throws XMLStreamException {
 		
-		return out;
-	}
+		log.debug("RivTransformer transformXML");
+	
+		ByteArrayOutputStream os = new ByteArrayOutputStream(2048);
+		XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(os, "UTF-8");
 
-	private boolean isHeaderElement(StartElement startElement) {
-		return startElement.getName().getLocalPart().equals("Header");
-	}
+	    writer.writeStartDocument();
 
-	private boolean isAddressingElement(final String fromAddressingElement, final EndElement endElement) {
-		return endElement.getName().getLocalPart().equals(fromAddressingElement);
-	}
+		int read = 0;
+		int event = reader.getEventType();
 
-	private boolean isAdressingElement(final String fromAddressingElement, final StartElement startElement) {
-		return startElement.getName().getLocalPart().equals(fromAddressingElement);
-	}
-
-	private boolean isEnvelopeElement(final StartElement startElement) {
-		return startElement.getName().getLocalPart().equals("Envelope");
-	}
-
-	private void replaceAddressingElement(final String toAddressingNs, final String toAddressingElement,
-			final XMLEventWriter writer, final XMLEventFactory factory, final StartElement se)
-			throws XMLStreamException {
-		StartElement newLogicalAddress = factory.createStartElement(se.getName().getPrefix(), toAddressingNs,
-				toAddressingElement);
-		writer.add(newLogicalAddress);
-	}
-
-	private void addStartElement(final XMLEventWriter writer, final XMLEventFactory factory, final StartElement se)
-			throws XMLStreamException {
-		final StartElement envelope = factory.createStartElement(se.getName().getPrefix(), se.getName()
-				.getNamespaceURI(), se.getName().getLocalPart());
-		writer.add(envelope);
-	}
-
-	private void addEndElement(final String toAddressingNs, final String toAddressingElement,
-			final XMLEventWriter writer, final XMLEventFactory factory, final EndElement endElement)
-			throws XMLStreamException {
-		final EndElement newEndElement = factory.createEndElement(endElement.getName().getPrefix(), toAddressingNs,
-				toAddressingElement);
-		writer.add(newEndElement);
-	}
-
-	private void replaceNamespacesForAddressingElement(final String fromAddressingNs, final String toAddressingNs,
-			final XMLEventWriter writer, final XMLEventFactory factory, final StartElement se)
-			throws XMLStreamException {
-
-		@SuppressWarnings("unchecked")
-		final Iterator<Namespace> namespaces = se.getNamespaces();
-		while (namespaces.hasNext()) {
-			Namespace ns = (Namespace) namespaces.next();
-
-			if (ns.getValue().equals(fromAddressingNs)) {
-				final Namespace namespace = factory.createNamespace(ns.getPrefix(), toAddressingNs);
-				writer.add(namespace);
-			} else {
-				final Namespace namespace = factory.createNamespace(ns.getPrefix(), ns.getNamespaceURI());
-				writer.add(namespace);
+		while (reader.hasNext()) {
+			switch (event) {
+			case XMLStreamConstants.START_ELEMENT:
+				read++;
+				writeStartElement(reader, writer, fromAddressingNs, toAddressingNs, fromAddressingElement, toAddressingElement);
+				break;
+			case XMLStreamConstants.END_ELEMENT:
+				writer.writeEndElement();
+				read--;
+				if (read <= 0) {
+				    writer.writeEndDocument();
+					return os;
+				}
+				break;
+			case XMLStreamConstants.CHARACTERS:
+				writer.writeCharacters(reader.getText());
+				break;
+			case XMLStreamConstants.START_DOCUMENT:
+			case XMLStreamConstants.END_DOCUMENT:
+			case XMLStreamConstants.ATTRIBUTE:
+			case XMLStreamConstants.NAMESPACE:
+				break;
+			case XMLStreamConstants.COMMENT:
+				writer.writeComment(reader.getText());
+				break;
+			default:
+				break;
 			}
+			event = reader.next();
+		}
+	    writer.writeEndDocument();
+
+		return os;
+	}
+
+	private static void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer, 
+			final String fromAddressingNs,
+			final String toAddressingNs, 
+			final String fromAddressingElement, 
+			final String toAddressingElement)
+			throws XMLStreamException {
+		
+		String uri = reader.getNamespaceURI();
+		if (fromAddressingNs.equals(uri)) {
+			if (log.isDebugEnabled()) {
+				log.debug("RivTransformer { fromNS: {}, toNS: {} }", new Object[] { fromAddressingNs, toAddressingNs });	
+			}
+			uri = toAddressingNs;
+		}
+
+		String local = reader.getLocalName();
+		// make sure we only transforms element names within the right namespace
+		if (fromAddressingElement.equals(local) && toAddressingNs.equals(uri)) {
+			local = toAddressingElement;
+			if (log.isDebugEnabled()) {
+				log.debug("RivTransformer { fromName: {}, toName: {}, uri: {} }", new Object[] { fromAddressingElement, toAddressingElement, uri });	
+			}
+		}
+				
+		String prefix = reader.getPrefix();
+		if (prefix == null) {
+			prefix = "";
+		}
+
+
+		//System.out.println("STAXUTILS:writeStartElement : node name : " + local +  " namespace URI" + uri);
+		boolean writeElementNS = false;
+		if (uri != null) {
+			String boundPrefix = writer.getPrefix(uri);
+			if (boundPrefix == null || !prefix.equals(boundPrefix)) {
+				writeElementNS = true;
+			}
+		}
+
+		// Write out the element name
+		if (uri != null) {
+			if (prefix.length() == 0 && StringUtils.isEmpty(uri)) {
+				writer.writeStartElement(local);
+				writer.setDefaultNamespace(uri);
+
+			} else {
+				writer.writeStartElement(prefix, local, uri);
+				writer.setPrefix(prefix, uri);
+			}
+		} else {
+			writer.writeStartElement(local);
+		}
+
+		// Write out the namespaces
+		for (int i = 0; i < reader.getNamespaceCount(); i++) {
+			String nsURI = reader.getNamespaceURI(i);
+			if (fromAddressingNs.equals(nsURI)) {
+				nsURI = toAddressingNs;
+			}
+			
+			String nsPrefix = reader.getNamespacePrefix(i);
+			if (nsPrefix == null) {
+				nsPrefix = "";
+			}
+
+			if (nsPrefix.length() == 0) {
+				writer.writeDefaultNamespace(nsURI);
+			} else {
+				writer.writeNamespace(nsPrefix, nsURI);
+			}
+
+			if (nsURI.equals(uri) && nsPrefix.equals(prefix)) {
+				writeElementNS = false;
+			}
+		}
+
+		// Check if the namespace still needs to be written.
+		// We need this check because namespace writing works
+		// different on Woodstox and the RI.
+		if (writeElementNS) {
+			if (prefix.length() == 0) {
+				writer.writeDefaultNamespace(uri);
+			} else {
+				writer.writeNamespace(prefix, uri);
+			}
+		}        
+
+		// Write out attributes
+		for (int i = 0; i < reader.getAttributeCount(); i++) {
+			String ns = reader.getAttributeNamespace(i);
+			
+			if (fromAddressingNs.equals(ns)) {
+				ns = toAddressingNs;
+			}
+
+			String nsPrefix = reader.getAttributePrefix(i);
+			if (ns == null || ns.length() == 0) {
+				writer.writeAttribute(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
+			} else if (nsPrefix == null || nsPrefix.length() == 0) {
+				writer.writeAttribute(reader.getAttributeNamespace(i), reader.getAttributeLocalName(i),
+						reader.getAttributeValue(i));
+			} else {
+				writer.writeAttribute(reader.getAttributePrefix(i), reader.getAttributeNamespace(i), reader
+						.getAttributeLocalName(i), reader.getAttributeValue(i));
+			}
+
 		}
 	}
 }
