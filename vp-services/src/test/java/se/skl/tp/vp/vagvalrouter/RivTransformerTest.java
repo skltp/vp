@@ -15,17 +15,25 @@ import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 
 public class RivTransformerTest {
 
-	private RivTransformer transformer;
-	
-	@Before
-	public void setUp() throws Exception {
-		this.transformer = new RivTransformer();
+	@Test
+	public void testRiv21To20TransformerSpecial() throws Exception {
+		final URL resource = Thread.currentThread().getContextClassLoader()
+				.getResource("testfiles/GetSubjectOfCareRequest21.xml");
+		final XMLStreamReader xstream = XMLInputFactory.newInstance().createXMLStreamReader(resource.openStream());
+
+		final URL resultFile = Thread.currentThread().getContextClassLoader()
+				.getResource("testfiles/GetSubjectOfCareRequest20.xml");
+		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
+
+		final ByteArrayOutputStream data = RivTransformer.transformXml(new ReversibleXMLStreamReader(xstream),
+				RivTransformer.RIV21_NS, RivTransformer.RIV20_NS, RivTransformer.RIV21_ELEM, RivTransformer.RIV20_ELEM);
+
+		this.executeComparison(data, expected);
 	}
 
 	@Test
@@ -38,9 +46,9 @@ public class RivTransformerTest {
 				.getResource("testfiles/PingForConfiguration-expected-rivtabp20-result.xml");
 		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
 
-		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+		final ByteArrayOutputStream data = RivTransformer.transformXml(new ReversibleXMLStreamReader(xstream),
 				RivTransformer.RIV21_NS, RivTransformer.RIV20_NS, RivTransformer.RIV21_ELEM, RivTransformer.RIV20_ELEM);
-
+		
 		this.executeComparison(data, expected);
 	}
 
@@ -54,7 +62,7 @@ public class RivTransformerTest {
 				.getResource("testfiles/PingForConfiguration-expected-result.xml");
 		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
 
-		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+		final ByteArrayOutputStream data = RivTransformer.transformXml(new ReversibleXMLStreamReader(xstream),
 				RivTransformer.RIV20_NS, RivTransformer.RIV21_NS, RivTransformer.RIV20_ELEM, RivTransformer.RIV21_ELEM);
 
 		this.executeComparison(data, expected);
@@ -70,7 +78,7 @@ public class RivTransformerTest {
 				.getResource("testfiles/Rivta20Request.xml");
 		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
 
-		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+		final ByteArrayOutputStream data = RivTransformer.transformXml(new ReversibleXMLStreamReader(xstream),
 				RivTransformer.RIV21_NS, RivTransformer.RIV20_NS, RivTransformer.RIV21_ELEM, RivTransformer.RIV20_ELEM);
 
 		this.executeComparison(data, expected);
@@ -85,7 +93,7 @@ public class RivTransformerTest {
 				.getResource("testfiles/Rivta21Request.xml");
 		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
 
-		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+		final ByteArrayOutputStream data = RivTransformer.transformXml(new ReversibleXMLStreamReader(xstream),
 				RivTransformer.RIV20_NS, RivTransformer.RIV21_NS, RivTransformer.RIV20_ELEM, RivTransformer.RIV21_ELEM);
 
 		this.executeComparison(data, expected);
@@ -100,8 +108,10 @@ public class RivTransformerTest {
 				.getResource("testfiles/Rivta20RequestNamespaceInHeader.xml");
 		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
 
-		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+		final ByteArrayOutputStream data = RivTransformer.transformXml(new ReversibleXMLStreamReader(xstream),
 				RivTransformer.RIV21_NS, RivTransformer.RIV20_NS, RivTransformer.RIV21_ELEM, RivTransformer.RIV20_ELEM);
+
+		System.out.println(new String(data.toByteArray(), "UTF-8"));
 
 		this.executeComparison(data, expected);
 	}
@@ -115,7 +125,7 @@ public class RivTransformerTest {
 				.getResource("testfiles/Rivta21RequestNamespaceInHeader.xml");
 		final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
 
-		final ByteArrayOutputStream data = this.transformer.transformXml(new ReversibleXMLStreamReader(xstream),
+		final ByteArrayOutputStream data = RivTransformer.transformXml(new ReversibleXMLStreamReader(xstream),
 				RivTransformer.RIV20_NS, RivTransformer.RIV21_NS, RivTransformer.RIV20_ELEM, RivTransformer.RIV21_ELEM);
 
 		this.executeComparison(data, expected);
@@ -125,7 +135,7 @@ public class RivTransformerTest {
 			throws Exception {
 
 		final XMLEventReader result = XMLInputFactory.newInstance().createXMLEventReader(
-				new ByteArrayInputStream(transformed.toByteArray()));
+				new ByteArrayInputStream(transformed.toByteArray()), "UTF-8");
 
 		System.out.println("Comparing xml results");
 		while (expected.hasNext()) {
