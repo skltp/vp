@@ -1,10 +1,14 @@
 package se.skl.tp.vp.vagvalrouter;
 
+import java.io.InputStream;
+
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +19,11 @@ import se.skl.tp.vp.util.helper.PayloadHelper;
 public class RivExtractor extends AbstractMessageTransformer {
 
 	private static final Logger log = LoggerFactory.getLogger(RivExtractor.class);
+	
+	//
+	public RivExtractor() {
+		super();
+	}
 	
 	@Override
 	public Object transformMessage(MuleMessage msg, String encoding)
