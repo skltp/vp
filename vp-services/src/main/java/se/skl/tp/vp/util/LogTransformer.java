@@ -61,6 +61,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 
 	
 	public LogTransformer() {
+		super();
 		this.eventLogger = new EventLogger();
 	}
 
