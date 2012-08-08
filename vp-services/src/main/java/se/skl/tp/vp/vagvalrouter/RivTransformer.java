@@ -250,8 +250,9 @@ public class RivTransformer extends AbstractMessageTransformer {
 		// Write out the namespaces
 		for (int i = 0; i < reader.getNamespaceCount(); i++) {
 			String nsURI = reader.getNamespaceURI(i);
-			if (fromAddressingNs.equals(nsURI)) {
-				nsURI = toAddressingNs;
+			if (fromAddressingNs.equals(nsURI) && ("Envelope".equals(local) || "Header".equals(local) 
+					|| toAddressingElement.equals(local))) {
+					nsURI = toAddressingNs;
 			}
 			
 			String nsPrefix = reader.getNamespacePrefix(i);
@@ -285,7 +286,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 		for (int i = 0; i < reader.getAttributeCount(); i++) {
 			String ns = reader.getAttributeNamespace(i);
 			
-			if (fromAddressingNs.equals(ns)) {
+			if (fromAddressingNs.equals(ns) && toAddressingElement.equals(local)) {
 				ns = toAddressingNs;
 			}
 
