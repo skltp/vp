@@ -241,6 +241,12 @@ public class VagvalRouter extends AbstractRecipientList {
 		mt.getAddProperties().put(X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
 		mt.getAddProperties().put(X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
 		mt.getAddProperties().put(X_VP_PRODUCER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
+
+		// XXX: Make sure SOAPAction is forwarded to producer
+		String action = message.getProperty("SOAPAction", PropertyScope.INBOUND);
+		if (action != null) {
+			mt.getAddProperties().put("SOAPAction", action);
+		}
 		
 		eb.addMessageProcessor(mt);
 		
