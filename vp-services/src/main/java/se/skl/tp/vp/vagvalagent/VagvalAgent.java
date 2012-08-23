@@ -20,14 +20,24 @@
  */
 package se.skl.tp.vp.vagvalagent;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.datatype.DatatypeConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 
 import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheRequest;
 import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheResponse;
@@ -46,22 +56,40 @@ import se.skl.tp.vp.util.ClientUtil;
 public class VagvalAgent implements VisaVagvalsInterface {
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalAgent.class);
+	
+	// cache
+	@XmlRootElement
+	static class PersistentCache implements Serializable {
+		private static final long serialVersionUID = 1L;
+		@XmlElement
+		private List<VirtualiseringsInfoType> virtualiseringsInfo;
+		@XmlElement
+		private List<AnropsBehorighetsInfoType> anropsBehorighetsInfo;
+	}
+	
+	private static final JaxbUtil JAXB = new JaxbUtil(PersistentCache.class);
 
-	public static final String HSA_SENDERID_VAGVALSAGENT = "vagvalsagent";
-
+	// file name of local cache
+	public static final String TK_LOCAL_CACHE = System.getProperty("user.home") 
+				+ System.getProperty("path.separator") 
+				+ ".tk.localCache";
+	
 	public List<VirtualiseringsInfoType> virtualiseringsInfo = null;
 	public List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = null;
 
-	public List<VirtualiseringsInfoType> tempVirtualiseringsInfo = null;
-	public List<AnropsBehorighetsInfoType> tempAnropsBehorighetsInfo = null;
 
 	private String endpointAddressTjanstekatalog;
 	private String addressDelimiter;
 
+	public VagvalAgent() {
+		
+	}
+	
 	public void setEndpointAddress(String endpointAddressTjanstekatalog) {
 		this.endpointAddressTjanstekatalog = endpointAddressTjanstekatalog;
 	}
 
+	
 	public void setAddressDelimiter(String addressDelimiter) {
 		this.addressDelimiter = addressDelimiter;
 	}
@@ -69,97 +97,170 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	/**
 	 * Initialize the two lists if they are null
 	 */
-	public void init() {
-		if (anropsBehorighetsInfo == null || virtualiseringsInfo == null) {
-			synchronized (this) {
+	public synchronized void init() {
+		if (!isInitialized()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("entering VagvalsAgent.init");
+			}
 
-				if (logger.isDebugEnabled()) {
-					logger.debug("entering VagvalsAgent.init");
-				}
-				
-				try {
-					
-					logger.info("Fetch all permissions...");
-					
-					HamtaAllaAnropsBehorigheterResponseType respAllaAnropsBehorigheter = getPort()
-							.hamtaAllaAnropsBehorigheter(null);
+			this.anropsBehorighetsInfo = getBehorigheter();
+			this.virtualiseringsInfo = getVirtualiseringar();
 
-					logger.info("Fetch all virtualizations...");
-					
-					HamtaAllaVirtualiseringarResponseType respAllaVirtualiseringar = getPort()
-							.hamtaAllaVirtualiseringar(null);
-
-					logger.info("Fetch request permission information.");
-					
-					anropsBehorighetsInfo = respAllaAnropsBehorigheter.getAnropsBehorighetsInfo();
-					
-					logger.info("Fetch virtualization information");
-					
-					virtualiseringsInfo = respAllaVirtualiseringar.getVirtualiseringsInfo();
-					if (logger.isDebugEnabled()) {
-						logger.info("init loaded " + anropsBehorighetsInfo.size()
-								+ " AnropsBehorighet");
-						logger.info("init loaded " + virtualiseringsInfo.size()
-								+ " VirtualiseradTjansteproducent");
-					}
-				} catch (RuntimeException e) {
-					
-					e.printStackTrace();
-					
-					logger.error("Exception in VagvalsAgewn.init() caused by" + e.toString());
-				}
+			if (isInitialized()) {
+				saveToLocalCopy(TK_LOCAL_CACHE);
+			} else {
+				restoreFromLocalCopy(TK_LOCAL_CACHE);
+			}
+			
+			if (isInitialized() && logger.isDebugEnabled()) {
+				logger.info("init loaded " + anropsBehorighetsInfo.size()
+						+ " AnropsBehorighet");
+				logger.info("init loaded " + virtualiseringsInfo.size()
+						+ " VirtualiseradTjansteproducent");
 			}
 		}
 	}
 
+	/**
+	 * Return if cache has been initialized.
+	 * 
+	 * @return true if cache has been initalized, otherwise false.
+	 */
+	private boolean isInitialized() {
+		return (anropsBehorighetsInfo != null) && (virtualiseringsInfo != null);
+	}
+	
 	private SokVagvalsInfoInterface getPort() {
 		SokVagvalsServiceSoap11LitDocService service = new SokVagvalsServiceSoap11LitDocService(
 				ClientUtil.createEndpointUrlFromServiceAddress(endpointAddressTjanstekatalog));
 		SokVagvalsInfoInterface port = service.getSokVagvalsSoap11LitDocPort();
 		return port;
 	}
+	
+	
+	/**
+	 * Return virtualizations from TK, or from local cache if TK is unavailable
+	 * 
+	 * @return virtualizations, or null on any error.
+	 */
+	private List<VirtualiseringsInfoType> getVirtualiseringar() {
+		List<VirtualiseringsInfoType> l = null;
+		try {
+			logger.info("Fetch all virtualizations...");
+			HamtaAllaVirtualiseringarResponseType t = getPort().hamtaAllaVirtualiseringar(null);
+			l = t.getVirtualiseringsInfo();
+		} catch (Exception e) {
+			logger.error("Unable to get behorigheter" + e.toString());
+		}
+		return l;
+	}
+
+	/**
+	 * Return permissions from TK, or from local cache if TK is unavailable
+	 * 
+	 * @return permissions, or null on any error.
+	 */
+	private List<AnropsBehorighetsInfoType> getBehorigheter() {
+		List<AnropsBehorighetsInfoType> l = null;
+		try {
+			logger.info("Fetch all permissions...");
+			HamtaAllaAnropsBehorigheterResponseType t = getPort().hamtaAllaAnropsBehorigheter(null);
+			l = t.getAnropsBehorighetsInfo();
+		} catch (Exception e) {
+			logger.error("Unable to get behorigheter" + e.toString());
+		}
+		return l;
+	}
+
+	
+	// restore saved object
+	private void restoreFromLocalCopy(String fileName) {
+		PersistentCache pc = null;
+		InputStream is = null;
+		final File file = new File(fileName);
+		try {
+			if (file.exists()) {
+				logger.info("Restore from local copy: ", fileName);
+				is = new FileInputStream(file);
+				pc = (PersistentCache)JAXB.unmarshal(is);
+			}
+		} catch (Exception e) {
+			logger.error("Unable to restore from: " + fileName, e);
+			// remove erroneous file.
+			if (is != null) {
+				file.delete();
+			}
+		} finally {
+			close(is);
+		}
+		
+		if (pc == null) {
+			this.virtualiseringsInfo = null;
+			this.anropsBehorighetsInfo = null;
+		} else {
+			this.virtualiseringsInfo = pc.virtualiseringsInfo;
+			this.anropsBehorighetsInfo = pc.anropsBehorighetsInfo;
+		}
+	}
+	
+	// save object
+	private void saveToLocalCopy(String fileName) {
+		PersistentCache pc = new PersistentCache();
+		pc.anropsBehorighetsInfo = this.anropsBehorighetsInfo;
+		pc.virtualiseringsInfo = this.virtualiseringsInfo;
+		
+		logger.info("Save to local copy: ", fileName);
+		OutputStream os = null;
+		try {
+			File file = new File(fileName);
+			os = new FileOutputStream(file);
+			os.write(JAXB.marshal(pc).getBytes("UTF-8"));
+		} catch (Exception e) {
+			logger.error("Unable to save state to: " + fileName, e);
+		} finally {
+			close(os);
+		}
+	}
+
+	// close resource, ignore errors
+	private static void close(Closeable c) {
+		if (c != null) {
+			try {
+				c.close();
+			} catch (Exception e) {}
+		}
+	}
 
 	/**
 	 * Resets the cached info
 	 */
-	public void reset() {
-		anropsBehorighetsInfo = null;
-		virtualiseringsInfo = null;
+	public synchronized void reset() {
+		this.anropsBehorighetsInfo = null;
+		this.virtualiseringsInfo = null;
 	}
 
 	/**
-	 * 
+	 * Resets cache.
 	 */
-	public ResetVagvalCacheResponse resetVagvalCache(
-			ResetVagvalCacheRequest parameters) {
+	public ResetVagvalCacheResponse resetVagvalCache(ResetVagvalCacheRequest parameters) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("entering vagvalAgent resetVagvalCache");
 		}
+		final List<VirtualiseringsInfoType> tempVirtualiseringsInfo = this.virtualiseringsInfo;
+		final List<AnropsBehorighetsInfoType> tempAnropsBehorighetsInfo = this.anropsBehorighetsInfo;
 
-		Boolean result = false;
-		
-		synchronized(this) {
-			// Save old config information
-			tempVirtualiseringsInfo = virtualiseringsInfo;
-			tempAnropsBehorighetsInfo = anropsBehorighetsInfo;
-	
-			reset();
-			init();
-	
-			// Check outcome of init, ie should we use new configuration!
-			if (virtualiseringsInfo == null || anropsBehorighetsInfo == null) {
-				virtualiseringsInfo = tempVirtualiseringsInfo;
-				anropsBehorighetsInfo = tempAnropsBehorighetsInfo;
-				result = false;
-			} else {
-				tempVirtualiseringsInfo = null;
-				tempAnropsBehorighetsInfo = null;	
-				result = true;
-			}
-		}
-		
+		reset();
+		init();
+
 		ResetVagvalCacheResponse response = new ResetVagvalCacheResponse();
-		response.setResetResult(result);
+
+		if (!isInitialized()) {
+			this.virtualiseringsInfo = tempVirtualiseringsInfo;
+			this.anropsBehorighetsInfo = tempAnropsBehorighetsInfo;
+			response.setResetResult(false);
+		} else {
+			response.setResetResult(true);
+		}
 
 		return response;
 	}
@@ -178,8 +279,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		// If the initiation failed, try again
 		init();
 
-		if (anropsBehorighetsInfo == null || virtualiseringsInfo == null) {
-			String errorMessage = "VP008 No contact with Tjanstekatalogen at startup or now, not possible to route call";
+		if (!isInitialized()) {
+			String errorMessage = "VP008 No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call";
 			logger.error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
