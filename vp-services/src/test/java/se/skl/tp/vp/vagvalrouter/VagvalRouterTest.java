@@ -1,5 +1,6 @@
 package se.skl.tp.vp.vagvalrouter;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -82,6 +83,8 @@ public class VagvalRouterTest extends TestCase {
 
 		vagvalAgent.anropsBehorighetsInfo = null;
 		vagvalAgent.virtualiseringsInfo = null;
+		// remove local cache
+		new File(VagvalAgent.TK_LOCAL_CACHE).delete();
 		try {
 			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
