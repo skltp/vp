@@ -71,7 +71,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	// file name of local cache
 	public static final String TK_LOCAL_CACHE = System.getProperty("user.home") 
-				+ System.getProperty("path.separator") 
+				+ System.getProperty("file.separator") 
 				+ ".tk.localCache";
 	
 	public List<VirtualiseringsInfoType> virtualiseringsInfo = null;
