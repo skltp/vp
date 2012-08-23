@@ -58,11 +58,9 @@ public class VagvalRouter extends AbstractRecipientList {
 	/**
 	 * HTTP Header forwarded to producer <p>
 	 * 
-	 * FIXME:
-	 * This header should be prefixed by "x-", but right now we need to be backward compatible 
-	 * because the header is used in insurance transformations.
+	 * @since VP-2.0
 	 */
-	private static final String X_VP_PRODUCER_ID = VPUtil.RECEIVER_ID;
+	private static final String X_VP_PRODUCER_ID = "x-vp-producer-id";
 	
 	/**
 	 * HTTP Header forwarded to producer. <p>
@@ -241,6 +239,11 @@ public class VagvalRouter extends AbstractRecipientList {
 		mt.getAddProperties().put(X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
 		mt.getAddProperties().put(X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
 		mt.getAddProperties().put(X_VP_PRODUCER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
+		
+		// FIXME:
+		//	This header should be removed (replaced by X_VP_PRODUCER_ID), but there's a need to be backward compatible 
+		//	because the header is actually in-use by insurance transformations.
+		mt.getAddProperties().put(VPUtil.RECEIVER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
 
 		// XXX: Make sure SOAPAction is forwarded to producer
 		String action = message.getProperty("SOAPAction", PropertyScope.INBOUND);
