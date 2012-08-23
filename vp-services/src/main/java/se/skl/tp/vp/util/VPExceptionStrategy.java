@@ -13,7 +13,6 @@ import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
-import static se.skl.tp.vp.util.VPUtil.nvl;
 
 /**
  * Logs error events on any kind of exception, and should be used for all VP services.
