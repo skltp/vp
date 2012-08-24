@@ -150,7 +150,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			HamtaAllaVirtualiseringarResponseType t = getPort().hamtaAllaVirtualiseringar(null);
 			l = t.getVirtualiseringsInfo();
 		} catch (Exception e) {
-			logger.error("Unable to get virtualizations" + e.toString());
+			logger.error("Unable to get virtualizations", e);
 		}
 		return l;
 	}
@@ -167,7 +167,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			HamtaAllaAnropsBehorigheterResponseType t = getPort().hamtaAllaAnropsBehorigheter(null);
 			l = t.getAnropsBehorighetsInfo();
 		} catch (Exception e) {
-			logger.error("Unable to get permissions" + e.toString());
+			logger.error("Unable to get permissions", e);
 		}
 		return l;
 	}
@@ -180,7 +180,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		final File file = new File(fileName);
 		try {
 			if (file.exists()) {
-				logger.info("Restore from local copy: ", fileName);
+				logger.info("Restore from local copy: {}", fileName);
 				is = new FileInputStream(file);
 				pc = (PersistentCache)JAXB.unmarshal(is);
 			}
@@ -209,7 +209,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		pc.anropsBehorighetsInfo = this.anropsBehorighetsInfo;
 		pc.virtualiseringsInfo = this.virtualiseringsInfo;
 		
-		logger.info("Save to local copy: ", fileName);
+		logger.info("Save to local copy: {}", fileName);
 		OutputStream os = null;
 		try {
 			File file = new File(fileName);
@@ -267,12 +267,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	
 	/**
 	 * 
-	 * @param parameters
+	 * @param request
 	 *            Receiver, Sender, ServiceName(TjansteKontrakt namespace), Time
 	 * @throws VpSemanticException
 	 *             if no AnropsBehorighet is found
 	 */
-	public VisaVagvalResponse visaVagval(VisaVagvalRequest parameters) {
+	public VisaVagvalResponse visaVagval(VisaVagvalRequest request) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("entering vagvalAgent visaVagval");
 		}
@@ -288,12 +288,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		VisaVagvalResponse response = new VisaVagvalResponse();
 		
 		// Determine if delimiter is set and present in request logical address
-		boolean isDelimiterPresent = addressDelimiter != null && addressDelimiter.length() > 0 && parameters.getReceiverId().contains(addressDelimiter);
+		boolean isDelimiterPresent = addressDelimiter != null && addressDelimiter.length() > 0 && request.getReceiverId().contains(addressDelimiter);
 		
 		// Extract all separate addresses in receiverId if it contains delimiter character
 		List<String> receiverAddresses = new ArrayList<String>();
 		if (isDelimiterPresent) {
-			StringTokenizer strToken = new StringTokenizer(parameters.getReceiverId(), addressDelimiter);
+			StringTokenizer strToken = new StringTokenizer(request.getReceiverId(), addressDelimiter);
 			while(strToken.hasMoreTokens() ) {
 				String tempAddress = (String) strToken.nextElement();
 				if (!receiverAddresses.contains(tempAddress)) {
@@ -301,7 +301,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				}
 			}		
 		} else {
-			receiverAddresses.add(parameters.getReceiverId());
+			receiverAddresses.add(request.getReceiverId());
 		}
 		
 		// Outer loop over all given addresses
@@ -310,9 +310,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			// Find all possible LogiskAdressat
 			for (VirtualiseringsInfoType vi : virtualiseringsInfo) {
 				if (vi.getReceiverId().equals(requestReceiverId)
-						&& vi.getTjansteKontrakt().equals(parameters.getTjanstegranssnitt())
-						&& parameters.getTidpunkt().compare(vi.getFromTidpunkt()) != DatatypeConstants.LESSER
-						&& parameters.getTidpunkt().compare(vi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
+						&& vi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
+						&& request.getTidpunkt().compare(vi.getFromTidpunkt()) != DatatypeConstants.LESSER
+						&& request.getTidpunkt().compare(vi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
 					addressFound = true;
 					response.getVirtualiseringsInfo().add(vi);
 				}
@@ -327,25 +327,10 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			return response;
 		}
 
-		// Check authorization
-		Boolean behorighetsStatus = false;
-		// Outer loop over all given addresses
-		for (String requestReceiverId : receiverAddresses) {
-			for (AnropsBehorighetsInfoType abi : anropsBehorighetsInfo) {	
-				if (abi.getReceiverId().equals(requestReceiverId)
-						&& abi.getSenderId().equals(parameters.getSenderId())
-						&& abi.getTjansteKontrakt().equals(parameters.getTjanstegranssnitt())
-						&& parameters.getTidpunkt().compare(abi.getFromTidpunkt()) != DatatypeConstants.LESSER
-						&& parameters.getTidpunkt().compare(abi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
-					behorighetsStatus = true;
-				}
-			}
-		}
-		
-		if (behorighetsStatus == false) {
+		if (!isAuthorized(request, receiverAddresses)) {
 			String errorMessage = ("VP007 Authorization missing for serviceNamespace: "
-					+ parameters.getTjanstegranssnitt() + ", receiverId: "
-					+ parameters.getReceiverId() + ", senderId: " + parameters
+					+ request.getTjanstegranssnitt() + ", receiverId: "
+					+ request.getReceiverId() + ", senderId: " + request
 					.getSenderId());
 			// This is not a fatal error, but if it happens a sign that a
 			// calling application does not know what its doing
@@ -358,5 +343,27 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		}
 
 		return response;
+	}
+	
+	/**
+	 * Returns if the request is authorized to access producer.
+	 * 
+	 * @param request the request.
+	 * @param receiverAddresses the addresses.
+	 * @return true if authorized, otherwise false.
+	 */
+	private boolean isAuthorized(VisaVagvalRequest request, List<String> receiverAddresses) {
+		for (String requestReceiverId : receiverAddresses) {
+			for (AnropsBehorighetsInfoType abi : this.anropsBehorighetsInfo) {	
+				if (abi.getReceiverId().equals(requestReceiverId)
+						&& abi.getSenderId().equals(request.getSenderId())
+						&& abi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
+						&& request.getTidpunkt().compare(abi.getFromTidpunkt()) != DatatypeConstants.LESSER
+						&& request.getTidpunkt().compare(abi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
