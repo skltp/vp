@@ -150,7 +150,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			HamtaAllaVirtualiseringarResponseType t = getPort().hamtaAllaVirtualiseringar(null);
 			l = t.getVirtualiseringsInfo();
 		} catch (Exception e) {
-			logger.error("Unable to get behorigheter" + e.toString());
+			logger.error("Unable to get virtualizations" + e.toString());
 		}
 		return l;
 	}
@@ -167,7 +167,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			HamtaAllaAnropsBehorigheterResponseType t = getPort().hamtaAllaAnropsBehorigheter(null);
 			l = t.getAnropsBehorighetsInfo();
 		} catch (Exception e) {
-			logger.error("Unable to get behorigheter" + e.toString());
+			logger.error("Unable to get permissions" + e.toString());
 		}
 		return l;
 	}
