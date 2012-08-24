@@ -20,14 +20,20 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import org.apache.commons.httpclient.HttpException;
+import java.net.InetAddress;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.commons.lang.StringEscapeUtils;
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
-import org.mule.api.registry.ServiceException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transport.NullPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,128 +43,147 @@ import se.skl.tp.vp.util.VPUtil;
 
 public class ExceptionTransformer extends AbstractMessageTransformer {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private static Logger logger = LoggerFactory.getLogger(ExceptionTransformer.class);
 
-	private static final String ERR_MSG = "VP009 Exception when calling the service producer!";
-	private static final String ERR_MSG_CON_CLOSED = "VP009 Exception when calling the service producer, connection closed"; 
+	static String HOSTNAME = getHostname();
+		
+	private static final String ERR_MSG = "VP009 Exception when calling the service producer (Cause: %s)";
 	
+	static String SOAP_FAULT_V11 = 
+			"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+					"  <soapenv:Header/>" + 
+					"  <soapenv:Body>" + 
+					"    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+					"      <faultcode>soap:Server</faultcode>\n" + 
+					"      <faultstring>%s</faultstring>\n" +
+					"      <faultactor>%s</faultactor>\n" +
+					"      <detail>\n" +
+					"        %s\n" +
+					"      </detail>\n" + 
+					"    </soap:Fault>" + 
+					"  </soapenv:Body>" + 
+					"</soapenv:Envelope>";
+
 	public ExceptionTransformer()  {}
 
 	@Override
 	public Object transformMessage(MuleMessage msg, String encoding) throws TransformerException {
 		
-		logger.debug("Exception transformer executing...");
+		logger.debug("transformMessage() called");
 		
-		// Check if any error
-		if (msg.getExceptionPayload() != null) {
-						
-			logger.debug("Exception payload detected!");
-			if (msg.getExceptionPayload().getException() instanceof ServiceException ||
-				msg.getExceptionPayload().getException() instanceof HttpException) {
-				
-				// Check for defined TP exceptions
-				if (msg.getExceptionPayload().getException() instanceof ServiceException &&
-					msg.getExceptionPayload().getException().getCause() != null ) {
-					
-					final Throwable exception = msg.getExceptionPayload().getException();
-					
-					if (exception.getCause() instanceof VpSemanticException || 
-						exception.getCause() instanceof VpTechnicalException) {
-						
-						this.setErrorProperties(msg, exception.getCause().getMessage(), exception.getCause().getMessage());
-						return createSoapFault(msg, msg.getExceptionPayload().getException().getCause().getMessage(), exception.getCause().getMessage());
-					}					
-				}
-				// Check if we got any payload if so return it!
-				if (msg.getPayload() instanceof org.mule.transport.NullPayload) {
-					
-					logger.debug("Nullpayload detected!");
-					this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
-					return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());					
-				} else {
-					
-					this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getMessage());
-					
-					logger.debug("Exception: {}", msg.getExceptionPayload().getMessage());
-					logger.debug("Root exception: {}", msg.getExceptionPayload().getRootException().getMessage());
-					
-					logger.debug("Payload detected!");
-					msg.setExceptionPayload(null);
-					return msg.getPayload();	
-				}
-				
-			} else if (msg.getExceptionPayload().getException() instanceof RoutingException) {
-				
-				// Here we could get some data in payload but don't use it!
-				logger.debug("Routingexception detected!");
-				
-				this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getMessage());
-				return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());					
-			}
-			
-			// No defined exception above or TP exception found
-			this.setErrorProperties(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
-			return createSoapFault(msg, ERR_MSG, msg.getExceptionPayload().getRootException().getMessage());
-			
-		} else if (msg.getPayload() instanceof org.mule.transport.NullPayload) {
-			final String errMsg = "Nullpayload detected in message";
-			msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-			
-			// No exception pauload and no message payload
-			logger.debug(errMsg);
-			
-			this.setErrorProperties(msg, ERR_MSG_CON_CLOSED, errMsg);
-			return createSoapFault(msg, ERR_MSG_CON_CLOSED, errMsg);
+		final ExceptionPayload ep = msg.getExceptionPayload();
+
+		if (ep == null) {
+        	logger.debug("No error, return origin message");
+        	if (msg.getPayload() instanceof NullPayload) {
+    			setSoapFault(msg, String.format(ERR_MSG, "response paylaod is emtpy, connection closed"), "", getEndpoint().getEndpointURI().getAddress());
+        	}
+        	return msg;
+        }
+        
+        final Throwable exception = ep.getException();
+        logger.debug("exception: {}", exception.getMessage());
+        
+        final Throwable rootCause = getRootCause(exception);
+        logger.debug("root cause: {}", rootCause.getMessage());
+        
+        if (exception instanceof RoutingException) {
+        	logger.debug("routing exception");
+        	String details = getDetails(msg);
+    		logger.debug("details: {}", details);
+			return setSoapFault(msg, String.format(ERR_MSG, rootCause.getMessage()), details, getEndpoint().getEndpointURI().getAddress());
+        } else {
+        	logger.debug("other exception");
+        	return setSoapFault(msg, rootCause.getMessage(), "", HOSTNAME);
+        }
+ 	}
+
+	
+	//
+	static String getDetails(MuleMessage msg) {
+		Object payload = msg.getOriginalPayload();
+		logger.debug("payload is of type: {}", payload.getClass());
+		if (payload instanceof XMLStreamReader) {
+			try {
+				return extractDetails((XMLStreamReader) payload);
+			} catch (XMLStreamException ex) {}
 		}
-				
-		// No error, return incoming payload!
-		return msg.getPayload();
-	}
-
-	private Object createSoapFault(MuleMessage msg, String srcCause, final String rootCause) {
-		StringBuffer result = new StringBuffer();
-		
-		final String escapedCause = StringEscapeUtils.escapeXml(srcCause);
-		final String escapedRoot = StringEscapeUtils.escapeXml(rootCause);
-		createSoapFault(result, escapedCause, escapedRoot);
-				
-		// Now wrap it into a soap-envelope
-		result = createSoapEnvelope(result);
-
-		// Clear out exception payload as we only return created SoapFaults when exception occurs
-		msg.setExceptionPayload(null);
-		
-		// Tell Mule that we have returned a SoapFault
-		logger.debug("SoapFault returned: " + result);
-		
-		// Set payload explict ??
-		msg.setPayload(result.toString());
-		
-		// Done, return the string
-		return result.toString();
-	}
-
-	private void createSoapFault(StringBuffer result, String faultString, String rootCause) {
-		result.append("<soap:Fault>");
-		result.append("<faultcode>soap:Server</faultcode>");
-		result.append("<faultstring>" + faultString + "\n" + rootCause + "</faultstring>");
-		result.append("</soap:Fault>");
+		return "";
 	}
 	
-	private StringBuffer createSoapEnvelope(StringBuffer result) {
-		StringBuffer envelope = new StringBuffer(); 
-		envelope.append("<?xml version='1.0' encoding='UTF-8'?>");
-		envelope.append("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">");
-		envelope.append("<soap:Body>");
-		envelope.append(result);
-		envelope.append("</soap:Body>");
-		envelope.append("</soap:Envelope>");
-		return envelope;
+	/**
+	 * Returns the SOAPFault element faultstring of the original message or an empty string of none exists.
+	 * 
+	 * @param reader the reader.
+	 * @return the fault string or an empty string if none found.
+	 * @throws XMLStreamException on errors.
+	 */
+	static String extractDetails(XMLStreamReader reader) throws XMLStreamException {
+		int event = reader.getEventType();
+		boolean fault = false;
+		while (reader.hasNext()) {
+			switch (event) {
+			case XMLStreamConstants.START_ELEMENT:
+				fault = "faultstring".equals(reader.getLocalName());
+				break;
+			case XMLStreamConstants.CHARACTERS:
+				if (fault) {
+					return reader.getText();
+				}
+				break;
+			case XMLStreamConstants.END_ELEMENT:
+				fault = false;
+				break;
+			default:
+				break;
+			}
+			event = reader.next();
+		}
+		return "";
 	}
 	
-	private void setErrorProperties(final MuleMessage msg, final String vpError, final String errorDescription) {
+	//
+	static String getHostname() {
+		try {
+			return InetAddress.getLocalHost().getHostName();
+		} catch (Exception e) {
+			return "vp-node";
+		}
+	}
+
+	
+	//
+	static Throwable getRootCause(Throwable throwable) {
+		Throwable rootCause = null;
+		for (Throwable cause = throwable; cause != null; cause = cause.getCause())  {
+			rootCause = cause;
+			if (isVpException(rootCause)) {
+				break;
+			}
+		}
+		return rootCause;
+	}
+
+	//
+	static boolean isVpException(Throwable throwable) {
+		return (throwable instanceof VpSemanticException) || (throwable instanceof VpTechnicalException);
+	}
+	
+	static String escape(String s) {
+		return StringEscapeUtils.escapeXml(s);
+	}
+	
+	private MuleMessage setSoapFault(MuleMessage msg, String cause, String details, String actor) {
 		msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, vpError, PropertyScope.SESSION);
-		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, errorDescription, PropertyScope.SESSION);
+		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, cause, PropertyScope.SESSION);
+		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, details, PropertyScope.SESSION);
+
+		String fault = String.format(SOAP_FAULT_V11, escape(cause), escape(actor), escape(details));
+		msg.setPayload(fault);
+		msg.setExceptionPayload(null);
+	    msg.setProperty("http.status", 500, PropertyScope.OUTBOUND);
+	    
+		return msg;
 	}
+	
 }
