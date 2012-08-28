@@ -4,6 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:spring="http://www.springframework.org/schema/beans"
 	xmlns:https="http://www.mulesoft.org/schema/mule/https"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
 	xmlns:management="http://www.mulesoft.org/schema/mule/management"
 	xsi:schemaLocation="
@@ -12,6 +13,7 @@
 		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
 		http://www.mulesoft.org/schema/mule/jms			http://www.mulesoft.org/schema/mule/jms/3.3/mule-jms.xsd
 		http://www.mulesoft.org/schema/mule/management	http://www.mulesoft.org/schema/mule/management/3.3/mule-management.xsd
+		http://www.mulesoft.org/schema/mule/http		http://www.mulesoft.org/schema/mule/http/3.3/mule-http.xsd
 	">
 
 	<spring:bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -50,19 +52,25 @@
 
     <!-- Common connectors and endpoints, i.e. that not needs to be changed for different config-files (local unit-test, integration-test or production environments) -->
     <!-- In the below configurations the https:tls-client element is never used! This may be a bug in 2.2.8... -->
-    <!-- Https connector used when acting as a producer, ie receiving calls-->
+   
+    <!-- Https connector used when acting as a producer, ie receiving calls,  sends no session info-->
   	<https:connector name="VPProducerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
 		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
 		<https:tls-key-store class="${TP_TLS_STORE_PRODUCER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_PRODUCER_FILE}" storePassword="${TP_TLS_STORE_PRODUCER_PASSWORD}" keyPassword="${TP_TLS_STORE_PRODUCER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
 
-    <!-- Https connector used when acting as a consumer, ie making calls -->
+    <!-- Https connector used when acting as a consumer, ie making calls, sends no session info -->
   	<https:connector name="VPConsumerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
 		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
   	    <https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
+	
+	<!-- Http connector that sends no session info-->
+  	<http:connector name="VPInsecureConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
+		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
+  	</http:connector>
 	
     <spring:beans>
   		<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">

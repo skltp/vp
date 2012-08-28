@@ -262,6 +262,10 @@ public class VagvalRouter extends AbstractRecipientList {
 			Connector connector = muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_NAME);
 			eb.setConnector(connector);
 			logger.debug("HTTPS connector has been set {}", connector.getName());
+		}else{
+			Connector connector = muleContext.getRegistry().lookupConnector(VPUtil.INSECURE_CONNECTOR_NAME);
+			eb.setConnector(connector);
+			logger.debug("HTTP connector has been set {}", connector.getName());
 		}
 		
 		try {
