@@ -74,73 +74,15 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 		final ExceptionPayload ep = msg.getExceptionPayload();
 
 		if (ep == null) {
-        	logger.debug("No error, return origin message");
+        	logger.debug("No error, check for payload");
         	if (msg.getPayload() instanceof NullPayload) {
     			setSoapFault(msg, String.format(ERR_MSG, "response paylaod is emtpy, connection closed"), "", getEndpoint().getEndpointURI().getAddress());
         	}
-        	return msg;
         }
-        
-        final Throwable exception = ep.getException();
-        logger.debug("exception: {}", exception.getMessage());
-        
-        final Throwable rootCause = getRootCause(exception);
-        logger.debug("root cause: {}", rootCause.getMessage());
-        
-        if (exception instanceof RoutingException) {
-        	logger.debug("routing exception");
-        	String details = getDetails(msg);
-    		logger.debug("details: {}", details);
-			return setSoapFault(msg, String.format(ERR_MSG, rootCause.getMessage()), details, getEndpoint().getEndpointURI().getAddress());
-        } else {
-        	logger.debug("other exception");
-        	return setSoapFault(msg, rootCause.getMessage(), "", HOSTNAME);
-        }
+		
+        return msg;
  	}
 
-	
-	//
-	static String getDetails(MuleMessage msg) {
-		Object payload = msg.getOriginalPayload();
-		logger.debug("payload is of type: {}", payload.getClass());
-		if (payload instanceof XMLStreamReader) {
-			try {
-				return extractDetails((XMLStreamReader) payload);
-			} catch (XMLStreamException ex) {}
-		}
-		return "";
-	}
-	
-	/**
-	 * Returns the SOAPFault element faultstring of the original message or an empty string of none exists.
-	 * 
-	 * @param reader the reader.
-	 * @return the fault string or an empty string if none found.
-	 * @throws XMLStreamException on errors.
-	 */
-	static String extractDetails(XMLStreamReader reader) throws XMLStreamException {
-		int event = reader.getEventType();
-		boolean fault = false;
-		while (reader.hasNext()) {
-			switch (event) {
-			case XMLStreamConstants.START_ELEMENT:
-				fault = "faultstring".equals(reader.getLocalName());
-				break;
-			case XMLStreamConstants.CHARACTERS:
-				if (fault) {
-					return reader.getText();
-				}
-				break;
-			case XMLStreamConstants.END_ELEMENT:
-				fault = false;
-				break;
-			default:
-				break;
-			}
-			event = reader.next();
-		}
-		return "";
-	}
 	
 	//
 	static String getHostname() {
@@ -151,23 +93,6 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 		}
 	}
 
-	
-	//
-	static Throwable getRootCause(Throwable throwable) {
-		Throwable rootCause = null;
-		for (Throwable cause = throwable; cause != null; cause = cause.getCause())  {
-			rootCause = cause;
-			if (isVpException(rootCause)) {
-				break;
-			}
-		}
-		return rootCause;
-	}
-
-	//
-	static boolean isVpException(Throwable throwable) {
-		return (throwable instanceof VpSemanticException) || (throwable instanceof VpTechnicalException);
-	}
 	
 	static String escape(String s) {
 		return StringEscapeUtils.escapeXml(s);

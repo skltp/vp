@@ -289,7 +289,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		
 		// Determine if delimiter is set and present in request logical address
 		boolean isDelimiterPresent = addressDelimiter != null && addressDelimiter.length() > 0 && request.getReceiverId().contains(addressDelimiter);
-		
+
 		// Extract all separate addresses in receiverId if it contains delimiter character
 		List<String> receiverAddresses = new ArrayList<String>();
 		if (isDelimiterPresent) {

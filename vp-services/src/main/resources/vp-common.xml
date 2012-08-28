@@ -63,7 +63,7 @@
   	    <https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
-
+	
     <spring:beans>
   		<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
 			<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_URL}"/>

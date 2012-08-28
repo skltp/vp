@@ -20,13 +20,14 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
+import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -44,6 +45,7 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.routing.outbound.AbstractRecipientList;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
+import org.mule.transport.http.HttpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,10 +104,7 @@ public class VagvalRouter extends AbstractRecipientList {
 			VPUtil.REVERSE_PROXY_HEADER_NAME,
 			VPUtil.PEER_CERTIFICATES,
 			"LOCAL_CERTIFICATES",
-			"content-type",
-			"Content-Type",
-			"Content-type",
-			"content-Type",
+			HttpConstants.HEADER_CONTENT_TYPE,
 			"http.disable.status.code.exception.check",
 	}));
 	
@@ -115,8 +114,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	private static final Map<String, Object> ADD_HEADERS;
 	static {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("Content-Type", "text/xml;charset=UTF-8");
-		map.put("User-Agent", "SKLTP VP/2.0");
+		map.put(HttpConstants.HEADER_USER_AGENT, "SKLTP VP/2.0");
+		map.put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8");
 		ADD_HEADERS = Collections.unmodifiableMap(map);
 	}
 	
@@ -228,12 +227,17 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException {
 
-		logger.debug("EndpointBuilder URI: {}", recipient);
-
-		String url = (String) recipient;		
+		if (logger.isDebugEnabled()) {
+			logger.debug("EndpointBuilder URI: {}", recipient);
+		}
+		
+		String url = (String) recipient;
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
 		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+		eb.setEncoding("UTF-8");
+		message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8", PropertyScope.OUTBOUND);
+		
 		
 		MessagePropertiesTransformer mt = createOutboundTransformer();
 		mt.getAddProperties().put(X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
@@ -249,20 +253,21 @@ public class VagvalRouter extends AbstractRecipientList {
 		String action = message.getProperty("SOAPAction", PropertyScope.INBOUND);
 		if (action != null) {
 			mt.getAddProperties().put("SOAPAction", action);
+			message.setProperty("SOAPAction", action, PropertyScope.OUTBOUND);
 		}
 		
 		eb.addMessageProcessor(mt);
 		
 		if (url.contains("https://")) {
 			Connector connector = muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_NAME);
-			eb.setConnector(connector);     
-			logger.debug("Https protocolConnector has been set {}", connector.getName());
+			eb.setConnector(connector);
+			logger.debug("HTTPS connector has been set {}", connector.getName());
 		}
 		
-		logger.debug("EndpointBuilder ready!");
-		
 		try {
-			return eb.buildOutboundEndpoint();
+			OutboundEndpoint ep =  eb.buildOutboundEndpoint();
+			logger.debug("EndpointBuilder ready!!!");
+			return ep;
 		} catch (InitialisationException e) {
 			throw new VpTechnicalException(e);
 		} catch (EndpointException e) {
