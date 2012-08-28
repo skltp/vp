@@ -50,7 +50,10 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
 	protected void logException(Throwable t) {
                 
 		log.debug("Entering VPExceptionStrategy...");
-		
+   		
+		Map<String, String> extraInfo = new HashMap<String, String>();
+		extraInfo.put("source", getClass().getName());
+
 		MuleException muleException = ExceptionHelper.getRootMuleException(t);
         if (muleException != null) {
 
@@ -66,19 +69,16 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
         		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, nvl(ex.toString()), PropertyScope.SESSION);
             	msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
 
-        		Map<String, String> extraInfo = new HashMap<String, String>();
-    			extraInfo.put("source", getClass().getName());
         		eventLogger.addSessionInfo(msg, extraInfo);
         		eventLogger.logErrorEvent(ex, msg, null, extraInfo); 
 
         	} else {
-                @SuppressWarnings("unchecked")
-				Map<String, Object> info = ExceptionHelper.getExceptionInfo(muleException);
-        		eventLogger.logErrorEvent(muleException, info.get("Payload"), null, null);                
+                Map<?, ?> info = ExceptionHelper.getExceptionInfo(muleException);
+        		eventLogger.logErrorEvent(muleException, info.get("Payload"), null, extraInfo);                
         	}
         	
         } else {
-    		eventLogger.logErrorEvent(t, null, null, null);
+    		eventLogger.logErrorEvent(t, "", null, extraInfo);
         }
 	}
 }
