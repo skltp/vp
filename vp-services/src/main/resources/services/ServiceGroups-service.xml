@@ -7,6 +7,9 @@
 		http://www.mulesoft.org/schema/mule/http		http://www.mulesoft.org/schema/mule/http/3.3/mule-http.xsd
 	">
 
+	<!-- Bridge to the service catalog service, and the active monitoring API 
+		This service is supposed to be used by inera.se, to provide active monitoring 
+		status (PingForConfiguration) -->
 	<flow name="ServiceGroups-flow">
 		<https:inbound-endpoint
 			address="https://${TP_HOST}:${TP_PORT}/monitoring/serviceGroups"
