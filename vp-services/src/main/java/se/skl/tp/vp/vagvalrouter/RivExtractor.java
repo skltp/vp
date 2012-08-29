@@ -1,18 +1,15 @@
 package se.skl.tp.vp.vagvalrouter;
 
-import java.io.InputStream;
-
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.PayloadHelper;
 
@@ -28,8 +25,14 @@ public class RivExtractor extends AbstractMessageTransformer {
 	@Override
 	public Object transformMessage(MuleMessage msg, String encoding)
 			throws TransformerException {
+		
 		log.debug("Extracting RIV-version and namespace");
 		
+		// open timers, and start total timer.
+		ExecutionTimer.init();
+		ExecutionTimer.start(VPUtil.TIMER_TOTAL);
+		
+	
 		QName qname = (QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION);
 		final String tns = VPUtil.extractNamespaceFromService(qname);
 
