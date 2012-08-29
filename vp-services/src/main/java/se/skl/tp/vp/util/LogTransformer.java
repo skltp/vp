@@ -17,6 +17,7 @@
 package se.skl.tp.vp.util;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
+import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
 
 import java.util.HashMap;
 import java.util.List;
@@ -132,9 +133,12 @@ public class LogTransformer extends AbstractMessageTransformer {
 	}
 
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
+		
+		final String logName = "log." + logType;
+		ExecutionTimer.start(logName);
 
 		try {
-
+			
 			/*
 			 * Don't skip in TP
 			 */
@@ -171,6 +175,11 @@ public class LogTransformer extends AbstractMessageTransformer {
 			} 	
 
 			evaluatedExtraInfo.put("source", getClass().getName());
+			// producer elapsed time
+			ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_PRODUCER);
+			if (timer != null) {
+				evaluatedExtraInfo.put("time.producer", String.valueOf(timer.getElapsed()));
+			}
 			eventLogger.addSessionInfo(message, evaluatedExtraInfo);
 
 			switch (logLevel) {
@@ -196,6 +205,13 @@ public class LogTransformer extends AbstractMessageTransformer {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		} finally {
+			ExecutionTimer.stop(logName);
+			// close total timer.
+			if ("xresp-out".equals(logType)) {
+				ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
+				log.info(message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, "") + " { " + ExecutionTimer.format() + " }");
+			}
 		}
 	}
 
