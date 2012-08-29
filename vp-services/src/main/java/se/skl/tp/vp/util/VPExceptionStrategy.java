@@ -53,6 +53,10 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
    		
 		Map<String, String> extraInfo = new HashMap<String, String>();
 		extraInfo.put("source", getClass().getName());
+		ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_PRODUCER);
+		if (timer != null) {
+			extraInfo.put("time.producer", String.valueOf(timer.getElapsed()));
+		}
 
 		MuleException muleException = ExceptionHelper.getRootMuleException(t);
         if (muleException != null) {
@@ -80,5 +84,9 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
         } else {
     		eventLogger.logErrorEvent(t, "", null, extraInfo);
         }
+        
+        // stop request.
+		ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
+		log.info(ExecutionTimer.format());
 	}
 }
