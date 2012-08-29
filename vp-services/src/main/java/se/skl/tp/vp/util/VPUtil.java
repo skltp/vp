@@ -47,6 +47,11 @@ public final class VPUtil {
 	
 	public static final String CERT_SENDERID_PATTERN = "=([^,]+)";
 	
+	public static final String TIMER_TOTAL = "total";
+	public static final String TIMER_ROUTE = "route";
+	public static final String TIMER_PRODUCER = "producer";
+	
+	
 	public static String extractNamespaceFromService(final QName qname) {
 		return (qname == null) ? null : qname.getNamespaceURI();
 	}
