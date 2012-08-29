@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
 import se.skl.tp.vp.dashboard.ServiceStatistics;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
+import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 
@@ -160,11 +161,16 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	@Override
 	protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
-		String addr = this.getAddressingHelper(event.getMessage()).getAddress();
+		ExecutionTimer.start(VPUtil.TIMER_ROUTE);
+		try {
+			String addr = this.getAddressingHelper(event.getMessage()).getAddress();
 		
-		logger.debug("Endpoint address is {}", addr);		
+			logger.debug("Endpoint address is {}", addr);		
 
-		return Collections.singletonList((Object)addr);
+			return Collections.singletonList((Object)addr);
+		} finally {
+			ExecutionTimer.stop(VPUtil.TIMER_ROUTE);			
+		}
 	}
 	
 	/**
@@ -200,9 +206,14 @@ public class VagvalRouter extends AbstractRecipientList {
 			serverStatistics.noOfCalls++;
 		}
 
-		
-		// Do the actual routing
-		MuleEvent replyEvent = super.route(event);
+		ExecutionTimer.start(VPUtil.TIMER_PRODUCER);
+		MuleEvent replyEvent;
+		try {
+			// Do the actual routing
+			replyEvent = super.route(event);
+		} finally {
+			ExecutionTimer.stop(VPUtil.TIMER_PRODUCER);			
+		}
 
 		/*
 		 * Restore properties
