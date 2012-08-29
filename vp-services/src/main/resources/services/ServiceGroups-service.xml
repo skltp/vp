@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:https="http://www.mulesoft.org/schema/mule/https" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core		http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
+		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/http		http://www.mulesoft.org/schema/mule/http/3.3/mule-http.xsd
+	">
+
+	<flow name="ServiceGroups-flow">
+		<https:inbound-endpoint
+			address="https://${TP_HOST}:${TP_PORT}/monitoring/serviceGroups"
+			connector-ref="VPProducerConnector" method="GET" exchange-pattern="request-response" />
+		<http:outbound-endpoint
+			address="http://${TK_HOST}:${TK_PORT}/log-analyzer/jersey/serviceProducers"
+			method="GET" connector-ref="VPInsecureConnector" exchange-pattern="request-response" />
+	</flow>
+
+</mule>
