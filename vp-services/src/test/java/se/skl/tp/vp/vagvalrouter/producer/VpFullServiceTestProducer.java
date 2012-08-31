@@ -40,7 +40,7 @@ import se.skl.tjanst1.wsdl.Tjanst1Interface;
 
 @WebService(serviceName = "Tjanst1Service"
 	, portName = "Tjanst1ImplPort"
-	, targetNamespace = "urn:skl:tjanst1:0.1"
+	, targetNamespace = "urn:skl:tjanst1:rivtabp20"
 	, name = "Tjanst1")
 public class VpFullServiceTestProducer implements Tjanst1Interface {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
