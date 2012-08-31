@@ -21,8 +21,8 @@
  -->
  
 <xs:schema 
-	targetNamespace="urn:skl:tjanst1:0.1"
-	xmlns="urn:skl:tjanst1:0.1"
+	targetNamespace="urn:skl:tjanst1:rivtabp20"
+	xmlns="urn:skl:tjanst1:rivtabp20"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	attributeFormDefault="unqualified"
 	elementFormDefault="unqualified"

@@ -26,12 +26,12 @@
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
-	targetNamespace="urn:skl:tjanst1:0.1"
-	xmlns="urn:skl:tjanst1:0.1">
+	targetNamespace="urn:skl:tjanst1:rivtabp20"
+	xmlns="urn:skl:tjanst1:rivtabp20">
 
 	<wsdl:types>
 		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified">
-			<xsd:import schemaLocation="tjanst1-1.0.xsd" namespace="urn:skl:tjanst1:0.1"/>
+			<xsd:import schemaLocation="tjanst1-1.0.xsd" namespace="urn:skl:tjanst1:rivtabp20"/>
 			<xsd:import schemaLocation="../../core_components/ws-addressing-1.0.xsd" namespace="http://www.w3.org/2005/08/addressing"/>
 		</xsd:schema>
 		
