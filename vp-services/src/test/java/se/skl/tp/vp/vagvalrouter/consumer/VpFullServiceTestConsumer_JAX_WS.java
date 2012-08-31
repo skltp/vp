@@ -35,9 +35,16 @@ import se.skl.tjanst1.wsdl.Tjanst1Interface;
 import se.skl.tjanst1.wsdl.Tjanst1Service;
 import se.skl.tp.vp.util.ClientUtil;
 
-public class VpFullServiceTestConsumer {
+/**
+ * Test consumer based on JAX WS.
+ * Works as a standalone test client but not to be used in a mule integration test, since it will fail on two mule https connectors.
+ * 
+ * @author magnuslarsson
+ *
+ */
+public class VpFullServiceTestConsumer_JAX_WS {
 	
-	private static final Logger logger = LoggerFactory.getLogger(VpFullServiceTestConsumer.class);
+	private static final Logger logger = LoggerFactory.getLogger(VpFullServiceTestConsumer_JAX_WS.class);
 
 	public static void main(String[] args) {
 
@@ -77,7 +84,7 @@ public class VpFullServiceTestConsumer {
 	public static Product callGetProductDetail(String productId, String serviceAddress)
 			throws Exception {
 
-		URL resource = VpFullServiceTestConsumer.class.getClassLoader().getResource(".");//Thread.currentThread().getContextClassLoader().getResource(".");
+		URL resource = VpFullServiceTestConsumer_JAX_WS.class.getClassLoader().getResource(".");//Thread.currentThread().getContextClassLoader().getResource(".");
 		System.out.println(resource.toString());
 		
 		
