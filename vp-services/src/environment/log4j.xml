@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
+		</layout>
+	</appender>
     <appender class="org.apache.log4j.FileAppender" name="devnull">
         <param value="/dev/null" name="File"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -15,41 +21,37 @@
             <param value="%-5p %d [%t] %c: %m%n" name="ConversionPattern"/>
         </layout>
     </appender>
-    <logger additivity="false" name="org.soitoolkit.commons.mule.messageLogger">
-        <level value="debug"/>
-        <appender-ref ref="devnull"/>
-    </logger>
     <logger name="com.mulesource">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="org.apache">
         <level value="warn"/>
     </logger>
     <logger name="org.apache.cxf">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog">
         <level value="error"/>
     </logger>
     <logger name="org.mule">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="org.mule.component.simple.LogComponent">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="org.mule.DefaultMuleContext">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="org.mule.model.seda">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="org.mule.MuleServer">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="org.soitoolkit.commons">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
-    <logger additivity="false" name="org.soitoolkit.commons.mule.messageLogger">
+    <logger name="org.soitoolkit.commons.mule.messageLogger">
         <level value="debug"/>
     </logger>
     <logger name="org.springframework">
@@ -68,13 +70,27 @@
         <level value="debug"/>
     </logger>
     <logger name="se.skl.tp.vp.logmanager">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="se.skl.tp.vp.util">
+        <level value="info"/>
+    </logger>
+    <logger name="se.skl.tp.vp.util.helper.AddressingHelper">
         <level value="debug"/>
     </logger>
+
+
+    <!-- Logging of http trafic, e.g. REST/HTTP or SOAP/HTTP 
+	<logger name="httpclient.wire">
+		<level value="DEBUG" />
+	</logger>
+	<logger name="org.apache.commons.httpclient">
+		<level value="DEBUG" />
+	</logger>
+    -->
+
     <root>
-        <level value="debug"/>
-        <appender-ref ref="file"/>
+        <level value="info"/>
+        <appender-ref ref="CONSOLE"/>
     </root>
 </log4j:configuration>
