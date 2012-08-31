@@ -31,15 +31,19 @@
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
 
       <flow name="vp-virtuell-tjanst-teststub-flow" >
-        <inbound-endpoint connector-ref="VPProducerConnector" address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"  
- 			name="Tjanst1" />
+        <inbound-endpoint 
+        	address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"  
+        	connector-ref="VPProducerConnector" 
+ 			name="Tjanst1"
+            exchange-pattern="request-response" 
+            responseTransformer-refs="filterResponseHeaders" />
+ 			
+        <cxf:proxy-service
+            namespace="urn:skl:tjanst1:rivtabp20"
+            payload="envelope"
+            service="Tjanst1Service"
+            wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
 
-        <cxf:jaxws-service
-            serviceClass="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"
-			/>
-        
-        <outbound-endpoint address="vm://vagval-router" >
-        </outbound-endpoint>    
-        
+        <flow-ref name="vagval-dynamic-routing-flow" />
     </flow>
 </mule>

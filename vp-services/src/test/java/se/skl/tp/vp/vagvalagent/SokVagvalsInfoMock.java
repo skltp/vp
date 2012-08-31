@@ -117,9 +117,9 @@ public class SokVagvalsInfoMock implements SokVagvalsInfoInterface {
 
 			int id = 1;
 
-			for (VagvalInput input : vagvalInputs.getVagvalInputs()) {
+			for (VagvalMockInputRecord input : vagvalInputs.getVagvalInputs()) {
 				VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
-				// vi.setAdress(vagvalInput.adress);
+				vi.setAdress(input.adress);
 				vi.setFromTidpunkt(fromTidpunkt);
 				vi.setTomTidpunkt(tomTidpunkt);
 				vi.setReceiverId(input.receiverId);

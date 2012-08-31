@@ -39,6 +39,8 @@ public class VagvalAgentTest extends FunctionalTestCase {
 		vagvalAgent = (VagvalAgent) muleContext.getRegistry().lookupObject("vagvalAgent");
 		vagvalAgent.reset();
 
+		resetVagvalInput();
+		
 		addVagvalInput("VardgivareB", "urn:riv:v1", "tppoc-vardgivare_A-tjanst1",
 				"{urn:riv13606:v1}RIV13606REQUEST_EHR_EXTRACT_PortType");
 
@@ -46,11 +48,16 @@ public class VagvalAgentTest extends FunctionalTestCase {
 				"{urn:riv13606:v1}RIV13606REQUEST_EHR_EXTRACT_PortType");
 	}
 
+	private void resetVagvalInput() {
+		SokVagvalsInfoMockInput vagvalInputs = (SokVagvalsInfoMockInput) muleContext.getRegistry().lookupObject("vagvalInputs");
+		vagvalInputs.reset();
+	}
+
 	private void addVagvalInput(String receiverId, String rivVersion, String senderId, String serviceNameSpace) {
 
 		SokVagvalsInfoMockInput vagvalInputs = (SokVagvalsInfoMockInput) muleContext.getRegistry().lookupObject("vagvalInputs");
 
-		VagvalInput vagvalInput = new VagvalInput();
+		VagvalMockInputRecord vagvalInput = new VagvalMockInputRecord();
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.rivVersion = rivVersion;
 		vagvalInput.senderId = senderId;

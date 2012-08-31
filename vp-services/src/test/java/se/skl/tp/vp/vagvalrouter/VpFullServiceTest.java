@@ -1,55 +1,59 @@
 package se.skl.tp.vp.vagvalrouter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.tck.FunctionalTestCase;
 
 import se.skl.tjanst1.wsdl.Product;
-import se.skl.tp.vp.vagvalagent.VagvalAgent;
-import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer;
+import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
+import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
+import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 
 public class VpFullServiceTest extends FunctionalTestCase {
 
 	private static final String PRODUCT_ID = "SW123";
 	private static final String TJANSTE_ADRESS = "https://localhost:20000/vp/tjanst1";
 	
+	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
+
 	VagvalInfo vagvalInfo;
 
 	
 	public VpFullServiceTest() {
 		super();
 		setDisposeManagerPerSuite(true);
+		
+		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		VagvalMockInputRecord vi = new VagvalMockInputRecord();
+		vi.receiverId = "vp-test-producer";
+		vi.senderId = "tp";
+		vi.rivVersion = "RIVTABP20";
+		vi.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vi.adress = "https://localhost:19000/vardgivare-b/tjanst1";
+		vagvalInputs.add(vi);
+		svimi.setVagvalInputs(vagvalInputs);
+		
 	}
 	
 	@Override
 	protected String getConfigResources() {
-		return "vp-teststubs-and-services-config.xml";
+		return 
+			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
+			"vp-teststubs-and-services-config.xml";
 	}
 	
 	@Override
 	protected void doSetUp() throws Exception {
-		// NOTE this test user the same certificates for consumer,
-		// virtualisation-plattform and producer
-		// The certs are located in certs folder and has SERIALNUMBER=tp
-
-		super.doSetUp();
-		VagvalAgent vagvalAgent = (VagvalAgent) muleContext.getRegistry().lookupObject(
-				"vagvalAgent");
-		vagvalAgent.reset();
-
-		// Initialize the vagvalsinfo that is supposed to be in Tjanstekatalogen
-		// when the call
-		// to the virtual service is made
-		// Note certificate serial number is used as sender
-		vagvalInfo = (VagvalInfo) muleContext.getRegistry().lookupObject("vagvalInfo");
-		vagvalInfo.reset();
+		if (testConsumer == null) {
+			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector");
+		}
 	}
 	
 	public void testHappyDays() throws Exception {
-//
-//		vagvalInfo.addVagval("vp-test-producer", "tp", "RIVTABP20", "urn:skl:tjanst1:0.1",
-//				"https://localhost:19000/vardgivare-b/tjanst1");
-//
-//		Product p = VpFullServiceTestConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS);
-//		assertEquals(PRODUCT_ID, p.getId());
-	}
 
+		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS);
+		assertEquals(PRODUCT_ID, p.getId());
+	}
 }
