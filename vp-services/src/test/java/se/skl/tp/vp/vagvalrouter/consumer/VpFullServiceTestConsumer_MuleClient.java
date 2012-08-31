@@ -26,7 +26,6 @@ import static org.soitoolkit.commons.xml.XPathUtil.getXml;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,10 +54,7 @@ import se.skl.tjanst1.wsdl.GetProductDetailResponse;
 import se.skl.tjanst1.wsdl.GetProductDetailType;
 import se.skl.tjanst1.wsdl.ObjectFactory;
 import se.skl.tjanst1.wsdl.Product;
-import se.skl.tjanst1.wsdl.Tjanst1Interface;
-import se.skl.tjanst1.wsdl.Tjanst1Service;
 import se.skl.tp.vp.soitoolkit060.duplicate.RestClient;
-import se.skl.tp.vp.util.ClientUtil;
 
 /**
  * Test consumer based on MuleClient and plain https, using jaxb, jaxp and xpath to create and parse soap-envelopes for requests and repsonses.
@@ -71,7 +67,7 @@ import se.skl.tp.vp.util.ClientUtil;
 
 public class VpFullServiceTestConsumer_MuleClient {
 	
-	private static final Logger logger = LoggerFactory.getLogger(VpFullServiceTestConsumer_MuleClient.class);
+	private static final Logger log = LoggerFactory.getLogger(VpFullServiceTestConsumer_MuleClient.class);
 
 	private static final JaxbUtil jaxbUtil = new JaxbUtil("org.w3.wsaddressing10:se.skl.tjanst1.wsdl");
 
@@ -90,15 +86,15 @@ public class VpFullServiceTestConsumer_MuleClient {
 	}
 
 	private static final String responseTemplate =
-	"<soapenv:Envelope " + 
-	  "xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' " +  
-	  "xmlns:urn='urn:riv:interoperability:headers:1' " + 
-	  "xmlns:urn1='urn:riv:itintegration:registry:1' >" + 
-	  "<soapenv:Header>" + 
-	  "</soapenv:Header>" +
-	  "<soapenv:Body>" +
-	  "</soapenv:Body>" +
-	"</soapenv:Envelope>";
+		"<soapenv:Envelope " + 
+		  "xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' " +  
+		  "xmlns:urn='urn:riv:interoperability:headers:1' " + 
+		  "xmlns:urn1='urn:riv:itintegration:registry:1' >" + 
+		  "<soapenv:Header>" + 
+		  "</soapenv:Header>" +
+		  "<soapenv:Body>" +
+		  "</soapenv:Body>" +
+		"</soapenv:Envelope>";
 	
 	
 	public VpFullServiceTestConsumer_MuleClient(MuleContext muleContext, String httpsConnector) {
@@ -129,8 +125,8 @@ public class VpFullServiceTestConsumer_MuleClient {
         String xmlHeader = jaxbUtil.marshal(OF_ADDR.createTo(logicalAddressHeader));
 		String xmlBody = jaxbUtil.marshal(OF.createGetProductDetailElem(request));
 
-        System.err.println("header:\n" + xmlHeader);
-        System.err.println("body:\n" + xmlBody);
+        log.debug("header:\n{}", xmlHeader);
+        log.debug("body:\n{}", xmlBody);
         
 		XPath xpath = XPathFactory.newInstance().newXPath();
 	    xpath.setNamespaceContext(new MapNamespaceContext(namespaceMap));
@@ -142,9 +138,8 @@ public class VpFullServiceTestConsumer_MuleClient {
 			XPathExpression xpathHeader = xpath.compile("/soap:Envelope/soap:Header");
 			result = xpathHeader.evaluate(respDoc, XPathConstants.NODESET);
 			
-			System.err.println("### XPATH RESULT: " + result);
 			NodeList list = (NodeList)result; 
-			System.err.println("### XPATH RESULT: " + list.getLength());
+			log.debug("header xpath result: {}", list.getLength());
 			Node nodeHeader = list.item(0);
 	        
 	    	appendXmlFragment(nodeHeader, xmlHeader);
@@ -154,9 +149,8 @@ public class VpFullServiceTestConsumer_MuleClient {
 			XPathExpression xpathBody = xpath.compile("/soap:Envelope/soap:Body");
 			result = xpathBody.evaluate(respDoc, XPathConstants.NODESET);
 			
-			System.err.println("### XPATH RESULT: " + result);
 			list = (NodeList)result; 
-			System.err.println("### XPATH RESULT: " + list.getLength());
+			log.debug("body xpath result: {}", list.getLength());
 			Node nodeBody = list.item(0);
 	        
 	    	appendXmlFragment(nodeBody, xmlBody);
@@ -177,7 +171,6 @@ public class VpFullServiceTestConsumer_MuleClient {
 	}
 
 	private GetProductDetailResponse unmarshall(InputStream xmlResponse) {
-		System.err.println("### TRY XPATH ON XML: " + xmlResponse);
 		Object result;
 		try {
 			XPath xpath = XPathFactory.newInstance().newXPath();
@@ -192,52 +185,18 @@ public class VpFullServiceTestConsumer_MuleClient {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		System.err.println("### XPATH RESULT: " + result);
 		NodeList list = (NodeList)result; 
-		System.err.println("### XPATH RESULT: " + list.getLength());
+		log.debug("getProductDetailResponse xpath result: {}", list.getLength());
 		Node node = list.item(0);
-				
+
 		// Lookup the fragment...
 		GetProductDetailResponse resp = (GetProductDetailResponse)jaxbUtil.unmarshal(node);
-		System.err.println("### XPATH RESULT: " + resp.getProduct().getId());
-		
+		log.debug("getProductDetailResponse jaxb unmarshal result: {}", resp.getProduct().getId());
+
 		return resp;
 	}
 	
-	
-	
-	public static Product callGetProductDetail_JAX_WS_NOT_WORKING_WITH_TWO_HTTPS_CONNECTORS(String productId, String serviceAddress) throws Exception {
-
-		URL resource = VpFullServiceTestConsumer_MuleClient.class.getClassLoader().getResource(".");//Thread.currentThread().getContextClassLoader().getResource(".");
-		System.out.println(resource.toString());
-		
-		
-		// Needed for accessing the WSDL file from an https URL
-		System.setProperty("javax.net.ssl.keyStore", "../certs/tp.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword", "password");
-		System.setProperty("javax.net.ssl.trustStore", "../certs/truststore.jks");
-		System.setProperty("javax.net.ssl.trustStorePassword", "password");
-		
-		Tjanst1Service ts = new Tjanst1Service(ClientUtil
-				.createEndpointUrlFromServiceAddress(serviceAddress));
-		Tjanst1Interface serviceInterface = ts.getTjanst1ImplPort();
-
-		GetProductDetailType t = new GetProductDetailType();
-		t.setProductId(productId);
-
-		AttributedURIType logicalAddressHeader = new AttributedURIType();
-		logicalAddressHeader.setValue("vp-test-producer");
-
-
-		GetProductDetailResponse response = serviceInterface.getProductDetail(logicalAddressHeader, t);
-		Product p = response.getProduct();
-
-		logger.info("Product Data: " + p.getId() + " - " + p.getDescription() + " - "
-				+ p.getHeight() + " - " + p.getWidth());
-		return p;
-	}
-
-	static public Document createDocument(InputStream content) {
+	private Document createDocument(InputStream content) {
 		try {
 			return getBuilder().parse(content);
 		} catch (Exception e) {
@@ -245,7 +204,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 		}
 	}
 
-	static public Document createDocument(String content, String charset) {
+	private Document createDocument(String content, String charset) {
 		try {
 			InputStream is = new ByteArrayInputStream(content.getBytes(charset));
 			return createDocument(is);
@@ -254,12 +213,10 @@ public class VpFullServiceTestConsumer_MuleClient {
 		}
 	}
 
-	private static DocumentBuilder getBuilder() throws ParserConfigurationException {
+	private DocumentBuilder getBuilder() throws ParserConfigurationException {
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 		domFactory.setNamespaceAware(true);
 		DocumentBuilder builder = domFactory.newDocumentBuilder();
 		return builder;
 	}
-	
 }
-
