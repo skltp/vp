@@ -8,7 +8,8 @@
 	" >
 
     <flow name="PingService-flow" >
-        <inbound-endpoint address="http://${TP_HOST}:${PINGSERVICE_PORT}/${PINGSERVICE_INBOUND_URI}" />
+        <inbound-endpoint address="http://${TP_HOST}:${PINGSERVICE_PORT}/${PINGSERVICE_INBOUND_URI}"
+            connector-ref="VPInsecureConnector" />
         <expression-transformer>
             <return-argument
                 evaluator="string"
