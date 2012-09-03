@@ -40,6 +40,14 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
             <url>http://my-maven-repo-server/repositories/releases</url>
         </repository>
     </distributionManagement>
+    
+     <repositories>
+    	<repository>
+  			<id>mulesoft</id>
+  			<name>MuleSoft Repository</name>
+  			<url>https://repository.mulesoft.org/nexus/content/repositories/releases</url>
+		</repository>
+	</repositories>
 
 	<modules>
 	    <module>soitoolkit-mule-dependencies</module>
