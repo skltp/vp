@@ -19,7 +19,9 @@
 
         <inbound-endpoint
             address="http://${TP_HOST}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
-            responseTimeout="${SERVICE_TIMEOUT_MS}" />
+            responseTimeout="${SERVICE_TIMEOUT_MS}" 
+            connector-ref="VPInsecureConnector"
+            />
 
         <component>
             <spring-object bean="resetVagvalCacheComponent" />
