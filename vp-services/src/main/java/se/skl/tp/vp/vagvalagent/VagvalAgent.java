@@ -80,7 +80,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	private String endpointAddressTjanstekatalog;
 	private String addressDelimiter;
-
+	
 	public VagvalAgent() {
 		
 	}
@@ -97,15 +97,14 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	/**
 	 * Initialize the two lists if they are null
 	 */
-	public synchronized void init() {
+	public void init() {
 		if (!isInitialized()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("entering VagvalsAgent.init");
 			}
 
-			this.anropsBehorighetsInfo = getBehorigheter();
-			this.virtualiseringsInfo = getVirtualiseringar();
-
+			setState(getVirtualiseringar(), getBehorigheter());
+			
 			if (isInitialized()) {
 				saveToLocalCopy(TK_LOCAL_CACHE);
 			} else {
@@ -120,14 +119,25 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			}
 		}
 	}
+	
+	/**
+	 * Sets state.
+	 * 
+	 * @param v the virtualization state.
+	 * @param p the permission state.
+	 */
+	private synchronized void setState(List<VirtualiseringsInfoType> v, List<AnropsBehorighetsInfoType> p) {
+		this.virtualiseringsInfo = v;
+		this.anropsBehorighetsInfo = p;
+	}
 
 	/**
 	 * Return if cache has been initialized.
 	 * 
 	 * @return true if cache has been initalized, otherwise false.
 	 */
-	private boolean isInitialized() {
-		return (anropsBehorighetsInfo != null) && (virtualiseringsInfo != null);
+	private synchronized boolean isInitialized() {
+		return (this.anropsBehorighetsInfo != null) && (this.virtualiseringsInfo != null);
 	}
 	
 	private SokVagvalsInfoInterface getPort() {
@@ -194,13 +204,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			close(is);
 		}
 		
-		if (pc == null) {
-			this.virtualiseringsInfo = null;
-			this.anropsBehorighetsInfo = null;
-		} else {
-			this.virtualiseringsInfo = pc.virtualiseringsInfo;
-			this.anropsBehorighetsInfo = pc.anropsBehorighetsInfo;
-		}
+		setState((pc == null) ? null : pc.virtualiseringsInfo, (pc == null) ? null : pc.anropsBehorighetsInfo);
 	}
 	
 	// save object
@@ -234,9 +238,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	/**
 	 * Resets the cached info
 	 */
-	public synchronized void reset() {
-		this.anropsBehorighetsInfo = null;
-		this.virtualiseringsInfo = null;
+	public void reset() {
+		setState(null, null);
 	}
 
 	/**
@@ -246,17 +249,13 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		if (logger.isDebugEnabled()) {
 			logger.debug("entering vagvalAgent resetVagvalCache");
 		}
-		final List<VirtualiseringsInfoType> tempVirtualiseringsInfo = this.virtualiseringsInfo;
-		final List<AnropsBehorighetsInfoType> tempAnropsBehorighetsInfo = this.anropsBehorighetsInfo;
-
+		
 		reset();
 		init();
 
 		ResetVagvalCacheResponse response = new ResetVagvalCacheResponse();
 
 		if (!isInitialized()) {
-			this.virtualiseringsInfo = tempVirtualiseringsInfo;
-			this.anropsBehorighetsInfo = tempAnropsBehorighetsInfo;
 			response.setResetResult(false);
 		} else {
 			response.setResetResult(true);
@@ -304,11 +303,18 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			receiverAddresses.add(request.getReceiverId());
 		}
 		
+		final List<VirtualiseringsInfoType> curVirtualiseringsInfo;
+		final List<AnropsBehorighetsInfoType> curAnropsBehorighetsInfo; 
+		synchronized (this) {
+			curVirtualiseringsInfo = this.virtualiseringsInfo;
+			curAnropsBehorighetsInfo = this.anropsBehorighetsInfo;
+		}
+
 		// Outer loop over all given addresses
 		boolean addressFound = false;
 		for (String requestReceiverId : receiverAddresses) {
 			// Find all possible LogiskAdressat
-			for (VirtualiseringsInfoType vi : virtualiseringsInfo) {
+			for (VirtualiseringsInfoType vi : curVirtualiseringsInfo) {
 				if (vi.getReceiverId().equals(requestReceiverId)
 						&& vi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
 						&& request.getTidpunkt().compare(vi.getFromTidpunkt()) != DatatypeConstants.LESSER
@@ -327,7 +333,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			return response;
 		}
 
-		if (!isAuthorized(request, receiverAddresses)) {
+		if (!isAuthorized(request, receiverAddresses, curAnropsBehorighetsInfo)) {
 			String errorMessage = ("VP007 Authorization missing for serviceNamespace: "
 					+ request.getTjanstegranssnitt() + ", receiverId: "
 					+ request.getReceiverId() + ", senderId: " + request
@@ -352,9 +358,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @param receiverAddresses the addresses.
 	 * @return true if authorized, otherwise false.
 	 */
-	private boolean isAuthorized(VisaVagvalRequest request, List<String> receiverAddresses) {
+	private boolean isAuthorized(VisaVagvalRequest request, List<String> receiverAddresses, List<AnropsBehorighetsInfoType> permissions) {
 		for (String requestReceiverId : receiverAddresses) {
-			for (AnropsBehorighetsInfoType abi : this.anropsBehorighetsInfo) {	
+			for (AnropsBehorighetsInfoType abi : permissions) {	
 				if (abi.getReceiverId().equals(requestReceiverId)
 						&& abi.getSenderId().equals(request.getSenderId())
 						&& abi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
