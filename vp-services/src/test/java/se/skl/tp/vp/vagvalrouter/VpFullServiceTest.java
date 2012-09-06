@@ -41,6 +41,8 @@ public class VpFullServiceTest extends FunctionalTestCase {
 	protected String getConfigResources() {
 		return 
 			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
+			"vp-common.xml," +
+			"services/VagvalRouter-service.xml," +
 			"vp-teststubs-and-services-config.xml";
 	}
 	

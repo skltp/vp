@@ -9,9 +9,10 @@
 	">
   
     <spring:beans>
-    	<!-- TODO: Add import of connector specific configuration files here as required -->
-        <spring:import resource="classpath:vp-common.xml"/>
-        <spring:import resource="classpath:services/VagvalRouter-service.xml"/>
+<!-- 
+		NOTE: Only enable vp-virtuell-tjanst-teststub-service.xml if you want to run teststubs for TK and Producer in separate mule-teststub-instance
+        <spring:import resource="classpath:teststub-services/vp-virtuell-tjanst-teststub-service.xml"/>
+ -->
         <spring:import resource="classpath:teststub-services/*-teststub-service.xml"/>
     </spring:beans>
 

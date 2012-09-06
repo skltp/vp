@@ -14,7 +14,7 @@
 	</parent>
 
 	<artifactId>vp-services</artifactId>
-
+    <packaging>mule</packaging>
 	<name>vp-services</name>
 
 	<dependencies>
@@ -88,6 +88,15 @@
 	</dependencies>
 
 	<build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <!-- To get mule-config files from the Mule Studio defined resource-folder in the classpath... -->
+                <directory>${basedir}/src/main/app</directory>
+            </resource>
+        </resources>
 		<testResources>
 			<testResource>
 				<directory>${basedir}/src/test/resources</directory>
@@ -98,6 +107,73 @@
 		</testResources>
 
 		<plugins>
+
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <extensions>true</extensions>
+                <!-- Include mule-dependencies that doesn't come with Mule 3.x otherwise we can't install to a vanilla Mule 3.x installation -->
+                <configuration>
+                    <inclusions>
+                        <inclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>commonretrypolicies</artifactId>
+                        </inclusion>
+                        <inclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-restlet</artifactId>
+                        </inclusion>
+                        <inclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-rest</artifactId>
+                        </inclusion>
+                        <inclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>devkit</artifactId>
+                        </inclusion>
+                    </inclusions>
+                </configuration>
+            </plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>assemblies/vp-virtuell-tjanst-teststub-assembly-descriptor.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>
+              <artifactId>maven-jar-plugin</artifactId>
+              <configuration>
+                <!-- 
+                 if no classifier is declared, then a mvn install results in a file in
+                 the local repo: ic2-1.0.0-SNAPSHOT.mule
+                 which is a jar-file - only strangely named and with a bad extension
+                -->
+                <classifier>core</classifier>
+                <excludes>
+                  <exclude>log4j.xml</exclude>
+                </excludes>
+              </configuration>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
@@ -183,6 +259,30 @@
 										</versionRange>
 										<goals>
 											<goal>wsdl2java</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.mule.tools
+										</groupId>
+										<artifactId>
+											maven-mule-plugin
+										</artifactId>
+										<versionRange>
+											[1.7,)
+										</versionRange>
+										<goals>
+											<goal>
+												filter-resources
+											</goal>
+											<goal>
+												attach-test-resources
+											</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

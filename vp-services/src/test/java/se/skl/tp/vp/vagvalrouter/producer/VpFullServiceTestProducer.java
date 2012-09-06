@@ -56,13 +56,13 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
     }
 
 	public ListProductsResponse listProducts(AttributedURIType logicalAddress, ListProducts parameters) {
-    	logger.info("Start");
+    	logger.info("Producer-teststub. Start listProducts()");
 
     	ListProductsResponse response = new ListProductsResponse();
     	List<String> productListing = response.getItem();
     	fillProductList(productListing);
 
-    	logger.info("End");
+    	logger.info("Producer-teststub. End listProducts(), returning {} products.", response.getItem().size());
     	
         return response;
     }
@@ -72,7 +72,7 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
 		if (logicalAddress != null) {
 			headerInfo = "[" + logicalAddress.getValue() + "]";
 		}
-		log("Start", "Header: " + headerInfo + ", Search args: ProductId = " + parameters.getProductId());
+		logger.info("Producer-teststub. Start getProductDetail(), Header: " + headerInfo + ", Search args: ProductId = " + parameters.getProductId());
     	
 		if ( parameters.getProductId().equals("Exception")){
 			throw new RuntimeException("PP01 Product Does Not Exist");
@@ -90,7 +90,7 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
         GetProductDetailResponse response = new GetProductDetailResponse();
         response.setProduct(product);
 
-        log("End", "Returned product data: " + product.getId() + " - " + product.getDescription() + " - " + product.getHeight() + " - " + product.getWidth());
+        logger.info("Producer-teststub. End getProductDetail(), Returned product data: " + product.getId() + " - " + product.getDescription() + " - " + product.getHeight() + " - " + product.getWidth());
         return response;
     }
 
@@ -109,10 +109,4 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
         p.setHeight(height);
 		return p;
 	}
-    
-
-    private void log(String event, String data) {
-//    	logger.info(event + ": " + data);
-    	System.out.println(event + ": " + data);
-    }
 }

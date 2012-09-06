@@ -26,6 +26,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaAnropsBehorigheterResponseType;
@@ -35,6 +38,7 @@ import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalrouter.VagvalInfo;
+import se.skl.tp.vp.vagvalrouter.VagvalInfo.Info;
 
 /**
  * Denna klass används för att kunna simulera en tjänstekatalog med valfritt
@@ -46,10 +50,26 @@ import se.skl.tp.vp.vagvalrouter.VagvalInfo;
 @javax.jws.WebService(portName = "SokVagvalsSoap11LitDocPort", serviceName = "SokVagvalsServiceSoap11LitDocService", targetNamespace = "urn:skl:tp:vagvalsinfo:v1")
 public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 
-	private VagvalInfo vagvalInfo;
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+	private VagvalInfo _vagvalInfo;
 
 	public void setVagvalInfo(VagvalInfo vagvalInfo) {
-		this.vagvalInfo = vagvalInfo;
+		this._vagvalInfo = vagvalInfo;
+	}
+
+	private VagvalInfo getVagvalInfo() {
+		if (_vagvalInfo == null) {
+			_vagvalInfo = initVagvalInfo();
+		}
+		return _vagvalInfo;
+	}
+	private VagvalInfo initVagvalInfo() {
+		logger.info("TK-teststub initiates valvalInfo");
+		VagvalInfo vi = new VagvalInfo();
+		vi.addVagval("vp-test-producer", "tp", "RIVTABP20", "urn:skl:tjanst1:rivtabp20", "https://localhost:19000/vardgivare-b/tjanst1");
+		logger.info("TK-teststub vagvalInfo now contains {} records", vi.getInfos().size());		
+		return vi;
 	}
 
 	/**
@@ -60,6 +80,7 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 	 */
 	public HamtaAllaAnropsBehorigheterResponseType hamtaAllaAnropsBehorigheter(Object parameters) {
 
+		logger.info("TK-teststub start hamtaAllaAnropsBehorigheter()");
 		HamtaAllaAnropsBehorigheterResponseType sampleResponse = new HamtaAllaAnropsBehorigheterResponseType();
 
 		try {
@@ -76,7 +97,7 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 			tomTidpunkt.add(tenYearsDuration);
 
 			int id = 1;
-			for (VagvalInfo.Info vagval : vagvalInfo.getInfos()) {
+			for (VagvalInfo.Info vagval : getVagvalInfo().getInfos()) {
 				AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
 				aboId.setValue(String.valueOf(id++));
 				AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
@@ -88,6 +109,8 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 				abo.setTjansteKontrakt(vagval.tjansteKontrakt);
 				sampleResponse.getAnropsBehorighetsInfo().add(abo);
 			}
+
+			logger.info("TK-teststub hamtaAllaAnropsBehorigheter() returns {} records", sampleResponse.getAnropsBehorighetsInfo().size());
 
 		} catch (Exception e) {
 			throw new RuntimeException("Technical failure: " + e.getMessage(), e);
@@ -103,6 +126,9 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 	 *            - null, eftersom operationen inte har någon payload.
 	 */
 	public HamtaAllaVirtualiseringarResponseType hamtaAllaVirtualiseringar(Object parameters) {
+
+		logger.info("TK-teststub start hamtaAllaVirtualiseringar()");
+
 		HamtaAllaVirtualiseringarResponseType sampleResponse = new HamtaAllaVirtualiseringarResponseType();
 
 		try {
@@ -118,7 +144,7 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 			tomTidpunkt.add(tenYearsDuration);
 
 			int id = 1;
-			for (VagvalInfo.Info vagval : vagvalInfo.getInfos()) {
+			for (VagvalInfo.Info vagval : getVagvalInfo().getInfos()) {
 				VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
 				vi.setAdress(vagval.adress);
 				vi.setFromTidpunkt(fromTidpunkt);
@@ -135,6 +161,8 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 		} catch (Exception e) {
 			throw new RuntimeException("Technical failure: " + e.getMessage(), e);
 		}
+
+		logger.info("TK-teststub hamtaAllaVirtualiseringar() returns {} records", sampleResponse.getVirtualiseringsInfo().size());
 
 		return sampleResponse;
 	}
