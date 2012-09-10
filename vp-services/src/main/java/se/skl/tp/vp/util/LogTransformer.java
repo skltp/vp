@@ -176,7 +176,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 
 			evaluatedExtraInfo.put("source", getClass().getName());
 			// producer elapsed time
-			ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_PRODUCER);
+			ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_ENDPOINT);
 			if (timer != null) {
 				evaluatedExtraInfo.put("time.producer", String.valueOf(timer.getElapsed()));
 			}
@@ -210,7 +210,11 @@ public class LogTransformer extends AbstractMessageTransformer {
 			// close total timer.
 			if ("xresp-out".equals(logType)) {
 				ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
-				log.info(message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, "") + " { " + ExecutionTimer.format() + " }");
+				final String infoMsg = String.format("%s, %s: { %s }", 
+						message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, ""),
+						message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION, ""),
+						ExecutionTimer.format());
+				log.info(infoMsg);
 			}
 		}
 	}
