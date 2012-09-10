@@ -206,13 +206,13 @@ public class VagvalRouter extends AbstractRecipientList {
 			serverStatistics.noOfCalls++;
 		}
 
-		ExecutionTimer.start(VPUtil.TIMER_PRODUCER);
+		ExecutionTimer.start(VPUtil.TIMER_ENDPOINT);
 		MuleEvent replyEvent;
 		try {
 			// Do the actual routing
 			replyEvent = super.route(event);
 		} finally {
-			ExecutionTimer.stop(VPUtil.TIMER_PRODUCER);			
+			ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);			
 		}
 
 		/*
@@ -243,6 +243,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 		
 		String url = (String) recipient;
+		message.setProperty(VPUtil.ENDPOINT_URL, url, PropertyScope.SESSION);
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
 		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
