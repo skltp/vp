@@ -42,7 +42,7 @@ public final class VPUtil {
 	public static final String SENDER_ID = "senderid";
 	public static final String RIV_VERSION = "rivversion";
 	public static final String SERVICE_NAMESPACE = "cxf_service";
-	public static final String ENDPOINT_URL = "endpoint.url";
+	public static final String ENDPOINT_URL = "endpoint_url";
 	
 	public static final String IS_HTTPS = "isHttps";
 	
@@ -50,7 +50,7 @@ public final class VPUtil {
 	
 	public static final String TIMER_TOTAL = "total";
 	public static final String TIMER_ROUTE = "route";
-	public static final String TIMER_ENDPOINT = "endpoint.time";
+	public static final String TIMER_ENDPOINT = "endpoint_time";
 	
 	
 	public static String extractNamespaceFromService(final QName qname) {
