@@ -53,7 +53,7 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
    		
 		Map<String, String> extraInfo = new HashMap<String, String>();
 		extraInfo.put("source", getClass().getName());
-		ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_PRODUCER);
+		ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_ENDPOINT);
 		if (timer != null) {
 			extraInfo.put("time.producer", String.valueOf(timer.getElapsed()));
 		}
