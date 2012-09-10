@@ -468,7 +468,10 @@ public class EventLogger {
 		map.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
 		map.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION));
 		map.put(VPUtil.SERVICE_NAMESPACE, (String) message.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION));
-
+		String endpoint = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION);
+		if (endpoint != null) {
+			map.put(VPUtil.ENDPOINT_URL, endpoint);
+		}
 		final Boolean error = (Boolean) message.getProperty(VPUtil.SESSION_ERROR, PropertyScope.SESSION);
 		if (Boolean.TRUE.equals(error)) {
 			map.put(VPUtil.SESSION_ERROR, error.toString());
