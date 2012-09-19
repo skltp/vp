@@ -12,10 +12,10 @@
 		status (PingForConfiguration) -->
 	<flow name="ServiceGroups-flow">
 		<https:inbound-endpoint
-			address="https://${TP_HOST}:${TP_PORT}/monitoring/serviceGroups"
+			address="https://${TP_HOST}:${TP_PORT}/monitoring/service-groups"
 			connector-ref="VPProducerConnector" method="GET" exchange-pattern="request-response" />
 		<http:outbound-endpoint
-			address="http://${TK_HOST}:${TK_PORT}/log-analyzer/jersey/serviceProducers"
+			address="http://${TK_HOST}:${TK_PORT}/log-analyzer/jersey/service-groups"
 			method="GET" connector-ref="VPInsecureConnector" exchange-pattern="request-response" />
 	</flow>
 
