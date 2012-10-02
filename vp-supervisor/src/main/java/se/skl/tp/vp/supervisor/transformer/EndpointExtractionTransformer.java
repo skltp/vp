@@ -27,27 +27,20 @@ public class EndpointExtractionTransformer extends AbstractMessageTransformer {
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
         @SuppressWarnings("unchecked")
         Map<String, Object> map = message.getPayload(Map.class);
-        URL endpointUrl = null;
         String endpoint = (String) map.get("serviceUrl");
-        String producerId = ((Long)map.get("id")).toString();
 
-        if (StringUtils.isBlank(endpoint)) {
-            String msg = "Ignoring endpoint since it's blank";
-            log.warn(msg);
-            throw new RuntimeException(msg);
-        }
-        try {
-            endpointUrl = new URL(endpoint);
-        } catch (MalformedURLException e) {
-            String msg = "Ignoring endpoint since it's illegal";
-            log.warn(msg);
-            throw new RuntimeException(msg);
-        }
+        URL endpointUrl = toURL(endpoint);
 
         if (logger.isDebugEnabled()) {
             log.debug("doTransform(" + this.getClass().getSimpleName() + ", " + encoding + ") returns: " + message);
         }
 
+        //
+        String producerId = ((Long)map.get("id")).toString();
+        message.setProperty("producerId", producerId, PropertyScope.SESSION);
+        message.setProperty("serviceUrl", endpoint, PropertyScope.OUTBOUND);
+
+        // FIXME: Legacy stuff
         message.setProperty("protocol", endpointUrl.getProtocol(), PropertyScope.OUTBOUND);
         message.setProperty("host", endpointUrl.getHost(), PropertyScope.OUTBOUND);
         if (endpointUrl.getPort() > 0) {
@@ -56,9 +49,22 @@ public class EndpointExtractionTransformer extends AbstractMessageTransformer {
         	message.setProperty("port", "", PropertyScope.OUTBOUND);
         }
         message.setProperty("path", endpointUrl.getPath(), PropertyScope.OUTBOUND);
-        message.setProperty("producerId", producerId, PropertyScope.SESSION);
+
 
         return message;
     }
     
+    //
+    private static URL toURL(String endpoint) {
+        try {
+        	if (StringUtils.isBlank(endpoint)) {
+        		throw new MalformedURLException("No endpoint defined (empty string)");
+        	}
+            return new URL(endpoint);
+        } catch (MalformedURLException e) {
+            String msg = "Ignoring endpoint since it's illegal";
+            log.error(msg);
+            throw new RuntimeException(msg, e);
+        }    	
+    }
 }
