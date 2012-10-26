@@ -18,7 +18,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	
 	<groupId>se.skl.tp</groupId>
 	<artifactId>vp</artifactId>
-	<version>2.0-SNAPSHOT</version>
+	<version>2.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>vp</name>
 
@@ -45,7 +45,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	    <module>soitoolkit-mule-dependencies</module>
 	    <module>vp-services</module>
 	    <module>vp-teststub</module>
-	    <module>vp-distribution</module>
+	  
 	</modules>
 	
 	<build>
