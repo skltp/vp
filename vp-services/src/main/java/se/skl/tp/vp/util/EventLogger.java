@@ -20,11 +20,11 @@ import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_BUSINESS
 import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CONTRACT_ID;
 import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
 import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_INTEGRATION_SCENARIO;
+import static se.skl.tp.vp.util.VPUtil.nvl;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,7 +59,6 @@ import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 import org.soitoolkit.commons.mule.util.MuleUtil;
 import org.soitoolkit.commons.mule.util.XmlUtil;
-import static se.skl.tp.vp.util.VPUtil.nvl;
 
 /**
  * Log events in a standardized way
@@ -423,12 +422,10 @@ public class EventLogger {
 			lme.setExceptionClass(exception.getClass().getName());
 			lme.setExceptionMessage(exception.getMessage());
 			StackTraceElement[] stArr = exception.getStackTrace();
-			List<String> stList = new ArrayList<String>();
-			for (int i = 0; i < stArr.length; i++) {
-				stList.add(stArr[i].toString());
-			}
-			lme.getStackTrace().addAll(stList);
-			
+			// we are just interested in the first lines.
+			for (int i = 0; i < stArr.length && i < 10; i++) {
+				lme.getStackTrace().add(stArr[i].toString());
+			}		
 			lm.setException(lme);
 		}
 
