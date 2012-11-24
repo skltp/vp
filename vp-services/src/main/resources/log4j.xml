@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
+		</layout>
+	</appender>
+	
+    <appender class="org.apache.log4j.FileAppender" name="devnull">
+        <param value="/dev/null" name="File"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%-5p %d [%t] %c: %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    
+    <appender class="org.apache.log4j.RollingFileAppender" name="ROLLINGFILE">
+        <param value="${mule.home}/logs/mule-app-vp.log" name="File"/>
+        <param value="10" name="MaxBackupIndex"/>
+        <param value="2MB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%-5p %d [%t] %c: %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    
+    <!--
+		Loglevels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL} See:
+		http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Level.html
+	-->
+	
+   <logger name="org.mockftpserver">
+		<level value="ERROR" />
+	</logger>
+	<logger name="org.apache.sshd">
+		<level value="ERROR" />
+	</logger>	
+    <logger name="org.apache.activemq.transport.failover.FailoverTransport">
+        <level value="DEBUG" />
+    </logger>
+	<logger name="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<level value="TRACE" />
+	</logger>
+	<logger name="org.springframework.core.io.support.PropertiesLoaderSupport">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.mule.model.seda">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.mule.MuleServer">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.mule.DefaultMuleContext">
+		<level value="INFO" />
+	</logger>
+    <logger name="org.mule.api.processor.LoggerMessageProcessor">
+        <level value="INFO" />
+    </logger>
+    <logger name="org.mule.component.simple.LogComponent">
+        <level value="INFO" />
+    </logger>
+	<logger name="org.soitoolkit.commons">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.soitoolkit.commons.mule.messageLogger">
+		<level value="INFO" />
+	</logger>
+    <logger name="se.skl.tp.vp">
+        <level value="info"/>
+    </logger>
+    <logger name="se.skl.tp.vp.logmanager">
+        <level value="info"/>
+    </logger>
+    <logger name="se.skl.tp.vp.util">
+        <level value="info"/>
+    </logger>
+    <logger name="se.skl.tp.vp.util.helper.AddressingHelper">
+        <level value="info"/>
+    </logger>
+
+   <root>
+		<priority value="WARN" />
+
+		<appender-ref ref="CONSOLE" />
+		<!--
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="ROLLINGFILE"/>
+		-->
+		
+	</root>
+</log4j:configuration>
