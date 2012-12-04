@@ -66,9 +66,12 @@
 	<logger name="org.soitoolkit.commons">
 		<level value="INFO" />
 	</logger>
+	
+	 <!--Set to INFO to store log events, ERROR or WARN will disable log events -->
 	<logger name="org.soitoolkit.commons.mule.messageLogger">
 		<level value="INFO" />
 	</logger>
+	
     <logger name="se.skl.tp.vp">
         <level value="info"/>
     </logger>
