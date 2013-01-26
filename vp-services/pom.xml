@@ -17,6 +17,11 @@
     <packaging>mule</packaging>
 	<name>vp-services</name>
 
+	<properties>
+		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
+	    <cxf-codegen-plugin.version>2.5.1</cxf-codegen-plugin.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.soitoolkit.commons.components</groupId>
@@ -34,6 +39,13 @@
 			<groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
 			<artifactId>soitoolkit-mule-dependencies</artifactId>
 			<version>${soitoolkit.version}</version>
+			<!-- Exclude mule-module-spring-security since we don't use it and it contains dependencies to old versions of spring causing strange problems to occurr -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.mule.modules</groupId>
+					<artifactId>mule-module-spring-security</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -108,6 +120,11 @@
 
 		<plugins>
 
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>${maven-eclipse-plugin.version}</version>
+			</plugin>
+
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
@@ -177,6 +194,7 @@
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>${cxf-codegen-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>generate-sources</id>
