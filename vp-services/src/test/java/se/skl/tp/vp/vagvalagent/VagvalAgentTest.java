@@ -134,7 +134,7 @@ public class VagvalAgentTest extends FunctionalTestCase {
 		addVagvalInput(receiverId, rivVersion, senderId, serviceNameSpace);
 
 		ResetVagvalCacheResponse rvcResponse = vagvalAgent.resetVagvalCache(createResetVagvalCacheRequest());
-		assertTrue(rvcResponse.isResetResult());
+		assertTrue(rvcResponse.getResetResult());
 
 		vvResponse = vagvalAgent.visaVagval(createVisaVagvalRequest("tppoc-vardgivare_A-tjanst1", "VardgivareB", null,
 				"{urn:riv13606:v1}RIV13606REQUEST_EHR_EXTRACT_PortType"));
