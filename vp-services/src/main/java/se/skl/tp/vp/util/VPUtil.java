@@ -52,7 +52,8 @@ public final class VPUtil {
 	public static final String TIMER_ROUTE = "route";
 	public static final String TIMER_ENDPOINT = "endpoint_time";
 	
-	
+	public static final String FEATURE_USE_KEEP_ALIVE = "featureUseKeepAlive";
+		
 	public static String extractNamespaceFromService(final QName qname) {
 		return (qname == null) ? null : qname.getNamespaceURI();
 	}
