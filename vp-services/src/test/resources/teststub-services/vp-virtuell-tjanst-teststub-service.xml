@@ -36,7 +36,11 @@
         	connector-ref="VPProducerConnector" 
  			name="Tjanst1"
             exchange-pattern="request-response" 
-            responseTransformer-refs="filterResponseHeaders" />
+            responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+        	<properties>
+        		<spring:entry key="featureUseKeepAlive" value="true"/> <!-- ${service.specific:${default}}" -->
+        	</properties>
+        </inbound-endpoint>
  			
         <cxf:proxy-service
             namespace="urn:skl:tjanst1:rivtabp20"

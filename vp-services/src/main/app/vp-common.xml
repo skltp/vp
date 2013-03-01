@@ -88,6 +88,8 @@
 		<default-receiver-threading-profile maxThreadsActive="${TP_RECEIVE_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_RECEIVE_MAX_THREADS_IDLE}" threadTTL="${TP_RECEIVE_MAX_THREADS_TTL}"/>
 	</configuration>
     
+    <custom-transformer name="featureKeepAliveResponse" class="se.skl.tp.vp.feature.keepalive.KeepAliveResponseTransformer"/>
+        
     <custom-transformer name="rivExtractor" class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
     
     <custom-transformer name="fixTransformer" class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
