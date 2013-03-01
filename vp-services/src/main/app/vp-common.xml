@@ -50,28 +50,21 @@
   		<notification-listener ref="muleStartupNotification"/>
 	</notifications>
 
-    <!-- Common connectors and endpoints, i.e. that not needs to be changed for different config-files (local unit-test, integration-test or production environments) -->
-    <!-- In the below configurations the https:tls-client element is never used! This may be a bug in 2.2.8... -->
-   
-    <!-- Https connector used when acting as a producer, ie receiving calls,  sends no session info-->
-  	<https:connector name="VPProducerConnector" keepSendSocketOpen="false" keepAlive="false" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
-		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
-		<https:tls-key-store class="${TP_TLS_STORE_PRODUCER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_PRODUCER_FILE}" storePassword="${TP_TLS_STORE_PRODUCER_PASSWORD}" keyPassword="${TP_TLS_STORE_PRODUCER_KEY_PASSWORD}" /> 
-		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
-	</https:connector>
+  <!-- The default profile used by normal usage of mule-app, either deployed in mule or started using st-muleServer-helper-class. Not used by integration tests -->
+    <spring:beans profile="default">
+        <!-- Connectors et al that are specific for different environment specific config-files (local unit-test, integration-test or production environments) -->
 
-    <!-- Https connector used when acting as a consumer, ie making calls, sends no session info -->
-  	<https:connector name="VPConsumerConnector" keepSendSocketOpen="false" keepAlive="false" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
-		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
-  	    <https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
-		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
-	</https:connector>
-	
-	<!-- Http connector that sends no session info-->
-  	<http:connector name="VPInsecureConnector" keepSendSocketOpen="false" keepAlive="false" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
-		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
-  	</http:connector>
-	
+		<spring:import resource="classpath:vp-mule-http-consumer-connector.xml"/>
+		<spring:import resource="classpath:vp-mule-https-consumer-connector.xml"/>
+		<spring:import resource="classpath:vp-mule-https-consumer-keepalive-connector.xml"/>
+		<spring:import resource="classpath:vp-mule-https-producer-connector.xml"/>
+		 
+        <!-- TODO: Add import of environment specific configuration files here as required -->
+        
+        <!-- Import the JMS-provider used in production here, embedded JMS providers used for integration tests are loaded by the *IntegratIonTest.java classes directly -->  
+       
+    </spring:beans> 
+    
     <spring:beans>
   		<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
 			<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_URL}"/>

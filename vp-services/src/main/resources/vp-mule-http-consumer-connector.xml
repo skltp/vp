@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xsi:schemaLocation="
+                http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-current.xsd
+                http://www.mulesoft.org/schema/mule/core                http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+                http://www.mulesoft.org/schema/mule/http               http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        ">
+        	
+	    <!-- Http connector that sends no session info-->
+        <http:connector name="VPConsumerConnectorHttp" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}" sendTcpNoDelay="${VP_MULE_HTTP_CONSUMER_CONNECTOR_TCPNODELAY}">
+                <spring:property name="keepAlive" value="${VP_MULE_HTTP_CONSUMER_CONNECTOR_KEEPALIVE}"/>
+                <spring:property name="keepAliveTimeout" value="${VP_MULE_HTTP_CONSUMER_CONNECTOR_KEEPALIVE_TIMEOUT_MS}"/>
+                <service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
+        </http:connector>
+	
+</mule>
