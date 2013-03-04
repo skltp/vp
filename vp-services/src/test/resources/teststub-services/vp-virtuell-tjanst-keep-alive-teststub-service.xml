@@ -30,11 +30,32 @@
 		http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
 
-      <flow name="vp-virtuell-tjanst-teststub-flow" >
+      <flow name="vp-virtuell-tjanst-keepalive-teststub-flow" >
         <inbound-endpoint 
-        	address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"  
+        	address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/keep-alive-tjanst1"  
         	connector-ref="VPProducerConnector" 
- 			name="Tjanst1"
+ 			name="Tjanst1-keep-alive"
+            exchange-pattern="request-response" 
+            responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+        	<properties>
+        		<spring:entry key="featureUseKeepAlive" value="true"/>
+        	</properties>
+        </inbound-endpoint>
+ 			
+        <cxf:proxy-service
+            namespace="urn:skl:tjanst1:rivtabp20"
+            payload="envelope"
+            service="Tjanst1Service"
+            wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
+
+        <flow-ref name="vagval-dynamic-routing-flow" />
+    </flow>
+    
+    <flow name="vp-virtuell-tjanst-no-keepalive-teststub-flow" >
+        <inbound-endpoint 
+        	address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/no-keep-alive-tjanst1"  
+        	connector-ref="VPProducerConnector" 
+ 			name="Tjanst1-no-keep-alive"
             exchange-pattern="request-response" 
             responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
         	<properties>
