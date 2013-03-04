@@ -15,21 +15,15 @@ import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
-import org.junit.Ignore;
 import org.mule.tck.FunctionalTestCase;
 
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
-import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 
+@SuppressWarnings("deprecation")
 public class VpFullKeepAliveServiceTest extends FunctionalTestCase {
 
-	private static final String PRODUCT_ID = "SW123";
-	private static final String TJANSTE_ADRESS = "https://localhost:20000/vp/tjanst1";
 	
-	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
-
-	private VagvalInfo vagvalInfo;
 	private HttpClient client;
 	private SslProtocolSocketFactory socketFactory;
 
@@ -301,27 +295,6 @@ public class VpFullKeepAliveServiceTest extends FunctionalTestCase {
 
 	private PostMethod executeHttp10SoapCall(final String subUrl) throws HttpException, IOException {
 		return executeSoapCall(subUrl, false, false, true);
-	}
-
-	public static void main(String[] args) throws Exception {
-		//InputStream keyStore = new FileInputStream("/Users/parwen/medcert/client.jks");
-		//InputStream trustStore =  new FileInputStream("/Users/parwen/medcert/truststore.jks");
-
-		InputStream keyStore = VpFullKeepAliveServiceTest.class.getClassLoader().getResourceAsStream("certs/client.jks");
-		InputStream trustStore = VpFullKeepAliveServiceTest.class.getClassLoader().getResourceAsStream("certs/truststore.jks");
-		Protocol authhttps = new Protocol("https", new SslProtocolSocketFactory(keyStore, "password", trustStore, "password"), 19000);
-
-		HttpClient client = new HttpClient();
-		client.getHostConfiguration().setHost("localhost", 19000, authhttps);
-		// use relative url only
-		GetMethod httpget = new GetMethod("/");
-		int status = client.executeMethod(httpget);	
-		
-		for(Header h : httpget.getResponseHeaders()) {
-			System.out.println(h);
-		}
-		
-		System.out.println(status);
 	}
 	
 }
