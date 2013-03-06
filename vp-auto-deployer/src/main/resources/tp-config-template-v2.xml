@@ -17,13 +17,18 @@
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
     xmlns:https="http://www.mulesoft.org/schema/mule/https"
     xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
-               http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
-               http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd" >
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+               http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd" >
 
     <!-- Name of this file is mandatory and may not be changed. -->
 
+	<!--
+		featureUseKeepAlive is configured in vp-config.properties, read more about how its done in vp-config.properties. 
+	-->
 
 	<flow name="%s-flow" >
 
@@ -31,7 +36,10 @@
             address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/%s"
             connector-ref="VPProducerConnector"
             exchange-pattern="request-response" 
-            responseTransformer-refs="filterResponseHeaders">
+            responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+            <properties>
+        		<spring:entry key="featureUseKeepAlive" value="${feature.keepalive.%s:${feature.keepalive}}"/>
+        	</properties>
         </https:inbound-endpoint>
 
         <cxf:proxy-service
