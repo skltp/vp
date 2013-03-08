@@ -59,19 +59,21 @@ import se.skl.tp.vp.util.helper.AddressingHelper;
 public class VagvalRouter extends AbstractRecipientList {
 
 	/**
-	 * HTTP Header forwarded to producer <p>
+	 * HTTP Header forwarded to producer
+	 * <p>
 	 * 
 	 * @since VP-2.0
 	 */
 	private static final String X_VP_PRODUCER_ID = "x-vp-producer-id";
-	
+
 	/**
-	 * HTTP Header forwarded to producer. <p>
+	 * HTTP Header forwarded to producer.
+	 * <p>
 	 * 
 	 * @since VP-2.0
 	 */
 	private static final String X_VP_CONSUMER_ID = "x-vp-consumer-id";
-	
+
 	/**
 	 * HTTP Header forwarded to consumer
 	 * 
@@ -94,21 +96,15 @@ public class VagvalRouter extends AbstractRecipientList {
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 
 	private AddressingHelper addrHelper;
-	
+
 	/**
 	 * Headers to be blocked when invoking producer.
 	 */
 	private static final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
-			VPUtil.SENDER_ID,
-			VPUtil.RIV_VERSION,
-			VPUtil.SERVICE_NAMESPACE,
-			VPUtil.REVERSE_PROXY_HEADER_NAME,
-			VPUtil.PEER_CERTIFICATES,
-			"LOCAL_CERTIFICATES",
-			HttpConstants.HEADER_CONTENT_TYPE,
-			"http.disable.status.code.exception.check",
-	}));
-	
+			VPUtil.SENDER_ID, VPUtil.RIV_VERSION, VPUtil.SERVICE_NAMESPACE, VPUtil.REVERSE_PROXY_HEADER_NAME,
+			VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES", HttpConstants.HEADER_CONTENT_TYPE,
+			"http.disable.status.code.exception.check", }));
+
 	/**
 	 * Headers to be added when invoking producer.
 	 */
@@ -119,7 +115,6 @@ public class VagvalRouter extends AbstractRecipientList {
 		map.put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8");
 		ADD_HEADERS = Collections.unmodifiableMap(map);
 	}
-	
 
 	void setAddressingHelper(final AddressingHelper helper) {
 		this.addrHelper = helper;
@@ -164,26 +159,25 @@ public class VagvalRouter extends AbstractRecipientList {
 		ExecutionTimer.start(VPUtil.TIMER_ROUTE);
 		try {
 			String addr = this.getAddressingHelper(event.getMessage()).getAddress();
-		
-			logger.debug("Endpoint address is {}", addr);		
 
-			return Collections.singletonList((Object)addr);
+			logger.debug("Endpoint address is {}", addr);
+
+			return Collections.singletonList((Object) addr);
 		} finally {
-			ExecutionTimer.stop(VPUtil.TIMER_ROUTE);			
+			ExecutionTimer.stop(VPUtil.TIMER_ROUTE);
 		}
 	}
-	
+
 	/**
 	 * Override this method to be able to collect statistics per
 	 * Contract/Service Producer
 	 */
 	@Override
-    public MuleEvent route(MuleEvent event) throws RoutingException {
-
+	public MuleEvent route(MuleEvent event) throws RoutingException {
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = event.getMessage().getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION)
-		    + "-" + event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
+		String serviceId = event.getMessage().getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION) + "-"
+				+ event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 
 		synchronized (statistics) {
 
@@ -212,7 +206,7 @@ public class VagvalRouter extends AbstractRecipientList {
 			// Do the actual routing
 			replyEvent = super.route(event);
 		} finally {
-			ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);			
+			ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
 		}
 
 		/*
@@ -220,10 +214,11 @@ public class VagvalRouter extends AbstractRecipientList {
 		 */
 		for (final String prop : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND)) {
 			if (!BLOCKED_REQ_HEADERS.contains(prop)) {
-				replyEvent.getMessage().setProperty((String) prop, event.getMessage().getProperty((String) prop, PropertyScope.OUTBOUND), PropertyScope.OUTBOUND);
+				replyEvent.getMessage().setProperty((String) prop,
+						event.getMessage().getProperty((String) prop, PropertyScope.OUTBOUND), PropertyScope.OUTBOUND);
 			}
 		}
-		
+
 		synchronized (statistics) {
 			ServiceStatistics serverStatistics = statistics.get(serviceId);
 			serverStatistics.noOfSuccesfullCalls++;
@@ -241,7 +236,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		if (logger.isDebugEnabled()) {
 			logger.debug("EndpointBuilder URI: {}", recipient);
 		}
-		
+
 		String url = (String) recipient;
 		message.setProperty(VPUtil.ENDPOINT_URL, url, PropertyScope.SESSION);
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
@@ -249,16 +244,17 @@ public class VagvalRouter extends AbstractRecipientList {
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 		eb.setEncoding("UTF-8");
 		message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8", PropertyScope.OUTBOUND);
-		
-		
+
 		MessagePropertiesTransformer mt = createOutboundTransformer();
-		mt.getAddProperties().put(X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
+		mt.getAddProperties().put(X_VP_CORRELATION_ID,
+				message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
 		mt.getAddProperties().put(X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
 		mt.getAddProperties().put(X_VP_PRODUCER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
-		
+
 		// FIXME:
-		//	This header should be removed (replaced by X_VP_PRODUCER_ID), but there's a need to be backward compatible 
-		//	because the header is actually in-use by insurance transformations.
+		// This header should be removed (replaced by X_VP_PRODUCER_ID), but
+		// there's a need to be backward compatible
+		// because the header is actually in-use by insurance transformations.
 		mt.getAddProperties().put(VPUtil.RECEIVER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
 
 		// XXX: Make sure SOAPAction is forwarded to producer
@@ -267,27 +263,34 @@ public class VagvalRouter extends AbstractRecipientList {
 			mt.getAddProperties().put("SOAPAction", action);
 			message.setProperty("SOAPAction", action, PropertyScope.OUTBOUND);
 		}
-		
+
 		eb.addMessageProcessor(mt);
-		
-		if (url.contains("https://")) {
-			Connector connector = muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_NAME);
-			eb.setConnector(connector);
-			logger.debug("HTTPS connector has been set {}", connector.getName());
-		}else{
-			Connector connector = muleContext.getRegistry().lookupConnector(VPUtil.INSECURE_CONNECTOR_NAME);
-			eb.setConnector(connector);
-			logger.debug("HTTP connector has been set {}", connector.getName());
-		}
-		
+
+		Connector connector = selectConsumerConnector(url, message);
+		eb.setConnector(connector);
+		logger.debug("VP Consumer connector to use: {}", connector.getName());
+
 		try {
-			OutboundEndpoint ep =  eb.buildOutboundEndpoint();
+			OutboundEndpoint ep = eb.buildOutboundEndpoint();
 			logger.debug("EndpointBuilder ready!!!");
 			return ep;
 		} catch (InitialisationException e) {
 			throw new VpTechnicalException(e);
 		} catch (EndpointException e) {
 			throw new VpTechnicalException(e);
+		}
+	}
+
+	private Connector selectConsumerConnector(String url, MuleMessage message) {
+
+		boolean useKeepAlive = message.getProperty(VPUtil.FEATURE_USE_KEEP_ALIVE, PropertyScope.INVOCATION, false);
+
+		if (url.contains("https://") && useKeepAlive) {
+			return muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_HTTPS_KEEPALIVE_NAME);
+		} else if (url.contains("https://")) {
+			return muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_HTTPS_NAME);
+		} else {
+			return muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_HTTP_NAME);
 		}
 	}
 

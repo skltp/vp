@@ -28,8 +28,9 @@ public final class VPUtil {
 	
 	public static final String REMOTE_ADDR = MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 	
-	public static final String CONSUMER_CONNECTOR_NAME = "VPConsumerConnector";
-	public static final String INSECURE_CONNECTOR_NAME = "VPInsecureConnector";
+	public static final String CONSUMER_CONNECTOR_HTTPS_NAME = "VPConsumerConnector";
+	public static final String CONSUMER_CONNECTOR_HTTPS_KEEPALIVE_NAME = "VPConsumerConnectorKeepAlive";
+	public static final String CONSUMER_CONNECTOR_HTTP_NAME = "VPInsecureConnector";
 	
 	public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
 	public static final String REVERSE_PROXY_HEADER_NAME = "x-vp-auth-cert";
@@ -52,7 +53,8 @@ public final class VPUtil {
 	public static final String TIMER_ROUTE = "route";
 	public static final String TIMER_ENDPOINT = "endpoint_time";
 	
-	
+	public static final String FEATURE_USE_KEEP_ALIVE = "featureUseKeepAlive";
+		
 	public static String extractNamespaceFromService(final QName qname) {
 		return (qname == null) ? null : qname.getNamespaceURI();
 	}

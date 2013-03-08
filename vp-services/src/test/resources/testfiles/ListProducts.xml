@@ -1,0 +1,9 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
+	<soapenv:Header>
+		<add:To>vp-test-producer</add:To>
+	</soapenv:Header>
+	<soapenv:Body>
+		<urn:listProducts />
+	</soapenv:Body>
+</soapenv:Envelope>

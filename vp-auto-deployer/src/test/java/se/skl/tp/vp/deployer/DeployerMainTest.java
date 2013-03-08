@@ -19,6 +19,7 @@
  */
 package se.skl.tp.vp.deployer;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,4 +41,17 @@ public class DeployerMainTest {
 	public void updateDeploy() throws Exception {
 		dm.deploy("src/test/resources/test.jar", true);
 	}	
+	
+	@Test
+	public void replaceColonsInNamespaceWithDots() throws Exception {
+		DeployerMain.XsdInfo xsdInfo = new DeployerMain.XsdInfo("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1");
+		Assert.assertEquals("urn.riv.crm.scheduling.GetSubjectOfCareScheduleResponder.1",xsdInfo.getNamespaceSeparatedWith("."));
+	}	
+	
+	@Test
+	public void extractResponderFromService(){
+		Assert.assertEquals("GetSubjectOfCareScheduleResponder", DeployerMain.extractResponderNameFromServiceName("GetSubjectOfCareScheduleResponderService"));
+		Assert.assertEquals("GetLogicalAddresseesByServiceContractResponder", DeployerMain.extractResponderNameFromServiceName("GetLogicalAddresseesByServiceContractResponderService"));
+		Assert.assertEquals("ServiceSomethingResponder", DeployerMain.extractResponderNameFromServiceName("ServiceSomethingResponderService"));
+	}
 }
