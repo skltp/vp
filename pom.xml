@@ -45,7 +45,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	    <module>soitoolkit-mule-dependencies</module>
 	    <module>vp-services</module>
 	    <module>vp-teststub</module>
-	  
+	    <module>vp-hsa-cache</module>  
 	</modules>
 	
 	<build>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HsaInformationList xmlns="urn:riv:hsa:HsaInformationList:1"
+	xmlns:hwr="urn:riv:hsa:HsaWsResponder:3">
+	<StartDate>2011-04-08T00:05:16.320+02:00</StartDate>
+	<HsaObjects>
+		<HsaObject>
+			<DN>ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+			<Attribute name="hsaIdentity">
+				<S>SE0000000003-1234</S>
+			</Attribute>
+		</HsaObject>
+		<HsaObject>
+			<DN>ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+			<Attribute name="hsaIdentity">
+				<S>SE0000000003-1234</S>
+			</Attribute>
+		</HsaObject>
+		<HsaObject>
+			<DN>o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+			<Attribute name="hsaIdentity">
+				<S>SE0000000004-1234</S>
+			</Attribute>
+		</HsaObject>
+	</HsaObjects>
+</HsaInformationList>
