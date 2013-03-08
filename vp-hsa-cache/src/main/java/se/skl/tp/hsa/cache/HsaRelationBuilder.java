@@ -96,12 +96,12 @@ public class HsaRelationBuilder {
 	 */
 	private Dn findParentDn(final Map<Dn, HsaNode> nodes, Dn dn) {
 		Dn parentDn = dn.parentDn();
-		int levels = 0;
+		int levels = 1;
 		while(parentDn != null && nodes.get(parentDn) == null) {
 			levels++;
 			parentDn = parentDn.parentDn();
 		}
-		if(warningLevel > 0 && levels > warningLevel) {
+		if(warningLevel > 1 && levels > warningLevel) {
 			logWarning("Parent on " + levels + " levels for [" + dn + "], parent is [" + parentDn + "]");
 		}
 		return parentDn;

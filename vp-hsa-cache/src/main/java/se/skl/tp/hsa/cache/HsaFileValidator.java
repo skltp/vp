@@ -65,7 +65,6 @@ public class HsaFileValidator {
 			formatter.printHelp( "java " + HsaFileValidator.class.getName() , options );
 			System.exit(-1);
 		}		
-		HsaCacheImpl impl = (HsaCacheImpl)new HsaCacheFactoryImpl().create(filename, encoding, Integer.parseInt(warning));
-		new HsaNodePrinter(impl.getNode("SE0000000000-001T"), 3).printTree(new PrintWriter(System.out));
+		new HsaCacheFactoryImpl().create(filename, encoding, Integer.parseInt(warning));
 	}
 }

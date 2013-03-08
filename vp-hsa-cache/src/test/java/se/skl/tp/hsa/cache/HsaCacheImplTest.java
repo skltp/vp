@@ -3,6 +3,7 @@ package se.skl.tp.hsa.cache;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -19,6 +20,10 @@ public class HsaCacheImplTest {
 		assertEquals("SE0000000003-1234", impl.getParent("SE0000000002-1234"));
 		assertEquals("SE0000000004-1234", impl.getParent("SE0000000003-1234"));
 		assertEquals(null, impl.getParent("SE0000000004-1234"));
+	
+		assertEquals(Arrays.asList(new String[]{"SE0000000003-1234"}), impl.getChildren("SE0000000004-1234"));
+		assertEquals(Arrays.asList(new String[]{"SE0000000002-1234"}), impl.getChildren("SE0000000003-1234"));
+		assertEquals(Arrays.asList(new String[]{"SE0000000000-1234","SE0000000001-1234"}), impl.getChildren("SE0000000002-1234"));
 	}
 	
 	@Test(expected=HsaCacheInitializationException.class)

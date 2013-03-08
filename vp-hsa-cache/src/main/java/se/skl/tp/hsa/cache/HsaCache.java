@@ -20,6 +20,8 @@
  */
 package se.skl.tp.hsa.cache;
 
+import java.util.List;
+
 public interface HsaCache {
 	
 	/**
@@ -43,4 +45,17 @@ public interface HsaCache {
 	 * @throws HsaCacheInitializationException if the cache has not been initialized
 	 */
 	String getParent(String hsaId) throws HsaCacheNodeNotFoundException, HsaCacheInitializationException;
+	
+	/**
+	 * Get the children HSA-ID for a specific HSA-ID
+	 * 
+	 * @param hsaId the HSA-ID
+	 * 
+	 * @return list of children HSA-ID. Can be empty.
+	 * 
+	 * @throws HsaCacheNodeNotFoundException if the hsaId is not found in the cache
+	 * @throws HsaCacheInitializationException if the cache has not been initialized
+	 */
+	List<String> getChildren(String hsaId) throws HsaCacheNodeNotFoundException;
+	
 }

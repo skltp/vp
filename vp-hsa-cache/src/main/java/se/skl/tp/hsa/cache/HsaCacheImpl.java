@@ -21,6 +21,8 @@
 package se.skl.tp.hsa.cache;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -84,18 +86,41 @@ public class HsaCacheImpl implements HsaCache {
 	 */
 	@Override
 	public String getParent(String hsaId) throws HsaCacheNodeNotFoundException {
-		if(cache == null) {
-			throw new HsaCacheInitializationException("HsaCache is NOT initialized yet!");
-		}
-		
-		HsaNode entry = cache.get(hsaId);
-		if (entry == null) {
-			throw new HsaCacheNodeNotFoundException("HsaNode with HSA-ID "
-					+ hsaId + " not found in cache!");
-		}
+		checkInitialized();		
+		HsaNode entry = getHsaNodeFromCache(hsaId);
 
 		return (entry.getParent() != null) ? entry.getParent().getHsaId()
 				: null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see se.skl.tp.hsa.cache.HsaCache#getChildren(java.lang.String)
+	 */
+	@Override
+	public List<String> getChildren(String hsaId) throws HsaCacheNodeNotFoundException {
+		checkInitialized();
+		HsaNode entry = getHsaNodeFromCache(hsaId);
+		
+		List<String> childHsaIds = new ArrayList<String>();
+		for(HsaNode child : entry.getChildren()){
+			childHsaIds.add(child.getHsaId());
+		}
+		return childHsaIds;
+	}
+	
+	private HsaNode getHsaNodeFromCache(String hsaId) throws HsaCacheNodeNotFoundException {
+		HsaNode entry = cache.get(hsaId);
+		if (entry == null) {
+			throw new HsaCacheNodeNotFoundException("HsaNode with HSA-ID " + hsaId + " not found in cache!");
+		}
+		return entry;
+	}
+
+	private void checkInitialized() throws HsaCacheInitializationException {
+		if(cache == null) {
+			throw new HsaCacheInitializationException("HsaCache is NOT initialized yet!");
+		}
 	}
 
 	
@@ -109,5 +134,6 @@ public class HsaCacheImpl implements HsaCache {
 	public HsaNode getNode(String hsaId) {
 		return cache.get(hsaId);
 	}
+
 
 }

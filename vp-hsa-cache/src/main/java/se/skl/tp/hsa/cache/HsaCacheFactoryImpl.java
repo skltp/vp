@@ -37,6 +37,10 @@ public class HsaCacheFactoryImpl implements HsaCacheFactory {
 		return new HsaCacheImpl().init(filename, encoding);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see se.skl.tp.hsa.cache.HsaCacheFactory#create(java.lang.String, java.lang.String, int)
+	 */
 	@Override
 	public HsaCache create(String filename, String encoding, int warning) {
 		return new HsaCacheImpl().init(filename, encoding, warning);

@@ -1,7 +1,10 @@
 package se.skl.tp.hsa.cache;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,12 +31,12 @@ public class HsaRelationBuilderTest {
 	
 	@Test
 	public void testSetupRelations() throws Exception {
-		Map<Dn, HsaNode> cache = new HashMap<Dn, HsaNode>();
+		Map<Dn, HsaNode> nodes = new HashMap<Dn, HsaNode>();
 		for(int i = 0; i < dn.length ; i++) {
-			cache.put(dn[i], createHsaNode(dn[i].toString(),hsaId[i]));
+			nodes.put(dn[i], createHsaNode(dn[i].toString(),hsaId[i]));
 		}
 		HsaRelationBuilder builder = new HsaRelationBuilder(-1);
-		Map<String, HsaNode> r = builder.setRelations(cache);
+		Map<String, HsaNode> r = builder.setRelations(nodes);
 		
 		HsaNode topNode = r.get(hsaId[0]);
 		
@@ -50,4 +53,67 @@ public class HsaRelationBuilderTest {
 		hsaNode.setHsaId(hsaId);
 		return hsaNode;
 	}
+	
+	@Test
+	public void testWarningLevelMinusOne() throws Exception {
+		Dn dn1 = new Dn("o=Landstinget i Jönköping,l=VpW,c=SE");
+		Dn dn2 = new Dn("ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE");		
+		
+		final String [] message = new String[1];
+		
+		Map<Dn, HsaNode> nodes = new HashMap<Dn, HsaNode>();
+		nodes.put(dn1, createHsaNode(dn1.toString(), "HSA-000001"));
+		nodes.put(dn1, createHsaNode(dn2.toString(), "HSA-000002"));
+		
+		HsaRelationBuilder builder = new HsaRelationBuilder(-1) {
+			protected void logWarning(String msg) {
+				message[0] = msg;
+			}
+		};
+		builder.setRelations(nodes);
+		assertNull(message[0]);		
+	}
+	
+	@Test
+	public void testWarningLevelOne() throws Exception {
+		Dn dn1 = new Dn("o=Landstinget i Jönköping,l=VpW,c=SE");
+		Dn dn2 = new Dn("ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE");		
+		
+		final String [] message = new String[1];
+		
+		Map<Dn, HsaNode> nodes = new HashMap<Dn, HsaNode>();
+		nodes.put(dn1, createHsaNode(dn1.toString(), "HSA-000001"));
+		nodes.put(dn1, createHsaNode(dn2.toString(), "HSA-000002"));
+		
+		HsaRelationBuilder builder = new HsaRelationBuilder(1) {
+			protected void logWarning(String msg) {
+				message[0] = msg;
+			}
+		};
+		builder.setRelations(nodes);
+		assertNull(message[0]);
+	}
+	
+	@Test
+	public void testWarningLevelThree() throws Exception {
+		Dn dn1 = new Dn("o=Landstinget i Jönköping,l=VpW,c=SE");
+		Dn dn2 = new Dn("ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE");		
+		
+		final String [] message = new String[1];
+		
+		Map<Dn, HsaNode> nodes = new HashMap<Dn, HsaNode>();
+		nodes.put(dn1, createHsaNode(dn1.toString(), "HSA-000001"));
+		nodes.put(dn1, createHsaNode(dn2.toString(), "HSA-000002"));
+		
+		HsaRelationBuilder builder = new HsaRelationBuilder(2) {
+			protected void logWarning(String msg) {
+				message[0] = msg;
+			}
+		};
+		builder.setRelations(nodes);
+		
+		assertNotNull(message[0]);
+		assertTrue(message[0].startsWith("Parent on 3 levels"));
+	}
+
 }
