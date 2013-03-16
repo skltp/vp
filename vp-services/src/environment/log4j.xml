@@ -67,7 +67,7 @@
         <level value="info"/>
     </logger>
     <logger name="se.skl.tp.vp">
-        <level value="debug"/>
+        <level value="info"/>
     </logger>
     <logger name="se.skl.tp.vp.logmanager">
         <level value="info"/>

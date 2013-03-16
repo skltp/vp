@@ -55,6 +55,20 @@ public class RestClient {
 
 		return doHttpSendRequest(url, "POST", payload, "application/xml;charset=utf-8");
 	}
+
+	/**
+	 * Perform a HTTP POST call with xml request and utf8 charset
+	 * 
+	 * @param url
+	 * @param payload
+	 * @return
+	 * @throws MuleException
+	 */
+	public MuleMessage doHttpPostRequest_XmlContent(String url, String payload, Map<String, String> properties) {    	
+
+		return doHttpSendRequest(url, "POST", payload, "application/xml;charset=utf-8", properties);
+	}
+
 	
 	/**
 	 * Perform a HTTP GET call with json response and utf8 charset
@@ -151,6 +165,31 @@ public class RestClient {
     	return response;
 	}
 	
+	/**
+	 * Perform a HTTP call sending information to the server using POST or PUT
+	 * 
+	 * @param url
+	 * @param method, e.g. "POST" or "PUT"
+	 * @param payload
+	 * @param contentType
+	 * @return
+	 * @throws MuleException
+	 */
+	public MuleMessage doHttpSendRequest(String url, String method, String payload, String contentType, Map<String, String> inProperties) {    	
+
+		Map<String, String> properties = new HashMap<String, String>();
+    	properties.put("http.method",    method);
+    	properties.put("Content-Type",   contentType);
+
+    	if (inProperties != null) {
+    		properties.putAll(inProperties);
+    	}
+
+    	MuleMessage response = send(url, payload, properties);
+    	
+    	return response;
+	}
+
 	/**
 	 * Perform a HTTP call receiving information from the server using GET or DELETE
 	 * 

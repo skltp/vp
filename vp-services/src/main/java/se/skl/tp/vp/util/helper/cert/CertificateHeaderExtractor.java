@@ -31,9 +31,8 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 		log.debug("Extracting from http header...");
 
-		if (!this.isCallerOnWhiteList()) {
-			throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses.");
-		}
+		// Check whitelist (throws an exception if not ok)
+		VPUtil.checkCallerOnWhiteList(getMuleMessage(), getWhiteList(), VPUtil.REVERSE_PROXY_HEADER_NAME);
 
 		log.debug("Extracting X509Certificate senderId from header");
 
@@ -74,33 +73,4 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 		}
 		return false;
 	}
-
-	private boolean isCallerOnWhiteList() {
-		final String ip = VPUtil.extractIpAddress((String) this.getMuleMessage().getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND));
-
-		log.debug("Check if caller {} is in white list..", ip);
-
-		if (VPUtil.isWhitespace(ip)) {
-			throw new VpSemanticException(
-					"Could not extract the IP address of the caller. Cannot check whether caller is on the white list");
-		}
-
-		if (VPUtil.isWhitespace(this.getWhiteList())) {
-			throw new VpSemanticException(
-					"Could not check whether the caller is on the white list because the white list was empty.");
-		}
-
-		final String[] ips = this.getWhiteList().split(",");
-
-		for (final String s : ips) {
-			if (s.trim().equals(ip.trim())) {
-				log.debug("Caller found in white list");
-				return true;
-			}
-		}
-
-		log.debug("Caller NOT found in white list");
-		return false;
-	}
-
 }

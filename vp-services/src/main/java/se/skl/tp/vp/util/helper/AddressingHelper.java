@@ -104,15 +104,11 @@ public class AddressingHelper extends VPHelperSupport {
 	}
 
 	private VagvalInput createRequestToServiceDirectory() {
-		CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(
-				this.getMuleMessage(), this.getPattern(), this.getWhiteList());
-
-		CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
 
 		VagvalInput vagvalInput = new VagvalInput();
-		vagvalInput.senderId = certHelper.extractSenderIdFromCertificate();
+		vagvalInput.senderId = VPUtil.getSenderId(this.getMuleMessage(), this.getWhiteList(), this.getPattern());
+		
 		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.OUTBOUND);
-		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.SESSION);
 
 		vagvalInput.receiverId = getSessionProperty(VPUtil.RECEIVER_ID);
 		vagvalInput.rivVersion = getSessionProperty(VPUtil.RIV_VERSION);

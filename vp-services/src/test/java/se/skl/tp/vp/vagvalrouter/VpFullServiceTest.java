@@ -17,24 +17,24 @@ public class VpFullServiceTest extends FunctionalTestCase {
 	
 	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
 
-	VagvalInfo vagvalInfo;
-
-	
 	public VpFullServiceTest() {
 		super();
+		
 		setDisposeManagerPerSuite(true);
 		
 		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
-		VagvalMockInputRecord vi = new VagvalMockInputRecord();
-		vi.receiverId = "vp-test-producer";
-		vi.senderId = "tp";
-		vi.rivVersion = "RIVTABP20";
-		vi.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
-		vi.adress = "https://localhost:19000/vardgivare-b/tjanst1";
-		vagvalInputs.add(vi);
+
+		VagvalMockInputRecord vi_TP = new VagvalMockInputRecord();
+		vi_TP.receiverId = "vp-test-producer";
+		vi_TP.senderId = "tp";
+		vi_TP.rivVersion = "RIVTABP20";
+		vi_TP.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vi_TP.adress = "https://localhost:19000/vardgivare-b/tjanst1";
+
+		vagvalInputs.add(vi_TP);
 		svimi.setVagvalInputs(vagvalInputs);
-		
+
 	}
 	
 	@Override
@@ -52,9 +52,9 @@ public class VpFullServiceTest extends FunctionalTestCase {
 			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector");
 		}
 	}
-	
-	public void testHappyDays() throws Exception {
 
+	public void testHappyDays() throws Exception {
+		
 		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS);
 		assertEquals(PRODUCT_ID, p.getId());
 	}

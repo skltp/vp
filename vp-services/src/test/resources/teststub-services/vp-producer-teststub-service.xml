@@ -33,7 +33,9 @@
         <inbound-endpoint address="https://localhost:19000/vardgivare-b/tjanst1"  
             connector-ref="VPProducerConnector"/>
 
-        <cxf:jaxws-service
+		<custom-transformer class="se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger"/>
+
+	    <cxf:jaxws-service
             serviceClass="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"
 					wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
 

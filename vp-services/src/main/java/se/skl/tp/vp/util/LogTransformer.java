@@ -171,7 +171,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 			String senderId = (String) message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
 
 			if (senderId == null) {
-				senderId = getSenderId(message);
+				senderId = VPUtil.getSenderId(message, whiteList, pattern);
 			} 	
 
 			evaluatedExtraInfo.put("source", getClass().getName());
@@ -236,20 +236,6 @@ public class LogTransformer extends AbstractMessageTransformer {
 	}
 
 	//
-	private String getSenderId(MuleMessage message) {
-		String senderId = "";
-		try {
-			CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message,
-					this.pattern, this.whiteList);
-			CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
-			senderId = certHelper.extractSenderIdFromCertificate();
-			message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
-			log.debug("Sender extracted from certificate {}", senderId);
-		} catch (final VpSemanticException e) {
-			log.warn("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
-		} 	
-		return senderId;
-	}
 	
 	
 	private String evaluateValue(String key, String value, MuleMessage message) {

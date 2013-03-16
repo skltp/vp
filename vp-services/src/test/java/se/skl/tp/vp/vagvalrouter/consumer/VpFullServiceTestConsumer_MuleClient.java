@@ -32,18 +32,22 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPFault;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.xml.stax.MapNamespaceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
+import org.soitoolkit.commons.mule.util.MiscUtil;
+import org.soitoolkit.commons.xml.XPathUtil;
 import org.w3.wsaddressing10.AttributedURIType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -102,6 +106,10 @@ public class VpFullServiceTestConsumer_MuleClient {
 	}
 
 	public Product callGetProductDetail(String productId, String serviceAddress) throws Exception {
+		return callGetProductDetail(productId, serviceAddress, null);
+	}
+
+	public Product callGetProductDetail(String productId, String serviceAddress, Map<String, String> properties) throws Exception {
 		GetProductDetailType request = new GetProductDetailType();
 		request.setProductId(productId);
 
@@ -110,16 +118,31 @@ public class VpFullServiceTestConsumer_MuleClient {
 
 		String xmlRequest = marshall(logicalAddressHeader, request);
 		
-        MuleMessage muleResponse = restClient.doHttpPostRequest_XmlContent(serviceAddress, xmlRequest);
+        MuleMessage muleResponse = restClient.doHttpPostRequest_XmlContent(serviceAddress, xmlRequest, properties);
 
         InputStream xmlResponse = (InputStream)muleResponse.getPayload();
-		GetProductDetailResponse response = unmarshall(xmlResponse);
+        Document domResponse = createDocument(xmlResponse);
+        
+        NodeList fault = XPathUtil.getXPathResult(domResponse, namespaceMap, "/soap:Envelope/soap:Body/soap:Fault");
+        if (fault.getLength() > 0) {
+        	throw new RuntimeException(XPathUtil.getXml(domResponse));
+        }
+        
+        GetProductDetailResponse response = unmarshall(domResponse);
 
 		Product p = response.getProduct();
 		return p;
 	}
 
 	
+	private Document createDocument(InputStream content) {
+		try {
+			return getBuilder().parse(content);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private String marshall(AttributedURIType logicalAddressHeader, GetProductDetailType request) {
 
         String xmlHeader = jaxbUtil.marshal(OF_ADDR.createTo(logicalAddressHeader));
@@ -170,7 +193,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 		return xml;
 	}
 
-	private GetProductDetailResponse unmarshall(InputStream xmlResponse) {
+	private GetProductDetailResponse unmarshall(Document doc) {
 		Object result;
 		try {
 			XPath xpath = XPathFactory.newInstance().newXPath();
@@ -178,8 +201,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 
 			XPathExpression xpathRequest = xpath.compile("/soap:Envelope/soap:Body/service:getProductDetailResponse");
 
-			Document reqDoc = createDocument(xmlResponse);
-			result = xpathRequest.evaluate(reqDoc, XPathConstants.NODESET);
+			result = xpathRequest.evaluate(doc, XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		} catch (Exception e) {
@@ -196,14 +218,6 @@ public class VpFullServiceTestConsumer_MuleClient {
 		return resp;
 	}
 	
-	private Document createDocument(InputStream content) {
-		try {
-			return getBuilder().parse(content);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	private Document createDocument(String content, String charset) {
 		try {
 			InputStream is = new ByteArrayInputStream(content.getBytes(charset));

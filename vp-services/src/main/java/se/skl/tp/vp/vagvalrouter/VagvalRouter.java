@@ -64,7 +64,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * 
 	 * @since VP-2.0
 	 */
-	private static final String X_VP_PRODUCER_ID = "x-vp-producer-id";
+	public static final String X_VP_PRODUCER_ID = "x-vp-producer-id";
 
 	/**
 	 * HTTP Header forwarded to producer.
@@ -72,14 +72,14 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * 
 	 * @since VP-2.0
 	 */
-	private static final String X_VP_CONSUMER_ID = "x-vp-consumer-id";
+	public static final String X_VP_CONSUMER_ID = "x-rivta-original-serviceconsumer-hsaid";
 
 	/**
 	 * HTTP Header forwarded to consumer
 	 * 
 	 * @since VP-2.0
 	 */
-	private static final String X_VP_CORRELATION_ID = "x-vp-correlation-id";
+	public static final String X_VP_CORRELATION_ID = "x-vp-correlation-id";
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalRouter.class);
 
@@ -244,6 +244,14 @@ public class VagvalRouter extends AbstractRecipientList {
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 		eb.setEncoding("UTF-8");
 		message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8", PropertyScope.OUTBOUND);
+
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Setting HTTP properties from Mule SESSION:\n{} = {}\n{} = {}\n{} = {}", new Object[] {
+				X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION),
+				X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION),
+				X_VP_PRODUCER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION)});
+		}
 
 		MessagePropertiesTransformer mt = createOutboundTransformer();
 		mt.getAddProperties().put(X_VP_CORRELATION_ID,
