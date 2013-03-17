@@ -22,10 +22,14 @@ package se.skl.tp.hsa.cache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link HsaCache}.
@@ -36,48 +40,72 @@ import javax.xml.stream.XMLStreamException;
 public class HsaCacheImpl implements HsaCache {
 
 	/**
+	 * Logger
+	 */
+	private Logger log = LoggerFactory.getLogger(HsaCacheImpl.class);
+	
+	/**
 	 * Map holding the cache
 	 */
-	Map<String, HsaNode> cache;
+	private Map<String, HsaNode> cache;
 
+	/**
+	 * File parser
+	 */
+	private HsaFileParser parser = new HsaFileParser();
+	
 	/**
 	 * Builds relations
 	 */
-	HsaRelationBuilder builder = new HsaRelationBuilder(-1);
+	private HsaRelationBuilder builder = new HsaRelationBuilder();
+	
+	/**
+	 * Default constructor initializes the cache in empty state  
+	 */
+	public HsaCacheImpl() {
+		cache = new HashMap<String, HsaNode>();
+	}
+	
+	/**
+	 * Constructor that initializes the cache from a file.
+	 * 
+	 * @param filename
+	 */
+	public HsaCacheImpl(String filename) {
+		this.init(filename);
+	}
 	
 	/*
 	 * (non-Javadoc)
 	 * @see se.skl.tp.hsa.cache.HsaCache#init(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public HsaCache init(String filename, String encoding) throws HsaCacheInitializationException {
+	public HsaCache init(String filename) throws HsaCacheInitializationException {
 		try {
-			doInitialize(filename, encoding);
+			cache = doInitialize(filename);
+			log.info("HSA Cache initialized!");
 		} catch (Exception e) {
-			throw new HsaCacheInitializationException("Failed to initialize cache!!", e);
+			throw new HsaCacheInitializationException("Failed to initialize HSA cache!", e);
 		}
 		return this;
 	}
 
-	public HsaCache init(String filename, String encoding, int warning) {
-		builder = new HsaRelationBuilder(warning);
-		return init(filename, encoding);
+	public HsaCache init(String filename, HsaRelationBuilder relationBuilder, HsaFileParser parser) {
+		this.builder = relationBuilder;
+		this.parser = parser;
+		return init(filename);
 	}
 	/**
 	 * Uses {@link HsaFileParser} and {@link HsaRelationBuilder} to populate cache.
 	 * 
 	 * @param filename path to file
-	 * @param encoding encoding of file
 	 * 
 	 * @throws XMLStreamException thrown on XML parsing error.
 	 * @throws IOException thrown if file cannot be read.
 	 */
-	private void doInitialize(String filename, String encoding)
-			throws XMLStreamException, IOException {
-		HsaFileParser parser = new HsaFileParser();
-		Map<Dn, HsaNode> hsaObjects = parser.parse(filename, encoding);
-
-		cache = builder.setRelations(hsaObjects);
+	private Map<String,HsaNode> doInitialize(String filename) throws XMLStreamException, IOException {
+		Map<Dn, HsaNode> hsaObjects = parser.parse(filename);
+		return builder.setRelations(hsaObjects);
 	}
 
 	/*
@@ -86,11 +114,8 @@ public class HsaCacheImpl implements HsaCache {
 	 */
 	@Override
 	public String getParent(String hsaId) throws HsaCacheNodeNotFoundException {
-		checkInitialized();		
 		HsaNode entry = getHsaNodeFromCache(hsaId);
-
-		return (entry.getParent() != null) ? entry.getParent().getHsaId()
-				: null;
+		return (entry.getParent() != null) ? entry.getParent().getHsaId() : null;
 	}
 
 	/*
@@ -99,7 +124,6 @@ public class HsaCacheImpl implements HsaCache {
 	 */
 	@Override
 	public List<String> getChildren(String hsaId) throws HsaCacheNodeNotFoundException {
-		checkInitialized();
 		HsaNode entry = getHsaNodeFromCache(hsaId);
 		
 		List<String> childHsaIds = new ArrayList<String>();
@@ -117,12 +141,6 @@ public class HsaCacheImpl implements HsaCache {
 		return entry;
 	}
 
-	private void checkInitialized() throws HsaCacheInitializationException {
-		if(cache == null) {
-			throw new HsaCacheInitializationException("HsaCache is NOT initialized yet!");
-		}
-	}
-
 	
 	/**
 	 * Gets a node with the specified HSA-ID
@@ -134,6 +152,4 @@ public class HsaCacheImpl implements HsaCache {
 	public HsaNode getNode(String hsaId) {
 		return cache.get(hsaId);
 	}
-
-
 }

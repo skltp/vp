@@ -1,3 +1,23 @@
+/**
+ * Copyright 2013 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ */
 package se.skl.tp.hsa.cache;
 
 import static org.junit.Assert.assertEquals;
@@ -21,7 +41,7 @@ public class HsaNodePrinterTest {
 	@Test
 	public void testPrint() throws Exception {
 		URL url = getClass().getClassLoader().getResource("simpleTest.xml");
-		HsaCacheImpl impl = (HsaCacheImpl)new HsaCacheFactoryImpl().create(url.getFile(), "UTF-8");
+		HsaCacheImpl impl = (HsaCacheImpl)new HsaCacheImpl().init(url.getFile());
 		
 		HsaNode topNode = impl.getNode("SE0000000004-1234");
 		

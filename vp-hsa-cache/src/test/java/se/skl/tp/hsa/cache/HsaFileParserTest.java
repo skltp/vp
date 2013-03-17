@@ -1,10 +1,33 @@
+/**
+ * Copyright 2013 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ */
 package se.skl.tp.hsa.cache;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Map;
 
 import org.junit.Test;
@@ -17,15 +40,15 @@ public class HsaFileParserTest {
 		
 		InputStream is = getClass().getClassLoader().getResourceAsStream("simpleTest.xml");
 		
-		Map<Dn, HsaNode> nodes = parser.parse(is, "UTF-8");
+		Map<Dn, HsaNode> nodes = parser.parse(is);
 		
 		assertEquals(5, nodes.size());
 		
-		HsaNode node1 = nodes.get(new Dn("o=Landstinget i Jönköping,l=VpW,c=SE"));
-		HsaNode node2 = nodes.get(new Dn("ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"));
-		HsaNode node3 = nodes.get(new Dn("ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"));
-		HsaNode node4 = nodes.get(new Dn("ou=Nässjö VC DLM,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"));
-		HsaNode node5 = nodes.get(new Dn("ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"));
+		HsaNode node1 = nodes.get(new Dn("o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"));
+		HsaNode node2 = nodes.get(new Dn("ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"));
+		HsaNode node3 = nodes.get(new Dn("ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"));
+		HsaNode node4 = nodes.get(new Dn("ou=N\u00e4ssj\u00f6 VC DLM,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"));
+		HsaNode node5 = nodes.get(new Dn("ou=N\u00e4ssj\u00f6 VC DLK,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"));
 	
 		assertNotNull(node1);
 		assertNotNull(node2);
@@ -42,34 +65,31 @@ public class HsaFileParserTest {
 
 	@Test
 	public void testParseDuplicateFile() throws Exception {
-		HsaFileParser parser = new HsaFileParser();
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		
+		HsaFileParser parser = new HsaFileParserWithLog(pw);	
 		
 		InputStream is = getClass().getClassLoader().getResourceAsStream("duplicateTest.xml");
 		
 		try {
-			parser.parse(is, "UTF-8");
+			parser.parse(is);
 			fail("Expected IllegalStateException");
 		} catch(Exception ex) {
-			assertEquals("HsaObject entry invalid @ LineNo:12, Duplicate with: dn=ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE,hsaId=SE0000000003-1234,lineNo=6", ex.getMessage());
+			assertTrue(ex.getMessage().startsWith("HsaObject entry invalid @ LineNo:12, Duplicate with: dn=ou="));
 		}
 	}
 	
 	@Test
-	public void testInvalidEntry() throws Exception {
+	public void testInvalidEntry() throws Exception {		
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
 		
-		final String [] error = new String[1];
-		
-		HsaFileParser parser = new HsaFileParser(){
-			@Override
-			protected void logError(String msg) {
-				error[0] = msg;
-			}
-		};		
+		HsaFileParser parser = new HsaFileParserWithLog(pw);	
 		InputStream is = getClass().getClassLoader().getResourceAsStream("invalidTest.xml");
 		
-		parser.parse(is, "UTF-8");
+		parser.parse(is);
 		
-		assertEquals("HsaObject entry invaliddn=ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE,hsaId=null,lineNo=12 @ LineNo:12", error[0]);
-		
+		assertTrue(sw.toString().startsWith("ERROR HsaObject entry invalid @ LineNo:12, entry: dn=ou="));		
 	}
 }

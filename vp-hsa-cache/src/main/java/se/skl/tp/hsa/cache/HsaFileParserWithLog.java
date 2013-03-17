@@ -20,29 +20,35 @@
  */
 package se.skl.tp.hsa.cache;
 
+import java.io.PrintWriter;
+
 /**
- * Implementation of factory for creating HsaCache instance from a file.
  * 
  * @author par.wenaker@callistaenterprise.se
  *
  */
-public class HsaCacheFactoryImpl implements HsaCacheFactory {
-	
-	/*
-	 * (non-Javadoc)
-	 * @see se.skl.tp.hsa.cache.HsaCacheFactory#create(java.lang.String, java.lang.String)
+public class HsaFileParserWithLog extends HsaFileParser {
+
+	/**
+	 * PrintWriter to use for printing errors
 	 */
-	@Override
-	public HsaCache create(String filename, String encoding) {
-		return new HsaCacheImpl().init(filename, encoding);
+	private PrintWriter pw;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param pw {@link PrintWriter}
+	 */
+	public HsaFileParserWithLog(PrintWriter pw){
+		this.pw = pw;
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see se.skl.tp.hsa.cache.HsaCacheFactory#create(java.lang.String, java.lang.String, int)
+	 * @see se.skl.tp.hsa.cache.HsaFileParser#logError(java.lang.String)
 	 */
 	@Override
-	public HsaCache create(String filename, String encoding, int warning) {
-		return new HsaCacheImpl().init(filename, encoding, warning);
+	protected void logError(String msg) {
+		this.pw.println("ERROR " + msg);
 	}
 }

@@ -25,21 +25,22 @@ import java.util.List;
 public interface HsaCache {
 	
 	/**
-	 * Initialize the Cache
+	 * Initialize the Cache. If the cache has a value before a call to this method, that state is 
+	 * retained in in case of an exception.
 	 * 
 	 * @param filename file to initialize from
-	 * @param encoding encoding of the file, e.g. UTF-8
-	 * @return a populated HsaCache
 	 * 
-	 * @throws HsaCacheInitializationException if a fatal error occurres initializing the file
+	 * @return a populated HsaCache or an unchanged HSA Cache in case of an exception
+	 * 
+	 * @throws HsaCacheInitializationException if a fatal error occurred initializing the file
 	 */
-	HsaCache init(String filename, String encoding) throws HsaCacheInitializationException;
+	HsaCache init(String filename) throws HsaCacheInitializationException;
 	
 	/**
 	 * Get the parent HSA-ID for a specific HSA-ID
 	 * 
 	 * @param hsaId the HSA-ID
-	 * @return parentHSA-ID
+	 * @return parent HSA-ID
 	 * 
 	 * @throws HsaCacheNodeNotFoundException if the hsaId is not found in the cache
 	 * @throws HsaCacheInitializationException if the cache has not been initialized

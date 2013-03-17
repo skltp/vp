@@ -24,8 +24,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,30 +60,28 @@ public class HsaFileParser {
 	 * Parses XML file
 	 * 
 	 * @param filename file name
-	 * @param encoding encoding
 	 * 
 	 * @return Map from {@link Dn} to {@link HsaNode}
 	 * 
 	 * @throws XMLStreamException thrown on XML parse exception.
 	 * @throws IOException thrown if file cannot be read
 	 */
-	public Map<Dn, HsaNode> parse(String filename, String encoding) throws XMLStreamException, IOException {
-		return parse(new FileInputStream(filename), encoding);
+	public Map<Dn, HsaNode> parse(String filename) throws XMLStreamException, IOException {
+		return parse(new FileInputStream(filename));
 	}
 	
 	/**
 	 * Parse XML from inputstream
 	 * 
 	 * @param is inputstream
-	 * @param encoding encoding
 	 * 
 	 * @return Map from {@link Dn} to {@link HsaNode}
 	 * 
 	 * @throws XMLStreamException thrown on XML parse exception.
 	 * @throws IOException thrown if file cannot be read
 	 */
-	public Map<Dn, HsaNode> parse(InputStream is, String encoding) throws XMLStreamException, IOException {
-		return doParseFile(new InputStreamReader(new BufferedInputStream(is), encoding));
+	public Map<Dn, HsaNode> parse(InputStream is) throws XMLStreamException, IOException {
+		return doParseFile(new BufferedInputStream(is));
 	}
 	
 	/**
@@ -98,7 +94,7 @@ public class HsaFileParser {
 	 * @throws XMLStreamException thrown on XML parse exception.
 	 * @throws IOException thrown if file cannot be read
 	 */
-	protected Map<Dn, HsaNode> doParseFile(Reader in) throws XMLStreamException, IOException {
+	protected Map<Dn, HsaNode> doParseFile(InputStream in) throws XMLStreamException, IOException {
 		Map<Dn, HsaNode> cache = new HashMap<Dn, HsaNode>();
 
 		try {
@@ -130,7 +126,7 @@ public class HsaFileParser {
 								throw new IllegalStateException("HsaObject entry invalid @ LineNo:" + startRow + ", Duplicate with: " + previous.toString());
 							}
 						} else {
-							logError("HsaObject entry invalid" + entry + " @ LineNo:" + startRow);
+							logError("HsaObject entry invalid @ LineNo:" + startRow + ", entry: " + entry);
 						}
 						continue;
 					}				

@@ -1,4 +1,3 @@
-package se.skl.tp.hsa.cache;
 /**
  * Copyright 2013 Sjukvardsradgivningen
  *
@@ -19,6 +18,8 @@ package se.skl.tp.hsa.cache;
 
  *   Boston, MA 02111-1307  USA
  */
+package se.skl.tp.hsa.cache;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

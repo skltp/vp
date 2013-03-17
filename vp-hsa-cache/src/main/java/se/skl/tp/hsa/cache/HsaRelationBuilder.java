@@ -36,12 +36,6 @@ public class HsaRelationBuilder {
 	
 	private static Logger log = LoggerFactory.getLogger(HsaRelationBuilder.class);
 
-	private final int warningLevel;
-	
-	public HsaRelationBuilder(int warningLevel) {
-		this.warningLevel = warningLevel;
-	}
-	
 	/**
 	 * Processes a Map of {@link Dn} to {@link HsaNode} to a Map of String (HSA-ID) to {@link HsaNode}. All
 	 * {@link HsaNode}s are updated with parent and children {@link HsaNode}s.
@@ -94,15 +88,10 @@ public class HsaRelationBuilder {
 	 * 
 	 * @return parent {@link Dn} or null if none is found
 	 */
-	private Dn findParentDn(final Map<Dn, HsaNode> nodes, Dn dn) {
+	protected Dn findParentDn(final Map<Dn, HsaNode> nodes, Dn dn) {
 		Dn parentDn = dn.parentDn();
-		int levels = 1;
 		while(parentDn != null && nodes.get(parentDn) == null) {
-			levels++;
 			parentDn = parentDn.parentDn();
-		}
-		if(warningLevel > 1 && levels > warningLevel) {
-			logWarning("Parent on " + levels + " levels for [" + dn + "], parent is [" + parentDn + "]");
 		}
 		return parentDn;
 	}
@@ -120,7 +109,7 @@ public class HsaRelationBuilder {
 			HsaNode entry = mapEntry.getValue();
 			HsaNode parent = mapEntry.getValue().getParent();
 			if(parent == null) {
-				logWarning("WARNING: No parent for HSA-ID="+entry.getHsaId()+", DN="+entry.getDn());
+				logWarning("No parent for HSA-ID="+entry.getHsaId()+", DN="+entry.getDn());
 			}
 			result.put(entry.getHsaId(), entry);
 		}		

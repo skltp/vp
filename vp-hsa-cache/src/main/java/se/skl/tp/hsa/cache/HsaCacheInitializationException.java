@@ -32,9 +32,4 @@ public class HsaCacheInitializationException extends RuntimeException {
 	public HsaCacheInitializationException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	public HsaCacheInitializationException(String message) {
-		super(message);
-	}
-
 }

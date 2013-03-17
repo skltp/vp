@@ -22,6 +22,8 @@ package se.skl.tp.hsa.cache;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
 import org.apache.commons.cli.BasicParser;
@@ -37,34 +39,53 @@ import org.apache.commons.cli.ParseException;
  *
  * usage: java se.skl.tp.hsa.cache.HsaFileValidator
  * -f <arg>   filename
- * -e <arg>   encoding
  * -w <arg>   warning level
+ * -o <atg>   output file
  * 
  * @author par.wenaker@callistaenterprise.se
  *
  */
 public class HsaFileValidator {
 
-	public static void main(String[] args) throws ParseException {
+	private HsaFileValidator() {
+	}
+	
+	public static void main(String[] args) throws ParseException, FileNotFoundException {
 		
 		Options options = new Options();
 		options.addOption("f", true, "filename");
-		options.addOption("e", true, "encoding");
 		options.addOption("w", true, "warning level");
+		options.addOption("o", true, "output file");
 		
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd = parser.parse(options, args);
 		
 		
-		String filename = cmd.getOptionValue("f");
-		String encoding = cmd.getOptionValue("e");
-		String warning  = cmd.getOptionValue("w", "-1");
+		String filename    = cmd.getOptionValue("f");
+		String warning     = cmd.getOptionValue("w", "-1");
+		String outputFile  = cmd.getOptionValue("o");
 		
-		if(isEmpty(filename) || isEmpty(encoding)) {
+		PrintWriter pw = getPrintWriter(outputFile);
+		
+		if(isEmpty(filename)) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp( "java " + HsaFileValidator.class.getName() , options );
 			System.exit(-1);
 		}		
-		new HsaCacheFactoryImpl().create(filename, encoding, Integer.parseInt(warning));
+		
+		HsaRelationBuilder relationBuilder = new HsaRelationBuilderWithLog(pw, Integer.parseInt(warning));
+		HsaFileParser fileParser = new HsaFileParserWithLog(pw);
+		
+		new HsaCacheImpl().init(filename, relationBuilder, fileParser);
+		
+		pw.close();
+	}
+
+	private static PrintWriter getPrintWriter(String outputFile) throws FileNotFoundException {
+		if(isEmpty(outputFile)) {
+			return new PrintWriter(System.err, true);
+		} else {
+			return new PrintWriter(new FileOutputStream(outputFile), true);
+		}
 	}
 }

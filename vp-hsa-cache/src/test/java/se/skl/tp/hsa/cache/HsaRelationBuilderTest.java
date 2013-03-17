@@ -1,11 +1,31 @@
+/**
+ * Copyright 2013 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ */
 package se.skl.tp.hsa.cache;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,11 +34,11 @@ import org.junit.Test;
 public class HsaRelationBuilderTest {
 
 	private static Dn [] dn = new Dn []{
-		new Dn("o=Landstinget i Jönköping,l=VpW,c=SE"),
-		new Dn("ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"),
-		new Dn("ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"),
-		new Dn("ou=Nässjö VC DLM,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"),		
-		new Dn("ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE"),		
+		new Dn("o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"),
+		new Dn("ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"),
+		new Dn("ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"),
+		new Dn("ou=N\u00e4ssj\u00f6 VC DLM,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"),		
+		new Dn("ou=N\u00e4ssj\u00f6 VC DLK,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE"),		
 	};
 	
 	private static String [] hsaId = new String [] {
@@ -35,7 +55,7 @@ public class HsaRelationBuilderTest {
 		for(int i = 0; i < dn.length ; i++) {
 			nodes.put(dn[i], createHsaNode(dn[i].toString(),hsaId[i]));
 		}
-		HsaRelationBuilder builder = new HsaRelationBuilder(-1);
+		HsaRelationBuilder builder = new HsaRelationBuilder();
 		Map<String, HsaNode> r = builder.setRelations(nodes);
 		
 		HsaNode topNode = r.get(hsaId[0]);
@@ -56,64 +76,60 @@ public class HsaRelationBuilderTest {
 	
 	@Test
 	public void testWarningLevelMinusOne() throws Exception {
-		Dn dn1 = new Dn("o=Landstinget i Jönköping,l=VpW,c=SE");
-		Dn dn2 = new Dn("ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE");		
-		
-		final String [] message = new String[1];
+		Dn dn1 = new Dn("o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE");
+		Dn dn2 = new Dn("ou=N\u00e4ssj\u00f6 VC DLK,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE");		
 		
 		Map<Dn, HsaNode> nodes = new HashMap<Dn, HsaNode>();
 		nodes.put(dn1, createHsaNode(dn1.toString(), "HSA-000001"));
 		nodes.put(dn1, createHsaNode(dn2.toString(), "HSA-000002"));
 		
-		HsaRelationBuilder builder = new HsaRelationBuilder(-1) {
-			protected void logWarning(String msg) {
-				message[0] = msg;
-			}
-		};
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		
+		HsaRelationBuilder builder = new HsaRelationBuilderWithLog(pw, -1);
+		
 		builder.setRelations(nodes);
-		assertNull(message[0]);		
+		
+		assertEquals("", sw.toString());
 	}
 	
 	@Test
 	public void testWarningLevelOne() throws Exception {
-		Dn dn1 = new Dn("o=Landstinget i Jönköping,l=VpW,c=SE");
-		Dn dn2 = new Dn("ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE");		
+		Dn dn1 = new Dn("o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE");
+		Dn dn2 = new Dn("ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE");		
 		
-		final String [] message = new String[1];
 		
 		Map<Dn, HsaNode> nodes = new HashMap<Dn, HsaNode>();
 		nodes.put(dn1, createHsaNode(dn1.toString(), "HSA-000001"));
 		nodes.put(dn1, createHsaNode(dn2.toString(), "HSA-000002"));
 		
-		HsaRelationBuilder builder = new HsaRelationBuilder(1) {
-			protected void logWarning(String msg) {
-				message[0] = msg;
-			}
-		};
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		
+		HsaRelationBuilder builder = new HsaRelationBuilderWithLog(pw, -1);
+		
 		builder.setRelations(nodes);
-		assertNull(message[0]);
+		
+		assertEquals("", sw.toString());
 	}
 	
 	@Test
 	public void testWarningLevelThree() throws Exception {
-		Dn dn1 = new Dn("o=Landstinget i Jönköping,l=VpW,c=SE");
-		Dn dn2 = new Dn("ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE");		
+		Dn dn1 = new Dn("o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE");
+		Dn dn2 = new Dn("ou=N\u00e4ssj\u00f6 VC DLK,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE");		
 		
-		final String [] message = new String[1];
 		
 		Map<Dn, HsaNode> nodes = new HashMap<Dn, HsaNode>();
 		nodes.put(dn1, createHsaNode(dn1.toString(), "HSA-000001"));
 		nodes.put(dn1, createHsaNode(dn2.toString(), "HSA-000002"));
 		
-		HsaRelationBuilder builder = new HsaRelationBuilder(2) {
-			protected void logWarning(String msg) {
-				message[0] = msg;
-			}
-		};
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		
+		HsaRelationBuilder builder = new HsaRelationBuilderWithLog(pw, 2);
 		builder.setRelations(nodes);
 		
-		assertNotNull(message[0]);
-		assertTrue(message[0].startsWith("Parent on 3 levels"));
+		assertTrue(sw.toString().startsWith("WARNING: Parent on 3 levels "));
 	}
 
 }
