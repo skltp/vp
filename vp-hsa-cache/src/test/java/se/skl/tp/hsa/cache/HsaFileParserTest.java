@@ -90,6 +90,6 @@ public class HsaFileParserTest {
 		
 		parser.parse(is);
 		
-		assertTrue(sw.toString().startsWith("ERROR HsaObject entry invalid @ LineNo:12, entry: dn=ou="));		
+		assertTrue(sw.toString().startsWith("ERROR HsaObject entry invalid @ LineNo:11, entry: dn=ou="));		
 	}
 }

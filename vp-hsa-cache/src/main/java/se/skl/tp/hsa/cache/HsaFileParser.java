@@ -27,11 +27,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -48,11 +46,9 @@ import org.slf4j.LoggerFactory;
  */
 public class HsaFileParser {
  
-	private static final String ELEMENT_NAME_ATTRIBUTE = "Attribute";
+	private static final String ELEMENT_NAME_HSA_IDENTITY = "hsaIdentity";
 	private static final String ELEMENT_NAME_DN = "DN";
-	private static final String ELEMENT_NAME_HSA_OBJECT = "HsaObject";
-	private static final String ATTRIBUTE_NAME_HSA_IDENTITY = "hsaIdentity";
-	private static final QName ATTRIBUTE_NAME_NAME = new QName("name");
+	private static final String ELEMENT_NAME_HSA_OBJECT = "hsaUnit";
 
 	private static Logger log = LoggerFactory.getLogger(HsaFileParser.class);
 	
@@ -140,7 +136,17 @@ public class HsaFileParser {
 						continue;
 					}
 				}
+				
+				// When we hit a <hsaIdentity> tag
+				if (event.isStartElement()) {
+					StartElement startElement = event.asStartElement();
+					if (startElement.getName().getLocalPart() == ELEMENT_NAME_HSA_IDENTITY) {
+						entry.setHsaId(eventReader.nextEvent().asCharacters().getData());
+						continue;
+					}
+				}
 				// When we hit a <Attribute> tag with attribute 'name'
+/*
 				if (event.isStartElement()) {
 					StartElement startElement = event.asStartElement();
 					if (startElement.getName().getLocalPart() == ELEMENT_NAME_ATTRIBUTE) {
@@ -152,6 +158,7 @@ public class HsaFileParser {
 			            }
 					}
 				}
+*/
 			}
 		} finally {
 			if(in != null) {

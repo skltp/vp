@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<HsaUnitsResponse xmlns="urn:riv:hsa:HsaWsResponder:3">
+  <startDate>2013-03-15T15:38:42.597+01:00</startDate>
+  <endDate>2013-03-15T15:38:45.721+01:00</endDate>
+  <hsaUnits>
+    <hsaUnit>
+      <hsaIdentity>SE0000000001-1234</hsaIdentity>
+      <DN>ou=Nässjö VC DLM,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+      <name>Nässjö VC DLM</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000000-1234</hsaIdentity>
+      <DN>ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+      <name>Nässjö Primärvårdsområde</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000002-1234</hsaIdentity>
+      <DN>ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+      <name>Nässjö Primärvårdsområde</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000003-1234</hsaIdentity>
+      <DN>ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+      <name>Höglandets sjukvårdsområde</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000004-1234</hsaIdentity>
+      <DN>o=Landstinget i Jönköping,l=VpW,c=SE</DN>
+      <name>Landstinget i Jönköping</name>
+    </hsaUnit>
+  </hsaUnits>
+</HsaUnitsResponse>

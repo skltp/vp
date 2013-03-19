@@ -47,7 +47,10 @@ public class HsaFileValidatorTest {
 			br.close();
 		}
 		
-		assertTrue(line1.startsWith("ERROR HsaObject entry invalid @ LineNo:12, entry: dn=ou="));
+		System.out.println(line1);
+		System.out.println(line2);
+		
+		assertTrue(line1.startsWith("ERROR HsaObject entry invalid @ LineNo:11, entry: dn=ou="));
 		assertTrue(line2.startsWith("WARNING: No parent for HSA-ID=SE0000000004-1234"));
 	}
 }

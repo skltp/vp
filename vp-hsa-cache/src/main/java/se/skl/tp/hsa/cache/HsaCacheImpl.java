@@ -71,8 +71,8 @@ public class HsaCacheImpl implements HsaCache {
 	 * 
 	 * @param filename
 	 */
-	public HsaCacheImpl(String filename) {
-		this.init(filename);
+	public HsaCacheImpl(String ... filenames) {
+		this.init(filenames);
 	}
 	
 	/*
@@ -80,9 +80,9 @@ public class HsaCacheImpl implements HsaCache {
 	 * @see se.skl.tp.hsa.cache.HsaCache#init(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public HsaCache init(String filename) throws HsaCacheInitializationException {
+	public HsaCache init(String ... filenames) throws HsaCacheInitializationException {
 		try {
-			cache = doInitialize(filename);
+			cache = doInitialize(filenames);
 			log.info("HSA Cache initialized!");
 		} catch (Exception e) {
 			throw new HsaCacheInitializationException("Failed to initialize HSA cache!", e);
@@ -103,8 +103,11 @@ public class HsaCacheImpl implements HsaCache {
 	 * @throws XMLStreamException thrown on XML parsing error.
 	 * @throws IOException thrown if file cannot be read.
 	 */
-	private Map<String,HsaNode> doInitialize(String filename) throws XMLStreamException, IOException {
-		Map<Dn, HsaNode> hsaObjects = parser.parse(filename);
+	private Map<String,HsaNode> doInitialize(String ... filenames) throws XMLStreamException, IOException {
+		Map<Dn, HsaNode> hsaObjects = new HashMap<Dn,HsaNode>();
+		for(String filename: filenames){
+			hsaObjects.putAll(parser.parse(filename));
+		}
 		return builder.setRelations(hsaObjects);
 	}
 

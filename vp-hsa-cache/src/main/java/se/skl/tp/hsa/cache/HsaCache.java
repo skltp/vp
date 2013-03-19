@@ -34,7 +34,7 @@ public interface HsaCache {
 	 * 
 	 * @throws HsaCacheInitializationException if a fatal error occurred initializing the file
 	 */
-	HsaCache init(String filename) throws HsaCacheInitializationException;
+	HsaCache init(String ... filenames) throws HsaCacheInitializationException;
 	
 	/**
 	 * Get the parent HSA-ID for a specific HSA-ID
