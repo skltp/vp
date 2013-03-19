@@ -8,12 +8,12 @@
 	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
 	xmlns:management="http://www.mulesoft.org/schema/mule/management"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.mulesoft.org/schema/mule/core		http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
-		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/3.3/mule-https.xsd
-		http://www.mulesoft.org/schema/mule/jms			http://www.mulesoft.org/schema/mule/jms/3.3/mule-jms.xsd
-		http://www.mulesoft.org/schema/mule/management	http://www.mulesoft.org/schema/mule/management/3.3/mule-management.xsd
-		http://www.mulesoft.org/schema/mule/http		http://www.mulesoft.org/schema/mule/http/3.3/mule-http.xsd
+		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-current.xsd
+		http://www.mulesoft.org/schema/mule/core		http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/jms			http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+		http://www.mulesoft.org/schema/mule/management	http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd
+		http://www.mulesoft.org/schema/mule/http		http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 	">
 
 	<spring:bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -65,15 +65,23 @@
        
     </spring:beans> 
     
-    <spring:beans>
+     <spring:beans>
+     
+     	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
+     	
   		<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
 			<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_URL}"/>
 			<spring:property name="addressDelimiter" value="#"/>
+			<spring:property name="hsaCache" ref="hsaCache"/>
+			<spring:property name="useHsaCache" value="${feature.hsacache}"/>
 		</spring:bean>
 		
 		<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
 			<spring:property name="vagvalAgent" ref="vagvalAgent"/>	
+			<spring:property name="hsaCache" ref="hsaCache"/>
+			<spring:property name="hsaFiles" value="${HSA_FILES}"/>
 		</spring:bean>
+		
     </spring:beans>
     
     <configuration>

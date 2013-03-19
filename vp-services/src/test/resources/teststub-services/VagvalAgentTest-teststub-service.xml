@@ -2,24 +2,32 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.3/mule.xsd
-		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.3/mule-cxf.xsd">
+		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
 	<spring:bean name="vagvalInputs"
 		class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput" />
+		
+	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
 
 	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
-		<spring:property name="endpointAddress"
-			value="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
+		<spring:property name="endpointAddress" value="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
 		<spring:property name="addressDelimiter" value="#" />
+		<spring:property name="hsaCache" ref="hsaCache"/>
+		<spring:property name="useHsaCache" value="true"/>
+	</spring:bean>
+	
+	<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
+			<spring:property name="vagvalAgent" ref="vagvalAgent"/>	
+			<spring:property name="hsaCache" ref="hsaCache"/>
+			<spring:property name="hsaFiles" value="src/test/resources/hsacache.xml,src/test/resources/hsacachecomplementary.xml"/>
 	</spring:bean>
 
 
 	<!-- TODO: Add teststub-service specific definitions here -->
 	<flow name="vagval-teststub-flow">
-		<inbound-endpoint
-			address="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
+		<inbound-endpoint address="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
 		<cxf:jaxws-service serviceClass="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMock" />
 		<component>
 			<singleton-object class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMock">

@@ -22,26 +22,16 @@ package se.skl.tp.vp.vagvalagent;
 
 import java.util.Arrays;
 
-import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.context.notification.MuleContextNotification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 
 import se.skl.tp.hsa.cache.HsaCache;
+import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 
-public class MuleStartupNotificationHandler implements MuleContextNotificationListener<MuleContextNotification> {
-
-	private static final Logger logger = LoggerFactory.getLogger(MuleStartupNotificationHandler.class);
-
-	private VagvalAgent vagvalAgent;
+public class ResetHsaCache implements Callable {
 
 	private HsaCache hsaCache;
-
 	private String[] hsaFiles;
-
-	public void setVagvalAgent(VagvalAgent vagvalAgent) {
-		this.vagvalAgent = vagvalAgent;
-	}
 
 	public void setHsaCache(HsaCache hsaCache) {
 		this.hsaCache = hsaCache;
@@ -51,18 +41,19 @@ public class MuleStartupNotificationHandler implements MuleContextNotificationLi
 		this.hsaFiles = hsaFiles;
 	}
 
-	@Override
-	public void onNotification(MuleContextNotification notification) {
-		if (notification.getType().equalsIgnoreCase(MuleContextNotification.TYPE_INFO)
-				&& notification.getAction() == MuleContextNotification.CONTEXT_STARTED) {
+	public Object onCall(final MuleEventContext eventContext) throws Exception {
 
-			logger.info("Initiates vagvalAgent");
-			vagvalAgent.init();
+		final String content = resetCache(eventContext);
+		eventContext.setStopFurtherProcessing(true);
+		return content;
+	}
 
-			logger.info("Initiates hsaCache with files: " + Arrays.toString(hsaFiles));
+	private String resetCache(final MuleEventContext eventContext) {
+		try {
 			hsaCache.init(hsaFiles);
-
-			logger.info("Mule started, vagvalAgent and hsaCache successfully initiated");
+			return "Reset HSA cache success using files: " + Arrays.toString(hsaFiles);
+		} catch (HsaCacheInitializationException e) {
+			return "Reset HSA cache failed using files: " + hsaFiles;
 		}
 	}
 }

@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mule.api.MuleMessage;
 
+import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
@@ -41,6 +42,10 @@ public class VagvalRouterTest extends TestCase {
 		vagvalRouter.setVagvalAgent(vagvalAgent);
 		vagvalAgent.anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
 		vagvalAgent.virtualiseringsInfo = new ArrayList<VirtualiseringsInfoType>();
+		
+		HsaCache hsaCacheMock = Mockito.mock(HsaCache.class);
+		Mockito.when(hsaCacheMock.getParent("VardgivareB")).thenReturn(null);
+		vagvalAgent.setHsaCache(hsaCacheMock);
 
 		vagvalInput = new VagvalInput();
 		vagvalInput.receiverId = "VardgivareB";
