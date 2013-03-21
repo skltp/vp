@@ -54,7 +54,6 @@ public class VagvalAgentTest {
 		vagvalAgent = new VagvalAgent();
 		vagvalAgent.setAddressDelimiter("#");
 		vagvalAgent.setHsaCache(hsaCacheMock);
-		vagvalAgent.setUseHsaCache(true);
 	}
 
 	@Test

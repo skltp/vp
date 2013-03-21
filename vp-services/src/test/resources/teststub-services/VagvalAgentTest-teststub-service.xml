@@ -15,7 +15,6 @@
 		<spring:property name="endpointAddress" value="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
 		<spring:property name="addressDelimiter" value="#" />
 		<spring:property name="hsaCache" ref="hsaCache"/>
-		<spring:property name="useHsaCache" value="true"/>
 	</spring:bean>
 	
 	<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">

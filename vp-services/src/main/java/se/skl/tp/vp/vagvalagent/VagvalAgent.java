@@ -83,7 +83,6 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	private String endpointAddressTjanstekatalog;
 	private String addressDelimiter;
-	private boolean useHsaCache;
 
 	public VagvalAgent() {
 
@@ -99,10 +98,6 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	public void setHsaCache(HsaCache hsaCache) {
 		this.hsaCache = hsaCache;
-	}
-
-	public void setUseHsaCache(boolean useHsaCache) {
-		this.useHsaCache = useHsaCache;
 	}
 
 	/**
@@ -369,15 +364,13 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 		VisaVagvalResponse response = new VisaVagvalResponse();
 
-		if (useHsaCache(request)) {
-			String receiverId = receiverAddresses.get(0);
-			while (response.getVirtualiseringsInfo().isEmpty() && receiverId != null) {
-				receiverId = getParent(receiverId);
-				// FIXME: When deprecated default routing is removed
-				// construction using Arrays.asList(receiverId) can be replaced
-				// with String
-				response = getRoutingInformation(request, curVirtualiseringsInfo, false, Arrays.asList(receiverId));
-			}
+		String receiverId = receiverAddresses.get(0);
+		while (response.getVirtualiseringsInfo().isEmpty() && receiverId != null) {
+			receiverId = getParent(receiverId);
+			// FIXME: When deprecated default routing is removed
+			// construction using Arrays.asList(receiverId) can be replaced
+			// with String
+			response = getRoutingInformation(request, curVirtualiseringsInfo, false, Arrays.asList(receiverId));
 		}
 
 		return response;
@@ -436,13 +429,11 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	private boolean isAuthorizedToAnyParent(VisaVagvalRequest request, List<AnropsBehorighetsInfoType> permissions) {
-		if (useHsaCache(request)) {
-			String receiverId = request.getReceiverId();
-			while (receiverId != null) {
-				receiverId = getParent(receiverId);
-				if (isAuthorized(request, receiverId, permissions)) {
-					return true;
-				}
+		String receiverId = request.getReceiverId();
+		while (receiverId != null) {
+			receiverId = getParent(receiverId);
+			if (isAuthorized(request, receiverId, permissions)) {
+				return true;
 			}
 		}
 		return false;
@@ -459,10 +450,5 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			}
 		}
 		return false;
-	}
-
-	private boolean useHsaCache(VisaVagvalRequest request) {
-		// TODO: Resolve request using request.getTjanstegranssnitt()
-		return useHsaCache;
 	}
 }
