@@ -116,9 +116,13 @@ public class HsaCacheImpl implements HsaCache {
 	 * @see se.skl.tp.hsa.cache.HsaCache#getParent(java.lang.String)
 	 */
 	@Override
-	public String getParent(String hsaId) throws HsaCacheNodeNotFoundException {
-		HsaNode entry = getHsaNodeFromCache(hsaId);
-		return (entry.getParent() != null) ? entry.getParent().getHsaId() : null;
+	public String getParent(String hsaId) {
+		try {
+			HsaNode entry = getHsaNodeFromCache(hsaId);
+			return (entry.getParent() != null) ? entry.getParent().getHsaId() : DEFAUL_ROOTNODE;
+		} catch (HsaCacheNodeNotFoundException e) {
+			return DEFAUL_ROOTNODE;
+		}
 	}
 
 	/*
@@ -139,6 +143,7 @@ public class HsaCacheImpl implements HsaCache {
 	private HsaNode getHsaNodeFromCache(String hsaId) throws HsaCacheNodeNotFoundException {
 		HsaNode entry = cache.get(hsaId);
 		if (entry == null) {
+			logWarning("HsaNode with HSA-ID " + hsaId + " not found in cache!");
 			throw new HsaCacheNodeNotFoundException("HsaNode with HSA-ID " + hsaId + " not found in cache!");
 		}
 		return entry;
@@ -154,5 +159,14 @@ public class HsaCacheImpl implements HsaCache {
 	 */
 	public HsaNode getNode(String hsaId) {
 		return cache.get(hsaId);
+	}
+	
+	/**
+	 * Log Warnings
+	 * 
+	 * @param msg message to log
+	 */
+	protected void logWarning(String msg) {
+		log.warn(msg);		
 	}
 }

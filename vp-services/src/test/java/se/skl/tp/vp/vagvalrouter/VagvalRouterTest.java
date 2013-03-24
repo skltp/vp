@@ -44,7 +44,7 @@ public class VagvalRouterTest extends TestCase {
 		vagvalAgent.virtualiseringsInfo = new ArrayList<VirtualiseringsInfoType>();
 		
 		HsaCache hsaCacheMock = Mockito.mock(HsaCache.class);
-		Mockito.when(hsaCacheMock.getParent("VardgivareB")).thenReturn(null);
+		Mockito.when(hsaCacheMock.getParent("VardgivareB")).thenReturn(HsaCache.DEFAUL_ROOTNODE);
 		vagvalAgent.setHsaCache(hsaCacheMock);
 
 		vagvalInput = new VagvalInput();

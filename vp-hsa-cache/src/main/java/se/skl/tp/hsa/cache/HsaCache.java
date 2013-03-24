@@ -25,6 +25,11 @@ import java.util.List;
 public interface HsaCache {
 	
 	/**
+	 * Default root for the HSA cache is SE.
+	 */
+	public static final String DEFAUL_ROOTNODE = "SE";
+	
+	/**
 	 * Initialize the Cache. If the cache has a value before a call to this method, that state is 
 	 * retained in in case of an exception.
 	 * 
@@ -37,15 +42,15 @@ public interface HsaCache {
 	HsaCache init(String ... filenames) throws HsaCacheInitializationException;
 	
 	/**
-	 * Get the parent HSA-ID for a specific HSA-ID
+	 * Get the parent HSA-ID for a specific HSA-ID. If the HSA-ID is not found in 
+	 * HSA cache the default root parent is returned, in this case the SE node. 
 	 * 
 	 * @param hsaId the HSA-ID
 	 * @return parent HSA-ID
 	 * 
-	 * @throws HsaCacheNodeNotFoundException if the hsaId is not found in the cache
 	 * @throws HsaCacheInitializationException if the cache has not been initialized
 	 */
-	String getParent(String hsaId) throws HsaCacheNodeNotFoundException, HsaCacheInitializationException;
+	String getParent(String hsaId) throws HsaCacheInitializationException;
 	
 	/**
 	 * Get the children HSA-ID for a specific HSA-ID

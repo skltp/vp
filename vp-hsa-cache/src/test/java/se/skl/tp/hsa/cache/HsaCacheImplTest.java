@@ -22,6 +22,7 @@ package se.skl.tp.hsa.cache;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static se.skl.tp.hsa.cache.HsaCache.*;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public class HsaCacheImplTest {
 		assertEquals("SE0000000002-1234", impl.getParent("SE0000000001-1234"));
 		assertEquals("SE0000000003-1234", impl.getParent("SE0000000002-1234"));
 		assertEquals("SE0000000004-1234", impl.getParent("SE0000000003-1234"));
-		assertEquals(null, impl.getParent("SE0000000004-1234"));
+		assertEquals(DEFAUL_ROOTNODE, impl.getParent("SE0000000004-1234"));
 	
 		assertEquals(Arrays.asList(new String[]{"SE0000000003-1234"}), impl.getChildren("SE0000000004-1234"));
 		assertEquals(Arrays.asList(new String[]{"SE0000000002-1234"}), impl.getChildren("SE0000000003-1234"));
@@ -57,7 +58,7 @@ public class HsaCacheImplTest {
 		assertEquals("SE0000000002-1234", impl.getParent("SE0000000001-1234"));
 		assertEquals("SE0000000003-1234", impl.getParent("SE0000000002-1234"));
 		assertEquals("SE0000000004-1234", impl.getParent("SE0000000003-1234"));
-		assertEquals(null, impl.getParent("SE0000000004-1234"));
+		assertEquals(DEFAUL_ROOTNODE, impl.getParent("SE0000000004-1234"));
 	
 		assertEquals(Arrays.asList(new String[]{"SE0000000003-1234"}), impl.getChildren("SE0000000004-1234"));
 		assertEquals(Arrays.asList(new String[]{"SE0000000002-1234"}), impl.getChildren("SE0000000003-1234"));
@@ -98,14 +99,14 @@ public class HsaCacheImplTest {
 		new HsaCacheImpl("notfound.xml");
 	}
 	
-	@Test(expected=HsaCacheNodeNotFoundException.class)
-	public void testNotInitialized() throws Exception {
+	@Test
+	public void testNotInitializedGivesDefaultRoot() throws Exception {
 		HsaCacheImpl impl = new HsaCacheImpl();
-		impl.getParent("jabbadabba");
+		assertEquals(DEFAUL_ROOTNODE,impl.getParent("jabbadabba"));
 	}
 	
-	@Test(expected=HsaCacheNodeNotFoundException.class)
-	public void testNodeNotFound() throws Exception {
+	@Test
+	public void defaultRootNodeReturnedWhenHsaIdNotFoundInCache() throws Exception {
 		HsaCacheImpl impl = new HsaCacheImpl();
 		URL url = getClass().getClassLoader().getResource("simpleTest.xml");
 		impl.init(url.getFile());

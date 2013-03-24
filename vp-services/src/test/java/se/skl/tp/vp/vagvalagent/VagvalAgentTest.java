@@ -4,10 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -18,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.skl.tp.hsa.cache.HsaCache;
+import se.skl.tp.hsa.cache.HsaCacheImpl;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
@@ -33,34 +33,33 @@ public class VagvalAgentTest {
 	HsaCache hsaCacheMock;
 
 	private static final String CRM_SCHEDULING = "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1";
+	private static final String CRM_LISTING = "urn:riv:crm:listing:GetListingResponder:1";
 	private static final String RIVTABP21 = "rivtabp21";
 	private static final String NATIONAL_CONSUMER = "NationellKonsument";
 	private static final String LOCAL_CONSUMER = "LokalKonsument";
 
-	private static final String HEALTHCAREUNIT_A = "vardenhetA";
-	private static final String HEALTHCAREPROVIDER_A = "vardgivareA";
-	private static final String HEALTHCAREPROVIDER_B = "vardgivareB";
+	private static final String HEALTHCAREUNIT_A = "SE0000000001-1234";
+	private static final String HEALTHCAREPROVIDER_A = "SE0000000002-1234";
+	private static final String HEALTHCAREPROVIDER_B = "SE0000000005-1234";
+	private static final String UNKNOWN_HEALTHCAREPROVIDER = "UNKNOWN";
 	private static final String SE = "SE";
 
 	@Before
 	public void beforeTest() throws Exception {
 
-		hsaCacheMock = mock(HsaCache.class);
-		when(hsaCacheMock.getParent(HEALTHCAREUNIT_A)).thenReturn(HEALTHCAREPROVIDER_A);
-		when(hsaCacheMock.getParent(HEALTHCAREPROVIDER_A)).thenReturn(SE);
-		when(hsaCacheMock.getParent(HEALTHCAREPROVIDER_B)).thenReturn(SE);
-		when(hsaCacheMock.getParent(SE)).thenReturn(null);
+		URL url = getClass().getClassLoader().getResource("hsacache.xml");
+		HsaCache hsaCache = new HsaCacheImpl().init(url.getFile());
 
 		vagvalAgent = new VagvalAgent();
 		vagvalAgent.setAddressDelimiter("#");
-		vagvalAgent.setHsaCache(hsaCacheMock);
+		vagvalAgent.setHsaCache(hsaCache);
 	}
 
 	@Test
 	public void nationalRoutingAndAuthorizationNationalConsumer() throws Exception {
 
 		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
-		routing.add(creareRouting("https://SE", RIVTABP21, CRM_SCHEDULING, "SE"));
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
 
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
@@ -86,11 +85,70 @@ public class VagvalAgentTest {
 	}
 
 	@Test
+	public void unknownRecieverGivesRoutingToSEWhenAuthorizationExist() throws Exception {
+
+		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+
+		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
+		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
+
+		vagvalAgent.virtualiseringsInfo = routing;
+		vagvalAgent.anropsBehorighetsInfo = authorization;
+
+		VisaVagvalRequest request = new VisaVagvalRequest();
+		request.setReceiverId(UNKNOWN_HEALTHCAREPROVIDER);
+		request.setSenderId(NATIONAL_CONSUMER);
+		request.setTidpunkt(createTimestamp());
+		request.setTjanstegranssnitt(CRM_SCHEDULING);
+
+		VisaVagvalResponse response = vagvalAgent.visaVagval(request);
+
+		assertEquals(1, response.getVirtualiseringsInfo().size());
+		assertEquals("https://SE", response.getVirtualiseringsInfo().get(0).getAdress());
+		assertEquals(SE, response.getVirtualiseringsInfo().get(0).getReceiverId());
+		assertEquals(RIVTABP21, response.getVirtualiseringsInfo().get(0).getRivProfil());
+		assertEquals(CRM_SCHEDULING, response.getVirtualiseringsInfo().get(0).getTjansteKontrakt());
+		assertNotNull(response.getVirtualiseringsInfo().get(0).getFromTidpunkt());
+		assertNotNull(response.getVirtualiseringsInfo().get(0).getTomTidpunkt());
+	}
+
+	@Test
+	public void unknownRecieverGivesNoRoutingToSEWhenAuthorizationDontExist() throws Exception {
+
+		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+
+		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
+		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
+
+		vagvalAgent.virtualiseringsInfo = routing;
+		vagvalAgent.anropsBehorighetsInfo = authorization;
+
+		VisaVagvalRequest request = new VisaVagvalRequest();
+		request.setReceiverId(UNKNOWN_HEALTHCAREPROVIDER);
+		request.setSenderId(NATIONAL_CONSUMER);
+		request.setTidpunkt(createTimestamp());
+		request.setTjanstegranssnitt(CRM_SCHEDULING);
+
+		try {
+			vagvalAgent.visaVagval(request);
+		} catch (VpSemanticException e) {
+			assertEquals(
+					"VP007 Authorization missing for serviceNamespace: urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1, receiverId: UNKNOWN, senderId: NationellKonsument",
+					e.getMessage());
+			return;
+		}
+
+		fail("Expected VpSemanticException");
+	}
+
+	@Test
 	public void nationalRoutingLocalAuthorizationNationalConsumer() throws Exception {
 
 		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
-		routing.add(creareRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
-		routing.add(creareRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+		routing.add(createRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
 
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
@@ -119,7 +177,7 @@ public class VagvalAgentTest {
 	public void nationalRoutingLocalAuthorizationLocalConsumer() throws Exception {
 
 		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
-		routing.add(creareRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
 
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(LOCAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
@@ -148,9 +206,9 @@ public class VagvalAgentTest {
 	public void localConsumerWithNoAccessToLocalHealthCareProvider() throws Exception {
 
 		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
-		routing.add(creareRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
-		routing.add(creareRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
-		routing.add(creareRouting("https://providerB", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_B));
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+		routing.add(createRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
+		routing.add(createRouting("https://providerB", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_B));
 
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(LOCAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_B));
@@ -168,7 +226,7 @@ public class VagvalAgentTest {
 			vagvalAgent.visaVagval(request);
 		} catch (VpSemanticException e) {
 			assertEquals(
-					"VP007 Authorization missing for serviceNamespace: urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1, receiverId: vardgivareA, senderId: LokalKonsument",
+					"VP007 Authorization missing for serviceNamespace: urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1, receiverId: SE0000000002-1234, senderId: LokalKonsument",
 					e.getMessage());
 			return;
 		}
@@ -180,9 +238,9 @@ public class VagvalAgentTest {
 	public void localConsumerWithAccessOnlyToHealthcareProvider() throws Exception {
 
 		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
-		routing.add(creareRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
-		routing.add(creareRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
-		routing.add(creareRouting("https://providerB", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_B));
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+		routing.add(createRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
+		routing.add(createRouting("https://providerB", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_B));
 
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(LOCAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
@@ -211,8 +269,8 @@ public class VagvalAgentTest {
 	public void deprecatedDefaultRoutingDontUseHsaTreeForRouting() throws Exception {
 
 		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
-		routing.add(creareRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
-		routing.add(creareRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+		routing.add(createRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
 
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
@@ -221,9 +279,10 @@ public class VagvalAgentTest {
 		vagvalAgent.anropsBehorighetsInfo = authorization;
 
 		/*
-		 * HEALTHCAREPROVIDER_B#HEALTHCAREUNIT_A, means that first a check is done to see if any routing 
-		 * exist for HEALTHCAREUNIT_A then on HEALTHCAREPROVIDER_B. If HSA tree was used routing would have
-		 * been found for HEALTHCAREPROVIDER_A which is a parent to HEALTHCAREUNIT_A.
+		 * HEALTHCAREPROVIDER_B#HEALTHCAREUNIT_A, means that first a check is
+		 * done to see if any routing exist for HEALTHCAREUNIT_A then on
+		 * HEALTHCAREPROVIDER_B. If HSA tree was used routing would have been
+		 * found for HEALTHCAREPROVIDER_A which is a parent to HEALTHCAREUNIT_A.
 		 */
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREPROVIDER_B + "#" + HEALTHCAREUNIT_A);
@@ -233,15 +292,15 @@ public class VagvalAgentTest {
 
 		VisaVagvalResponse response = vagvalAgent.visaVagval(request);
 		assertTrue(response.getVirtualiseringsInfo().isEmpty());
-		
+
 	}
-	
+
 	@Test
 	public void deprecatedDefaultRoutingDontUseHsaTreeForAuthorization() throws Exception {
 
 		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
-		routing.add(creareRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
-		routing.add(creareRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREUNIT_A));
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_SCHEDULING, SE));
+		routing.add(createRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREUNIT_A));
 
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
@@ -250,9 +309,11 @@ public class VagvalAgentTest {
 		vagvalAgent.anropsBehorighetsInfo = authorization;
 
 		/*
-		 * HEALTHCAREPROVIDER_B#HEALTHCAREUNIT_A, means that first a check is done to see if any authorization 
-		 * exist for HEALTHCAREUNIT_A then on HEALTHCAREPROVIDER_B. If HSA tree was used authorization would have
-		 * been found for HEALTHCAREPROVIDER_A which is a parent to HEALTHCAREUNIT_A.
+		 * HEALTHCAREPROVIDER_B#HEALTHCAREUNIT_A, means that first a check is
+		 * done to see if any authorization exist for HEALTHCAREUNIT_A then on
+		 * HEALTHCAREPROVIDER_B. If HSA tree was used authorization would have
+		 * been found for HEALTHCAREPROVIDER_A which is a parent to
+		 * HEALTHCAREUNIT_A.
 		 */
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREPROVIDER_B + "#" + HEALTHCAREUNIT_A);
@@ -264,12 +325,36 @@ public class VagvalAgentTest {
 			vagvalAgent.visaVagval(request);
 		} catch (VpSemanticException e) {
 			assertEquals(
-					"VP007 Authorization missing for serviceNamespace: urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1, receiverId: vardgivareB#vardenhetA, senderId: NationellKonsument",
+					"VP007 Authorization missing for serviceNamespace: urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1, receiverId: SE0000000005-1234#SE0000000001-1234, senderId: NationellKonsument",
 					e.getMessage());
 			return;
 		}
 
 		fail("Expected VpSemanticException");
+	}
+
+	@Test
+	public void noRoutingExistAtAllEvenWhenUsingHsaTree() throws Exception {
+
+		// No routing for CRM_SCHEDULING, only CRM_LISTING
+		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
+		routing.add(createRouting("https://SE", RIVTABP21, CRM_LISTING, SE));
+
+		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
+		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
+
+		vagvalAgent.virtualiseringsInfo = routing;
+		vagvalAgent.anropsBehorighetsInfo = authorization;
+
+		VisaVagvalRequest request = new VisaVagvalRequest();
+		request.setReceiverId(HEALTHCAREUNIT_A);
+		request.setSenderId(NATIONAL_CONSUMER);
+		request.setTidpunkt(createTimestamp());
+		request.setTjanstegranssnitt(CRM_SCHEDULING);
+
+		VisaVagvalResponse response = vagvalAgent.visaVagval(request);
+
+		assertEquals("No routing found", 0, response.getVirtualiseringsInfo().size());
 	}
 
 	private XMLGregorianCalendar createTimestamp() throws Exception {
@@ -279,7 +364,7 @@ public class VagvalAgentTest {
 		return time;
 	}
 
-	private VirtualiseringsInfoType creareRouting(String adress, String rivVersion, String namnrymnd, String receiver)
+	private VirtualiseringsInfoType createRouting(String adress, String rivVersion, String namnrymnd, String receiver)
 			throws Exception {
 
 		XMLGregorianCalendar fromTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();

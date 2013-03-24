@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 
 import se.skl.tp.hsa.cache.HsaCache;
+import static se.skl.tp.hsa.cache.HsaCache.DEFAUL_ROOTNODE;
 import se.skl.tp.hsa.cache.HsaCacheInitializationException;
-import se.skl.tp.hsa.cache.HsaCacheNodeNotFoundException;
 import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheRequest;
 import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheResponse;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
@@ -365,7 +365,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		VisaVagvalResponse response = new VisaVagvalResponse();
 
 		String receiverId = receiverAddresses.get(0);
-		while (response.getVirtualiseringsInfo().isEmpty() && receiverId != null) {
+		while (response.getVirtualiseringsInfo().isEmpty() && receiverId != DEFAUL_ROOTNODE) {
 			receiverId = getParent(receiverId);
 			// FIXME: When deprecated default routing is removed
 			// construction using Arrays.asList(receiverId) can be replaced
@@ -381,9 +381,6 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			return hsaCache.getParent(receiverId);
 		} catch (HsaCacheInitializationException e) {
 			throw new VpSemanticException("VP011 Internal HSA cache is not available!", e);
-		} catch (HsaCacheNodeNotFoundException e) {
-			// No parent found
-			return null;
 		}
 	}
 
@@ -430,7 +427,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	private boolean isAuthorizedToAnyParent(VisaVagvalRequest request, List<AnropsBehorighetsInfoType> permissions) {
 		String receiverId = request.getReceiverId();
-		while (receiverId != null) {
+		while (receiverId != DEFAUL_ROOTNODE) {
 			receiverId = getParent(receiverId);
 			if (isAuthorized(request, receiverId, permissions)) {
 				return true;
