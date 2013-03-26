@@ -119,7 +119,9 @@ public final class VPUtil {
 		}
 		
 		// Cache the retrieved value in the session property SENDER_ID
-		message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
+		if (senderId != null) {
+			message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
+		}
 		return senderId;
 	}	
 	
