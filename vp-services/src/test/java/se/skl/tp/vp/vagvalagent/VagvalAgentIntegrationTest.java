@@ -137,7 +137,7 @@ public class VagvalAgentIntegrationTest extends FunctionalTestCase {
 		addVagvalInput(receiverId, rivVersion, senderId, serviceNameSpace);
 
 		ResetVagvalCacheResponse rvcResponse = vagvalAgent.resetVagvalCache(createResetVagvalCacheRequest());
-		assertTrue(rvcResponse.getResetResult());
+		assertTrue(rvcResponse.isResetResult());
 
 		vvResponse = vagvalAgent.visaVagval(createVisaVagvalRequest(konsumentA, vardgivareB, null,
 				"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));

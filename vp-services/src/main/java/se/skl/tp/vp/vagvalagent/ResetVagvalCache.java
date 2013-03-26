@@ -71,6 +71,6 @@ public class ResetVagvalCache implements Callable {
 	}
 	
 	private String getResultAsString(ResetVagvalCacheResponse result) {
-		return "Vagval cache reset result = " + result.getResetResult();
+		return "Vagval cache reset result = " + result.isResetResult();
 	}
 }
