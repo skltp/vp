@@ -65,6 +65,23 @@
 			<artifactId>pingforconfiguration-schemas</artifactId>
 			<version>1.0</version>
 		</dependency>
+		
+		<!-- Ping -->
+		<dependency>
+			<groupId>se.skl.tp</groupId>
+			<artifactId>itinfra-tp-schemas</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>se.skl.tp</groupId>
+			<artifactId>itinfra-tp-ping-virtualisering</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>se.skl.tp</groupId>
+			<artifactId>itinfra-tp-ping-test-producer</artifactId>
+			<version>1.3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>mysql</groupId>
