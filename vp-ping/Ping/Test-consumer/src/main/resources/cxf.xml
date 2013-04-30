@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- * Copyright 2009 Sjukvardsradgivningen * * This library is free software; 
+	you can redistribute it and/or modify * it under the terms of version 2.1 
+	of the GNU Lesser General Public * License as published by the Free Software 
+	Foundation. * * This library is distributed in the hope that it will be useful, 
+	* but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU Lesser General Public 
+	License for more details. * * You should have received a copy of the GNU 
+	Lesser General Public * License along with this library; if not, write to 
+	the * Free Software Foundation, Inc., 59 Temple Place, Suite 330, * Boston, 
+	MA 02111-1307 USA -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://cxf.apache.org/configuration/security"
+	xmlns:http="http://cxf.apache.org/transports/http/configuration"
+	xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:cxf="http://cxf.apache.org/core"
+	xsi:schemaLocation="
+		   http://cxf.apache.org/core                          http://cxf.apache.org/schemas/core.xsd
+	       http://cxf.apache.org/configuration/security         http://cxf.apache.org/schemas/configuration/security.xsd
+           http://cxf.apache.org/transports/http/configuration  http://cxf.apache.org/schemas/configuration/http-conf.xsd
+           http://www.springframework.org/schema/beans          http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="abstractLoggingInterceptor" abstract="true">
+		<property name="prettyLogging" value="true" />
+	</bean>
+	<bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor"
+		parent="abstractLoggingInterceptor" />
+	<bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor"
+		parent="abstractLoggingInterceptor" />
+
+	<cxf:bus>
+		<cxf:inInterceptors>
+			<ref bean="loggingInInterceptor" />
+		</cxf:inInterceptors>
+		<cxf:outInterceptors>
+			<ref bean="loggingOutInterceptor" />
+		</cxf:outInterceptors>
+		<cxf:outFaultInterceptors>
+			<ref bean="loggingOutInterceptor" />
+		</cxf:outFaultInterceptors>
+		<cxf:inFaultInterceptors>
+			<ref bean="loggingInInterceptor" />
+		</cxf:inFaultInterceptors>
+	</cxf:bus>
+
+</beans> 
+
