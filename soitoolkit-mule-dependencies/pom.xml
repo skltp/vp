@@ -167,6 +167,17 @@
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-cxf</artifactId>
 			<version>${mule.version}</version>
+			<!-- Exclude mule-module-spring-security since we don't use it and it contains dependencies to old versions of spring causing strange problems to occur -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.mule.modules</groupId>
+					<artifactId>mule-module-spring-security</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-web</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -247,6 +258,13 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
 			<version>${activemq.version}</version>
+			<!-- Exclude spring-context to ensure that we don't get conflicting versions -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Required to be able to configure a embedded AMQ-broker in spring-config-files -->
 		<dependency>
