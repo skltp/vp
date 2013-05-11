@@ -29,7 +29,7 @@ import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 
 public class VagvalAgentTest {
 
-	VagvalAgent vagvalAgent;
+	VagvalAgentMock vagvalAgent;
 	HsaCache hsaCacheMock;
 
 	private static final String CRM_SCHEDULING = "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1";
@@ -50,7 +50,7 @@ public class VagvalAgentTest {
 		URL url = getClass().getClassLoader().getResource("hsacache.xml");
 		HsaCache hsaCache = new HsaCacheImpl().init(url.getFile());
 
-		vagvalAgent = new VagvalAgent();
+		vagvalAgent = new VagvalAgentMock();
 		vagvalAgent.setAddressDelimiter("#");
 		vagvalAgent.setHsaCache(hsaCache);
 	}
@@ -64,8 +64,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREUNIT_A);
@@ -93,8 +93,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(UNKNOWN_HEALTHCAREPROVIDER);
@@ -122,8 +122,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(UNKNOWN_HEALTHCAREPROVIDER);
@@ -153,8 +153,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREUNIT_A);
@@ -182,8 +182,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(LOCAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREPROVIDER_A);
@@ -213,8 +213,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(LOCAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_B));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREPROVIDER_A);
@@ -245,8 +245,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(LOCAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREPROVIDER_A);
@@ -275,8 +275,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		/*
 		 * HEALTHCAREPROVIDER_B#HEALTHCAREUNIT_A, means that first a check is
@@ -305,8 +305,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		/*
 		 * HEALTHCAREPROVIDER_B#HEALTHCAREUNIT_A, means that first a check is
@@ -343,8 +343,8 @@ public class VagvalAgentTest {
 		ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
 		authorization.add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, SE));
 
-		vagvalAgent.virtualiseringsInfo = routing;
-		vagvalAgent.anropsBehorighetsInfo = authorization;
+		vagvalAgent.setMockVirtualiseringsInfo(routing);
+		vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
 		VisaVagvalRequest request = new VisaVagvalRequest();
 		request.setReceiverId(HEALTHCAREUNIT_A);

@@ -1,7 +1,9 @@
 package se.skl.tp.vp.getlogicaladdresseesbyservicecontract;
 
-import static org.junit.Assert.*;
-import static se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract.extractFirstPartOfNamespace;
+import static se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,6 +19,7 @@ import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
+import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
 
 public class GetLogicalAddresseesByServiceContractTest {
 	
@@ -150,39 +153,29 @@ public class GetLogicalAddresseesByServiceContractTest {
 	}
 
 	private VagvalAgent createVagvalAgentContainingServiceContractNamespaces() {
-		
-		VagvalAgent vagvalAgent = new VagvalAgent();
-		
+
 		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfigurationResponder:1"));
-		
-		vagvalAgent.anropsBehorighetsInfo = anropsBehorighetsInfo;
-		
-		return vagvalAgent;
+
+		return new VagvalAgentMock(anropsBehorighetsInfo);
 	}
 	
 	private VagvalAgent createVagvalAgentContainingServiceInteractionNamespaces() {
 
-		VagvalAgent vagvalAgent = new VagvalAgent();
-		
 		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
-		
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21"));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20"));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21"));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20"));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21"));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"));	
-		
-		vagvalAgent.anropsBehorighetsInfo = anropsBehorighetsInfo;
-		
-		return vagvalAgent;
+
+		return new VagvalAgentMock(anropsBehorighetsInfo);
 	}
 
-	private AnropsBehorighetsInfoType validAuthorization(String receiverId, String senderId,
-			String tjansteKontrakt) {
+	private AnropsBehorighetsInfoType validAuthorization(String receiverId, String senderId, String tjansteKontrakt) {
 		AnropsBehorighetsInfoType behorighetsInfoType = new AnropsBehorighetsInfoType();
 		behorighetsInfoType.setReceiverId(receiverId);
 		behorighetsInfoType.setSenderId(senderId);

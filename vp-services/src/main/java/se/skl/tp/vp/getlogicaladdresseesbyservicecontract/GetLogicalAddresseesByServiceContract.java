@@ -42,7 +42,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		}
 
 		Set<String> uniqueLogicalAddresses = new HashSet<String>();
-		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.anropsBehorighetsInfo) {
+		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
 			if (validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
 				uniqueLogicalAddresses.add(authInfo.getReceiverId());
 			}

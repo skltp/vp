@@ -28,21 +28,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.datatype.DatatypeConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 
 import se.skl.tp.hsa.cache.HsaCache;
-import static se.skl.tp.hsa.cache.HsaCache.DEFAUL_ROOTNODE;
-import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheRequest;
 import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheResponse;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
@@ -77,8 +73,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	public static final String TK_LOCAL_CACHE = System.getProperty("user.home") + System.getProperty("file.separator")
 			+ ".tk.localCache";
 
-	public List<VirtualiseringsInfoType> virtualiseringsInfo = null;
-	public List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = null;
+	private VagvalHandler vagvalHandler = null;
+	private BehorighetHandler behorighetHandler = null;
 	private HsaCache hsaCache;
 
 	private String endpointAddressTjanstekatalog;
@@ -118,8 +114,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			}
 
 			if (isInitialized() && logger.isDebugEnabled()) {
-				logger.info("init loaded " + anropsBehorighetsInfo.size() + " AnropsBehorighet");
-				logger.info("init loaded " + virtualiseringsInfo.size() + " VirtualiseradTjansteproducent");
+				logger.info("init loaded " + behorighetHandler.size() + " AnropsBehorighet");
+				logger.info("init loaded " + vagvalHandler.size() + " VirtualiseradTjansteproducent");
 			}
 		}
 	}
@@ -133,8 +129,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 *            the permission state.
 	 */
 	private synchronized void setState(List<VirtualiseringsInfoType> v, List<AnropsBehorighetsInfoType> p) {
-		this.virtualiseringsInfo = v;
-		this.anropsBehorighetsInfo = p;
+		this.vagvalHandler     = (v == null) ? null : new VagvalHandler(hsaCache, v);
+		this.behorighetHandler = (p == null) ? null : new BehorighetHandler(hsaCache, p);
 	}
 
 	/**
@@ -143,7 +139,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @return true if cache has been initalized, otherwise false.
 	 */
 	private synchronized boolean isInitialized() {
-		return (this.anropsBehorighetsInfo != null) && (this.virtualiseringsInfo != null);
+		return (this.behorighetHandler != null) && (this.vagvalHandler != null);
 	}
 
 	private SokVagvalsInfoInterface getPort() {
@@ -158,7 +154,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * 
 	 * @return virtualizations, or null on any error.
 	 */
-	private List<VirtualiseringsInfoType> getVirtualiseringar() {
+	protected List<VirtualiseringsInfoType> getVirtualiseringar() {
 		List<VirtualiseringsInfoType> l = null;
 		try {
 			logger.info("Fetch all virtualizations...");
@@ -175,7 +171,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * 
 	 * @return permissions, or null on any error.
 	 */
-	private List<AnropsBehorighetsInfoType> getBehorigheter() {
+	protected List<AnropsBehorighetsInfoType> getBehorigheter() {
 		List<AnropsBehorighetsInfoType> l = null;
 		try {
 			logger.info("Fetch all permissions...");
@@ -214,8 +210,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	// save object
 	private void saveToLocalCopy(String fileName) {
 		PersistentCache pc = new PersistentCache();
-		pc.anropsBehorighetsInfo = this.anropsBehorighetsInfo;
-		pc.virtualiseringsInfo = this.virtualiseringsInfo;
+		pc.anropsBehorighetsInfo = this.behorighetHandler.getAnropsBehorighetsInfoList();
+		pc.virtualiseringsInfo = this.vagvalHandler.getVirtualiseringsInfo();
 
 		logger.info("Save to local copy: {}", fileName);
 		OutputStream os = null;
@@ -238,6 +234,14 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			} catch (Exception e) {
 			}
 		}
+	}
+
+	public List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
+
+		// If the initiation failed, try again
+		init();
+
+		return (behorighetHandler == null) ? null : behorighetHandler.getAnropsBehorighetsInfoList();
 	}
 
 	/**
@@ -289,103 +293,31 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			throw new VpSemanticException(errorMessage);
 		}
 
-		final List<VirtualiseringsInfoType> curVirtualiseringsInfo;
-		final List<AnropsBehorighetsInfoType> curAnropsBehorighetsInfo;
-		synchronized (this) {
-			curVirtualiseringsInfo = this.virtualiseringsInfo;
-			curAnropsBehorighetsInfo = this.anropsBehorighetsInfo;
-		}
-
 		// Determine if delimiter is set and present in request logical address.
 		// Delimiter is used in deprecated default routing (VG#VE).
 		boolean useDeprecatedDefaultRouting = addressDelimiter != null && addressDelimiter.length() > 0
 				&& request.getReceiverId().contains(addressDelimiter);
 		List<String> receiverAddresses = extractReceiverAdresses(request, useDeprecatedDefaultRouting);
 
-		// Check if routing was found in TAK for requested receiver.
-		VisaVagvalResponse response = getRoutingInformation(request, curVirtualiseringsInfo,
-				useDeprecatedDefaultRouting, receiverAddresses);
-
-		// No routing information found for requested receiver, check in the HSA
-		// tree if there is any routing information registered on parents.
-		// Routing using HSA tree is only applicable when not using deprecated
-		// default routing (VG#VE)
-		if (containsNoRouting(response) && !useDeprecatedDefaultRouting) {
-			response = getRoutingInformationFromParent(request, curVirtualiseringsInfo, receiverAddresses);
-		}
+		// Get possible routes (vagval)
+		VisaVagvalResponse response = vagvalHandler.getRoutingInformation(request, useDeprecatedDefaultRouting, receiverAddresses);
 
 		// No routing was found neither on requested receiver nor using the HSA
 		// tree for parents. No need to continue to check authorization.
-		if (containsNoRouting(response)) {
+		if (vagvalHandler.containsNoRouting(response)) {
 			return response;
 		}
 
 		// Check in TAK if sender is authorized to call the requested
 		// receiver,if not check if sender is authorized to call any of the
-		// receiver parents using HSA tree. HSA tree is only used when old
-		// school default routing (VG#VE) is not used.
-		if (!isAuthorized(request, receiverAddresses, curAnropsBehorighetsInfo)) {
-			if (!isAuthorizedToAnyParent(request, curAnropsBehorighetsInfo)) {
-				throwNotAuthorizedException(request);
-			}
+		// receiver parents using HSA tree. 
+		//
+		// Note: If old school default routing (VG#VE)HSA tree is used then we only get one address (the first one found routing info for) to check permissions for.
+		if (!behorighetHandler.isAuthorized(request, receiverAddresses)) {
+			throwNotAuthorizedException(request);
 		}
 
 		return response;
-	}
-
-	private VisaVagvalResponse getRoutingInformation(VisaVagvalRequest request,
-			final List<VirtualiseringsInfoType> curVirtualiseringsInfo, boolean useDeprecatedDefaultRouting,
-			List<String> receiverAddresses) {
-		VisaVagvalResponse response = new VisaVagvalResponse();
-
-		// Outer loop over all given addresses
-		boolean addressFound = false;
-		for (String requestReceiverId : receiverAddresses) {
-			// Find all possible LogiskAdressat
-			for (VirtualiseringsInfoType vi : curVirtualiseringsInfo) {
-				if (vi.getReceiverId().equals(requestReceiverId)
-						&& vi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
-						&& request.getTidpunkt().compare(vi.getFromTidpunkt()) != DatatypeConstants.LESSER
-						&& request.getTidpunkt().compare(vi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
-					addressFound = true;
-					response.getVirtualiseringsInfo().add(vi);
-				}
-			}
-			// Only return 1 address if we do a delimiter search!
-			if (useDeprecatedDefaultRouting && addressFound) {
-				break;
-			}
-		}
-		return response;
-	}
-
-	private VisaVagvalResponse getRoutingInformationFromParent(VisaVagvalRequest request,
-			final List<VirtualiseringsInfoType> curVirtualiseringsInfo, List<String> receiverAddresses) {
-
-		VisaVagvalResponse response = new VisaVagvalResponse();
-
-		String receiverId = receiverAddresses.get(0);
-		while (response.getVirtualiseringsInfo().isEmpty() && receiverId != DEFAUL_ROOTNODE) {
-			receiverId = getParent(receiverId);
-			// FIXME: When deprecated default routing is removed
-			// construction using Arrays.asList(receiverId) can be replaced
-			// with String
-			response = getRoutingInformation(request, curVirtualiseringsInfo, false, Arrays.asList(receiverId));
-		}
-
-		return response;
-	}
-
-	private String getParent(String receiverId) {
-		try {
-			return hsaCache.getParent(receiverId);
-		} catch (HsaCacheInitializationException e) {
-			throw new VpSemanticException("VP011 Internal HSA cache is not available!", e);
-		}
-	}
-
-	private boolean containsNoRouting(VisaVagvalResponse response) {
-		return response == null || response.getVirtualiseringsInfo().isEmpty();
 	}
 
 	/*
@@ -413,39 +345,5 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				+ ", receiverId: " + request.getReceiverId() + ", senderId: " + request.getSenderId());
 		logger.info(errorMessage);
 		throw new VpSemanticException(errorMessage);
-	}
-
-	private boolean isAuthorized(VisaVagvalRequest request, List<String> receiverAddresses,
-			List<AnropsBehorighetsInfoType> permissions) {
-		for (String requestReceiverId : receiverAddresses) {
-			if (isAuthorized(request, requestReceiverId, permissions)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isAuthorizedToAnyParent(VisaVagvalRequest request, List<AnropsBehorighetsInfoType> permissions) {
-		String receiverId = request.getReceiverId();
-		while (receiverId != DEFAUL_ROOTNODE) {
-			receiverId = getParent(receiverId);
-			if (isAuthorized(request, receiverId, permissions)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isAuthorized(VisaVagvalRequest request, String receiverId,
-			List<AnropsBehorighetsInfoType> permissions) {
-		for (AnropsBehorighetsInfoType abi : permissions) {
-			if (abi.getReceiverId().equals(receiverId) && abi.getSenderId().equals(request.getSenderId())
-					&& abi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
-					&& request.getTidpunkt().compare(abi.getFromTidpunkt()) != DatatypeConstants.LESSER
-					&& request.getTidpunkt().compare(abi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
-				return true;
-			}
-		}
-		return false;
 	}
 }
