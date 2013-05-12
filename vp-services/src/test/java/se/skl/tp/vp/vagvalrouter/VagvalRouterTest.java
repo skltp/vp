@@ -1,13 +1,11 @@
 package se.skl.tp.vp.vagvalrouter;
 
+import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createAuthorization;
+import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createRouting;
+
 import java.io.File;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
-
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import junit.framework.TestCase;
 
@@ -16,12 +14,9 @@ import org.mockito.Mockito;
 import org.mule.api.MuleMessage;
 
 import se.skl.tp.hsa.cache.HsaCache;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
@@ -59,9 +54,9 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testHappyDaysOneHit() throws Exception {
 		
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("https://adress", adress);
@@ -71,11 +66,11 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testManyHits() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress9", "urn:riv:v9",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress9", "urn:riv:v9",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress1", "urn:riv:v1",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress1", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("https://adress1", adress);
@@ -109,11 +104,11 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testManyHitsNoMatchingRivVersion() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress9", "urn:riv:v9",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress9", "urn:riv:v9",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress8", "urn:riv:v8",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress8", "urn:riv:v8",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 
 		try {
@@ -128,11 +123,11 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testManyMatchingRivVersion() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress9", "urn:riv:v1",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress9", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress8", "urn:riv:v1",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress8", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 
 		try {
@@ -147,7 +142,7 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testBehorighetMissing() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
 		try {
 			helper.getAddressFromAgent(vagvalInput);
@@ -160,7 +155,7 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testVirtualiseradTjansteproducentMissing() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1", "unknown",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1", "unknown",
 				"VardgivareB"));
 		try {
 			helper.getAddressFromAgent(vagvalInput);
@@ -174,7 +169,7 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testReceiverNotSpecified() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1", "unknown",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1", "unknown",
 				"VardgivareB"));
 		try {
 			vagvalInput.receiverId = null;
@@ -189,7 +184,7 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testSenderNotSpecified() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1", "unknown",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1", "unknown",
 				"VardgivareB"));
 		try {
 			vagvalInput.senderId = null;
@@ -204,7 +199,7 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testRivVersionNotConfigured() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1", "unknown",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1", "unknown",
 				"VardgivareB"));
 		try {
 			vagvalInput.rivVersion = null;
@@ -219,9 +214,9 @@ public class VagvalRouterTest extends TestCase {
 	@Test
 	public void testOneHitEmptyAdress() throws Exception {
 
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("", "urn:riv:v1", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("", "urn:riv:v1", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
-		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		try {
 			helper.getAddressFromAgent(vagvalInput);
@@ -237,9 +232,9 @@ public class VagvalRouterTest extends TestCase {
 
 		vagvalAgent.setAddressDelimiter("#");
 		vagvalInput.receiverId = "VardgivareB#VardgivareA";
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("https://adress", adress);
@@ -251,64 +246,14 @@ public class VagvalRouterTest extends TestCase {
 
 		vagvalAgent.setAddressDelimiter("#");
 		vagvalInput.receiverId = "VardgivareA#VardgivareB";
-		vagvalAgent.getMockVirtualiseringsInfo().add(createVirtualiseringsInfoType("https://adress", "urn:riv:v1",
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
-		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAnropsBehorighetsInfoType("TP-TEST", "{urn:riv13606:v1}RIV",
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
 				"VardgivareB"));
 		String adress = helper.getAddressFromAgent(vagvalInput);
 		assertEquals("https://adress", adress);
 
 	}
 
-	private VirtualiseringsInfoType createVirtualiseringsInfoType(String adress, String rivVersion, String namnrymnd,
-			String receiver) throws Exception {
-
-		XMLGregorianCalendar fromTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		Duration anHourAgo = DatatypeFactory.newInstance().newDuration(false, 0, 0, 0, 1, 0, 0);
-		fromTidpunkt.add(anHourAgo);
-
-		XMLGregorianCalendar tomTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		Duration tenYearsDuration = DatatypeFactory.newInstance().newDurationYearMonth(true, new BigInteger("10"),
-				new BigInteger("2"));
-		tomTidpunkt.add(tenYearsDuration);
-
-		VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
-		vi.setAdress(adress);
-		vi.setFromTidpunkt(fromTidpunkt);
-		vi.setTomTidpunkt(tomTidpunkt);
-		vi.setReceiverId(receiver);
-		vi.setRivProfil(rivVersion);
-		VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
-		viId.setValue(String.valueOf(1));
-		vi.setVirtualiseringsInfoId(viId);
-		vi.setTjansteKontrakt(namnrymnd);
-		return vi;
-
-	}
-
-	private AnropsBehorighetsInfoType createAnropsBehorighetsInfoType(String sender, String namnrymd, String receiver)
-			throws Exception {
-
-		Duration tenYearsDuration = DatatypeFactory.newInstance().newDurationYearMonth(true, new BigInteger("10"),
-				new BigInteger("2"));
-		Duration anHourAgo = DatatypeFactory.newInstance().newDuration(false, 0, 0, 0, 1, 0, 0);
-
-		XMLGregorianCalendar fromTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		fromTidpunkt.add(anHourAgo);
-
-		XMLGregorianCalendar tomTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		tomTidpunkt.add(tenYearsDuration);
-
-		AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
-		aboId.setValue(String.valueOf(1));
-		AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
-		abo.setAnropsBehorighetsInfoId(aboId);
-		abo.setFromTidpunkt(fromTidpunkt);
-		abo.setTomTidpunkt(tomTidpunkt);
-		abo.setReceiverId(receiver);
-		abo.setSenderId(sender);
-		abo.setTjansteKontrakt(namnrymd);
-		return abo;
-	}
 
 }

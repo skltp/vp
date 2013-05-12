@@ -20,11 +20,9 @@
  */
 package se.skl.tp.vp.vagvalagent;
 
-import java.math.BigInteger;
-
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
+import static se.skl.tp.vp.util.VagvalSchemasTestUtil.AN_HOUR_AGO;
+import static se.skl.tp.vp.util.VagvalSchemasTestUtil.IN_TEN_YEARS;
+import static se.skl.tp.vp.util.VagvalSchemasTestUtil.getRelativeDate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +34,7 @@ import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaVirtualiseringarResponseType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.SokVagvalsInfoInterface;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
-import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalrouter.VagvalInfo;
-import se.skl.tp.vp.vagvalrouter.VagvalInfo.Info;
 
 /**
  * Denna klass används för att kunna simulera en tjänstekatalog med valfritt
@@ -84,26 +80,14 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 		HamtaAllaAnropsBehorigheterResponseType sampleResponse = new HamtaAllaAnropsBehorigheterResponseType();
 
 		try {
-			Duration tenYearsDuration = DatatypeFactory.newInstance().newDurationYearMonth(true,
-					new BigInteger("10"), new BigInteger("2"));
-			Duration anHourAgo = DatatypeFactory.newInstance().newDuration(false, 0, 0, 0, 1, 0, 0);
-
-			XMLGregorianCalendar fromTidpunkt = XmlGregorianCalendarUtil
-					.getNowAsXMLGregorianCalendar();
-			fromTidpunkt.add(anHourAgo);
-
-			XMLGregorianCalendar tomTidpunkt = XmlGregorianCalendarUtil
-					.getNowAsXMLGregorianCalendar();
-			tomTidpunkt.add(tenYearsDuration);
-
 			int id = 1;
 			for (VagvalInfo.Info vagval : getVagvalInfo().getInfos()) {
 				AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
 				aboId.setValue(String.valueOf(id++));
 				AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
 				abo.setAnropsBehorighetsInfoId(aboId);
-				abo.setFromTidpunkt(fromTidpunkt);
-				abo.setTomTidpunkt(tomTidpunkt);
+				abo.setFromTidpunkt(getRelativeDate(AN_HOUR_AGO));
+				abo.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
 				abo.setReceiverId(vagval.receiver);
 				abo.setSenderId(vagval.sender);
 				abo.setTjansteKontrakt(vagval.tjansteKontrakt);
@@ -132,23 +116,12 @@ public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 		HamtaAllaVirtualiseringarResponseType sampleResponse = new HamtaAllaVirtualiseringarResponseType();
 
 		try {
-			XMLGregorianCalendar fromTidpunkt = XmlGregorianCalendarUtil
-					.getNowAsXMLGregorianCalendar();
-			Duration anHourAgo = DatatypeFactory.newInstance().newDuration(false, 0, 0, 0, 1, 0, 0);
-			fromTidpunkt.add(anHourAgo);
-
-			XMLGregorianCalendar tomTidpunkt = XmlGregorianCalendarUtil
-					.getNowAsXMLGregorianCalendar();
-			Duration tenYearsDuration = DatatypeFactory.newInstance().newDurationYearMonth(true,
-					new BigInteger("10"), new BigInteger("2"));
-			tomTidpunkt.add(tenYearsDuration);
-
 			int id = 1;
 			for (VagvalInfo.Info vagval : getVagvalInfo().getInfos()) {
 				VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
 				vi.setAdress(vagval.adress);
-				vi.setFromTidpunkt(fromTidpunkt);
-				vi.setTomTidpunkt(tomTidpunkt);
+				vi.setFromTidpunkt(getRelativeDate(AN_HOUR_AGO));
+				vi.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
 				vi.setReceiverId(vagval.receiver);
 				vi.setRivProfil(vagval.rivVersion);
 				VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();

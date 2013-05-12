@@ -22,8 +22,11 @@ package se.skl.tp.vp.vagvalagent;
 
 import static se.skl.tp.hsa.cache.HsaCache.DEFAUL_ROOTNODE;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeConstants;
 
@@ -38,6 +41,7 @@ public class VagvalHandler {
 
 	// Initialized to a non-null value by the constructor.
 	private List<VirtualiseringsInfoType> virtualiseringsInfo = null;
+	private Map<String, List<VirtualiseringsInfoType>> virtualiseringsInfoMap;
 
 	// Initialized to a non-null value by the constructor.
 	private HsaCache hsaCache;
@@ -53,6 +57,7 @@ public class VagvalHandler {
 
 		this.hsaCache = hsaCache;
 		this.virtualiseringsInfo = virtualiseringsInfo;
+		this.virtualiseringsInfoMap = createVirtualiseringsInfoMap(virtualiseringsInfo);
 	}
 	
 	public int size() {
@@ -89,15 +94,23 @@ public class VagvalHandler {
 		boolean addressFound = false;
 		for (String requestReceiverId : receiverAddresses) {
 			// Find all possible LogiskAdressat
-			for (VirtualiseringsInfoType vi : virtualiseringsInfo) {
-				if (vi.getReceiverId().equals(requestReceiverId)
-						&& vi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
-						&& request.getTidpunkt().compare(vi.getFromTidpunkt()) != DatatypeConstants.LESSER
-						&& request.getTidpunkt().compare(vi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
-					addressFound = true;
-					response.getVirtualiseringsInfo().add(vi);
+			
+			// Start to lookup elements matching recevier, tjanstekontrakt in the map
+			List<VirtualiseringsInfoType> matchingVirtualiseringsInfo = lookupInVirtualiseringsInfoMap(requestReceiverId, request.getTjanstegranssnitt());
+			
+			// Skip if no hit in the map
+			if (matchingVirtualiseringsInfo != null) {
+
+				// Now look through that list for matching time intervals
+				for (VirtualiseringsInfoType vi : matchingVirtualiseringsInfo) {
+					if (request.getTidpunkt().compare(vi.getFromTidpunkt()) != DatatypeConstants.LESSER &&
+						request.getTidpunkt().compare(vi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
+						addressFound = true;
+						response.getVirtualiseringsInfo().add(vi);
+					}
 				}
 			}
+			
 			// Only return 1 address if we do a delimiter search!
 			if (useDeprecatedDefaultRouting && addressFound) {
 				break;
@@ -128,5 +141,38 @@ public class VagvalHandler {
 		} catch (HsaCacheInitializationException e) {
 			throw new VpSemanticException("VP011 Internal HSA cache is not available!", e);
 		}
+	}
+	
+	/* VIRTUALISERINGS-INFO MAP METHODS */
+
+	private Map<String, List<VirtualiseringsInfoType>> createVirtualiseringsInfoMap(List<VirtualiseringsInfoType> inVirtualiseringsInfo) {
+
+		Map<String, List<VirtualiseringsInfoType>> outVirtualiseringsInfoMap = new HashMap<String, List<VirtualiseringsInfoType>>();
+		
+		// Loop through all entries in the list and store them by recevier and tjanstekontrakt in a map for faster lookup
+		for (VirtualiseringsInfoType v : inVirtualiseringsInfo) {
+			String key = createVirtualiseringsInfoMapKey(v.getReceiverId(), v.getTjansteKontrakt());
+			
+			// Lookup the entry (list) in the map and create it if missing
+			List<VirtualiseringsInfoType> value = outVirtualiseringsInfoMap.get(key);
+			if (value == null) {
+				value = new ArrayList<VirtualiseringsInfoType>();
+				outVirtualiseringsInfoMap.put(key, value);
+			}
+			
+			// Add the record to the list
+			value.add(v);
+		}
+
+		return outVirtualiseringsInfoMap;
+	}
+	
+	List<VirtualiseringsInfoType> lookupInVirtualiseringsInfoMap(String receiverId, String tjansteKontrakt) {
+		String key = createVirtualiseringsInfoMapKey(receiverId, tjansteKontrakt);
+		return virtualiseringsInfoMap.get(key);
+	}
+
+	private String createVirtualiseringsInfoMapKey(String receiverId, String tjansteKontrakt) {
+		return receiverId + "|" + tjansteKontrakt;
 	}
 }

@@ -1,11 +1,32 @@
+/**
+ * Copyright 2009 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ */
 package se.skl.tp.vp.vagvalagent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createAuthorization;
+import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createRouting;
 
-import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -20,9 +41,7 @@ import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
@@ -30,7 +49,6 @@ import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 public class VagvalAgentTest {
 
 	VagvalAgentMock vagvalAgent;
-	HsaCache hsaCacheMock;
 
 	private static final String CRM_SCHEDULING = "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1";
 	private static final String CRM_LISTING = "urn:riv:crm:listing:GetListingResponder:1";
@@ -363,55 +381,4 @@ public class VagvalAgentTest {
 		time.add(anHourAgo);
 		return time;
 	}
-
-	private VirtualiseringsInfoType createRouting(String adress, String rivVersion, String namnrymnd, String receiver)
-			throws Exception {
-
-		XMLGregorianCalendar fromTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		Duration anHourAgo = DatatypeFactory.newInstance().newDuration(false, 0, 0, 0, 1, 0, 0);
-		fromTidpunkt.add(anHourAgo);
-
-		XMLGregorianCalendar tomTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		Duration tenYearsDuration = DatatypeFactory.newInstance().newDurationYearMonth(true, new BigInteger("10"),
-				new BigInteger("2"));
-		tomTidpunkt.add(tenYearsDuration);
-
-		VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
-		vi.setAdress(adress);
-		vi.setFromTidpunkt(fromTidpunkt);
-		vi.setTomTidpunkt(tomTidpunkt);
-		vi.setReceiverId(receiver);
-		vi.setRivProfil(rivVersion);
-		VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
-		viId.setValue(String.valueOf(1));
-		vi.setVirtualiseringsInfoId(viId);
-		vi.setTjansteKontrakt(namnrymnd);
-		return vi;
-	}
-
-	private AnropsBehorighetsInfoType createAuthorization(String sender, String namnrymd, String receiver)
-			throws Exception {
-
-		Duration tenYearsDuration = DatatypeFactory.newInstance().newDurationYearMonth(true, new BigInteger("10"),
-				new BigInteger("2"));
-		Duration anHourAgo = DatatypeFactory.newInstance().newDuration(false, 0, 0, 0, 1, 0, 0);
-
-		XMLGregorianCalendar fromTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		fromTidpunkt.add(anHourAgo);
-
-		XMLGregorianCalendar tomTidpunkt = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
-		tomTidpunkt.add(tenYearsDuration);
-
-		AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
-		aboId.setValue(String.valueOf(1));
-		AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
-		abo.setAnropsBehorighetsInfoId(aboId);
-		abo.setFromTidpunkt(fromTidpunkt);
-		abo.setTomTidpunkt(tomTidpunkt);
-		abo.setReceiverId(receiver);
-		abo.setSenderId(sender);
-		abo.setTjansteKontrakt(namnrymd);
-		return abo;
-	}
-
 }

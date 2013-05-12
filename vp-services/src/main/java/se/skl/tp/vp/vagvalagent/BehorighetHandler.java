@@ -22,7 +22,10 @@ package se.skl.tp.vp.vagvalagent;
 
 import static se.skl.tp.hsa.cache.HsaCache.DEFAUL_ROOTNODE;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeConstants;
 
@@ -36,6 +39,7 @@ public class BehorighetHandler {
 
 	// Initialized to a non-null value by the constructor.
 	private List<AnropsBehorighetsInfoType> permissions;
+	private Map<String, List<AnropsBehorighetsInfoType>> permissionMap;
 
 	// Initialized to a non-null value by the constructor.
 	private HsaCache hsaCache;
@@ -50,6 +54,7 @@ public class BehorighetHandler {
 
 		this.hsaCache = hsaCache;
 		this.permissions = permissions;
+		this.permissionMap = createPermissionMap(permissions);
 	}
 	
 	public int size() {
@@ -102,11 +107,16 @@ public class BehorighetHandler {
 
 	private boolean isAuthorized(VisaVagvalRequest request, String receiverId) {
 
-		for (AnropsBehorighetsInfoType abi : permissions) {
-			if (abi.getReceiverId().equals(receiverId) && abi.getSenderId().equals(request.getSenderId())
-					&& abi.getTjansteKontrakt().equals(request.getTjanstegranssnitt())
-					&& request.getTidpunkt().compare(abi.getFromTidpunkt()) != DatatypeConstants.LESSER
-					&& request.getTidpunkt().compare(abi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
+		// Start to lookup elements matching recevier, sender and tjanstekontrakt in the map
+		List<AnropsBehorighetsInfoType> matchingPermissions = lookupInPermissionMap(receiverId, request.getSenderId(), request.getTjanstegranssnitt());
+		
+		// Return false if no hit in the map
+		if (matchingPermissions == null) return false;
+		
+		// Now look through that list for matching time intervals
+		for (AnropsBehorighetsInfoType abi : matchingPermissions) {
+			if (request.getTidpunkt().compare(abi.getFromTidpunkt()) != DatatypeConstants.LESSER &&
+			    request.getTidpunkt().compare(abi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
 				return true;
 			}
 		}
@@ -121,4 +131,36 @@ public class BehorighetHandler {
 		}
 	}
 	
+	/* PERMISSION MAP METHODS */
+
+	private Map<String, List<AnropsBehorighetsInfoType>> createPermissionMap(List<AnropsBehorighetsInfoType> inPermissions) {
+
+		Map<String, List<AnropsBehorighetsInfoType>> outPermissionMap = new HashMap<String, List<AnropsBehorighetsInfoType>>();
+		
+		// Loop through all entries in the list and store them by recevier, sender and tjanstekontrakt in a map for faster lookup
+		for (AnropsBehorighetsInfoType p : inPermissions) {
+			String key = createPermissionsMapKey(p.getReceiverId(), p.getSenderId(), p.getTjansteKontrakt());
+			
+			// Lookup the entry (list) in the map and create it if missing
+			List<AnropsBehorighetsInfoType> value = outPermissionMap.get(key);
+			if (value == null) {
+				value = new ArrayList<AnropsBehorighetsInfoType>();
+				outPermissionMap.put(key, value);
+			}
+			
+			// Add the record to the list
+			value.add(p);
+		}
+
+		return outPermissionMap;
+	}
+	
+	List<AnropsBehorighetsInfoType> lookupInPermissionMap(String receiverId, String senderId, String tjansteKontrakt) {
+		String key = createPermissionsMapKey(receiverId, senderId, tjansteKontrakt);
+		return permissionMap.get(key);
+	}
+
+	private String createPermissionsMapKey(String receiverId, String senderId, String tjansteKontrakt) {
+		return receiverId + "|" + senderId + "|" + tjansteKontrakt;
+	}
 }
