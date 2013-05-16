@@ -83,10 +83,15 @@
 									<arguments>
 										<!-- sleeptime -->
 										<argument>2000</argument>
-										<!-- endpoint
+										<!-- 
+										
+										VP Ping endpoint 
 										<argument>https://localhost:20000/vp/Ping/1/rivtabp20</argument>
+										
+										Testproducer Ping endpoint
+										<argument>https://localhost:10000/test/Ping_Service</argument>
 										-->
-										<argument>https://localhost:20000/vp/Ping/1/rivtabp20</argument> 
+										<argument>https://localhost:10000/test/Ping_Service</argument> 
 										<!-- logical adress -->
 										<argument>Ping</argument>
 									</arguments>

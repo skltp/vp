@@ -28,30 +28,38 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 
-public class PingProducer {
+public class PingProducer implements Runnable {
 
-    protected PingProducer() throws Exception {
-        System.out.println("Starting Producer");
+	private static String endpointAddress = "https://localhost:10000/test/Ping_Service";
 
-        // Loads a cxf configuration file to use
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = this.getClass().getClassLoader().getResource("cxf-producer.xml");
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        
-        Object implementor = new PingImpl();
-        String address = "https://localhost:10000/test/Ping_Service";
-        Endpoint.publish(address, implementor);
-    }
+	protected PingProducer(String address) throws Exception {
+
+		System.out.println("Starting Ping testproducer");
+
+		// Loads a cxf configuration file to use
+		final SpringBusFactory bf = new SpringBusFactory();
+		final URL busFile = this.getClass().getClassLoader()
+				.getResource("cxf-producer.xml");
+		final Bus bus = bf.createBus(busFile.toString());
+
+		SpringBusFactory.setDefaultBus(bus);
+		final Object implementor = new PingImpl();
+		Endpoint.publish(address, implementor);
+	}
+
+	@Override
+	public void run() {
+		System.out.println("Ping testproducer ready...");
+	}
 
 	public static void main(String[] args) throws Exception {
-		
-        new PingProducer();
-        System.out.println("Producer ready...");
-        
-        Thread.sleep(60 * 60 * 1000);
-        System.out.println("Producer exiting");
-        System.exit(0);
-    }
-	
+
+		if (args.length > 0) {
+			endpointAddress = args[0];
+		}
+
+		(new Thread(new PingProducer(endpointAddress))).start();
+
+	}
+
 }
