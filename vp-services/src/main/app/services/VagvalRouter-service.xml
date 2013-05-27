@@ -38,7 +38,7 @@
         </custom-processor>
         
         <response>
-            <!--  <transformer ref="exceptionTransformer" />  -->
+            <transformer ref="exceptionTransformer" />
             <object-to-string-transformer /> 
             <transformer ref="logRespOut" />
         </response>

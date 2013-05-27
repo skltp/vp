@@ -8,10 +8,7 @@ import java.util.Map;
 import org.mule.tck.FunctionalTestCase;
 
 import se.skl.tjanst1.wsdl.Product;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
-import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
-import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 
@@ -20,10 +17,11 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 	private static final String NOT_AUHTORIZED_CONSUMER_HSAID = "some-not-authorized-consumer-hsaid";
 	private static final String AUHTORIZED_CONSUMER_HSAID = "some-authorized-consumer-hsaid";
 	private static final String PRODUCT_ID = "SW123";
+	private static final String PRODUCT_ID_EXCEPTION = "Exception";
 	private static final String TJANSTE_ADRESS = "https://localhost:20000/vp/tjanst1";
 	
 	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
-
+	
 	public VpFullServiceWithOriginalConsumerTest() {
 		super();
 		
@@ -38,7 +36,7 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 		vi_ORIGINAL_CONSUMER.rivVersion = "RIVTABP20";
 		vi_ORIGINAL_CONSUMER.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
 		vi_ORIGINAL_CONSUMER.adress = "https://localhost:19000/vardgivare-b/tjanst1";
-
+		
 		vagvalInputs.add(vi_ORIGINAL_CONSUMER);
 		svimi.setVagvalInputs(vagvalInputs);
 	}
@@ -80,4 +78,19 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
     		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:skl:tjanst1:rivtabp20, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
     	}
 	}
+	
+	public void testProducerThrowsCorrectSoapFault() throws Exception {
+		
+ 		Map<String, String> properties = new HashMap<String, String>();
+    	properties.put(VagvalRouter.X_VP_CONSUMER_ID, AUHTORIZED_CONSUMER_HSAID);
+
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID_EXCEPTION, TJANSTE_ADRESS, properties);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		assertTrue(ex.getMessage().contains("<faultcode>soap:Server</faultcode>"));
+    		assertTrue(ex.getMessage().contains("<faultstring>PP01 Product Does Not Exist</faultstring>"));
+    	}
+	}
+	
 }

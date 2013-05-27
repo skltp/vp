@@ -71,14 +71,33 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 		
 		logger.debug("transformMessage() called");
 		
-		final ExceptionPayload ep = msg.getExceptionPayload();
+		/*
+		 * NOTE!
+		 * ExceptionTransformer in its current shape only supports the case where a service 
+		 * producer returns a soap fault in a HTTP 500. In case of read timeout this is not 
+		 * handled correct and is a known bug. This bug is adressed in https://skl-tp.atlassian.net/browse/SKLTP-39.
+		 * 
+		 * In case where service producers returns soap fault in a HTTP 200, this is treated
+		 * as any OK response and no exception handling is triggered. Note that according to
+		 * specification WS-I Basic Profile 1.1 a soap fault should always be returned in a
+		 * HTTP 500, but some cases exists where service producers do not follow the spec.
+		 */
 
+		// Take care of any error message and send it back as a SOAP Fault!
+		// Is there an exception-payload?
+		ExceptionPayload ep = msg.getExceptionPayload();
 		if (ep == null) {
-        	logger.debug("No error, check for payload");
-        	if (msg.getPayload() instanceof NullPayload) {
-    			setSoapFault(msg, String.format(ERR_MSG, "response paylaod is emtpy, connection closed"), "", getEndpoint().getEndpointURI().getAddress());
-        	}
-        }
+			// No, it's no, just bail out returning what we got
+			logger.debug("No error, return origin message");
+			
+			//if (msg.getPayload() instanceof NullPayload) {
+			  //setSoapFault(msg, String.format(ERR_MSG, "response paylaod is emtpy, connection closed"), "", getEndpoint().getEndpointURI().getAddress());
+			//}
+			return msg;
+		}
+		
+		 msg.setExceptionPayload(null);
+		 msg.setProperty("http.status", 500, PropertyScope.OUTBOUND);
 		
         return msg;
  	}
