@@ -56,6 +56,8 @@ import se.skl.tp.vp.util.ClientUtil;
 public class VagvalAgent implements VisaVagvalsInterface {
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalAgent.class);
+	public static final boolean FORCE_RESET = true;
+	public static final boolean DONT_FORCE_RESET = false;
 
 	// cache
 	@XmlRootElement
@@ -97,15 +99,18 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	/**
-	 * Initialize the two lists if they are null
+	 * Initialize VagvalAgent resources. Force a init by setting forceReset=true, use
+	 * constants VagvalAgent.FORCE_RESET or VagvalAgent.DONT_FORCE_RESET.
+	 * If not forced, init checks if necessary resources are loaded, otherwise
+	 * resources are loaded.
 	 */
-	public void init() {
-		if (!isInitialized()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("entering VagvalsAgent.init");
-			}
-
-			setState(getVirtualiseringar(), getBehorigheter());
+	public void init(boolean forceReset) {
+		if (forceReset || !isInitialized()) {
+			logger.info("Init VagvalAgent...");
+			
+			List<VirtualiseringsInfoType> v = getVirtualiseringar();
+			List<AnropsBehorighetsInfoType> p = getBehorigheter();
+			setState(v, p);
 
 			if (isInitialized()) {
 				saveToLocalCopy(TK_LOCAL_CACHE);
@@ -113,10 +118,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				restoreFromLocalCopy(TK_LOCAL_CACHE);
 			}
 
-			if (isInitialized() && logger.isDebugEnabled()) {
-				logger.info("init loaded " + behorighetHandler.size() + " AnropsBehorighet");
-				logger.info("init loaded " + vagvalHandler.size() + " VirtualiseradTjansteproducent");
+			if (isInitialized()) {
+				logger.info("Init VagvalAgent loaded {} permissions", behorighetHandler.size());
+				logger.info("Init VagvalAgent loaded {} virtualizations", vagvalHandler.size());
 			}
+			
+			logger.info("Init VagvalAgent done");
 		}
 	}
 
@@ -238,37 +245,32 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	public List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
 
-		// If the initiation failed, try again
-		init();
+		// Dont force a reset, initialize only if needed
+		init(DONT_FORCE_RESET);
 
 		return (behorighetHandler == null) ? null : behorighetHandler.getAnropsBehorighetsInfoList();
-	}
-
-	/**
-	 * Resets the cached info
-	 */
-	public void reset() {
-		setState(null, null);
 	}
 
 	/**
 	 * Resets cache.
 	 */
 	public ResetVagvalCacheResponse resetVagvalCache(ResetVagvalCacheRequest parameters) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("entering vagvalAgent resetVagvalCache");
-		}
-
-		reset();
-		init();
+		logger.info("Start force a reset of VagvalAgent...");
+		
+		//Force reset in init
+		init(FORCE_RESET);
 
 		ResetVagvalCacheResponse response = new ResetVagvalCacheResponse();
 
 		if (!isInitialized()) {
 			response.setResetResult(false);
+			logger.info("Failed force reset VagvalAgent");
 		} else {
 			response.setResetResult(true);
+			logger.info("Successfully force reset VagvalAgent");
 		}
+		
+		
 
 		return response;
 	}
@@ -284,8 +286,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		if (logger.isDebugEnabled()) {
 			logger.debug("entering vagvalAgent visaVagval");
 		}
-		// If the initiation failed, try again
-		init();
+				
+		// Dont force a reset, initialize only if needed
+		init(DONT_FORCE_RESET);
 
 		if (!isInitialized()) {
 			String errorMessage = "VP008 No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call";

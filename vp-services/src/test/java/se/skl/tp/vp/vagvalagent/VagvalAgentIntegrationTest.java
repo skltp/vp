@@ -39,8 +39,8 @@ public class VagvalAgentIntegrationTest extends FunctionalTestCase {
 	public void doSetUp() throws Exception {
 		super.doSetUp();
 		vagvalAgent = (VagvalAgent) muleContext.getRegistry().lookupObject("vagvalAgent");
-		vagvalAgent.reset();
-
+		vagvalAgent.resetVagvalCache(new ResetVagvalCacheRequest());
+		
 		resetVagvalInput();
 
 		addVagvalInput(vardgivareB, "rivtabp20", konsumentA,
@@ -124,7 +124,7 @@ public class VagvalAgentIntegrationTest extends FunctionalTestCase {
 	}
 
 	@Test
-	public void testGiltigaVagvalAfterCacheUpdate() throws Exception {
+	public void resetCacheUpdatesVagvalAgent() throws Exception {
 		VisaVagvalResponse vvResponse = vagvalAgent.visaVagval(createVisaVagvalRequest(konsumentA, vardgivareB, null,
 				"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		assertEquals(2, vvResponse.getVirtualiseringsInfo().size());

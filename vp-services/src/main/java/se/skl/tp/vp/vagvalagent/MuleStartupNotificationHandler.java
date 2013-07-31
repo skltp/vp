@@ -56,8 +56,9 @@ public class MuleStartupNotificationHandler implements MuleContextNotificationLi
 		if (notification.getType().equalsIgnoreCase(MuleContextNotification.TYPE_INFO)
 				&& notification.getAction() == MuleContextNotification.CONTEXT_STARTED) {
 
+			// Force a reset at startup
 			logger.info("Initiates vagvalAgent");
-			vagvalAgent.init();
+			vagvalAgent.init(VagvalAgent.FORCE_RESET);
 
 			logger.info("Initiates hsaCache with files: " + Arrays.toString(hsaFiles));
 			hsaCache.init(hsaFiles);
