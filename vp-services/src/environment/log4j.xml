@@ -1,96 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
 		</layout>
 	</appender>
-    <appender class="org.apache.log4j.FileAppender" name="devnull">
-        <param value="/dev/null" name="File"/>
+    
+    <appender name="devnull" class="org.apache.log4j.FileAppender">
+        <param name="file" value="/dev/null"/>
         <layout class="org.apache.log4j.PatternLayout">
-            <param value="%-5p %d [%t] %c: %m%n" name="ConversionPattern"/>
+            <param name="ConversionPattern" value="%-5p %d [%t] %c: %m%n"/>
         </layout>
     </appender>
-    <appender class="org.apache.log4j.RollingFileAppender" name="file">
-        <param value="../logs/vp.log" name="File"/>
-        <param value="50" name="MaxBackupIndex"/>
-        <param value="5MB" name="MaxFileSize"/>
+    
+    <appender name="ROLLINGFILE" class="org.apache.log4j.RollingFileAppender">
+        <param  name="file" value="${mule.home}/logs/mule-app-vp.log"/>
+        <param name="MaxBackupIndex" value="10" />
+        <param name="MaxFileSize" value="2MB" />
+        
+        <!-- The threshold level for this appender. -->
+        <!-- <param name="Threshold" value="ERROR"/> -->
         <layout class="org.apache.log4j.PatternLayout">
-            <param value="%-5p %d [%t] %c: %m%n" name="ConversionPattern"/>
+        	 <param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
         </layout>
     </appender>
-    <logger name="com.mulesource">
-        <level value="info"/>
+    
+    <!--
+		Loglevels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL} See:
+		http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Level.html
+	-->
+	
+  
+  	<logger name="org.mockftpserver">
+		<level value="ERROR" />
+	</logger>
+	
+	<logger name="org.apache.sshd">
+		<level value="ERROR" />
+	</logger>	
+
+    <logger name="org.apache.activemq.transport.failover.FailoverTransport">
+        <level value="DEBUG" />
     </logger>
-    <logger name="org.apache">
-        <level value="warn"/>
+    
+	<logger name="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<level value="TRACE" />
+	</logger>
+
+	<logger name="org.springframework.core.io.support.PropertiesLoaderSupport">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="org.mule.model.seda">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.mule.MuleServer">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.mule.DefaultMuleContext">
+		<level value="INFO" />
+	</logger>
+
+    <!-- Message logging using the old Mule <logger/> - element -->
+    <logger name="org.mule.api.processor.LoggerMessageProcessor">
+        <level value="ERROR" />
     </logger>
-    <logger name="org.apache.cxf">
-        <level value="info"/>
-    </logger>
-    <logger name="org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog">
-        <level value="error"/>
-    </logger>
-    <logger name="org.mule">
-        <level value="info"/>
-    </logger>
+
+    <!-- Message logging using the old Mule <log-component/> - element -->
     <logger name="org.mule.component.simple.LogComponent">
-        <level value="info"/>
-    </logger>
-    <logger name="org.mule.DefaultMuleContext">
-        <level value="info"/>
-    </logger>
-    <logger name="org.mule.model.seda">
-        <level value="info"/>
-    </logger>
-    <logger name="org.mule.MuleServer">
-        <level value="info"/>
-    </logger>
-    <logger name="org.soitoolkit.commons">
-        <level value="info"/>
-    </logger>
-    <logger name="org.soitoolkit.commons.mule.messageLogger">
-        <level value="debug"/>
-    </logger>
-    <logger name="org.springframework">
-        <level value="info"/>
-    </logger>
-    <logger name="org.springframework.beans.factory">
-        <level value="warn"/>
-    </logger>
-    <logger name="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <level value="info"/>
-    </logger>
-    <logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
-        <level value="info"/>
-    </logger>
-    <logger name="se.skl.tp.vp">
-        <level value="info"/>
-    </logger>
-    <logger name="se.skl.tp.vp.logmanager">
-        <level value="info"/>
-    </logger>
-    <logger name="se.skl.tp.vp.util">
-        <level value="info"/>
-    </logger>
-    <logger name="se.skl.tp.vp.util.helper.AddressingHelper">
-        <level value="debug"/>
+        <level value="ERROR" />
     </logger>
 
-
-    <!-- Logging of http trafic, e.g. REST/HTTP or SOAP/HTTP 
-	<logger name="httpclient.wire">
-		<level value="DEBUG" />
-	</logger>
-	<logger name="org.apache.commons.httpclient">
-		<level value="DEBUG" />
-	</logger>
+    <!--     	
+    	Message logging using se.skl.tp.vp.util.EventLogger that is used in VP
+    	instead of soi-toolkit LogTransformer class.
+    	
+    	INFO puts logevents and errorevents on log queue
+    	ERROR will only put errorevents on log queue
+    	 
     -->
+	<logger name="org.soitoolkit.commons.mule.messageLogger">
+		<level value="INFO" />
+	</logger>
+	
+	<logger name="org.soitoolkit.commons">
+		<level value="ERROR" />
+	</logger>
+	
+    <logger name="se.skl.tp.vp">
+        <level value="ERROR"/>
+    </logger>
+    
+    <!-- Level INFO will give log output for reset cache to selected appender -->
+    <logger name="se.skl.tp.vp.vagvalagent.VagvalAgent">
+        <level value="INFO"/>
+    </logger>
 
     <root>
-        <level value="info"/>
-        <appender-ref ref="CONSOLE"/>
+       <priority value="WARN" />
+
+        <appender-ref ref="ROLLINGFILE"/>
+		<!--
+        <appender-ref ref="CONSOLE" />
+		-->
     </root>
 </log4j:configuration>
