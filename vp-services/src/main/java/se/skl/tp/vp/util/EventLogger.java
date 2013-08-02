@@ -143,9 +143,11 @@ public class EventLogger {
 			LogEvent logEvent = createLogEntry(LogLevelType.INFO, message, logMessage, businessContextId, extraInfo, message.getPayload(), null);
 			String xmlString = JAXB_UTIL.marshal(logEvent);
 			dispatchInfoEvent(xmlString);
-
-			String logMsg = formatLogMessage(LOG_EVENT_INFO, logEvent);
-			messageLogger.info(logMsg);
+			
+			if(log.isInfoEnabled()){
+				String logMsg = formatLogMessage(LOG_EVENT_INFO, logEvent);
+				log.info(logMsg);
+			}
 		}
 	}
 
@@ -157,12 +159,11 @@ public class EventLogger {
 		Map<String, String> extraInfo) {
 
 		LogEvent logEvent = createLogEntry(LogLevelType.ERROR, message, error.toString(), businessContextId, extraInfo, message.getPayload(), error);
-		
-		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
-		messageLogger.error(logMsg);
-
 		String xmlString = JAXB_UTIL.marshal(logEvent);
 		dispatchErrorEvent(xmlString);
+		
+		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
+		log.error(logMsg);
 	}
 
 	//
@@ -173,12 +174,11 @@ public class EventLogger {
 		Map<String, String> extraInfo) {
 
 		LogEvent logEvent = createLogEntry(LogLevelType.ERROR, null, error.toString(), businessContextId, extraInfo, payload, error);
-
-		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
-		messageLogger.error(logMsg);
-
 		String xmlString = JAXB_UTIL.marshal(logEvent);
 		dispatchErrorEvent(xmlString);
+		
+		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
+		log.error(logMsg);
 	}
 
 	//----------------

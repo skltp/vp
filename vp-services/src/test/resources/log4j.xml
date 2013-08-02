@@ -2,6 +2,11 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 	
+	<!--
+		This is the logging configuration used for developing and local testing. This file should
+		not be included in the production build of VP. 
+	 -->
+	
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
@@ -71,9 +76,12 @@
         <level value="INFO" />
     </logger>
 
+    <logger name="org.soitoolkit.commons">
+		<level value="INFO" />
+	</logger>
+    
     <!--     	
-    	Message logging using se.skl.tp.vp.util.EventLogger that is used in VP
-    	instead of soi-toolkit LogTransformer class.
+    	For logging events to QUEUE using EventLogger:
     	
     	INFO puts logevents and errorevents on log queue
     	ERROR will only put errorevents on log queue
@@ -83,10 +91,16 @@
 		<level value="INFO" />
 	</logger>
 	
-	<logger name="org.soitoolkit.commons">
-		<level value="INFO" />
-	</logger>
-	
+	<!-- 
+		For logging events to APPENDER using EventLogger:
+		
+		INFO logs logevents and errorevents to selected appender
+    	ERROR will only log errorevents to selected appender
+	-->
+	 <logger name="se.skl.tp.vp.util.EventLogger">
+        <level value="INFO"/>
+     </logger>
+		
     <logger name="se.skl.tp.vp">
         <level value="DEBUG"/>
     </logger>
