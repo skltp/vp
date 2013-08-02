@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<!-- 
+		This is the VP production configuration for logging, it is important that this file
+		always is correct configured as in production ready. Support and maintenance should 
+		not need to change this file in case of a new deploy of the VP application.
+	 -->
 	
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
