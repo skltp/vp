@@ -20,13 +20,11 @@
 		<spring:property name="ignoreResourceNotFound" value="true" />
 		<spring:property name="locations">
 			<spring:list>
-				<!-- Only available in development env, e.g. Eclipse -->
 				<spring:value>classpath:vp-security.properties</spring:value>
-				<spring:value>classpath:vp-config.properties</spring:value>
+				<spring:value>classpath:vp-security-override.properties</spring:value>
 				
-				<!-- Only available when deployed to a servlet container -->
-				<spring:value>file:${app.home}/vp/config/vp-security.properties</spring:value>
-				<spring:value>file:${app.home}/vp/config/vp-config.properties</spring:value>
+				<spring:value>classpath:vp-config.properties</spring:value>
+				<spring:value>classpath:vp-config-override.properties</spring:value>
 			</spring:list>
 		</spring:property>
 	</spring:bean>
