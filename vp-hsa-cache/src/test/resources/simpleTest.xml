@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<HsaUnitsResponse xmlns="urn:riv:hsa:HsaWsResponder:3">
+<FileGetHsaUnitsResponse xmlns="urn:riv:hsa:HsaWsResponder:3">
   <startDate>2013-03-15T15:38:42.597+01:00</startDate>
   <endDate>2013-03-15T15:38:45.721+01:00</endDate>
   <hsaUnits>
@@ -29,4 +29,4 @@
       <name>Landstinget i Jönköping</name>
     </hsaUnit>
   </hsaUnits>
-</HsaUnitsResponse>
+</FileGetHsaUnitsResponse>

@@ -24,12 +24,15 @@ import java.util.Arrays;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 
 public class ResetHsaCache implements Callable {
 
+	private Logger log = LoggerFactory.getLogger(ResetHsaCache.class);
 	private HsaCache hsaCache;
 	private String[] hsaFiles;
 
@@ -50,10 +53,13 @@ public class ResetHsaCache implements Callable {
 
 	private String resetCache(final MuleEventContext eventContext) {
 		try {
+			log.info("Start a reset of HSA cache using files: {} ...", Arrays.toString(hsaFiles));
 			hsaCache.init(hsaFiles);
-			return "Reset HSA cache success using files: " + Arrays.toString(hsaFiles);
+			log.info("Succesfully reset HSA cache");
+			return "Succesfully reset HSA cache using files: " + Arrays.toString(hsaFiles);
 		} catch (HsaCacheInitializationException e) {
-			return "Reset HSA cache failed using files: " + hsaFiles;
+			log.error("Reset HSA cache failed", e);
+			return "Reset HSA cache failed using files: " + Arrays.toString(hsaFiles);
 		}
 	}
 }
