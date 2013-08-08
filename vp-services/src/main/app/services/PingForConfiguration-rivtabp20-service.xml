@@ -22,7 +22,7 @@
         <cxf:jaxws-service
             namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"            
             serviceClass="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa20"
-            wsdlLocation="classpath:/schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl" />
+            wsdlLocation="classpath:/TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl" />
         
         <component>
             <singleton-object class="se.skl.tp.vp.pingforconfiguration.PingForConfigurationProducerRivTa20" />

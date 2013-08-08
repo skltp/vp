@@ -23,7 +23,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>se.skl.tp</groupId>
 	<artifactId>itinfra-tp-schemas</artifactId>
 	<name>itinfra-tp-schemas</name>
 	<url>http://maven.apache.org</url>
@@ -33,9 +32,10 @@
 	</properties>
 	
 	<parent>
-  		<groupId>se.skl.tp</groupId>
+  		<groupId>se.skltp.vp</groupId>
   		<artifactId>itinfra-tp</artifactId>
   		<version>2.3.0-RC1-SNAPSHOT</version>
+  		<relativePath>../pom.xml</relativePath>
    </parent>
  
 	<dependencies>

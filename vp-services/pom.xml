@@ -8,77 +8,60 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>se.skl.tp</groupId>
-		<artifactId>vp</artifactId>
+		<groupId>se.skltp.vp</groupId>
+		<artifactId>vp-parent</artifactId>
 		<version>2.3.0-RC1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>vp-services</artifactId>
     <packaging>mule</packaging>
 	<name>vp-services</name>
 
-	<properties>
-		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
-	    <cxf-codegen-plugin.version>2.5.1</cxf-codegen-plugin.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
-			<groupId>org.soitoolkit.commons.components</groupId>
+		  <groupId>org.soitoolkit.commons.components</groupId>
 			<artifactId>soitoolkit-commons-mule</artifactId>
 			<version>${soitoolkit.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.soitoolkit.commons.components</groupId>
-			<artifactId>soitoolkit-commons-log</artifactId>
-			<version>${soitoolkit.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
-			<artifactId>soitoolkit-mule-dependencies</artifactId>
+			<artifactId>soitoolkit-mule-3.3.1-dependencies</artifactId>
 			<version>${soitoolkit.version}</version>
-			<!-- Exclude mule-module-spring-security since we don't use it and it contains dependencies to old versions of spring causing strange problems to occurr -->
+			<type>pom</type>
+			<!-- Exclude mule-module-spring-security since we don't use it and it contains dependencies to old versions of spring causing strange problems to occur -->
 			<exclusions>
 				<exclusion>
 					<groupId>org.mule.modules</groupId>
 					<artifactId>mule-module-spring-security</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-web</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>se.skl.tp</groupId>
-			<artifactId>vagval-schemas</artifactId>
-			<version>1.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>se.skl.tp</groupId>
-			<artifactId>itintegration-registry-schemas</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>se.skl.tp</groupId>
-			<artifactId>pingforconfiguration-schemas</artifactId>
-			<version>1.0</version>
+			<groupId>se.skltp.vp</groupId>
+			<artifactId>vp-schemas</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<!-- Ping -->
 		<dependency>
-			<groupId>se.skl.tp</groupId>
+			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-schemas</artifactId>
 			<version>2.3.0-RC1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>se.skl.tp</groupId>
+			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-ping-virtualisering</artifactId>
 			<version>2.3.0-RC1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>se.skl.tp</groupId>
+			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-ping-test-producer</artifactId>
 			<version>2.3.0-RC1-SNAPSHOT</version>
 		</dependency>
@@ -88,26 +71,21 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.17</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.jmock</groupId>
-			<artifactId>jmock-junit4</artifactId>
-			<version>2.5.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.9</version>
-			<scope>test</scope>
-		</dependency>
+		  
+		<!-- Mockito -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.8.5</version>
 			<scope>test</scope>
+			<version>1.8.5</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+			<version>1.8.5</version>
+		</dependency>
+		
 		<dependency>
 		  <groupId>org.bouncycastle</groupId>
 		  <artifactId>bcprov-jdk16</artifactId>
@@ -115,7 +93,7 @@
 		</dependency>
 		
 		<dependency>
-		  <groupId>se.skl.tp</groupId>
+		  <groupId>se.skltp.vp</groupId>
 		  <artifactId>vp-hsa-cache</artifactId>
 		  <version>2.3.0-RC1-SNAPSHOT</version>
 		</dependency>
@@ -142,7 +120,6 @@
 
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>${maven-eclipse-plugin.version}</version>
 			</plugin>
 
             <plugin>
@@ -214,7 +191,6 @@
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
-				<version>${cxf-codegen-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>generate-sources</id>

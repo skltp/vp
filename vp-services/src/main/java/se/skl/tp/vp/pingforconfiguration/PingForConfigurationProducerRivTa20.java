@@ -36,7 +36,7 @@ import se.riv.itintegration.monitoring.v1.PingForConfigurationType;
 		endpointInterface="se.riv.itintegration.monitoring.v1.PingForConfigurationResponderInterface", 
 		portName = "PingForConfigurationResponderPort", 
 		targetNamespace = "urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20",
-		wsdlLocation = "schemas/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl")
+		wsdlLocation = "TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl")
 public class PingForConfigurationProducerRivTa20 implements PingForConfigurationResponderInterface {
 
 	public PingForConfigurationResponseType pingForConfiguration(final AttributedURIType logicalAddress, final PingForConfigurationType parameters) {

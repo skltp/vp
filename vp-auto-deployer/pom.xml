@@ -2,16 +2,16 @@
 															     ache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>se.skl.tp</groupId>
   <artifactId>vp-auto-deployer</artifactId>
   <name>vp-auto-deployer</name>
   <description>Generates Mule configuration deployment descriptor into a separate jar file (for RIV-TAWSDL service definitons only.. )</description>
   
   <parent>
-		<groupId>se.skl.tp</groupId>
-		<artifactId>vp</artifactId>
+		<groupId>se.skltp.vp</groupId>
+		<artifactId>vp-parent</artifactId>
 		<version>2.3.0-RC1-SNAPSHOT</version>
-  </parent>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
   
   <dependencies>
     <dependency>

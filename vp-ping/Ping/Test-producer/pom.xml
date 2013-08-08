@@ -23,15 +23,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>se.skl.tp</groupId>
 	<artifactId>itinfra-tp-ping-test-producer</artifactId>
 	<name>itinfra-tp-ping-test-producer</name>
 	<url>http://maven.apache.org</url>
     
     <parent>
-        <groupId>se.skl.tp</groupId>
+        <groupId>se.skltp.vp</groupId>
         <artifactId>itinfra-tp-ping-service</artifactId>
         <version>2.3.0-RC1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     
 	<properties>
@@ -41,7 +41,7 @@
 	<dependencies>
 	    <!-- schema dependency -->
         <dependency>
-            <groupId>se.skl.tp</groupId>
+            <groupId>se.skltp.vp</groupId>
             <artifactId>itinfra-tp-schemas</artifactId>
             <version>2.3.0-RC1-SNAPSHOT</version>
         </dependency>

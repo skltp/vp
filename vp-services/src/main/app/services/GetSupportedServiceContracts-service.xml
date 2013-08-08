@@ -17,7 +17,7 @@
 
         <cxf:proxy-service
             service="GetSupportedServiceContractsResponderService"
-            wsdlLocation="classpath:/schemas/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
+            wsdlLocation="classpath:/TD_REGISTRY_1_0_0/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
             namespace="urn:riv:itintegration:registry:GetSupportedServiceContracts:1:rivtabp21" />
    
         <cxf:proxy-client />

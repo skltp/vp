@@ -42,7 +42,7 @@
 
         <cxf:jaxws-service
             serviceClass="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub"
-            wsdlLocation="classpath:/schemas/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-1.0.wsdl" />
+            wsdlLocation="classpath:/VAGVAL_1_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-1.0.wsdl" />
 
         <component>
             <singleton-object class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub" >
