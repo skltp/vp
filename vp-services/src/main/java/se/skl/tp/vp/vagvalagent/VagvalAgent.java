@@ -70,10 +70,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	private static final JaxbUtil JAXB = new JaxbUtil(PersistentCache.class);
-
-	// file name of local cache
-	public static final String TK_LOCAL_CACHE = System.getProperty("user.home") + System.getProperty("file.separator")
-			+ ".tk.localCache";
+	
+	private String localTakCache;
 
 	private VagvalHandler vagvalHandler = null;
 	private BehorighetHandler behorighetHandler = null;
@@ -97,6 +95,10 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	public void setHsaCache(HsaCache hsaCache) {
 		this.hsaCache = hsaCache;
 	}
+	
+	public void setLocalTakCache(String localTakCache) {
+		this.localTakCache = localTakCache;
+	}
 
 	/**
 	 * Initialize VagvalAgent resources. Force a init by setting forceReset=true, use
@@ -113,9 +115,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			setState(v, p);
 
 			if (isInitialized()) {
-				saveToLocalCopy(TK_LOCAL_CACHE);
+				saveToLocalCopy(localTakCache);
 			} else {
-				restoreFromLocalCopy(TK_LOCAL_CACHE);
+				restoreFromLocalCopy(localTakCache);
 			}
 
 			if (isInitialized()) {

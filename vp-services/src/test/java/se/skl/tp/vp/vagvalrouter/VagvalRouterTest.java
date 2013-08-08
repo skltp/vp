@@ -1,5 +1,8 @@
 package se.skl.tp.vp.vagvalrouter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createAuthorization;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createRouting;
 
@@ -7,9 +10,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mule.api.MuleMessage;
 
@@ -21,7 +25,7 @@ import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
 
-public class VagvalRouterTest extends TestCase {
+public class VagvalRouterTest {
 
 	VagvalRouter vagvalRouter;
 	VagvalAgentMock vagvalAgent;
@@ -29,9 +33,13 @@ public class VagvalRouterTest extends TestCase {
 	String serviceNamespace;
 	
 	private AddressingHelper helper;
-
-	@Override
-	protected void setUp() throws Exception {
+	
+	//JUnit will create a temporary folder before your test, and delete it afterwards
+	@Rule
+	public TemporaryFolder folder = new TemporaryFolder();
+	
+	@Before
+	public void setUp() throws Exception {
 
 		vagvalRouter = new VagvalRouter();
 		vagvalAgent = new VagvalAgentMock(new ArrayList<VirtualiseringsInfoType>(), new ArrayList<AnropsBehorighetsInfoType>());
@@ -78,25 +86,28 @@ public class VagvalRouterTest extends TestCase {
 	}
 
 	@Test
-	public void testNoContactTjansteKatalogen() throws Exception {
+	public void noContactWithTjanstekatalogenAndNoLocalTakCacheShouldGiveVP008() throws Exception {
 
 		// This test can't be run with the VagvalAgentMock since is overrides the getVirtualiseringar() and getBehorigheter() methods.
 		// This test however works fine on the original VagValAgent since it doesn't require any mocked TAK-info
 
-		// Setup VagvalAgent with no routing or access control added
-		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		AddressingHelper myHelper = new AddressingHelper(msg, new VagvalAgent(), Pattern.compile("OU=([^,]+)"), null);
+		// Remove local cached TAK file
+		File localCache = folder.newFile(".tk.localCache");	
+		localCache.delete();
 		
-		// Remove local cache
-		new File(VagvalAgent.TK_LOCAL_CACHE).delete();
-
-		// Perform the test and ensure that we get a "VP008 no contact" error message
+		// Setup VagvalAgent with no routing or access control added
+		VagvalAgent vagvalAgent = new VagvalAgent();
+		vagvalAgent.setLocalTakCache(localCache.getAbsolutePath());
+		
+		final MuleMessage msg = Mockito.mock(MuleMessage.class);
+		AddressingHelper myHelper = new AddressingHelper(msg, vagvalAgent, Pattern.compile("OU=([^,]+)"), null);
+		
+		// Perform the test and ensure that we get a "VP008 no contact..." error message
 		try {
 			myHelper.getAddressFromAgent(vagvalInput);
-			fail("Exception expected");
+			fail("VP008 Exception expected");
 		} catch (VpSemanticException e) {
-			System.err.println(e.getMessage());
-			assertTrue(e.getMessage().startsWith("VP008"));
+			assertTrue(e.getMessage().equals("VP008 No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call"));
 		}
 
 	}
