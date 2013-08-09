@@ -1,32 +1,54 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+
+    Copyright (c) 2013 Sveriges Kommuner och Landsting (SKL).
+    								<http://www.skl.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
 <FileGetHsaUnitsResponse xmlns="urn:riv:hsa:HsaWsResponder:3">
   <startDate>2013-03-15T15:38:42.597+01:00</startDate>
   <endDate>2013-03-15T15:38:45.721+01:00</endDate>
   <hsaUnits>
     <hsaUnit>
       <hsaIdentity>SE0000000001-1234</hsaIdentity>
-      <DN>ou=Nässjö VC DLM,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
-      <name>Nässjö VC DLM</name>
+      <DN>ou=Nï¿½ssjï¿½ VC DLM,ou=Nï¿½ssjï¿½ Primï¿½rvï¿½rdsomrï¿½de,ou=Hï¿½glandets sjukvï¿½rdsomrï¿½de,o=Landstinget i Jï¿½nkï¿½ping,l=VpW,c=SE</DN>
+      <name>Nï¿½ssjï¿½ VC DLM</name>
     </hsaUnit>
     <hsaUnit>
       <hsaIdentity>SE0000000000-1234</hsaIdentity>
-      <DN>ou=Nässjö VC DLK,ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
-      <name>Nässjö Primärvårdsområde</name>
+      <DN>ou=Nï¿½ssjï¿½ VC DLK,ou=Nï¿½ssjï¿½ Primï¿½rvï¿½rdsomrï¿½de,ou=Hï¿½glandets sjukvï¿½rdsomrï¿½de,o=Landstinget i Jï¿½nkï¿½ping,l=VpW,c=SE</DN>
+      <name>Nï¿½ssjï¿½ Primï¿½rvï¿½rdsomrï¿½de</name>
     </hsaUnit>
     <hsaUnit>
       <hsaIdentity>SE0000000002-1234</hsaIdentity>
-      <DN>ou=Nässjö Primärvårdsområde,ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
-      <name>Nässjö Primärvårdsområde</name>
+      <DN>ou=Nï¿½ssjï¿½ Primï¿½rvï¿½rdsomrï¿½de,ou=Hï¿½glandets sjukvï¿½rdsomrï¿½de,o=Landstinget i Jï¿½nkï¿½ping,l=VpW,c=SE</DN>
+      <name>Nï¿½ssjï¿½ Primï¿½rvï¿½rdsomrï¿½de</name>
     </hsaUnit>
     <hsaUnit>
       <hsaIdentity>SE0000000003-1234</hsaIdentity>
-      <DN>ou=Höglandets sjukvårdsområde,o=Landstinget i Jönköping,l=VpW,c=SE</DN>
-      <name>Höglandets sjukvårdsområde</name>
+      <DN>ou=Hï¿½glandets sjukvï¿½rdsomrï¿½de,o=Landstinget i Jï¿½nkï¿½ping,l=VpW,c=SE</DN>
+      <name>Hï¿½glandets sjukvï¿½rdsomrï¿½de</name>
     </hsaUnit>
     <hsaUnit>
       <hsaIdentity>SE0000000004-1234</hsaIdentity>
-      <DN>o=Landstinget i Jönköping,l=VpW,c=SE</DN>
-      <name>Landstinget i Jönköping</name>
+      <DN>o=Landstinget i Jï¿½nkï¿½ping,l=VpW,c=SE</DN>
+      <name>Landstinget i Jï¿½nkï¿½ping</name>
     </hsaUnit>
   </hsaUnits>
 </FileGetHsaUnitsResponse>

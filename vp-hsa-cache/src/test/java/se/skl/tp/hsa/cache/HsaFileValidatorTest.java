@@ -1,22 +1,22 @@
 /**
- * Copyright 2013 Sjukvardsradgivningen
+ * Copyright (c) 2013 Sveriges Kommuner och Landsting (SKL).
+ * 								<http://www.skl.se/>
  *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
-
- *   License as published by the Free Software Foundation.
+ * This file is part of SKLTP.
  *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
- *   GNU Lesser General Public License for more details.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-
- *   Boston, MA 02111-1307  USA
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package se.skl.tp.hsa.cache;
 
@@ -50,7 +50,7 @@ public class HsaFileValidatorTest {
 		System.out.println(line1);
 		System.out.println(line2);
 		
-		assertTrue(line1.startsWith("ERROR HsaObject entry invalid @ LineNo:11, entry: dn=ou="));
+		assertTrue(line1.startsWith("ERROR HsaObject entry invalid @ LineNo:33, entry: dn=ou="));
 		assertTrue(line2.startsWith("WARNING: No parent for HSA-ID=SE0000000004-1234"));
 	}
 }

@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOING!
-[soi-toolkit.gen.version=0.3.1]
-[soi-toolkit.gen.type=integrationComponent]
-[soi-toolkit.gen.createDate=2011-06-30T14:55:14.006+02:00]
-[soi-toolkit.gen.artifactId=vp]
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT 
+	YOU ARE DOING! [soi-toolkit.gen.version=0.3.1] [soi-toolkit.gen.type=integrationComponent] 
+	[soi-toolkit.gen.createDate=2011-06-30T14:55:14.006+02:00] [soi-toolkit.gen.artifactId=vp] -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-        <groupId>org.soitoolkit.commons.poms</groupId>
-        <artifactId>soitoolkit-default-parent</artifactId>
-        <version>0.6.1-M2</version>
-    </parent>
-	
+		<groupId>org.soitoolkit.commons.poms</groupId>
+		<artifactId>soitoolkit-default-parent</artifactId>
+		<version>0.6.1-M2</version>
+	</parent>
+
 	<groupId>se.skltp.vp</groupId>
 	<artifactId>vp-parent</artifactId>
 	<version>2.3.0-RC1-SNAPSHOT</version>
@@ -25,15 +22,15 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 	<scm>
 		<connection>scm:svn:http://skltp.googlecode.com/svn/skltp/tp/vp/trunk</connection>
 		<developerConnection>scm:svn:https://skltp.googlecode.com/svn/skltp/tp/vp/trunk</developerConnection>
-	  <url>http://skltp.googlecode.com/svn/skltp/tp/vp/trunk</url>
-   </scm>
-    
+		<url>http://skltp.googlecode.com/svn/skltp/tp/vp/trunk</url>
+	</scm>
+
 	<modules>
 		<module>vp-schemas</module>
-	    <module>vp-ping</module>
-	    <module>vp-services</module>
+		<module>vp-ping</module>
+		<module>vp-services</module>
 		<module>vp-teststub</module>
-	    <module>vp-hsa-cache</module> 
+		<module>vp-hsa-cache</module>
 		<module>vp-auto-deployer</module>
 	</modules>
 
@@ -51,5 +48,78 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.mycila.maven-license-plugin</groupId>
+					<artifactId>maven-license-plugin</artifactId>
+					<version>1.10.b1</version>
+					<configuration>
+						<properties>
+							<year>2013</year>
+							<copyright>Sveriges Kommuner och Landsting (SKL).
+								&lt;http://www.skl.se/&gt;</copyright>
+							<product>SKLTP</product>
+						</properties>
+						<strictCheck>true</strictCheck>
+						<basedir>${basedir}</basedir>
+						<header>http://skltp.googlecode.com/svn/tp/license/lgpl/header.txt</header>
+						<encoding>UTF-8</encoding>
+						<includes>
+							<include>src/main/**</include>
+							<include>src/test/**</include>
+						</includes>
+						<excludes>
+							<exclude>**/*.xsd</exclude>
+							<exclude>**/*.wsdl</exclude>
+
+							<exclude>**/*.dtd</exclude>
+						</excludes>
+						<useDefaultExcludes>true</useDefaultExcludes>
+						<mapping>
+							<tag>DYNASCRIPT_STYLE</tag>
+						</mapping>
+						<useDefaultMapping>true</useDefaultMapping>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+			</plugin>
+		</plugins>
+
+	</build>
+	<profiles>
+		<profile>
+			<id>license</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.mycila.maven-license-plugin</groupId>
+						<artifactId>maven-license-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>check</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+
 
 </project>
