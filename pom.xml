@@ -74,7 +74,7 @@
 						<excludes>
 							<exclude>**/*.xsd</exclude>
 							<exclude>**/*.wsdl</exclude>
-
+							<exclude>**/*.xml</exclude>
 							<exclude>**/*.dtd</exclude>
 						</excludes>
 						<useDefaultExcludes>true</useDefaultExcludes>
