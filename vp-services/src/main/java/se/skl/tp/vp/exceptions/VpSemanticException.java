@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2013 Sveriges Kommuner och Landsting (SKL).
- * 								<http://www.skl.se/>
+ * Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+ * 							<http://cehis.se/>
  *
  * This file is part of SKLTP.
  *

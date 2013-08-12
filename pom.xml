@@ -59,8 +59,8 @@
 					<configuration>
 						<properties>
 							<year>2013</year>
-							<copyright>Sveriges Kommuner och Landsting (SKL).
-								&lt;http://www.skl.se/&gt;</copyright>
+							<copyright>Center for eHalsa i samverkan (CeHis). 
+							&lt;http://cehis.se/&gt;</copyright>
 							<product>SKLTP</product>
 						</properties>
 						<strictCheck>true</strictCheck>
