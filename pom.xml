@@ -18,6 +18,11 @@
 	<version>2.3.0-RC1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>vp-parent</name>
+	
+	<properties>
+		<compiler.target.version>1.6</compiler.target.version>
+        <compiler.source.version>1.6</compiler.source.version>
+	</properties>
 
 	<scm>
 		<connection>scm:svn:http://skltp.googlecode.com/svn/skltp/tp/vp/trunk</connection>
