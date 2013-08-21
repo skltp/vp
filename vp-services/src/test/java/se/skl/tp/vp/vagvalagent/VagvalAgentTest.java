@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createAuthorization;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createRouting;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -35,7 +36,9 @@ import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
@@ -61,16 +64,23 @@ public class VagvalAgentTest {
 	private static final String HEALTHCAREPROVIDER_B = "SE0000000005-1234";
 	private static final String UNKNOWN_HEALTHCAREPROVIDER = "UNKNOWN";
 	private static final String SE = "SE";
+	
+	//JUnit will create a temporary folder before your test, and delete it afterwards
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
 	@Before
 	public void beforeTest() throws Exception {
 
 		URL url = getClass().getClassLoader().getResource("hsacache.xml");
 		HsaCache hsaCache = new HsaCacheImpl().init(url.getFile());
+		
+		File localTakCache = folder.newFile(".tk.localCache");    
 
 		vagvalAgent = new VagvalAgentMock();
 		vagvalAgent.setAddressDelimiter("#");
 		vagvalAgent.setHsaCache(hsaCache);
+		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
 	}
 
 	@Test

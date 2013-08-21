@@ -60,9 +60,12 @@ public class VagvalRouterTest {
 	
 	@Before
 	public void setUp() throws Exception {
-
+	    
+	    File localTakCache = folder.newFile(".tk.localCache");    
+	    vagvalAgent = new VagvalAgentMock(new ArrayList<VirtualiseringsInfoType>(), new ArrayList<AnropsBehorighetsInfoType>());
+	    vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
+	    
 		vagvalRouter = new VagvalRouter();
-		vagvalAgent = new VagvalAgentMock(new ArrayList<VirtualiseringsInfoType>(), new ArrayList<AnropsBehorighetsInfoType>());
 		vagvalRouter.setVagvalAgent(vagvalAgent);
 		
 		HsaCache hsaCacheMock = Mockito.mock(HsaCache.class);
@@ -112,12 +115,12 @@ public class VagvalRouterTest {
 		// This test however works fine on the original VagValAgent since it doesn't require any mocked TAK-info
 
 		// Remove local cached TAK file
-		File localCache = folder.newFile(".tk.localCache");	
-		localCache.delete();
+		File localTakCache = folder.newFile(".tk.localCache");	
+		localTakCache.delete();
 		
 		// Setup VagvalAgent with no routing or access control added
 		VagvalAgent vagvalAgent = new VagvalAgent();
-		vagvalAgent.setLocalTakCache(localCache.getAbsolutePath());
+		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		AddressingHelper myHelper = new AddressingHelper(msg, vagvalAgent, Pattern.compile("OU=([^,]+)"), null);
