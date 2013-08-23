@@ -82,6 +82,8 @@
 							<exclude>**/*.wsdl</exclude>
 							<exclude>**/*.xml</exclude>
 							<exclude>**/*.dtd</exclude>
+							<exclude>**/*.jks</exclude>
+							<exclude>**/*.pem</exclude>
 						</excludes>
 						<useDefaultExcludes>true</useDefaultExcludes>
 						<mapping>
