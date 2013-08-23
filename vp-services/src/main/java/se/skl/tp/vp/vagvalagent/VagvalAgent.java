@@ -174,11 +174,11 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	protected List<VirtualiseringsInfoType> getVirtualiseringar() {
 		List<VirtualiseringsInfoType> l = null;
 		try {
-			logger.info("Fetch all virtualizations...");
+			logger.info("Fetch all virtualizations from TAK...");
 			HamtaAllaVirtualiseringarResponseType t = getPort().hamtaAllaVirtualiseringar(null);
 			l = t.getVirtualiseringsInfo();
 		} catch (Exception e) {
-			logger.error("Unable to get virtualizations", e);
+			logger.error("Unable to get virtualizations from TAK", e);
 		}
 		return l;
 	}
@@ -191,11 +191,11 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	protected List<AnropsBehorighetsInfoType> getBehorigheter() {
 		List<AnropsBehorighetsInfoType> l = null;
 		try {
-			logger.info("Fetch all permissions...");
+			logger.info("Fetch all permissions from TAK...");
 			HamtaAllaAnropsBehorigheterResponseType t = getPort().hamtaAllaAnropsBehorigheter(null);
 			l = t.getAnropsBehorighetsInfo();
 		} catch (Exception e) {
-			logger.error("Unable to get permissions", e);
+			logger.error("Unable to get permissions from TAK", e);
 		}
 		return l;
 	}
@@ -207,12 +207,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		final File file = new File(fileName);
 		try {
 			if (file.exists()) {
-				logger.info("Restore from local copy: {}", fileName);
+				logger.info("Restore virtualizations and permissions from local TAK copy: {}", fileName);
 				is = new FileInputStream(file);
 				pc = (PersistentCache) JAXB.unmarshal(is);
 			}
 		} catch (Exception e) {
-			logger.error("Unable to restore from: " + fileName, e);
+			logger.error("Unable to restore virtualizations and permissions from local TAK copy: {}" + fileName, e);
 			// remove erroneous file.
 			if (is != null) {
 				file.delete();
@@ -230,14 +230,14 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		pc.anropsBehorighetsInfo = this.behorighetHandler.getAnropsBehorighetsInfoList();
 		pc.virtualiseringsInfo = this.vagvalHandler.getVirtualiseringsInfo();
 
-		logger.info("Save to local copy: {}", fileName);
+		logger.info("Save virtualizations and permissions to local TAK copy: {}", fileName);
 		OutputStream os = null;
 		try {
 			File file = new File(fileName);
 			os = new FileOutputStream(file);
 			os.write(JAXB.marshal(pc).getBytes("UTF-8"));
 		} catch (Exception e) {
-			logger.error("Unable to save state to: " + fileName, e);
+			logger.error("Unable to save virtualizations and permissions to local TAK copy: {}" + fileName, e);
 		} finally {
 			close(os);
 		}
