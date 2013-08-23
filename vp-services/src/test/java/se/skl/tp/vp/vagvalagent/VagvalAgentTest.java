@@ -20,11 +20,13 @@
  */
 package se.skl.tp.vp.vagvalagent;
 
-import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createAuthorization;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createRouting;
 
@@ -38,14 +40,11 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.examples.CountingNodeTester;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 import org.xml.sax.InputSource;
 
 import se.skl.tp.hsa.cache.HsaCache;
