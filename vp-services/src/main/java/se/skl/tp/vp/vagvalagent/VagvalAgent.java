@@ -79,6 +79,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	private String endpointAddressTjanstekatalog;
 	private String addressDelimiter;
+	
+	private SokVagvalsInfoInterface port = null;
 
 	public VagvalAgent() {
 
@@ -152,11 +154,17 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	private SokVagvalsInfoInterface getPort() {
-		SokVagvalsServiceSoap11LitDocService service = new SokVagvalsServiceSoap11LitDocService(
-				ClientUtil.createEndpointUrlFromServiceAddress(endpointAddressTjanstekatalog));
-		SokVagvalsInfoInterface port = service.getSokVagvalsSoap11LitDocPort();
+	    if(port == null){
+	        SokVagvalsServiceSoap11LitDocService service = new SokVagvalsServiceSoap11LitDocService(
+	                ClientUtil.createEndpointUrlFromServiceAddress(endpointAddressTjanstekatalog));
+	        port = service.getSokVagvalsSoap11LitDocPort();
+	    }
 		return port;
 	}
+	
+	protected void setPort(SokVagvalsInfoInterface port) {
+        this.port = port;
+    }
 
 	/**
 	 * Return virtualizations from TK, or from local cache if TK is unavailable
@@ -252,6 +260,10 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 		return (behorighetHandler == null) ? null : behorighetHandler.getAnropsBehorighetsInfoList();
 	}
+	
+	protected List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
+        return (vagvalHandler == null) ? null: vagvalHandler.getVirtualiseringsInfo();
+    }
 
 	/**
 	 * Resets cache.

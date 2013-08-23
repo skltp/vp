@@ -20,6 +20,7 @@
  */
 package se.skl.tp.vp.vagvalagent;
 
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -28,23 +29,31 @@ import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createAuthorization;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createRouting;
 
 import java.io.File;
+import java.io.FileReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.examples.CountingNodeTester;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
+import org.xml.sax.InputSource;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
 import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v1.SokVagvalsInfoInterface;
 import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
@@ -384,6 +393,84 @@ public class VagvalAgentTest {
 
 		assertEquals("No routing found", 0, response.getVirtualiseringsInfo().size());
 	}
+
+    @Test
+    public void noContactWithTjanstekatalogenAlwaysReultsInLocalCacheIsRead()
+            throws Exception {
+        
+        //Mock TAK service to return no result for authorizations and virtualizations
+        SokVagvalsInfoInterface mockedTakService = mock(SokVagvalsInfoInterface.class);
+        when(mockedTakService.hamtaAllaAnropsBehorigheter(anyObject())).thenReturn(null);
+        when(mockedTakService.hamtaAllaVirtualiseringar(anyObject())).thenReturn(null);
+        
+        URL hsaUrl = getClass().getClassLoader().getResource("hsacache.xml");
+        HsaCache hsaCache = new HsaCacheImpl().init(hsaUrl.getFile());
+        
+        //The local cache to read when TAK is not available
+        URL url = getClass().getClassLoader().getResource("tklocalcachetest.xml");
+        
+        VagvalAgent vagvalAgent = new VagvalAgent();
+        vagvalAgent.setAddressDelimiter("#");
+        vagvalAgent.setHsaCache(hsaCache);
+           
+        // Prepare agent with local cache and that call to TAK returns null
+        // results as when TAK is not available.
+        vagvalAgent.setLocalTakCache(url.getFile());
+        vagvalAgent.setPort(mockedTakService);
+        
+        //Init VagvalAgent from local cache
+        vagvalAgent.init(VagvalAgent.FORCE_RESET);
+
+        // Verify authorizations are loaded from local cache
+        List<AnropsBehorighetsInfoType> authorization = vagvalAgent
+                .getAnropsBehorighetsInfoList();
+
+        assertEquals(1, authorization.size());
+        assertEquals("vp-test-producer", authorization.get(0).getReceiverId());
+        assertEquals("tp", authorization.get(0).getSenderId());
+        assertEquals("urn:skl:tjanst1:rivtabp20", authorization.get(0)
+                .getTjansteKontrakt());
+
+        // Verify virtualizations are loaded from local cache
+        List<VirtualiseringsInfoType> virtualizations = vagvalAgent
+                .getVirtualiseringsInfo();
+
+        assertEquals(1, virtualizations.size());
+        assertEquals("vp-test-producer", virtualizations.get(0).getReceiverId());
+        assertEquals("https://localhost:19000/vardgivare-b/tjanst1",
+                virtualizations.get(0).getAdress());
+        assertEquals("RIVTABP20", virtualizations.get(0).getRivProfil());
+        assertEquals("urn:skl:tjanst1:rivtabp20", virtualizations.get(0)
+                .getTjansteKontrakt());
+
+    }
+    
+    @Test
+    public void contactWithTjanstekatalogenAlwaysReultsInLocalCacheIsUpdated()
+            throws Exception {
+
+        // An empty tmp local cache is created
+        File localTakCache = folder.newFile(".tk.empty.localCache");
+
+        // Prepare agent with local cache
+        vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
+
+        // Prepare result from TAK that will update the local cache
+        ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
+        routing.add(createRouting("https://SE", RIVTABP21, CRM_LISTING, SE));
+
+        ArrayList<AnropsBehorighetsInfoType> authorization = new ArrayList<AnropsBehorighetsInfoType>();
+        authorization.add(createAuthorization(NATIONAL_CONSUMER,
+                CRM_SCHEDULING, SE));
+
+        vagvalAgent.setMockVirtualiseringsInfo(routing);
+        vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
+
+        vagvalAgent.init(VagvalAgent.FORCE_RESET);
+
+        XMLAssert.assertXpathExists("/persistentCache/virtualiseringsInfo", new InputSource(new FileReader(localTakCache)));
+        XMLAssert.assertXpathExists("/persistentCache/anropsBehorighetsInfo",new InputSource(new FileReader(localTakCache)));
+    }
 
 	private XMLGregorianCalendar createTimestamp() throws Exception {
 		XMLGregorianCalendar time = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();

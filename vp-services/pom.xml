@@ -92,6 +92,12 @@
 		  <artifactId>vp-hsa-cache</artifactId>
 		  <version>2.3.0-RC1-SNAPSHOT</version>
 		</dependency>
+    
+        <dependency>
+          <groupId>xmlunit</groupId>
+          <artifactId>xmlunit</artifactId>
+          <version>1.4</version>
+        </dependency>
             
 	</dependencies>
 
