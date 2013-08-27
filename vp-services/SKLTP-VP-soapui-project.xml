@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="SKLTP-VP" resourceRoot="" soapui-version="4.5.2" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="PingResponderBinding" type="wsdl" bindingName="{urn:riv:itinfra:tp:Ping:1:rivtabp20}PingResponderBinding" soapVersion="1_1" anonymous="optional" definition="https://localhost:20000/vp/Ping/1/rivtabp20?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://localhost:20000/vp/Ping/1/rivtabp20?wsdl"><con:part><con:url>https://localhost:20000/vp/Ping/1/rivtabp20?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="PingInteraction" targetNamespace="urn:riv:itinfra:tp:Ping:1:rivtabp20" xmlns="urn:riv:itinfra:tp:Ping:1:rivtabp20" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tjs="urn:riv:itinfra:tp:PingResponder:1" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified">
+      <xsd:import namespace="urn:riv:itinfra:tp:PingResponder:1" schemaLocation="https://localhost:20000/vp/Ping/1/rivtabp20?xsd=PingResponder_1_0.xsd"/>
+    </xsd:schema>
+    <xsd:schema>
+      <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="https://localhost:20000/vp/Ping/1/rivtabp20?xsd=ws-addressing-1.0.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="pingResponse">
+    <wsdl:part element="tjs:pingResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="pingRequest">
+    <wsdl:part element="wsa:To" name="LogicalAddress"></wsdl:part>
+    <wsdl:part element="tjs:ping" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="PingResponderInterface">
+    <wsdl:operation name="ping">
+      <wsdl:documentation>Ping. Logisk adress är till producent som ska kunna svara på frågan.</wsdl:documentation>
+      <wsdl:input message="pingRequest"></wsdl:input>
+      <wsdl:output message="pingResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PingResponderBinding" type="PingResponderInterface">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="urn:riv:test:PingResponder:1:ping"/>
+      <wsdl:input>
+        <soap:header message="pingRequest" part="LogicalAddress" use="literal"></soap:header>
+        <soap:body parts="parameters" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PingResponderService">
+    <wsdl:port binding="PingResponderBinding" name="PingResponderPort">
+      <soap:address location="https://localhost:20000/vp/Ping/1/rivtabp20"/>
+    </wsdl:port>
+  </wsdl:service>
+  <xsd:annotation>
+    <xsd:documentation>Beskrivning: Kontrakt för en testtjänst som svarar på ett ping anrop 
+			Revisioner: 2010-04-30 Version 1.0: Skapade tjänstekontraktet. 
+			Tjänstedomän: test.
+			Tjänsteinteraktionens namn: Ping
+			Tjänsteinteraktionstyp: Fråga-Svar.	
+			RIV Tekniska Anvisning: Basic Profile 2.0</xsd:documentation>
+  </xsd:annotation>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>https://localhost:20000/vp/Ping/1/rivtabp20?xsd=PingResponder_1_0.xsd</con:url><con:content><![CDATA[<!--Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.-->
+<xs:schema elementFormDefault="qualified" targetNamespace="urn:riv:itinfra:tp:PingResponder:1" version="1.0" xml:lang="en" xmlns:tns="urn:riv:itinfra:tp:PingResponder:1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation>Beskrivning: Meddelandetyper som används av Nationella Pingtjänsten.
+			Revisioner: 2010-04-30: Skapade tjänstekontraktet, version 1.0.</xs:documentation>
+  </xs:annotation>
+  <!--Globala element: Method parametrar-->
+  <xs:element name="ping" type="tns:pingRequestType"/>
+  <xs:element name="pingResponse" type="tns:pingResponseType"/>
+  <!--Fel-->
+  <!--<xs:element name="PersonNotFoundException" type="core:PersonNotFoundException" />
+	<xs:element name="TechnicalException" type="core:TechnicalException" />-->
+  <!--data typer-->
+  <xs:complexType name="pingRequestType">
+    <xs:sequence>
+      <xs:element name="pingIn" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Anger inkommande ping sträng</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="pingResponseType">
+    <xs:sequence>
+      <xs:element name="pingUt" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Ping svar</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>https://localhost:20000/vp/Ping/1/rivtabp20?xsd=ws-addressing-1.0.xsd</con:url><con:content><![CDATA[<!--W3C XML Schema defined in the Web Services Addressing 1.0 specification
+    http://www.w3.org/TR/ws-addr-core
+
+   Copyright © 2005 World Wide Web Consortium,
+
+   (Massachusetts Institute of Technology, European Research Consortium for
+   Informatics and Mathematics, Keio University). All Rights Reserved. This
+   work is distributed under the W3C® Software License [1] in the hope that
+   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+
+   $Id: ws-addr.xsd,v 1.4 2008/07/14 18:48:47 plehegar Exp $-->
+<xs:schema attributeFormDefault="unqualified" blockDefault="#all" elementFormDefault="qualified" finalDefault="" targetNamespace="http://www.w3.org/2005/08/addressing" xmlns:tns="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--Constructs from the WS-Addressing Core-->
+  <xs:element name="EndpointReference" type="tns:EndpointReferenceType"/>
+  <xs:complexType mixed="false" name="EndpointReferenceType">
+    <xs:sequence>
+      <xs:element name="Address" type="tns:AttributedURIType"/>
+      <xs:element minOccurs="0" name="ReferenceParameters" type="tns:ReferenceParametersType"/>
+      <xs:element minOccurs="0" ref="tns:Metadata"/>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType mixed="false" name="ReferenceParametersType">
+    <xs:sequence>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="Metadata" type="tns:MetadataType"/>
+  <xs:complexType mixed="false" name="MetadataType">
+    <xs:sequence>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="MessageID" type="tns:AttributedURIType"/>
+  <xs:element name="RelatesTo" type="tns:RelatesToType"/>
+  <xs:complexType mixed="false" name="RelatesToType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:attribute default="http://www.w3.org/2005/08/addressing/reply" name="RelationshipType" type="tns:RelationshipTypeOpenEnum" use="optional"/>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name="RelationshipTypeOpenEnum">
+    <xs:union memberTypes="tns:RelationshipType xs:anyURI"/>
+  </xs:simpleType>
+  <xs:simpleType name="RelationshipType">
+    <xs:restriction base="xs:anyURI">
+      <xs:enumeration value="http://www.w3.org/2005/08/addressing/reply"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="ReplyTo" type="tns:EndpointReferenceType"/>
+  <xs:element name="From" type="tns:EndpointReferenceType"/>
+  <xs:element name="FaultTo" type="tns:EndpointReferenceType"/>
+  <xs:element name="To" type="tns:AttributedURIType"/>
+  <xs:element name="Action" type="tns:AttributedURIType"/>
+  <xs:complexType mixed="false" name="AttributedURIType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <!--Constructs from the WS-Addressing SOAP binding-->
+  <xs:attribute name="IsReferenceParameter" type="xs:boolean"/>
+  <xs:simpleType name="FaultCodesOpenEnumType">
+    <xs:union memberTypes="tns:FaultCodesType xs:QName"/>
+  </xs:simpleType>
+  <xs:simpleType name="FaultCodesType">
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="tns:InvalidAddressingHeader"/>
+      <xs:enumeration value="tns:InvalidAddress"/>
+      <xs:enumeration value="tns:InvalidEPR"/>
+      <xs:enumeration value="tns:InvalidCardinality"/>
+      <xs:enumeration value="tns:MissingAddressInEPR"/>
+      <xs:enumeration value="tns:DuplicateMessageID"/>
+      <xs:enumeration value="tns:ActionMismatch"/>
+      <xs:enumeration value="tns:MessageAddressingHeaderRequired"/>
+      <xs:enumeration value="tns:DestinationUnreachable"/>
+      <xs:enumeration value="tns:ActionNotSupported"/>
+      <xs:enumeration value="tns:EndpointUnavailable"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="RetryAfter" type="tns:AttributedUnsignedLongType"/>
+  <xs:complexType mixed="false" name="AttributedUnsignedLongType">
+    <xs:simpleContent>
+      <xs:extension base="xs:unsignedLong">
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:element name="ProblemHeaderQName" type="tns:AttributedQNameType"/>
+  <xs:complexType mixed="false" name="AttributedQNameType">
+    <xs:simpleContent>
+      <xs:extension base="xs:QName">
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:element name="ProblemHeader" type="tns:AttributedAnyType"/>
+  <xs:complexType mixed="false" name="AttributedAnyType">
+    <xs:sequence>
+      <xs:any maxOccurs="1" minOccurs="1" namespace="##any" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="ProblemIRI" type="tns:AttributedURIType"/>
+  <xs:element name="ProblemAction" type="tns:ProblemActionType"/>
+  <xs:complexType mixed="false" name="ProblemActionType">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="tns:Action"/>
+      <xs:element minOccurs="0" name="SoapAction" type="xs:anyURI"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="test" type="xs:string"/>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://localhost:20000/vp/Ping/1/rivtabp20</con:endpoint></con:endpoints><con:operation isOneWay="false" action="urn:riv:test:PingResponder:1:ping" name="ping" bindingOperationName="ping" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/Ping/1/rivtabp20</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
+   <soapenv:Header>
+      <add:To>vp-test-producer</add:To>
+   </soapenv:Header>
+   <soapenv:Body>
+      <urn:ping>
+         <urn:pingIn></urn:pingIn>
+         <!--You may enter ANY elements at this point-->
+      </urn:ping>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:test:PingResponder:1:ping"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="Tjanst1SoapBinding" type="wsdl" bindingName="{urn:skl:tjanst1:rivtabp20}Tjanst1SoapBinding" soapVersion="1_1" anonymous="optional" definition="https://localhost:20000/vp/tjanst1?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://localhost:20000/vp/tjanst1?wsdl"><con:part><con:url>https://localhost:20000/vp/tjanst1?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="Tjanst1" targetNamespace="urn:skl:tjanst1:rivtabp20" xmlns="urn:skl:tjanst1:rivtabp20" xmlns:rivh="urn:riv:v1" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified">
+      <xsd:import namespace="urn:skl:tjanst1:rivtabp20" schemaLocation="https://localhost:20000/vp/tjanst1?xsd=tjanst1-1.0.xsd"/>
+      <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="https://localhost:20000/vp/tjanst1?xsd=../../core_components/ws-addressing-1.0.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="listProductsMsg">
+    <wsdl:part element="wsa:To" name="LogicalAddress"></wsdl:part>
+    <wsdl:part element="listProducts" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getProductDetailResponse">
+    <wsdl:part element="getProductDetailResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listProductsResponse">
+    <wsdl:part element="listProductsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getProductDetailMsg">
+    <wsdl:part element="wsa:To" name="LogicalAddress"></wsdl:part>
+    <wsdl:part element="getProductDetailElem" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Tjanst1Interface">
+    <wsdl:operation name="getProductDetail">
+      <wsdl:input message="getProductDetailMsg"></wsdl:input>
+      <wsdl:output message="getProductDetailResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listProducts">
+      <wsdl:input message="listProductsMsg"></wsdl:input>
+      <wsdl:output message="listProductsResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Tjanst1SoapBinding" type="Tjanst1Interface">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getProductDetail">
+      <soap:operation soapAction="getProductDetail"/>
+      <wsdl:input>
+        <soap:header message="getProductDetailMsg" part="LogicalAddress" use="literal"></soap:header>
+        <soap:body parts="parameters" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listProducts">
+      <soap:operation soapAction="listProducts"/>
+      <wsdl:input>
+        <soap:header message="listProductsMsg" part="LogicalAddress" use="literal"></soap:header>
+        <soap:body parts="parameters" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Tjanst1Service">
+    <wsdl:port binding="Tjanst1SoapBinding" name="Tjanst1ImplPort">
+      <soap:address location="https://localhost:20000/vp/tjanst1"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>https://localhost:20000/vp/tjanst1?xsd=tjanst1-1.0.xsd</con:url><con:content><![CDATA[<!--* Copyright 2009 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA-->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="urn:skl:tjanst1:rivtabp20" version="1.0" xmlns="urn:skl:tjanst1:rivtabp20" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="product">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+      <xs:element name="height" type="xs:int"/>
+      <xs:element minOccurs="0" name="id" type="xs:string"/>
+      <xs:element name="width" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="listProducts" type="listProducts"/>
+  <xs:complexType name="listProducts">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:element name="listProductsResponse" type="listProductsResponse"/>
+  <xs:complexType name="listProductsResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="getProductDetailElem" type="getProductDetailType"/>
+  <xs:complexType name="getProductDetailType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="productId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="getProductDetailResponse" type="getProductDetailResponse"/>
+  <xs:complexType name="getProductDetailResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="product" type="product"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>https://localhost:20000/vp/tjanst1?xsd=../../core_components/ws-addressing-1.0.xsd</con:url><con:content><![CDATA[<!--W3C XML Schema defined in the Web Services Addressing 1.0 specification
+    http://www.w3.org/TR/ws-addr-core
+
+   Copyright © 2005 World Wide Web Consortium,
+
+   (Massachusetts Institute of Technology, European Research Consortium for
+   Informatics and Mathematics, Keio University). All Rights Reserved. This
+   work is distributed under the W3C® Software License [1] in the hope that
+   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+
+   $Id: ws-addr.xsd,v 1.4 2008/07/14 18:48:47 plehegar Exp $-->
+<xs:schema attributeFormDefault="unqualified" blockDefault="#all" elementFormDefault="qualified" finalDefault="" targetNamespace="http://www.w3.org/2005/08/addressing" xmlns:tns="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--Constructs from the WS-Addressing Core-->
+  <xs:element name="EndpointReference" type="tns:EndpointReferenceType"/>
+  <xs:complexType mixed="false" name="EndpointReferenceType">
+    <xs:sequence>
+      <xs:element name="Address" type="tns:AttributedURIType"/>
+      <xs:element minOccurs="0" name="ReferenceParameters" type="tns:ReferenceParametersType"/>
+      <xs:element minOccurs="0" ref="tns:Metadata"/>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType mixed="false" name="ReferenceParametersType">
+    <xs:sequence>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="Metadata" type="tns:MetadataType"/>
+  <xs:complexType mixed="false" name="MetadataType">
+    <xs:sequence>
+      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="MessageID" type="tns:AttributedURIType"/>
+  <xs:element name="RelatesTo" type="tns:RelatesToType"/>
+  <xs:complexType mixed="false" name="RelatesToType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:attribute default="http://www.w3.org/2005/08/addressing/reply" name="RelationshipType" type="tns:RelationshipTypeOpenEnum" use="optional"/>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name="RelationshipTypeOpenEnum">
+    <xs:union memberTypes="tns:RelationshipType xs:anyURI"/>
+  </xs:simpleType>
+  <xs:simpleType name="RelationshipType">
+    <xs:restriction base="xs:anyURI">
+      <xs:enumeration value="http://www.w3.org/2005/08/addressing/reply"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="ReplyTo" type="tns:EndpointReferenceType"/>
+  <xs:element name="From" type="tns:EndpointReferenceType"/>
+  <xs:element name="FaultTo" type="tns:EndpointReferenceType"/>
+  <xs:element name="To" type="tns:AttributedURIType"/>
+  <xs:element name="Action" type="tns:AttributedURIType"/>
+  <xs:complexType mixed="false" name="AttributedURIType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <!--Constructs from the WS-Addressing SOAP binding-->
+  <xs:attribute name="IsReferenceParameter" type="xs:boolean"/>
+  <xs:simpleType name="FaultCodesOpenEnumType">
+    <xs:union memberTypes="tns:FaultCodesType xs:QName"/>
+  </xs:simpleType>
+  <xs:simpleType name="FaultCodesType">
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="tns:InvalidAddressingHeader"/>
+      <xs:enumeration value="tns:InvalidAddress"/>
+      <xs:enumeration value="tns:InvalidEPR"/>
+      <xs:enumeration value="tns:InvalidCardinality"/>
+      <xs:enumeration value="tns:MissingAddressInEPR"/>
+      <xs:enumeration value="tns:DuplicateMessageID"/>
+      <xs:enumeration value="tns:ActionMismatch"/>
+      <xs:enumeration value="tns:MessageAddressingHeaderRequired"/>
+      <xs:enumeration value="tns:DestinationUnreachable"/>
+      <xs:enumeration value="tns:ActionNotSupported"/>
+      <xs:enumeration value="tns:EndpointUnavailable"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="RetryAfter" type="tns:AttributedUnsignedLongType"/>
+  <xs:complexType mixed="false" name="AttributedUnsignedLongType">
+    <xs:simpleContent>
+      <xs:extension base="xs:unsignedLong">
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:element name="ProblemHeaderQName" type="tns:AttributedQNameType"/>
+  <xs:complexType mixed="false" name="AttributedQNameType">
+    <xs:simpleContent>
+      <xs:extension base="xs:QName">
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:element name="ProblemHeader" type="tns:AttributedAnyType"/>
+  <xs:complexType mixed="false" name="AttributedAnyType">
+    <xs:sequence>
+      <xs:any maxOccurs="1" minOccurs="1" namespace="##any" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:element name="ProblemIRI" type="tns:AttributedURIType"/>
+  <xs:element name="ProblemAction" type="tns:ProblemActionType"/>
+  <xs:complexType mixed="false" name="ProblemActionType">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="tns:Action"/>
+      <xs:element minOccurs="0" name="SoapAction" type="xs:anyURI"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint></con:endpoints><con:operation isOneWay="false" action="getProductDetail" name="getProductDetail" bindingOperationName="getProductDetail" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
+   <soapenv:Header>
+      <add:To>vp-test-producer</add:To>
+   </soapenv:Header>
+   <soapenv:Body>
+      <urn:getProductDetailElem>
+         <!--Optional:-->
+         <productId>RW456</productId>
+      </urn:getProductDetailElem>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="listProducts" name="listProducts" bindingOperationName="listProducts" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
+   <soapenv:Header>
+      <add:To>vp-test-producer</add:To>
+   </soapenv:Header>
+   <soapenv:Body>
+      <urn:listProducts/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="listProducts"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/></con:soapui-project>
