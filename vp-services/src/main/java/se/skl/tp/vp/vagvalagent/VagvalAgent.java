@@ -107,28 +107,42 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * constants VagvalAgent.FORCE_RESET or VagvalAgent.DONT_FORCE_RESET.
 	 * If not forced, init checks if necessary resources are loaded, otherwise
 	 * resources are loaded.
+	 * 
+	 * @param forceReset Force a init by setting forceReset=true
+	 * @return a processing log containing status for loading TAK resources
 	 */
-	public void init(boolean forceReset) {
+	public VagvalAgentProcessingLog init(boolean forceReset) {
 		if (forceReset || !isInitialized()) {
-			logger.info("Init VagvalAgent...");
+			logger.info("Initialize VagvalAgent TAK resources...");
+			
+			//Create a processing log
+			VagvalAgentProcessingLog processingLog = new VagvalAgentProcessingLog();
+			processingLog.addLog("Initialize VagvalAgent TAK resources...");
 			
 			List<VirtualiseringsInfoType> v = getVirtualiseringar();
 			List<AnropsBehorighetsInfoType> p = getBehorigheter();
 			setState(v, p);
 
 			if (isInitialized()) {
-				saveToLocalCopy(localTakCache);
+			    processingLog.addLog("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy...");
+				saveToLocalCopy(localTakCache, processingLog);
 			} else {
-				restoreFromLocalCopy(localTakCache);
+			    processingLog.addLog("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy...");
+				restoreFromLocalCopy(localTakCache, processingLog);
 			}
 
 			if (isInitialized()) {
-				logger.info("Init VagvalAgent loaded {} permissions", behorighetHandler.size());
-				logger.info("Init VagvalAgent loaded {} virtualizations", vagvalHandler.size());
+				logger.info("Init VagvalAgent loaded number of permissions: {}", behorighetHandler.size());
+				logger.info("Init VagvalAgent loaded number of virtualizations: {}", vagvalHandler.size());
+				processingLog.addLog("Init VagvalAgent loaded number of permissions: " + behorighetHandler.size());
+				processingLog.addLog("Init VagvalAgent loaded number of virtualizations: " + vagvalHandler.size());
 			}
 			
 			logger.info("Init VagvalAgent done");
+			
+			return processingLog;
 		}
+		return null;
 	}
 
 	/**
@@ -201,7 +215,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	// restore saved object
-	private void restoreFromLocalCopy(String fileName) {
+	private void restoreFromLocalCopy(String fileName, VagvalAgentProcessingLog processingLog) {
 		PersistentCache pc = null;
 		InputStream is = null;
 		final File file = new File(fileName);
@@ -210,9 +224,16 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				logger.info("Restore virtualizations and permissions from local TAK copy: {}", fileName);
 				is = new FileInputStream(file);
 				pc = (PersistentCache) JAXB.unmarshal(is);
+				processingLog.addLog("Succesfully restored virtualizations and permissions from local TAK copy: " + fileName);
+			}else{
+			    logger.error("Failed to find following file containing local TAK copy: {}", fileName);
+	            processingLog.addLog("Failed to find following file containing local TAK copy: " + fileName);
 			}
 		} catch (Exception e) {
-			logger.error("Unable to restore virtualizations and permissions from local TAK copy: {}" + fileName, e);
+			logger.error("Failed to restore virtualizations and permissions from local TAK copy: {}", fileName, e);
+			processingLog.addLog("Failed to restore virtualizations and permissions from local TAK copy: " + fileName);
+			processingLog.addLog("Reason for failure: " + e.getMessage());
+			
 			// remove erroneous file.
 			if (is != null) {
 				file.delete();
@@ -225,7 +246,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	// save object
-	private void saveToLocalCopy(String fileName) {
+	private void saveToLocalCopy(String fileName, VagvalAgentProcessingLog processingLog) {
 		PersistentCache pc = new PersistentCache();
 		pc.anropsBehorighetsInfo = this.behorighetHandler.getAnropsBehorighetsInfoList();
 		pc.virtualiseringsInfo = this.vagvalHandler.getVirtualiseringsInfo();
@@ -236,8 +257,11 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			File file = new File(fileName);
 			os = new FileOutputStream(file);
 			os.write(JAXB.marshal(pc).getBytes("UTF-8"));
+			processingLog.addLog("Succesfully saved virtualizations and permissions to local TAK copy: " + fileName);
 		} catch (Exception e) {
-			logger.error("Unable to save virtualizations and permissions to local TAK copy: {}" + fileName, e);
+			logger.error("Failed to save virtualizations and permissions to local TAK copy: {}" + fileName, e);
+			processingLog.addLog("Failed to save virtualizations and permissions to local TAK copy: " + fileName);
+			processingLog.addLog("Reason for failure: " + e.getMessage());
 		} finally {
 			close(os);
 		}
@@ -271,10 +295,10 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	public ResetVagvalCacheResponse resetVagvalCache(ResetVagvalCacheRequest parameters) {
 		logger.info("Start force a reset of VagvalAgent...");
 		
-		//Force reset in init
-		init(FORCE_RESET);
-
 		ResetVagvalCacheResponse response = new ResetVagvalCacheResponse();
+				
+		//Force reset in init
+        VagvalAgentProcessingLog processingLog = init(FORCE_RESET);
 
 		if (!isInitialized()) {
 			response.setResetResult(false);
@@ -284,8 +308,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			logger.info("Successfully force reset VagvalAgent");
 		}
 		
-		
-
+		response.getProcessingLog().addAll(processingLog.getLog());
 		return response;
 	}
 

@@ -71,6 +71,13 @@ public class ResetVagvalCache implements Callable {
 	}
 	
 	private String getResultAsString(ResetVagvalCacheResponse result) {
-		return "Vagval cache reset result = " + result.isResetResult();
+	
+	    
+	    StringBuffer resultAsString = new StringBuffer();
+	    for (String processingLog : result.getProcessingLog()) {
+	        resultAsString.append("<br>" + processingLog);
+        }
+	   
+		return resultAsString.toString();
 	}
 }
