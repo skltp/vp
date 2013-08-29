@@ -6,14 +6,17 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 [soi-toolkit.gen.createDate=2012-09-04T15:27:20.335+02:00]
 [soi-toolkit.gen.artifactId=vp]
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project 
+	xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>se.skltp.vp</groupId>
 		<artifactId>vp-parent</artifactId>
-		<version>2.2.1-RC1</version>
+		<version>2.3.0-RC1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
     
@@ -26,13 +29,13 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
     <dependency>
     	<groupId>se.skltp.vp</groupId>
     	<artifactId>vp-services</artifactId>
-    	<version>2.2.1-RC1</version>
+    	<version>2.3.0-RC1-SNAPSHOT</version>
     	<type>test-jar</type>
     </dependency>
     <dependency>
     	<groupId>se.skltp.vp</groupId>
     	<artifactId>vp-services</artifactId>
-    	<version>2.2.1-RC1</version>
+    	<version>2.3.0-RC1-SNAPSHOT</version>
     	<classifier>core</classifier>    	
     </dependency>
 	</dependencies> 
@@ -103,7 +106,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore></ignore>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -127,7 +130,7 @@ DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT YOU ARE DOI
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore></ignore>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
