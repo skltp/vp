@@ -25,7 +25,7 @@
     <appender name="ROLLINGFILE" class="org.apache.log4j.RollingFileAppender">
         <param  name="file" value="${mule.home}/logs/mule-app-vp.log"/>
         <param name="MaxBackupIndex" value="10" />
-        <param name="MaxFileSize" value="2MB" />
+        <param name="MaxFileSize" value="50MB" />
         
         <!-- The threshold level for this appender. -->
         <!-- <param name="Threshold" value="ERROR"/> -->
