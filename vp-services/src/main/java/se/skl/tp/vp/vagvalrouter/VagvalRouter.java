@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -58,7 +59,15 @@ import se.skl.tp.vp.util.helper.AddressingHelper;
 
 public class VagvalRouter extends AbstractRecipientList {
 
-	/**
+    /**
+     * HTTP Header holding producer response time, forwarded to consumer.
+     * <p>
+     * 
+     * @since VP-2.2.1
+     */
+    public static final String X_SKLTP_PRODUCER_RESPONSETIME = "x-skltp-prt";
+
+    /**
 	 * HTTP Header forwarded to producer
 	 * <p>
 	 * 
@@ -206,7 +215,8 @@ public class VagvalRouter extends AbstractRecipientList {
 			// Do the actual routing
 			replyEvent = super.route(event);
 		} finally {
-			ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
+		    long endpointTime =  ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
+		    event.getMessage().setProperty(X_SKLTP_PRODUCER_RESPONSETIME, endpointTime, PropertyScope.OUTBOUND); 
 		}
 
 		/*

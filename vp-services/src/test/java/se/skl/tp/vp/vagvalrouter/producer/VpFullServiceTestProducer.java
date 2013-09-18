@@ -89,8 +89,14 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
         
         GetProductDetailResponse response = new GetProductDetailResponse();
         response.setProduct(product);
+        
+        if(product != null){
+            logger.info("Producer-teststub. End getProductDetail(), Returned product data: " + product.getId() + " - " + product.getDescription() + " - " + product.getHeight() + " - " + product.getWidth());
+        }else{
+            logger.info("Producer-teststub. End getProductDetail(), Returned null, no product found using {}", parameters.getProductId());
+        }
 
-        logger.info("Producer-teststub. End getProductDetail(), Returned product data: " + product.getId() + " - " + product.getDescription() + " - " + product.getHeight() + " - " + product.getWidth());
+       
         return response;
     }
 

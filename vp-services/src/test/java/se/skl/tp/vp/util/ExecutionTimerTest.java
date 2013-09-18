@@ -47,8 +47,9 @@ public class ExecutionTimerTest {
 	public void unInitialized() throws Exception {
 		ExecutionTimer.start("single");
 		Thread.sleep(200);
-		ExecutionTimer.stop("single");
+		long elapsedTIme = ExecutionTimer.stop("single");
 		assertNull(ExecutionTimer.getAll());
+		assertEquals("No imer started returns -1L", -1L, elapsedTIme);
 	}
 	
 	@Test

@@ -37,18 +37,19 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.mule.tck.FunctionalTestCase;
 
+import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 
 @SuppressWarnings("deprecation")
-public class VpFullKeepAliveServiceTest extends FunctionalTestCase {
+public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase {
 
 	
 	private HttpClient client;
 	private SslProtocolSocketFactory socketFactory;
 
 	
-	public VpFullKeepAliveServiceTest() {
+	public VpFullKeepAliveAndHttpHeaderServiceTest() {
 		super();
 		setDisposeManagerPerSuite(true);
 		
@@ -282,6 +283,18 @@ public class VpFullKeepAliveServiceTest extends FunctionalTestCase {
 		}
 	}
 	
+	public void testProducerResponseTimeIsReturnedWhenHttp200() throws Exception {
+        PostMethod httppost = executeHttp11SoapCall("/vp/keep-alive-tjanst1");
+        assertNotNull(httppost.getResponseHeader(VagvalRouter.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
+        assertEquals(200, httppost.getStatusCode());
+    }
+	
+	public void testProducerResponseTimeIsReturnedWhenHttp500() throws Exception {
+        PostMethod httppost = executeHttp11SoapCallReturningHttp500("/vp/keep-alive-tjanst1");
+        assertNotNull(httppost.getResponseHeader(VagvalRouter.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
+        assertEquals(500, httppost.getStatusCode());
+    }
+	
 	private PostMethod executeSoapCall(final String subUrl, final boolean doClose, final boolean doKeepAlive, final boolean version10) throws HttpException, IOException {
 		PostMethod httppost = new PostMethod(subUrl);
 		RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream("testfiles/ListProducts.xml"));
@@ -292,6 +305,21 @@ public class VpFullKeepAliveServiceTest extends FunctionalTestCase {
 		client.executeMethod(httppost);
 		return httppost;
 	}
+	
+	private PostMethod executeSoapCallHttp500(final String subUrl, final boolean doClose, final boolean doKeepAlive, final boolean version10) throws HttpException, IOException {
+        PostMethod httppost = new PostMethod(subUrl);
+        RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream("testfiles/GetProductsExceptionResponse.xml"));
+        httppost.getParams().setVersion(version10 ? HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
+        httppost.setRequestEntity(requestEntity);
+        if(doClose) httppost.setRequestHeader("Connection", "close");
+        if(doKeepAlive) httppost.setRequestHeader("Connection", "keep-alive");
+        client.executeMethod(httppost);
+        return httppost;
+    }
+	
+	private PostMethod executeHttp11SoapCallReturningHttp500(final String subUrl) throws HttpException, IOException {
+        return executeSoapCallHttp500(subUrl, false, false, false);
+    }
 
 	private PostMethod executeHttp11SoapCallWithClose(final String subUrl) throws HttpException, IOException {
 		return executeSoapCall(subUrl, true, false, false);

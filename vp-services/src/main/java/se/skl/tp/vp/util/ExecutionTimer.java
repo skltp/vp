@@ -80,17 +80,20 @@ public class ExecutionTimer {
 	}
 	
 	/**
-	 * Stops timer with name.
+	 * Stops timer with name and returns the elapsed time since since started.
 	 * 
 	 * @param name the name of the timer.
+	 * @return the elapsed time, -1 if no timer was started
 	 */
-	public static void stop(String name) {
+	public static long stop(String name) {
 		logger.debug(name);
 		ExecutionTimer timer = get(name);
 		if (timer != null) {
 			timer.stop();
 			logger.debug(timer.toString());
+			return timer.getElapsed();
 		}
+		return -1L;
 	}
 		
 	/**
