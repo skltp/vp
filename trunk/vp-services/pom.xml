@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT 
+	YOU ARE DOING! [soi-toolkit.gen.version=0.3.1] [soi-toolkit.gen.type=services] 
+	[soi-toolkit.gen.createDate=2011-06-30T14:55:14.318+02:00] [soi-toolkit.gen.artifactId=vp] -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>se.skltp.vp</groupId>
+		<artifactId>vp-parent</artifactId>
+		<version>2.2.2-RC1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>vp-services</artifactId>
+    <packaging>mule</packaging>
+	<name>vp-services</name>
+
+	<dependencies>
+		<dependency>
+		  <groupId>org.soitoolkit.commons.components</groupId>
+			<artifactId>soitoolkit-commons-mule</artifactId>
+			<version>${soitoolkit.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>se.skltp.vp</groupId>
+			<artifactId>vp-soitoolkit-mule-dependencies</artifactId>
+			<version>${project.version}</version>
+			<!-- Exclude mule-module-spring-security since we don't use it and it contains dependencies to old versions of spring causing strange problems to occurr -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.mule.modules</groupId>
+					<artifactId>mule-module-spring-security</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>se.skltp.vp</groupId>
+			<artifactId>vp-schemas</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- Ping -->
+		<dependency>
+			<groupId>se.skltp.vp</groupId>
+			<artifactId>itinfra-tp-schemas</artifactId>
+			<version>2.2.2-RC1</version>
+		</dependency>
+		<dependency>
+			<groupId>se.skltp.vp</groupId>
+			<artifactId>itinfra-tp-ping-virtualisering</artifactId>
+			<version>2.2.2-RC1</version>
+		</dependency>
+		<dependency>
+			<groupId>se.skltp.vp</groupId>
+			<artifactId>itinfra-tp-ping-test-producer</artifactId>
+			<version>2.2.2-RC1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.17</version>
+		</dependency>
+		  
+		<!-- Mockito -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+			<version>1.8.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+			<version>1.8.5</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.bouncycastle</groupId>
+		  <artifactId>bcprov-jdk16</artifactId>
+		  <version>1.45</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>se.skltp.vp</groupId>
+		  <artifactId>vp-hsa-cache</artifactId>
+		  <version>2.2.2-RC1</version>
+		</dependency>
+    
+        <dependency>
+          <groupId>xmlunit</groupId>
+          <artifactId>xmlunit</artifactId>
+          <version>1.4</version>
+        </dependency>
+            
+	</dependencies>
+
+	<build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <!-- To get mule-config files from the Mule Studio defined resource-folder in the classpath... -->
+                <directory>${basedir}/src/main/app</directory>
+            </resource>
+        </resources>
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/test/resources</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+			</plugin>
+
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <extensions>true</extensions>
+                <!-- Include mule-dependencies that doesn't come with Mule 3.x otherwise we can't install to a vanilla Mule 3.x installation -->
+                <configuration>
+                    <inclusions>
+                        <inclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>commonretrypolicies</artifactId>
+                        </inclusion>
+                        <inclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-restlet</artifactId>
+                        </inclusion>
+                        <inclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-rest</artifactId>
+                        </inclusion>
+                        <inclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>devkit</artifactId>
+                        </inclusion>
+                    </inclusions>
+                </configuration>
+            </plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>assemblies/vp-virtuell-tjanst-teststub-assembly-descriptor.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>
+              <artifactId>maven-jar-plugin</artifactId>
+              <configuration>
+                <!-- 
+                 if no classifier is declared, then a mvn install results in a file in
+                 the local repo: ic2-1.0.0-SNAPSHOT.mule
+                 which is a jar-file - only strangely named and with a bad extension
+                -->
+                <classifier>core</classifier>
+                <excludes>
+                  <exclude>log4j.xml</exclude>
+                </excludes>
+              </configuration>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sourceRoot>${basedir}/target/generated/src/test/java</sourceRoot>
+							<wsdlOptions>
+								<wsdlOption>
+									<extraargs>
+										<extraarg>-p</extraarg>
+										<!-- Note: be careful when changing this - must be in sync for 
+											all schemas generations in this namespace! -->
+										<extraarg>
+											urn:riv:v1=se.skl.riv.wsdl.v1
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											urn:skl:tjanst1:rivtabp20=se.skl.tjanst1.wsdl
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											http://www.w3.org/2005/08/addressing=org.w3.wsaddressing10
+										</extraarg>
+									</extraargs>
+									<wsdl>src/test/resources/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl</wsdl>
+								</wsdlOption>
+
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+			    <artifactId>maven-resources-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>copy-log4j-resource</id>
+			            <phase>prepare-package</phase>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <configuration>
+			                <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>src/environment</directory>
+			                        <includes>
+			                            <include>log4j.xml</include>
+			                            <include>log4j.dtd</include>
+			                        </includes>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											properties-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0-alpha-2,)
+										</versionRange>
+										<goals>
+											<goal>
+												write-project-properties
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.cxf
+										</groupId>
+										<artifactId>
+											cxf-codegen-plugin
+										</artifactId>
+										<versionRange>
+											[2.1.9,)
+										</versionRange>
+										<goals>
+											<goal>wsdl2java</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.mule.tools
+										</groupId>
+										<artifactId>
+											maven-mule-plugin
+										</artifactId>
+										<versionRange>
+											[1.7,)
+										</versionRange>
+										<goals>
+											<goal>
+												filter-resources
+											</goal>
+											<goal>
+												attach-test-resources
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	
+	 <profiles>
+        <profile>
+            <id>muleServer</id>
+            <!-- Start mule server with the command "mvn -PmuleServer" or "mvn -PmuleServer -Dexec.args="${artifaceId}-config.xml"" if you want to override the default config-file -->
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>se.skl.tp.vp.VpMuleServer</mainClass>
+                                    <classpathScope>test</classpathScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

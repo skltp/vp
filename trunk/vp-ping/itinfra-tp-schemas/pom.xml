@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!--
+ * Copyright 2009 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>itinfra-tp-schemas</artifactId>
+	<name>itinfra-tp-schemas</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<schema.path>schemas</schema.path>
+	</properties>
+	
+	<parent>
+  		<groupId>se.skltp.vp</groupId>
+  		<artifactId>itinfra-tp</artifactId>
+  		<version>2.2.2-RC1</version>
+  		<relativePath>../pom.xml</relativePath>
+   </parent>
+ 
+	<dependencies>
+	    <!-- cxf dependencies -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxf.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId> 
+                    <artifactId>spring-web</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+             <groupId>org.apache.cxf</groupId>
+             <artifactId>cxf-rt-transports-http-jetty</artifactId>
+             <version>${cxf.version}</version>
+       </dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+            <plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>${cxf.version}</version>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+							<wsdlOptions>						
+								<wsdlOption>
+									<extraargs>
+										<extraarg>-p</extraarg>
+										Note: be careful when changing this - must be in sync for all schemas generations in this namespace!										 
+										<extraarg>
+											urn:riv:itinfra:tp:Ping:1:rivtabp20=se.riv.itinfra.tp.ping.v1.rivtabp20
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											urn:riv:itinfra:tp:PingResponder:1=se.riv.itinfra.tp.pingresponder.v1
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											http://www.w3.org/2005/08/addressing=org.w3.wsaddressing10
+										</extraarg>
+									</extraargs>
+									<wsdl>${schema.path}/PingInteraction_1.0_rivtabp20.wsdl</wsdl>
+								</wsdlOption>								
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+								
+		</plugins>
+		
+		 <resources>
+      <resource>
+        <directory>${schema.path}</directory>
+      </resource>
+    </resources>
+	</build>
+</project>
