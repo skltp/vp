@@ -70,14 +70,14 @@
 	</spring:bean>
 	
     <!-- Https connector used when acting as a producer, ie receiving calls,  sends no session info-->
-  	<https:connector name="VPProducerConnector" keepSendSocketOpen="false" keepAlive="false" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
+  	<https:connector name="VPProducerConnector" keepSendSocketOpen="false" keepAlive="false" socketSoLinger="${SOCKET_SO_LINGER_MS}">
 		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
 		<https:tls-key-store class="${TP_TLS_STORE_PRODUCER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_PRODUCER_FILE}" storePassword="${TP_TLS_STORE_PRODUCER_PASSWORD}" keyPassword="${TP_TLS_STORE_PRODUCER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>
 	</https:connector>
 
     <!-- Https connector used when acting as a consumer, ie making calls, sends no session info -->
-  	<https:connector name="VPConsumerConnector" keepSendSocketOpen="false" keepAlive="false" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}">
+  	<https:connector name="VPConsumerConnector" keepSendSocketOpen="false" keepAlive="false" socketSoLinger="${SOCKET_SO_LINGER_MS}">
 		<service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
   	    <https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
 		<https:tls-server    class="${TP_TLS_STORE_TRUSTSTORE_TYPE}" path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_TRUSTSTORE_FILE}" storePassword="${TP_TLS_STORE_TRUSTSTORE_PASSWORD}" requireClientAuthentication="true"/>

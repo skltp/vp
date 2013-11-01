@@ -25,24 +25,37 @@
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
     xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xmlns="http://www.mulesoft.org/schema/mule/core"
     xsi:schemaLocation="
 		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
 
       <flow name="vp-virtuell-tjanst-teststub-flow" >
-        <inbound-endpoint 
-        	address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"  
-        	connector-ref="VPProducerConnector" 
- 			name="Tjanst1"
-            exchange-pattern="request-response" 
-            responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
-        	<properties>
-        		<spring:entry key="featureUseKeepAlive" value="false"/>
-        	</properties>
-        </inbound-endpoint>
+       
+        <composite-source>
+      	  	<https:inbound-endpoint
+        	    address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"
+           		connector-ref="VPProducerConnector"
+            	exchange-pattern="request-response" 
+            	responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+            	<properties>
+        			<spring:entry key="featureUseKeepAlive" value="true"/>
+              		<spring:entry key="featureResponseTimeout" value="5000"/>
+        		</properties>
+        	</https:inbound-endpoint>
+        	<http:inbound-endpoint
+        	    address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/tjanst1"
+            	exchange-pattern="request-response" 
+            	responseTransformer-refs="filterResponseHeaders">
+              <properties>
+              <spring:entry key="featureResponseTimeout" value="5000"/>
+            </properties>
+        	</http:inbound-endpoint>
+         </composite-source>
  			
         <cxf:proxy-service
             namespace="urn:skl:tjanst1:rivtabp20"

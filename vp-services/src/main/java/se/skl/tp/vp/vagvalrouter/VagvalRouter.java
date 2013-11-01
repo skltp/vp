@@ -100,7 +100,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private String whiteList;
 
-	private String responseTimeout;
+	private int responseTimeout;
 
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 
@@ -146,7 +146,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		this.whiteList = whiteList;
 	}
 
-	public void setResponseTimeout(final String responseTimeout) {
+	public void setResponseTimeout(final int responseTimeout) {
 		this.responseTimeout = responseTimeout;
 	}
 
@@ -250,7 +250,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		String url = (String) recipient;
 		message.setProperty(VPUtil.ENDPOINT_URL, url, PropertyScope.SESSION);
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
-		eb.setResponseTimeout(Integer.valueOf(this.responseTimeout));
+		eb.setResponseTimeout(selectResponseTimeout(message));
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 		eb.setEncoding("UTF-8");
 		message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8", PropertyScope.OUTBOUND);
@@ -297,6 +297,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		} catch (EndpointException e) {
 			throw new VpTechnicalException(e);
 		}
+	}
+	
+	protected int selectResponseTimeout(MuleMessage message) {
+		//Feature: Select response timeout provided by invoked service or use global default in responseTimeout
+		int responseTimeoutValue = message.getProperty(VPUtil.FEATURE_RESPONSE_TIMOEUT, PropertyScope.INVOCATION,responseTimeout);
+		logger.debug("Selected response timeout {}", responseTimeoutValue);
+		return responseTimeoutValue;
 	}
 
 	private Connector selectConsumerConnector(String url, MuleMessage message) {

@@ -32,7 +32,7 @@
         ">
         	
 	    <!-- Https connector used when acting as a producer, ie receiving calls,  sends no session info-->
-        <https:connector name="VPProducerConnector" clientSoTimeout="${SERVICE_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}" sendTcpNoDelay="${VP_MULE_HTTPS_PRODUCER_CONNECTOR_TCPNODELAY}">
+        <https:connector name="VPProducerConnector" socketSoLinger="${SOCKET_SO_LINGER_MS}" sendTcpNoDelay="${VP_MULE_HTTPS_PRODUCER_CONNECTOR_TCPNODELAY}">
                 <spring:property name="keepAlive" value="${VP_MULE_HTTPS_PRODUCER_CONNECTOR_KEEPALIVE}"/>
                 <spring:property name="keepAliveTimeout" value="${VP_MULE_HTTPS_PRODUCER_CONNECTOR_KEEPALIVE_TIMEOUT_MS}"/>
                 <service-overrides sessionHandler="org.mule.session.NullSessionHandler" />

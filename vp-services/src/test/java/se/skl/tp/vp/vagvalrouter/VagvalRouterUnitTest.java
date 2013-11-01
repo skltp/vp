@@ -20,29 +20,64 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 
 
-public class VagvalRouterUnitTest extends TestCase {
+public class VagvalRouterUnitTest extends AbstractMuleContextTestCase{
 
+	private static final int DEFAULT_RESPONSETIMEOUT = 30000;
+
+	@Test
 	public void testHttpsPropertyIsSet() throws Exception {
 		final String url = "https://localhost:20000/vp/PingForConfiguration/1/rivtabp21";
 		this.verifyProperty(url, true);
 	}
 	
+	@Test
 	public void testHttpsPropertyIsSetToFalse() throws Exception {
 		final String url = "http://localhost:20000/vp/PingForConfiguration/1/rivtabp21";
 		this.verifyProperty(url, false);
+	}
+	
+	@Test
+	public void defaultResponseTimeoutSelectedWhenNotProvided() throws Exception{
+		final VagvalRouter router = new VagvalRouter();
+		router.setResponseTimeout(DEFAULT_RESPONSETIMEOUT);
+		Integer providedResponsetime = null;
+		
+		assertEquals(DEFAULT_RESPONSETIMEOUT, router.selectResponseTimeout(createMessageWithResponseTimeout(providedResponsetime)));
+	}
+
+	@Test
+	public void responseTimeoutProvidedIsUsed() {
+		final VagvalRouter router = new VagvalRouter();
+		router.setResponseTimeout(DEFAULT_RESPONSETIMEOUT);
+		int providedResponsetime = 5000;
+
+		assertEquals(providedResponsetime, router.selectResponseTimeout(createMessageWithResponseTimeout(providedResponsetime)));
+	}
+
+	private MuleMessage createMessageWithResponseTimeout(Integer providedResponseTimeout) {
+		MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+		if (providedResponseTimeout != null) {
+			message.setProperty(VPUtil.FEATURE_RESPONSE_TIMOEUT,
+					providedResponseTimeout, PropertyScope.INVOCATION);
+		}
+		return message;
 	}
 	
 	private void verifyProperty(final String url, final boolean expectedResult) throws Exception {

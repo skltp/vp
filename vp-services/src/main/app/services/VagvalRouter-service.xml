@@ -50,6 +50,7 @@
                 name="senderIdPropertyName"
                 value="${VAGVALROUTER_SENDERID}" />
 
+			<!-- Default value for response timeout is set in VagvalRouter -->
             <spring:property
                 name="responseTimeout"
                 value="${SERVICE_TIMEOUT_MS}" />
