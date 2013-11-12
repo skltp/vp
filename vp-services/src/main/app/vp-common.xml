@@ -191,7 +191,17 @@
 		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
     
-    <!-- Transformer filters mule stuff out from HTTP response headers -->
+    <!-- Transformer filters mule stuff out from HTTP response headers, referenced from generated virtual services .
+    
+    	Sample virtual service referencing filterResponseHeaders:
+    	
+        <https:inbound-endpoint
+        	    address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"
+           		connector-ref="VPProducerConnector"
+            	exchange-pattern="request-response" 
+            	responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+    
+    -->
     <message-properties-transformer name="filterResponseHeaders" scope="outbound">
 	    <add-message-property key="x-vp-correlation-id" value="#[groovy:message.getSessionProperty('soitoolkit_correlationId', 'none')]" />
 	    <delete-message-property key="SOAPAction" />
