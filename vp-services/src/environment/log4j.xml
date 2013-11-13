@@ -131,6 +131,16 @@
     <logger name="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
         <level value="INFO"/>
     </logger>
+    
+    <!-- Level DEBUG: Log http headers transfered during a request/response -->
+    <logger name="httpclient.wire.header">
+        <level value="FATAL"/>
+    </logger>
+
+	 <!-- Level DEBUG: Log the http content transfered during a request/response -->
+    <logger name="httpclient.wire.content">
+        <level value="FATAL"/>
+    </logger>
 	
 
     <root>
