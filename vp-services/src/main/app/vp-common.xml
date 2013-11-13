@@ -176,32 +176,6 @@
 		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
     
-    <!--  FIXME: do not change logType, beacuse it's a hard-coded type used by Evactor active monitoring sub-system -->
-    <custom-transformer name="monitorLogRequest" class="se.skl.tp.vp.util.MonitorLogTransformer">
-		<spring:property name="logType"  value="req-out"/>
-		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
-    </custom-transformer>
-    
-    <custom-transformer name="monitorLogResponse" class="se.skl.tp.vp.util.MonitorLogTransformer">
-		<spring:property name="logType"  value="resp-in"/>
-		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
-    </custom-transformer>
-    
-    <!-- Transformer filters mule stuff out from HTTP response headers, referenced from generated virtual services .
-    
-    	Sample virtual service referencing filterResponseHeaders:
-    	
-        <https:inbound-endpoint
-        	    address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"
-           		connector-ref="VPProducerConnector"
-            	exchange-pattern="request-response" 
-            	responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
-    
-    -->
     <message-properties-transformer name="filterResponseHeaders" scope="outbound">
 	    <add-message-property key="x-vp-correlation-id" value="#[groovy:message.getSessionProperty('soitoolkit_correlationId', 'none')]" />
 	    <delete-message-property key="SOAPAction" />
