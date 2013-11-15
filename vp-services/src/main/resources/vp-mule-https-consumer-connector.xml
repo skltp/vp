@@ -32,7 +32,7 @@
         ">
         	
 	    <!-- Https connector used when acting as a consumer, ie making calls, sends no session info -->
-        <https:connector name="VPConsumerConnector" socketSoLinger="${SOCKET_SO_LINGER_MS}" sendTcpNoDelay="${VP_MULE_HTTPS_CONSUMER_CONNECTOR_TCPNODELAY}">
+        <https:connector name="VPConsumerConnector" clientSoTimeout="${CLIENT_SO_TIMEOUT_MS}" socketSoLinger="${SOCKET_SO_LINGER_MS}" sendTcpNoDelay="${VP_MULE_HTTPS_CONSUMER_CONNECTOR_TCPNODELAY}">
                 <spring:property name="keepAlive" value="false"/>
                 <service-overrides sessionHandler="org.mule.session.NullSessionHandler" />
                 <https:tls-key-store class="${TP_TLS_STORE_CONSUMER_TYPE}"     path="${TP_TLS_STORE_LOCATION}/${TP_TLS_STORE_CONSUMER_FILE}" storePassword="${TP_TLS_STORE_CONSUMER_PASSWORD}" keyPassword="${TP_TLS_STORE_CONSUMER_KEY_PASSWORD}" /> 
