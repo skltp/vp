@@ -21,9 +21,7 @@
 package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.jws.WebService;
 import javax.xml.datatype.DatatypeConstants;
