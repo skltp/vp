@@ -18,9 +18,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.getlogicaladdresseesbyservicecontract;
+package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jws.WebService;
@@ -31,21 +33,18 @@ import org.mule.api.annotations.expressions.Lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontract.v2.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.LogicalAddresseeRecordType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 /**
- * 
  * GetLogicalAddressesByServiceContract by using the local cache instead of
- * calling Service Catalog every time.
- * 
- * @deprecated  As of release 2.2.2, replaced by {@link se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract}
+ * calling Service Catalog (TAK) every time.
  */
-@Deprecated
 @WebService(serviceName = "GetLogicalAddresseesByServiceContractResponderService", portName = "GetLogicalAddresseesByServiceContractResponderPort", name = "GetLogicalAddresseesByServiceContractInteraction")
 public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresseesByServiceContractResponderInterface {
 
@@ -64,25 +63,54 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		if (!requestIsValidAccordingToRivSpec(request)) {
 			return new GetLogicalAddresseesByServiceContractResponseType();
 		}
-
-		Set<String> uniqueLogicalAddresses = new HashSet<String>();
+		
+		/*
+		 * This is a fix to solve the problem with TAK holding serviceinteraction namespace aand not servicecontract namespace. Because
+		 * VP should not infect other systems with this problem GetLogicalAddresseesByServiceContract needs to always return the
+		 * servicecontract namespace.
+		 * 
+		 * Lets say these are registered in TAK:
+		 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21
+		 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20
+		 * 
+		 * Then this code needs to solve to only return the servicecontract namespace, which is the same for different rivtabp versions:
+		 * urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1
+		 */
+		Map<String, LogicalAddresseeRecordType> uniqueLogicalAddresses = new HashMap<String,LogicalAddresseeRecordType>();
 		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
-			if (validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
-				uniqueLogicalAddresses.add(authInfo.getReceiverId());
+			if (!contains(authInfo, uniqueLogicalAddresses) && validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
+				
+				/*
+				 * FIXME: Hur skall vi hantera om filter i TAK finns definierat på både:
+				 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21
+				 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20
+				 * 
+				 * Så länge som vi har kvar buggen med att wsdl namespace används i TAK?
+				 */
+				
+				LogicalAddresseeRecordType logicalAddressee = new LogicalAddresseeRecordType();
+				logicalAddressee.setLogicalAddress(authInfo.getReceiverId());
+				uniqueLogicalAddresses.put(authInfo.getReceiverId(), logicalAddressee);
+				
 			}
 		}
 
 		GetLogicalAddresseesByServiceContractResponseType response = new GetLogicalAddresseesByServiceContractResponseType();
-		response.getLogicalAddress().addAll(uniqueLogicalAddresses);
+		response.getLogicalAddressRecord().addAll(uniqueLogicalAddresses.values());
 
 		if (log.isInfoEnabled()) {
 			String consumerHsaId = request.getServiceConsumerHsaId();
 			String namespace = request.getServiceContractNameSpace().getServiceContractNamespace();
-			log.info("getLogicalAddresseesByServiceContract.v1 found {} logical addresses for consumerHsaId: {}, namespace: {}", new Object[] {
+			log.info("getLogicalAddresseesByServiceContract.v2 found {} logical addresses for consumerHsaId: {}, namespace: {}", new Object[] {
 					uniqueLogicalAddresses.size(), consumerHsaId, namespace });
 		}
 
 		return response;
+	}
+
+	static boolean contains(AnropsBehorighetsInfoType authInfo,
+			Map<String, LogicalAddresseeRecordType> uniqueLogicalAddresses) {
+		return uniqueLogicalAddresses.containsKey(authInfo.getReceiverId());
 	}
 
 	static boolean requestIsValidAccordingToRivSpec(GetLogicalAddresseesByServiceContractType request) {
@@ -90,6 +118,10 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 				&& request.getServiceContractNameSpace().getServiceContractNamespace() != null;
 	}
 
+	/*
+	 * Compare the requested namespace with the one stored in TAK. Should handle both case when service interaction 
+	 * namespace(wsdl) is in the request and a correct service contract namespace is in the request.
+	 */
 	private boolean matchesRequested(AnropsBehorighetsInfoType authInfo,
 			GetLogicalAddresseesByServiceContractType request) {
 		String namespace = extractFirstPartOfNamespace(request.getServiceContractNameSpace()
@@ -97,15 +129,27 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		return authInfo.getSenderId().equals(request.getServiceConsumerHsaId())
 				&& authInfo.getTjansteKontrakt().startsWith(namespace);
 	}
+	
+	/*
+	 * Split the first part of a namespace to be able to compare with the service interaction namespace (wsdl)
+	 * declared in TAK.
+	 * 
+	 * urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1 
+	 * should return 
+	 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule
+	 * 
+	 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21 
+	 * should return 
+	 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21
+	 */
+	static String extractFirstPartOfNamespace(String namespace) {
+		return namespace.split("Responder")[0];
+	}
 
 	private boolean validAccordingToTime(AnropsBehorighetsInfoType authInfo) {
 		XMLGregorianCalendar requestTime = XmlGregorianCalendarUtil.getNowAsXMLGregorianCalendar();
 		return requestTime.compare(authInfo.getFromTidpunkt()) != DatatypeConstants.LESSER
 				&& requestTime.compare(authInfo.getTomTidpunkt()) != DatatypeConstants.GREATER;
-	}
-
-	static String extractFirstPartOfNamespace(String namespace) {
-		return namespace.split("Responder")[0];
 	}
 
 }

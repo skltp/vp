@@ -18,12 +18,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.getlogicaladdresseesbyservicecontract;
+package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract.extractFirstPartOfNamespace;
-import static se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
+import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract.extractFirstPartOfNamespace;
+import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,20 +32,17 @@ import java.util.List;
 
 import org.junit.Test;
 
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
-import se.riv.itintegration.registry.v1.ServiceContractNamespaceType;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
+import se.rivta.infrastructure.itintegration.registry.v2.ServiceContractNamespaceType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
 
-/**
- * @deprecated  As of release 2.2.2, replaced by {@link se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContractTest}
- */
 public class GetLogicalAddresseesByServiceContractTest {
-	
+
 	private static final String CONSUMER_HSAID_1 = "SENDERID-1";
 	private static final String RECEIVERID_1 = "RECEIVERID-1";
 	private static final String RECEIVERID_2 = "RECEIVERID-2";
@@ -58,9 +55,9 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1", CONSUMER_HSAID_1);
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 		
-		assertEquals(2, response.getLogicalAddress().size());
-		assertEquals(RECEIVERID_1, response.getLogicalAddress().get(0));
-		assertEquals(RECEIVERID_2, response.getLogicalAddress().get(1));
+		assertEquals(2, response.getLogicalAddressRecord().size());
+		assertEquals(RECEIVERID_1, response.getLogicalAddressRecord().get(0).getLogicalAddress());
+		assertEquals(RECEIVERID_2, response.getLogicalAddressRecord().get(1).getLogicalAddress());
 	}
 	
 	@Test
@@ -71,9 +68,9 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1",CONSUMER_HSAID_1);
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 		
-		assertEquals(2, response.getLogicalAddress().size());
-		assertEquals(RECEIVERID_1, response.getLogicalAddress().get(0));
-		assertEquals(RECEIVERID_2, response.getLogicalAddress().get(1));
+		assertEquals(2, response.getLogicalAddressRecord().size());
+		assertEquals(RECEIVERID_1, response.getLogicalAddressRecord().get(0).getLogicalAddress());
+		assertEquals(RECEIVERID_2, response.getLogicalAddressRecord().get(1).getLogicalAddress());
 	}
 	
 	@Test
@@ -84,9 +81,9 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",CONSUMER_HSAID_1);
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 		
-		assertEquals(2, response.getLogicalAddress().size());
-		assertEquals(RECEIVERID_1, response.getLogicalAddress().get(0));
-		assertEquals(RECEIVERID_2, response.getLogicalAddress().get(1));
+		assertEquals(2, response.getLogicalAddressRecord().size());
+		assertEquals(RECEIVERID_1, response.getLogicalAddressRecord().get(0).getLogicalAddress());
+		assertEquals(RECEIVERID_2, response.getLogicalAddressRecord().get(1).getLogicalAddress());
 	}
 	
 	@Test
@@ -97,7 +94,7 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1", "NONE");
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 		
-		assertEquals(0, response.getLogicalAddress().size());
+		assertEquals(0, response.getLogicalAddressRecord().size());
 	}
 	
 	@Test
@@ -108,7 +105,7 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21", "NONE");
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 		
-		assertEquals(0, response.getLogicalAddress().size());
+		assertEquals(0, response.getLogicalAddressRecord().size());
 	}
 	
 	@Test
@@ -119,7 +116,7 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:itintegration:monitoring:PingForConfigurationResponder:1",CONSUMER_HSAID_1);
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 		
-		assertEquals(0, response.getLogicalAddress().size());
+		assertEquals(0, response.getLogicalAddressRecord().size());
 	}
 	
 	@Test
@@ -130,7 +127,7 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21",CONSUMER_HSAID_1);
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 		
-		assertEquals(0, response.getLogicalAddress().size());
+		assertEquals(0, response.getLogicalAddressRecord().size());
 	}
 	
 	@Test
@@ -141,7 +138,7 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractType requestWithoutMandatoryElements = new GetLogicalAddresseesByServiceContractType();
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", requestWithoutMandatoryElements);
 		
-		assertEquals(0, response.getLogicalAddress().size());
+		assertEquals(0, response.getLogicalAddressRecord().size());
 	}
 	
 	@Test

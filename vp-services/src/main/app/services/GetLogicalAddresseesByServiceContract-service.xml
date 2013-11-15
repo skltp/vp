@@ -33,11 +33,20 @@
 		http://www.mulesoft.org/schema/mule/cxf     http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
 		http://www.mulesoft.org/schema/mule/jms     http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
 	">
-
+	
+	
+	<!-- Deprecated version 1, replaced by version 2 -->
 	<simple-service 
-		name="GetLogicalAddresseesByServiceContract-simple-service"
-        address="https://${TP_HOST}:${GETLOGICALADDRESSESBYSERVICECONTRACT_RIVTABP21_PORT}/${TP_BASE_URI}/GetLogicalAddresseesByServiceContract/1/rivtabp21?connector=VPProducerConnector" 
+		name="GetLogicalAddresseesByServiceContract-V1-simple-service"
+        address="${GETLOGICALADDRESSESBYSERVICECONTRACT_V1_INBOUND_ENDPOINT}" 
         component-class="se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract"
+        type="jax-ws" />
+    
+    <!-- Version 2, since VP 2.2.2, supports fiters, https://skl-tp.atlassian.net/browse/SKLTP-9 -->
+    <simple-service 
+		name="GetLogicalAddresseesByServiceContract-V2-simple-service"
+        address="${GETLOGICALADDRESSESBYSERVICECONTRACT_V2_INBOUND_ENDPOINT}" 
+        component-class="se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract"
         type="jax-ws" />
  
 </mule>
