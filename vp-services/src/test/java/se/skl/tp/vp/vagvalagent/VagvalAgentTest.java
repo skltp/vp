@@ -539,6 +539,20 @@ public class VagvalAgentTest {
         assertThat(log.get(2), containsString("Failed to restore virtualizations and permissions from local TAK copy:"));
         assertThat(log.get(3), containsString("Reason for failure: javax.xml.bind.UnmarshalException"));
     }
+    
+    @Test
+    public void noAuthorizationsLoadedGivesEmptyList(){
+    	List<AnropsBehorighetsInfoType> authInfo = new VagvalAgent().getAnropsBehorighetsInfoList();
+    	assertNotNull(authInfo);
+    	assertTrue(authInfo.isEmpty());
+    }
+    
+    @Test
+    public void noRoutingLoadedGivesEmptyList(){
+    	List<VirtualiseringsInfoType> routingInfo = new VagvalAgent().getVirtualiseringsInfo();
+    	assertNotNull(routingInfo);
+    	assertTrue(routingInfo.isEmpty());
+    }
 
     private VagvalAgent setupVagvalAgent(
             SokVagvalsInfoInterface takService, String localTakCache) {

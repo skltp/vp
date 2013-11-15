@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -277,16 +278,20 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		}
 	}
 
+	/**
+	 * Get authorization list from the internal TAK cache.
+	 * @return list of authorization, empty if no authorizations exists.
+	 */
 	public List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
-
-		// Dont force a reset, initialize only if needed
-		init(DONT_FORCE_RESET);
-
-		return (behorighetHandler == null) ? null : behorighetHandler.getAnropsBehorighetsInfoList();
+		return (behorighetHandler == null) ? Collections.<AnropsBehorighetsInfoType>emptyList() : behorighetHandler.getAnropsBehorighetsInfoList();
 	}
 	
-	protected List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
-        return (vagvalHandler == null) ? null: vagvalHandler.getVirtualiseringsInfo();
+	/**
+	 * Get routing information list from the internal TAK cache.
+	 * @return list of routing information, empty if no routing information exists.
+	 */
+	public List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
+        return (vagvalHandler == null) ? Collections.<VirtualiseringsInfoType>emptyList(): vagvalHandler.getVirtualiseringsInfo();
     }
 
 	/**
