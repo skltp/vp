@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tns:GetLogicalAddresseesByServiceContract xmlns:p="urn:riv:itintegration:registry:1" xmlns:tns="urn:riv:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:riv:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:1 GetLogicalAddresseesByServiceContractResponder_1.0.xsd ">
-  <tns:serviceConsumerHsaId>hsaid för Ineras engagemangsindex-instans</tns:serviceConsumerHsaId>
-  <tns:serviceContractNameSpace>
-    <p:ServiceContractNamespace>urn:riv:itintegration:engagementindex:ProcessNotification:1</p:ServiceContractNamespace>
-  </tns:serviceContractNameSpace>
-</tns:GetLogicalAddresseesByServiceContract>

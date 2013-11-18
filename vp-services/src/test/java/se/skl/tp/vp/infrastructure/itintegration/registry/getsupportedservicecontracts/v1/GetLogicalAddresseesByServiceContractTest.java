@@ -18,12 +18,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.getlogicaladdresseesbyservicecontract;
+package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v1;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract.extractFirstPartOfNamespace;
-import static se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
+import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v1.GetLogicalAddresseesByServiceContract.extractFirstPartOfNamespace;
+import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v1.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,9 +32,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
-import se.riv.itintegration.registry.v1.ServiceContractNamespaceType;
+import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
+import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
+import se.rivta.itintegration.registry.v1.ServiceContractNamespaceType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;

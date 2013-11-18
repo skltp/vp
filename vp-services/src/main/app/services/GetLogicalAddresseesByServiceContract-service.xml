@@ -39,7 +39,7 @@
 	<simple-service 
 		name="GetLogicalAddresseesByServiceContract-V1-simple-service"
         address="${GETLOGICALADDRESSESBYSERVICECONTRACT_V1_INBOUND_ENDPOINT}" 
-        component-class="se.skl.tp.vp.getlogicaladdresseesbyservicecontract.GetLogicalAddresseesByServiceContract"
+        component-class="se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v1.GetLogicalAddresseesByServiceContract"
         type="jax-ws" />
     
     <!-- Version 2, since VP 2.2.2, supports fiters, https://skl-tp.atlassian.net/browse/SKLTP-9 -->

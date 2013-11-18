@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.getlogicaladdresseesbyservicecontract;
+package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v1;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,9 +31,9 @@ import org.mule.api.annotations.expressions.Lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
-import se.riv.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
+import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
+import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
+import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
 import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
