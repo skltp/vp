@@ -32,10 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontract.v2.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.FilterType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.LogicalAddresseeRecordType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.FilterInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
@@ -84,10 +86,15 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 				 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20
 				 * 
 				 * Så länge som vi har kvar buggen med att wsdl namespace används i TAK?
+				 * Det går att komma runt genom att i TAK definera samma filter på alla
+				 * tjänsteinteraktioner.
 				 */
 				
 				LogicalAddresseeRecordType logicalAddressee = new LogicalAddresseeRecordType();
 				logicalAddressee.setLogicalAddress(authInfo.getReceiverId());
+			
+				addFilterToResponse(authInfo, logicalAddressee);
+	
 				uniqueLogicalAddresses.put(authInfo.getReceiverId(), logicalAddressee);
 				
 			}
@@ -104,6 +111,24 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		}
 
 		return response;
+	}
+
+	/*
+	 * add filter to response if any filters are defined in TAK
+	 */
+	private void addFilterToResponse(AnropsBehorighetsInfoType authInfo,
+			LogicalAddresseeRecordType logicalAddressee) {
+		
+		if(authInfo == null || authInfo.getFilterInfo() == null){
+			return;
+		}
+		
+		for (FilterInfoType filterInfoType : authInfo.getFilterInfo()) {
+			FilterType filter = new FilterType();
+			filter.setServiceDomain(filterInfoType.getServiceDomain());
+			filter.getCategorization().addAll(filterInfoType.getCategorization());
+			logicalAddressee.getFilter().add(filter);
+		}
 	}
 
 	static boolean contains(AnropsBehorighetsInfoType authInfo,

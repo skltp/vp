@@ -38,8 +38,8 @@ import org.mockito.Mockito;
 import org.mule.api.MuleMessage;
 
 import se.skl.tp.hsa.cache.HsaCache;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;

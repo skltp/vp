@@ -50,7 +50,7 @@ import org.mule.transport.http.HttpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skl.tp.vp.dashboard.ServiceStatistics;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.ExecutionTimer;

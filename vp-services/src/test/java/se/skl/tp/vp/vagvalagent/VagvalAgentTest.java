@@ -51,11 +51,11 @@ import org.xml.sax.InputSource;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.SokVagvalsInfoInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 

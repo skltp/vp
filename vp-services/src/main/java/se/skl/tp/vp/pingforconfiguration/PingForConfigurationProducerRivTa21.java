@@ -25,9 +25,15 @@ import java.util.Date;
 
 import javax.jws.WebService;
 
+import org.mule.api.annotations.expressions.Lookup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import se.riv.itintegration.monitoring.v1.ConfigurationType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationResponseType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationType;
 import se.riv.itintegration.monitoring.v1.rivtabp21.PingForConfigurationResponderInterface;
+import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 @WebService(
 		serviceName = "PingForConfigurationResponderService", 
@@ -36,17 +42,39 @@ import se.riv.itintegration.monitoring.v1.rivtabp21.PingForConfigurationResponde
 		targetNamespace = "urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21",
 		wsdlLocation = "TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl")
 public class PingForConfigurationProducerRivTa21 implements PingForConfigurationResponderInterface {
+	
+	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationProducerRivTa21.class);
+
+	@Lookup("vagvalAgent")
+	private VagvalAgent vagvalAgent;
 
 	@Override
 	public PingForConfigurationResponseType pingForConfiguration(
 			String logicalAddress, PingForConfigurationType parameters) {
+		
 		PingForConfigurationResponseType response = new PingForConfigurationResponseType();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddhhmmss");
+		Integer authInfoSize = vagvalAgent.getAnropsBehorighetsInfoList().size();
+		Integer routingInfoSize = vagvalAgent.getVirtualiseringsInfo().size();
 		
+		if(log.isInfoEnabled()){
+			log.info("pingForConfiguration result, nr of authorizations:{}, nr of routing information:{}", authInfoSize.toString(), routingInfoSize.toString());
+		}
+		
+		response.getConfiguration().add(createConfiguration("Applikation", "VP"));
+		response.getConfiguration().add(createConfiguration("Anropsbehörigheter", authInfoSize.toString()));
+		response.getConfiguration().add(createConfiguration("Logiska-adresser", routingInfoSize.toString()));
 		response.setPingDateTime(formatter.format(new Date()));
 		response.setVersion("V1.0");
 		
 		return response;
+	}
+
+	private ConfigurationType createConfiguration(String name, String value) {
+		ConfigurationType configurationType = new ConfigurationType();
+		configurationType.setName(name);
+		configurationType.setValue(value);
+		return configurationType;
 	}
 
 }

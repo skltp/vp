@@ -27,13 +27,13 @@ import static se.skl.tp.vp.util.VagvalSchemasTestUtil.getRelativeDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaAnropsBehorigheterResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaVirtualiseringarResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.SokVagvalsInfoInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaAnropsBehorigheterResponseType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaVirtualiseringarResponseType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoIdType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.vagvalrouter.VagvalInfo;
 
 /**
@@ -43,7 +43,7 @@ import se.skl.tp.vp.vagvalrouter.VagvalInfo;
  * en lista på alla vägval tp-vitualisering-DEV använder sig av denna.
  */
 
-@javax.jws.WebService(portName = "SokVagvalsSoap11LitDocPort", serviceName = "SokVagvalsServiceSoap11LitDocService", targetNamespace = "urn:skl:tp:vagvalsinfo:v1")
+@javax.jws.WebService(portName = "SokVagvalsSoap11LitDocPort", serviceName = "SokVagvalsServiceSoap11LitDocService", targetNamespace = "urn:skl:tp:vagvalsinfo:v2")
 public class SokVagvalsInfoTestStub implements SokVagvalsInfoInterface {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());

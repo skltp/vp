@@ -34,10 +34,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mule.tck.junit4.FunctionalTestCase;
 
-import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheRequest;
-import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheResponse;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
+import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheRequest;
+import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheResponse;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 

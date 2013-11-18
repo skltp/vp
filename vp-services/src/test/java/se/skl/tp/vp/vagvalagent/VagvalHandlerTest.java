@@ -37,7 +37,7 @@ import org.junit.Test;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
 public class VagvalHandlerTest {
 

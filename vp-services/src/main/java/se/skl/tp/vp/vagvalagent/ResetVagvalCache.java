@@ -26,8 +26,8 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.PropertyScope;
 
-import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheResponse;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
+import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheResponse;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
 
 public class ResetVagvalCache implements Callable {
 

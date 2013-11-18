@@ -30,10 +30,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;

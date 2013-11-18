@@ -40,7 +40,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 

@@ -40,17 +40,17 @@ import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 
 import se.skl.tp.hsa.cache.HsaCache;
-import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheRequest;
-import se.skl.tp.vagval.wsdl.v1.ResetVagvalCacheResponse;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalResponse;
-import se.skl.tp.vagval.wsdl.v1.VisaVagvalsInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaAnropsBehorigheterResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaVirtualiseringarResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.SokVagvalsInfoInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v1.SokVagvalsServiceSoap11LitDocService;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheRequest;
+import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheResponse;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
+import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaAnropsBehorigheterResponseType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaVirtualiseringarResponseType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
+import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsServiceSoap11LitDocService;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.ClientUtil;
 

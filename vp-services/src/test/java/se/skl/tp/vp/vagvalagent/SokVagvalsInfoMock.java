@@ -23,13 +23,13 @@ package se.skl.tp.vp.vagvalagent;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.AN_HOUR_AGO;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.IN_TEN_YEARS;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.getRelativeDate;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaAnropsBehorigheterResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.HamtaAllaVirtualiseringarResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.SokVagvalsInfoInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaAnropsBehorigheterResponseType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaVirtualiseringarResponseType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoIdType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.vagvalrouter.VagvalInput;
 
 /**
@@ -40,7 +40,7 @@ import se.skl.tp.vp.vagvalrouter.VagvalInput;
  * denna.
  */
 
-@javax.jws.WebService(portName = "SokVagvalsSoap11LitDocPort", serviceName = "SokVagvalsServiceSoap11LitDocService", targetNamespace = "urn:skl:tp:vagvalsinfo:v1")
+@javax.jws.WebService(portName = "SokVagvalsSoap11LitDocPort", serviceName = "SokVagvalsServiceSoap11LitDocService", targetNamespace = "urn:skl:tp:vagvalsinfo:v2")
 public class SokVagvalsInfoMock implements SokVagvalsInfoInterface {
 
 	private SokVagvalsInfoMockInput vagvalInputs;

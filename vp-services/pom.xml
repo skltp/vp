@@ -38,9 +38,10 @@
 		</dependency>
 		
         <!-- 
-            itintegration infrastructure schemas 1.0 bundled in vp-schemas
             itintegration monitoring schemas 1.0 bundled in vp-schemas
-            tp vagval schemas 1.0 bundled in vp-schemas
+            tp vagval schemas 2.0.0 bundled in vp-schemas.
+            
+            When these are moved to central maven dependency can be removed here.
         -->
 		<dependency>
 			<groupId>se.skltp.vp</groupId>
@@ -49,11 +50,11 @@
 		</dependency>
 
         <!-- itintegration infrastructure schemas 2.0 from central maven -->
-        <dependency>
-            <groupId>se.rivta.infrastructure.itintegration</groupId>
-            <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
-            <version>2.0-M5</version>
-        </dependency>
+		<dependency>
+  			<groupId>se.rivta.infrastructure.itintegration</groupId>
+  			<artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
+  			<version>2.0-M6</version>
+		</dependency>
 		
 		<!-- Ping -->
 		<dependency>

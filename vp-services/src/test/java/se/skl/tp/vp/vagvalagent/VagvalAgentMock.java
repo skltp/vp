@@ -22,8 +22,8 @@ package se.skl.tp.vp.vagvalagent;
 
 import java.util.List;
 
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.VirtualiseringsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
 public class VagvalAgentMock extends VagvalAgent {
 

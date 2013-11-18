@@ -26,17 +26,21 @@ import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedser
 import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
 
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.FilterType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
 import se.rivta.infrastructure.itintegration.registry.v2.ServiceContractNamespaceType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v1.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vagvalsinfo.wsdl.v2.FilterInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
@@ -159,6 +163,43 @@ public class GetLogicalAddresseesByServiceContractTest {
 		assertEquals("urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",partOfNamespace);
 	}
 	
+	@Test
+	public void filtersDefinedInSeveralDomains() {
+		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
+		service.setVagvalAgent(createVagvalAgentContainingServiceContractNamespaces());
+		
+		GetLogicalAddresseesByServiceContractType requestCrmScheduling = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1", CONSUMER_HSAID_1);
+		GetLogicalAddresseesByServiceContractResponseType responseCrmScheduling = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", requestCrmScheduling);
+		
+		GetLogicalAddresseesByServiceContractType requestEngagementindex = createRequest("urn:riv:itintegration.engagementindex:FindContentResponder:1", CONSUMER_HSAID_1);
+		GetLogicalAddresseesByServiceContractResponseType responseEngagementindex = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", requestEngagementindex);
+		
+		assertEquals(2, responseCrmScheduling.getLogicalAddressRecord().size());
+		assertEquals(1, responseEngagementindex.getLogicalAddressRecord().size());
+		
+		//Receiver RECEIVERID-1 crm:scheduling	
+		assertEquals(RECEIVERID_1, responseCrmScheduling.getLogicalAddressRecord().get(0).getLogicalAddress());
+		FilterType filterReceiver1CrmScheduling = responseCrmScheduling.getLogicalAddressRecord().get(0).getFilter().get(0);
+		assertEquals("crm:scheduling", filterReceiver1CrmScheduling.getServiceDomain());
+		assertEquals(2, filterReceiver1CrmScheduling.getCategorization().size());
+		assertEquals("Booking", filterReceiver1CrmScheduling.getCategorization().get(0));
+		assertEquals("Invitation", filterReceiver1CrmScheduling.getCategorization().get(1));	
+		
+		//Receiver RECEIVERID-2 itintegration:engegaementindex	
+		assertEquals(RECEIVERID_2, responseEngagementindex.getLogicalAddressRecord().get(0).getLogicalAddress());
+		FilterType filterReceiver1Engagementindex = responseEngagementindex.getLogicalAddressRecord().get(0).getFilter().get(0);
+		assertEquals("itintegration:engagementindex", filterReceiver1Engagementindex.getServiceDomain());
+		assertEquals(1, filterReceiver1Engagementindex.getCategorization().size());
+		assertEquals("Update", filterReceiver1Engagementindex.getCategorization().get(0));
+		
+		//Receiver RECEIVERID-2 crm:scheduling
+		assertEquals(RECEIVERID_2, responseCrmScheduling.getLogicalAddressRecord().get(1).getLogicalAddress());	
+		FilterType filterReceiver2 = responseCrmScheduling.getLogicalAddressRecord().get(1).getFilter().get(0);
+		assertEquals("crm:scheduling", filterReceiver2.getServiceDomain());
+		assertEquals(1, filterReceiver2.getCategorization().size());
+		assertEquals("Invitation", filterReceiver2.getCategorization().get(0));
+	}
+	
 	private GetLogicalAddresseesByServiceContractType createRequest(String nameSpace, String consumer) {
 		GetLogicalAddresseesByServiceContractType request =	new GetLogicalAddresseesByServiceContractType();
 		request.setServiceConsumerHsaId(consumer);
@@ -175,8 +216,9 @@ public class GetLogicalAddresseesByServiceContractTest {
 	private VagvalAgent createVagvalAgentContainingServiceContractNamespaces() {
 
 		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
+		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1",createFilter("crm:scheduling", "Booking", "Invitation")));
+		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1",createFilter("crm:scheduling", "Invitation")));
+		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:itintegration.engagementindex:FindContentResponder:1",createFilter("itintegration:engagementindex", "Update")));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfigurationResponder:1"));
 
 		return new VagvalAgentMock(anropsBehorighetsInfo);
@@ -185,17 +227,17 @@ public class GetLogicalAddresseesByServiceContractTest {
 	private VagvalAgent createVagvalAgentContainingServiceInteractionNamespaces() {
 
 		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21"));
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20"));
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21"));
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20"));
+		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",createFilter("crm:scheduling", "Booking", "Invitation")));
+		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20",createFilter("crm:scheduling", "Booking", "Invitation")));
+		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",createFilter("crm:scheduling", "Booking", "Invitation")));
+		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20",createFilter("crm:scheduling", "Booking", "Invitation")));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21"));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"));	
 
 		return new VagvalAgentMock(anropsBehorighetsInfo);
 	}
 
-	private AnropsBehorighetsInfoType validAuthorization(String receiverId, String senderId, String tjansteKontrakt) {
+	private AnropsBehorighetsInfoType validAuthorization(String receiverId, String senderId, String tjansteKontrakt, FilterInfoType... filter) {
 		AnropsBehorighetsInfoType behorighetsInfoType = new AnropsBehorighetsInfoType();
 		behorighetsInfoType.setReceiverId(receiverId);
 		behorighetsInfoType.setSenderId(senderId);
@@ -213,9 +255,19 @@ public class GetLogicalAddresseesByServiceContractTest {
 		behorighetsInfoType.setFromTidpunkt(XmlGregorianCalendarUtil.fromDate(aWeekAgo));
 		behorighetsInfoType.setAnropsBehorighetsInfoId(new AnropsBehorighetsInfoIdType());
 
+		//Filters and categories
+		behorighetsInfoType.getFilterInfo().addAll(Arrays.asList(filter));
+		
 		return behorighetsInfoType;
 	}
 	
+	private FilterInfoType createFilter(String serviceDomain, String... cetegorizations) {
+		FilterInfoType filter = new FilterInfoType();
+		filter.setServiceDomain(serviceDomain);
+		filter.getCategorization().addAll(Arrays.asList(cetegorizations));
+		return filter;
+	}
+
 	private AnropsBehorighetsInfoType oldAuthorization(String receiverId, String senderId, String tjansteKontrakt) {
 		AnropsBehorighetsInfoType behorighetsInfoType = new AnropsBehorighetsInfoType();
 		behorighetsInfoType.setReceiverId(receiverId);
