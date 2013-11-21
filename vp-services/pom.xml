@@ -50,11 +50,11 @@
 		</dependency>
 
         <!-- itintegration infrastructure schemas 2.0 from central maven -->
-		<dependency>
-  			<groupId>se.rivta.infrastructure.itintegration</groupId>
-  			<artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
-  			<version>2.0-M6</version>
-		</dependency>
+        <dependency>
+            <groupId>se.rivta.infrastructure.itintegration</groupId>
+            <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
+            <version>2.0-RC1</version>
+        </dependency>
 		
 		<!-- Ping -->
 		<dependency>
