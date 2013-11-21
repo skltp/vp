@@ -28,8 +28,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -57,288 +59,310 @@ import org.w3c.dom.NodeList;
  */
 public class DeployerMain {
 
-	static String MULE_TEMPLATE = "/tp-config-template-v2.xml";
-	static String DEPLOY_DESCRIPTOR_NAME = "tp2-service-mule-descriptor.xml";
+    static String MULE_TEMPLATE = "/tp-config-template-v2.xml";
+    static String MULE_FLOW_TEMPLATE = "/tp-flow-template.xml";
+    static String DEPLOY_DESCRIPTOR_NAME = "tp2-service-mule-descriptor.xml";
 
-	//
-	private String muleTemplate;
+    //
+    private String muleTemplate;
+    private String flowTemplate;
 
-	/**
-	 * Keeps xsd servicecontract information.
-	 * 
-	 * 
-	 */
-	static class XsdInfo {
-		String namespace;
+    /**
+     * Keeps xsd servicecontract information.
+     * 
+     * 
+     */
+    static class XsdInfo {
+        String namespace;
 
-		XsdInfo(String namespace) {
-			this.namespace = namespace;
-		}
+        XsdInfo(String namespace) {
+            this.namespace = namespace;
+        }
 
-		String getNamespaceSeparatedWith(String separatedWith) {
-			return namespace.replaceAll(":", separatedWith);
-		}
-	}
+        String getNamespaceSeparatedWith(String separatedWith) {
+            return namespace.replaceAll(":", separatedWith);
+        }
+    }
 
-	/**
-	 * Keeps riv infomration.
-	 * 
-	 * @author Peter
-	 * 
-	 */
-	static class WsdlInfo {
-		String name;
-		String namespace;
-		String wsdl;
-		String version;
-		String profile;
-		String method;
-		String path;
-		String responderName;
+    /**
+     * Keeps riv infomration.
+     * 
+     * @author Peter
+     * 
+     */
+    static class WsdlInfo {
+        String name;
+        String namespace;
+        String wsdl;
+        String version;
+        String profile;
+        String method;
+        String path;
+        String responderName;
+        XsdInfo xsdInfo;
 
-		WsdlInfo(String name, String namespace, String wsdl, String responderName) {
-			this.name = name;
-			this.namespace = namespace;
-			this.wsdl = wsdl;
-			this.responderName = responderName;
-			init();
-		}
+        WsdlInfo(String name, String namespace, String wsdl, String responderName) {
+            this.name = name;
+            this.namespace = namespace;
+            this.wsdl = wsdl;
+            this.responderName = responderName;
+            init();
+        }
 
-		private void init() {
-			String[] args = this.namespace.split(":");
-			if ((args.length < 7) || !"riv".equals(args[1])) {
-				throw new IllegalArgumentException("Invalid namespace: " + namespace);
-			}
-			int len = args.length;
-			this.method = args[len - 3];
-			this.version = args[len - 2];
-			this.profile = args[len - 1];
-			this.path = this.method + "/" + this.version + "/" + this.profile;
-		}
-	}
+        private void init() {
+            String[] args = this.namespace.split(":");
+            if ((args.length < 7) || !"riv".equals(args[1])) {
+                throw new IllegalArgumentException("Invalid namespace: " + namespace);
+            }
+            int len = args.length;
+            this.method = args[len - 3];
+            this.version = args[len - 2];
+            this.profile = args[len - 1];
+            this.path = this.method + "/" + this.version + "/" + this.profile;
+        }
+    }
 
-	//
-	public DeployerMain() {
-		initTemplate();
-	}
+    //
+    public DeployerMain() {
+        initTemplate();
+    }
 
-	//
-	private DeployerMain initTemplate() {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			close(copy(this.getClass().getResourceAsStream(MULE_TEMPLATE), out));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		this.muleTemplate = out.toString();
-		return this;
-	}
+    //
+    private String readTemplate(final String template) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            close(copy(this.getClass().getResourceAsStream(template), out));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return out.toString();
+    }
 
-	//
-	private static InputStream copy(InputStream in, OutputStream out) throws IOException {
-		byte buf[] = new byte[1024];
-		for (int len; (len = in.read(buf)) != -1;) {
-			out.write(buf, 0, len);
-		}
-		return in;
-	}
+    //
+    private DeployerMain initTemplate() {
+        this.muleTemplate = readTemplate(MULE_TEMPLATE);
+        this.flowTemplate = readTemplate(MULE_FLOW_TEMPLATE);
+        return this;
+    }
 
-	//
-	private static String getBasename(String fileName) {
-		int n = fileName.lastIndexOf('.');
-		if (n > 0) {
-			return fileName.substring(0, n);
-		}
-		return fileName;
-	}
+    //
+    private static InputStream copy(InputStream in, OutputStream out) throws IOException {
+        byte buf[] = new byte[1024];
+        for (int len; (len = in.read(buf)) != -1;) {
+            out.write(buf, 0, len);
+        }
+        return in;
+    }
 
-	//
-	private void writeDescriptor(String fileName, WsdlInfo wsdlInfo, XsdInfo xsdInfo) throws Exception {
-		File src = new File(fileName);
-		File tmp = new File(fileName + ".tmp");
-		JarOutputStream jos = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(tmp)));
-		addToJar(jos, new JarFile(src));
+    //
+    private static String getBasename(String fileName) {
+        int n = fileName.lastIndexOf('.');
+        if (n > 0) {
+            return fileName.substring(0, n);
+        }
+        return fileName;
+    }
 
-		String content = String.format(this.muleTemplate, new Date(), wsdlInfo.wsdl, getBasename(src.getName()), wsdlInfo.path,
-				xsdInfo.getNamespaceSeparatedWith("."), wsdlInfo.namespace, wsdlInfo.name, wsdlInfo.wsdl);
+    //
+    private void writeDescriptor(String fileName, List<WsdlInfo> wsdlInfoList) throws Exception {
+        File src = new File(fileName);
+        File tmp = new File(fileName + ".tmp");
+        JarOutputStream jos = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(tmp)));
+        addToJar(jos, new JarFile(src));
 
-		JarEntry deployEntry = new JarEntry(DEPLOY_DESCRIPTOR_NAME);
-		deployEntry.setComment("Added by vp-auto-deployer: " + wsdlInfo.path);
-		jos.putNextEntry(deployEntry);
-		jos.write(content.getBytes());
-		jos.closeEntry();
-		close(jos);
+        final StringBuilder flows = new StringBuilder();
+        for (final WsdlInfo wsdlInfo : wsdlInfoList) {
+            flows.append(String.format(this.flowTemplate, getBasename(src.getName()) + "-" + wsdlInfo.name.toLowerCase(), wsdlInfo.path,
+                    wsdlInfo.xsdInfo.getNamespaceSeparatedWith("."), wsdlInfo.namespace, wsdlInfo.name, wsdlInfo.wsdl));
+        }
 
-		if (!src.delete()) {
-			throw new IllegalArgumentException("Unable to update jar file, permission denied");
-		}
-		if (!tmp.renameTo(src)) {
-			throw new IllegalArgumentException(String.format("Fatal error during update, backup saved as: %s", tmp));
-		}
-	}
+        final String content = String.format(this.muleTemplate, flows.toString());
 
-	//
-	private Element parseXmlSchema(InputStream is) throws Exception {
-		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-		return docBuilderFactory.newDocumentBuilder().parse(is).getDocumentElement();
-	}
+        JarEntry deployEntry = new JarEntry(DEPLOY_DESCRIPTOR_NAME);
+        deployEntry.setComment("vp-auto-deployer added " + wsdlInfoList.size() + " mule flows");
+        jos.putNextEntry(deployEntry);
+        jos.write(content.getBytes());
+        jos.closeEntry();
+        close(jos);
 
-	//
-	static void close(Closeable s) {
-		if (s != null) {
-			try {
-				s.close();
-			} catch (IOException e) {
-			}
-		}
-	}
+        if (!src.delete()) {
+            throw new IllegalArgumentException("Unable to update jar file, permission denied");
+        }
+        if (!tmp.renameTo(src)) {
+            throw new IllegalArgumentException(String.format("Fatal error during update, backup saved as: %s", tmp));
+        }
+    }
 
-	//
-	private void addToJar(JarOutputStream jos, JarFile jf) throws IOException {
-		for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
-			JarEntry entry = e.nextElement();
-			// always skip deployment descriptor (for update mode)
-			if (DEPLOY_DESCRIPTOR_NAME.equals(entry.getName())) {
-				continue;
-			}
-			jos.putNextEntry(entry);
-			copy(jf.getInputStream(entry), jos);
-		}
-	}
+    //
+    private Element parseXmlSchema(InputStream is) throws Exception {
+        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        return docBuilderFactory.newDocumentBuilder().parse(is).getDocumentElement();
+    }
 
-	//
-	private WsdlInfo extractWSDL(String wsdl, InputStream wsdlInputStream) throws Exception {
-		Element element = parseXmlSchema(wsdlInputStream);
-		close(wsdlInputStream);
-		String namespace = element.getAttribute("targetNamespace");
+    //
+    static void close(Closeable s) {
+        if (s != null) {
+            try {
+                s.close();
+            } catch (IOException e) {
+            }
+        }
+    }
 
-		String serviceName = extractTagName(wsdl, element, "wsdl:service");
-		String responderName = extractResponderNameFromServiceName(serviceName);
+    //
+    private void addToJar(JarOutputStream jos, JarFile jf) throws IOException {
+        for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
+            JarEntry entry = e.nextElement();
+            // always skip deployment descriptor (for update mode)
+            if (DEPLOY_DESCRIPTOR_NAME.equals(entry.getName())) {
+                continue;
+            }
+            jos.putNextEntry(entry);
+            copy(jf.getInputStream(entry), jos);
+        }
+    }
 
-		System.out.println("Service name found: " + serviceName);
-		System.out.println("Responder name found: " + responderName);
+    //
+    private WsdlInfo extractWSDL(String wsdl, InputStream wsdlInputStream) throws Exception {
+        Element element = parseXmlSchema(wsdlInputStream);
+        close(wsdlInputStream);
+        String namespace = element.getAttribute("targetNamespace");
 
-		WsdlInfo info = new WsdlInfo(serviceName, namespace, wsdl, responderName);
+        String serviceName = extractTagName(wsdl, element, "wsdl:service");
+        String responderName = extractResponderNameFromServiceName(serviceName);
 
-		return info;
-	}
+        System.out.println("Service name found: " + serviceName);
+        System.out.println("Responder name found: " + responderName);
 
-	public static String extractResponderNameFromServiceName(String serviceName) {
-		// Convention is GetSubjectOfCareScheduleResponderService
-		int lastIndex = serviceName.lastIndexOf("Service");
-		return serviceName.substring(0, lastIndex);
-	}
+        WsdlInfo info = new WsdlInfo(serviceName, namespace, wsdl, responderName);
 
-	private String extractTagName(String wsdl, Element element, String tagName) {
-		NodeList wsdlServiceNodeList = element.getElementsByTagName(tagName);
-		if (wsdlServiceNodeList.getLength() != 1) {
-			throw new IllegalArgumentException(tagName + " name not found: " + wsdl);
-		}
+        return info;
+    }
 
-		String name = ((Element) wsdlServiceNodeList.item(0)).getAttribute("name");
-		return name;
-	}
+    public static String extractResponderNameFromServiceName(String serviceName) {
+        // Convention is GetSubjectOfCareScheduleResponderService
+        int lastIndex = serviceName.lastIndexOf("Service");
+        return serviceName.substring(0, lastIndex);
+    }
 
-	private XsdInfo extractXSD(InputStream xsdInputStream) throws Exception {
-		Element element = parseXmlSchema(xsdInputStream);
-		close(xsdInputStream);
-		String namespace = element.getAttribute("targetNamespace");
+    private String extractTagName(String wsdl, Element element, String tagName) {
+        NodeList wsdlServiceNodeList = element.getElementsByTagName(tagName);
+        if (wsdlServiceNodeList.getLength() != 1) {
+            throw new IllegalArgumentException(tagName + " name not found: " + wsdl);
+        }
 
-		XsdInfo xsdInfo = new XsdInfo(namespace);
+        String name = ((Element) wsdlServiceNodeList.item(0)).getAttribute("name");
+        return name;
+    }
 
-		System.out.println("XSD NS found: " + namespace);
+    private XsdInfo extractXSD(InputStream xsdInputStream) throws Exception {
+        Element element = parseXmlSchema(xsdInputStream);
+        close(xsdInputStream);
+        String namespace = element.getAttribute("targetNamespace");
 
-		return xsdInfo;
-	}
+        XsdInfo xsdInfo = new XsdInfo(namespace);
 
-	//
-	private JarEntry getJarEntry(JarFile jarFile, String fileNameContains, String fileExtenstion) {
-		for (Enumeration<JarEntry> enumeration = jarFile.entries(); enumeration.hasMoreElements();) {
-			JarEntry entry = enumeration.nextElement();
-			if (entry.getName().contains(fileNameContains) && entry.getName().endsWith(fileExtenstion)) {
-				return entry;
-			}
-		}
-		throw new IllegalArgumentException(String.format("Invalid jar file \"%s\", no file containing name "
-				+ fileNameContains + " found!", jarFile.getName()));
-	}
+        System.out.println("XSD NS found: " + namespace);
 
-	/**
-	 * Creates a mule deployment descriptor for RIV-TA service packed in a jar
-	 * file.
-	 * 
-	 * @param fileName
-	 *            the jar file name with service WSDL definition.
-	 * @param update
-	 *            true if existing entries shall be updated, otherwise false.
-	 * 
-	 * @return instance.
-	 * 
-	 * @throws Exception
-	 *             on any kind of unexpected error.
-	 */
-	public DeployerMain deploy(String fileName, boolean update) throws Exception {
-		JarFile jarFile = new JarFile(fileName);
+        return xsdInfo;
+    }
 
-		JarEntry wsdlEntry = getJarEntry(jarFile, "", ".wsdl");
-		WsdlInfo wsdlInfo = extractWSDL(wsdlEntry.getName(), jarFile.getInputStream(wsdlEntry));
+    //
+    private List<JarEntry> getJarEntries(JarFile jarFile, String fileNameContains, String fileExtenstion) {
+        final List<JarEntry> entries = new ArrayList<JarEntry>();
+        for (Enumeration<JarEntry> enumeration = jarFile.entries(); enumeration.hasMoreElements();) {
+            JarEntry entry = enumeration.nextElement();
+            if (entry.getName().contains(fileNameContains) && entry.getName().endsWith(fileExtenstion)) {
+                entries.add(entry);
+            }
+        }
+        if (entries.size() == 0) {
+            throw new IllegalArgumentException(String.format("Invalid jar file \"%s\", no entry containing name "
+                    + fileNameContains + " found!", jarFile.getName()));
+        }
+        return entries;
+    }
 
-		JarEntry xsdlEntry = getJarEntry(jarFile, wsdlInfo.responderName, ".xsd");
-		XsdInfo xsdInfo = extractXSD(jarFile.getInputStream(xsdlEntry));
+    /**
+     * Creates a mule deployment descriptor for RIV-TA service packed in a jar
+     * file.
+     * 
+     * @param fileName
+     *            the jar file name with service WSDL definition.
+     * @param update
+     *            true if existing entries shall be updated, otherwise false.
+     * 
+     * @return instance.
+     * 
+     * @throws Exception
+     *             on any kind of unexpected error.
+     */
+    public DeployerMain deploy(String fileName, boolean update) throws Exception {
+        JarFile jarFile = new JarFile(fileName);
 
-		JarEntry deployEntry = jarFile.getJarEntry(DEPLOY_DESCRIPTOR_NAME);
+        List<JarEntry> wsdlEntries = getJarEntries(jarFile, "", ".wsdl");
 
-		if (deployEntry == null || update) {
-			System.out.printf("Updating %s with deployment descriptor (%s)\n", fileName, DEPLOY_DESCRIPTOR_NAME);
-			writeDescriptor(fileName, wsdlInfo, xsdInfo);
-		}
-		return this;
-	}
+        List<WsdlInfo> wsdlInfoList = new ArrayList<WsdlInfo>();
+        for (final JarEntry wsdlEntry : wsdlEntries) {
+            final WsdlInfo wsdlInfo = extractWSDL(wsdlEntry.getName(), jarFile.getInputStream(wsdlEntry));
+            List<JarEntry> xsdlEntries = getJarEntries(jarFile, wsdlInfo.responderName, ".xsd");
+            wsdlInfo.xsdInfo = extractXSD(jarFile.getInputStream(xsdlEntries.get(0)));
+            wsdlInfoList.add(wsdlInfo);
+        }
 
-	/**
-	 * Prints usage information, and exits with exit code 1.
-	 */
-	public static void usage() {
-		System.out.println("vp-auto-deployer: Creates a VP R2 deployment descriptor to virtualize RIV services");
-		System.out.println("Be careful: for RIV standard virtualisations only, and also be aware of the fact that all");
-		System.out.println("input jars are modified by this utility program.");
-		System.out.println("\nusage: java -jar vp-auto-deployer[-<version>].jar [-update] [jar files...]");
-		System.out.printf("\t-update: force update of existing deployment descriptors (%s).\n", DEPLOY_DESCRIPTOR_NAME);
-		System.exit(1);
-	}
+        JarEntry deployEntry = jarFile.getJarEntry(DEPLOY_DESCRIPTOR_NAME);
 
-	/**
-	 * Creates a mule deployment descriptor for all specified RIV-TA service
-	 * packed jar files.
-	 * 
-	 * @param args
-	 *            program arguments.
-	 * 
-	 * @see #usage()
-	 */
-	public static void main(String[] args) {
-		if (args.length < 1) {
-			usage();
-		}
-		boolean update = false;
-		int n = 0;
-		if ("-update".equals(args[n])) {
-			update = true;
-			n++;
-		}
-		DeployerMain deployer = new DeployerMain();
-		for (int i = n; i < args.length; i++) {
-			try {
-				if (!args[i].endsWith(".jar")) {
-					throw new IllegalArgumentException("Invalid input file, .jar file extension expected");
-				}
-				deployer.deploy(args[i], update);
-			} catch (Exception e) {
-				System.err.printf("Warning: unexpected error while processing file: %s - %s (skipped)\n", args[i], e);
-			}
-		}
+        if (deployEntry == null || update) {
+            System.out.printf("Updating %s with deployment descriptor (%s)\n", fileName, DEPLOY_DESCRIPTOR_NAME);
+            writeDescriptor(fileName, wsdlInfoList);
+        }
+        return this;
+    }
 
-		System.exit(0);
-	}
+    /**
+     * Prints usage information, and exits with exit code 1.
+     */
+    public static void usage() {
+        System.out.println("vp-auto-deployer: Creates a VP R2 deployment descriptor to virtualize RIV services");
+        System.out.println("Be careful: for RIV standard virtualisations only, and also be aware of the fact that all");
+        System.out.println("input jars are modified by this utility program.");
+        System.out.println("\nusage: java -jar vp-auto-deployer[-<version>].jar [-update] [jar files...]");
+        System.out.printf("\t-update: force update of existing deployment descriptors (%s).\n", DEPLOY_DESCRIPTOR_NAME);
+        System.exit(1);
+    }
+
+    /**
+     * Creates a mule deployment descriptor for all specified RIV-TA service
+     * packed jar files.
+     * 
+     * @param args
+     *            program arguments.
+     * 
+     * @see #usage()
+     */
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            usage();
+        }
+        boolean update = false;
+        int n = 0;
+        if ("-update".equals(args[n])) {
+            update = true;
+            n++;
+        }
+        DeployerMain deployer = new DeployerMain();
+        for (int i = n; i < args.length; i++) {
+            try {
+                if (!args[i].endsWith(".jar")) {
+                    throw new IllegalArgumentException("Invalid input file, .jar file extension expected");
+                }
+                deployer.deploy(args[i], update);
+            } catch (Exception e) {
+                System.err.printf("Warning: unexpected error while processing file: %s - %s (skipped)\n", args[i], e);
+            }
+        }
+
+        System.exit(0);
+    }
 
 }

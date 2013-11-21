@@ -31,31 +31,6 @@
                http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd" >
 
-    <!-- Name of this file is mandatory and may not be changed. -->
-
-	<!--
-		featureUseKeepAlive is configured in vp-config.properties, read more about how its done in vp-config.properties. 
-	-->
-
-	<flow name="%s-flow" >
-
-        <https:inbound-endpoint
-            address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/%s"
-            connector-ref="VPProducerConnector"
-            exchange-pattern="request-response" 
-            responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
-            <properties>
-        		<spring:entry key="featureUseKeepAlive" value="${feature.keepalive.%s:${feature.keepalive}}"/>
-        	</properties>
-        </https:inbound-endpoint>
-
-        <cxf:proxy-service
-            namespace="%s"
-            payload="envelope"
-            service="%s"
-            wsdlLocation="classpath:%s" />
-
-        <flow-ref name="vagval-dynamic-routing-flow" />
-    </flow>
+  	%s
 
 </mule>
