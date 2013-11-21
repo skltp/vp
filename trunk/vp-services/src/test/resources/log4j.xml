@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	
+	<!--
+		This is the logging configuration used for developing and local testing. This file should
+		not be included in the production build of VP. 
+	 -->
+	
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
+		</layout>
+	</appender>
+    
+    <appender name="ROLLINGFILE" class="org.apache.log4j.RollingFileAppender">
+        <param  name="file" value="${mule.home}/logs/mule-app-vp.log"/>
+        <param name="MaxBackupIndex" value="3" />
+        <param name="MaxFileSize" value="1MB" />
+        
+        <!-- The threshold level for this appender. -->
+        <!-- <param name="Threshold" value="ERROR"/> -->
+        <layout class="org.apache.log4j.PatternLayout">
+        	 <param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
+        </layout>
+    </appender>
+    
+    <!--
+		Loglevels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL} See:
+		http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Level.html
+	-->
+	
+  
+  	<logger name="org.mockftpserver">
+		<level value="ERROR" />
+	</logger>
+	
+	<logger name="org.apache.sshd">
+		<level value="ERROR" />
+	</logger>	
+
+    <logger name="org.apache.activemq.transport.failover.FailoverTransport">
+        <level value="DEBUG" />
+    </logger>
+    
+	<logger name="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<level value="TRACE" />
+	</logger>
+
+	<logger name="org.springframework.core.io.support.PropertiesLoaderSupport">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="org.springframework.beans.factory.xml.XmlBeanDefinitionReader">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="org.mule.model.seda">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.mule.MuleServer">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.mule.DefaultMuleContext">
+		<level value="INFO" />
+	</logger>
+
+    <!-- Message logging using the old Mule <logger/> - element -->
+    <logger name="org.mule.api.processor.LoggerMessageProcessor">
+        <level value="INFO" />
+    </logger>
+
+    <!-- Message logging using the old Mule <log-component/> - element -->
+    <logger name="org.mule.component.simple.LogComponent">
+        <level value="INFO" />
+    </logger>
+
+    <logger name="org.soitoolkit.commons">
+		<level value="INFO" />
+	</logger>
+    
+    <!--     	
+    	For logging events to QUEUE using EventLogger:
+    	
+    	INFO puts logevents and errorevents on log queue
+    	ERROR will only put errorevents on log queue
+    	 
+    -->
+	<logger name="org.soitoolkit.commons.mule.messageLogger">
+		<level value="INFO" />
+	</logger>
+	
+	<!-- 
+		For logging events to APPENDER using EventLogger:
+		
+		INFO logs logevents and errorevents to selected appender
+    	ERROR will only log errorevents to selected appender
+	-->
+	 <logger name="se.skl.tp.vp.util.EventLogger">
+        <level value="INFO"/>
+     </logger>
+		
+    <logger name="se.skl.tp.vp">
+        <level value="DEBUG"/>
+    </logger>
+    
+    <logger name="se.skl.tp.hsa">
+        <level value="DEBUG"/>
+    </logger>
+    
+    <!-- Level INFO will give log output for reset cache to selected appender -->
+    <logger name="se.skl.tp.vp.vagvalagent.VagvalAgent">
+        <level value="INFO"/>
+    </logger>
+    
+     <!-- Level INFO will give log output for reset hsa cache to selected appender -->
+    <logger name="se.skl.tp.vp.vagvalagent.ResetHsaCache">
+        <level value="INFO"/>
+    </logger>
+    
+    <!-- Level INFO will give log output during startup of VP, initiating VP caches etc -->
+    <logger name="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
+        <level value="INFO"/>
+    </logger>
+    
+ 	<!-- Level DEBUG: Log http headers transfered during a request/response -->
+    <logger name="httpclient.wire.header">
+        <level value="FATAL"/>
+    </logger>
+
+	 <!-- Level DEBUG: Log the http content transfered during a request/response -->
+    <logger name="httpclient.wire.content">
+        <level value="FATAL"/>
+    </logger>
+
+    <root>
+       <priority value="WARN" />
+
+        <appender-ref ref="CONSOLE"/>
+		<!--
+        <appender-ref ref="ROLLINGFILE" />
+		-->
+    </root>
+</log4j:configuration>

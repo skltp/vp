@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="                                                                                                 
+      http://www.mulesoft.org/schema/mule/core  http://www.mulesoft.org/schema/mule/core/current/mule.xsd            
+      http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd                                                                                                                      
+      http://www.mulesoft.org/schema/mule/cxf   http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
+
+       <flow name="GetSupportedServiceContracts-V1-flow" >
+
+        <https:inbound-endpoint
+            address="https://${TP_HOST}:${GETSUPPORTEDSERVICECONTRACTS_RIVTABP21_PORT}/${TP_BASE_URI}/GetSupportedServiceContracts/1/rivtabp21"
+            connector-ref="VPProducerConnector"
+            exchange-pattern="request-response" />
+
+        <cxf:proxy-service
+            service="GetSupportedServiceContractsResponderService"
+            wsdlLocation="classpath:/ServiceContracts_infrastructure_itintegration_registry/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_1.0_RIVTABP21.wsdl"
+            namespace="urn:riv:itintegration:registry:GetSupportedServiceContracts:1:rivtabp21" />
+   
+        <cxf:proxy-client />
+
+        <outbound-endpoint
+            address="http://${TK_HOST}:${TK_PORT}/${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_URI}"
+            exchange-pattern="request-response"
+            connector-ref="VPInsecureConnector"
+            responseTimeout="${SERVICE_TIMEOUT_MS}" />
+    </flow>
+    
+    <flow name="GetSupportedServiceContracts-V2-flow" >
+
+        <https:inbound-endpoint
+            address="https://${TP_HOST}:${GETSUPPORTEDSERVICECONTRACTS_RIVTABP21_PORT}/${TP_BASE_URI}/GetSupportedServiceContracts/2/rivtabp21"
+            connector-ref="VPProducerConnector"
+            exchange-pattern="request-response" />
+
+        <cxf:proxy-service
+            service="GetSupportedServiceContractsResponderService"
+            wsdlLocation="classpath:/ServiceContracts_infrastructure_itintegration_registry/interactions/GetSupportedServiceContractsInteraction/GetSupportedServiceContractsInteraction_2.0_RIVTABP21.wsdl"
+            namespace="urn:riv:infrastructure:itintegration:registry:GetSupportedServiceContracts:2:rivtabp21" />
+   
+        <cxf:proxy-client />
+
+        <outbound-endpoint
+            address="http://${TK_HOST}:${TK_PORT}/${GETSUPPORTEDSERVICECONTRACTS_V2_OUTBOUND_URI}"
+            exchange-pattern="request-response"
+            connector-ref="VPInsecureConnector"
+            responseTimeout="${SERVICE_TIMEOUT_MS}" />
+    </flow>
+
+</mule>
