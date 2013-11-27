@@ -14,7 +14,7 @@
 
 	<groupId>se.skltp.vp</groupId>
 	<artifactId>vp-parent</artifactId>
-	<version>2.2.2-RC4</version>
+	<version>2.2.2-RC5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>vp-parent</name>
 	
@@ -24,9 +24,9 @@
 	</properties>
 
 	<scm>
-		<connection>scm:svn:https://skltp.googlecode.com/svn/tp/vp/tags/vp-parent-2.2.2-RC4</connection>
-		<developerConnection>scm:svn:https://skltp.googlecode.com/svn/tp/vp/tags/vp-parent-2.2.2-RC4</developerConnection>
-		<url>http://skltp.googlecode.com/svn/tp/vp/tags/vp-parent-2.2.2-RC4</url>
+		<connection>scm:svn:https://skltp.googlecode.com/svn/tp/vp/trunk/</connection>
+		<developerConnection>scm:svn:https://skltp.googlecode.com/svn/tp/vp/trunk/</developerConnection>
+		<url>http://skltp.googlecode.com/svn/tp/vp/trunk/</url>
 	</scm>
 
 	<modules>
