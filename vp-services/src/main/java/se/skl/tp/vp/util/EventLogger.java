@@ -74,8 +74,6 @@ public class EventLogger {
 
 	private static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
 
-	private static final Logger log = LoggerFactory.getLogger(EventLogger.class);
-
 	// Creating JaxbUtil objects (i.e. JaxbContext objects)  are costly, so we only keep one instance.
 	// According to https://jaxb.dev.java.net/faq/index.html#threadSafety this should be fine since they are thread safe!
 	private static final JaxbUtil JAXB_UTIL = new JaxbUtil(LogEvent.class);
@@ -83,11 +81,14 @@ public class EventLogger {
 	private static final String MSG_ID = "soi-toolkit.log";
 	private static final String LOG_EVENT_INFO = "logEvent-info";
 	private static final String LOG_EVENT_ERROR = "logEvent-error";
+	private static final String LOG_EVENT_DEBUG = "logEvent-debug";
 	private static final String LOG_STRING = MSG_ID + 
 		"\n** {}.start ***********************************************************" +
 		"\nIntegrationScenarioId={}\nContractId={}\nLogMessage={}\nServiceImpl={}\nHost={} ({})\nComponentId={}\nEndpoint={}\nMessageId={}\nBusinessCorrelationId={}\nBusinessContextId={}\nExtraInfo={}\nPayload={}" + 
 		"{}" + // Placeholder for stack trace info if an error is logged
 		"\n** {}.end *************************************************************";
+
+	
 
 	private static InetAddress HOST = null;
 	private static String HOST_NAME = "UNKNOWN";
@@ -122,7 +123,7 @@ public class EventLogger {
 	
 	
 	public void setMuleContext(MuleContext muleContext) {
-		log.debug("setMuleContext { muleContext: {} }", muleContext);
+		messageLogger.debug("setMuleContext { muleContext: {} }", muleContext);
 		this.muleContext = muleContext;
 	}
 	
@@ -143,15 +144,19 @@ public class EventLogger {
 		Map<String, String> businessContextId,
 		Map<String, String> extraInfo) {
 		
-		if (messageLogger.isInfoEnabled()) {
-			LogEvent logEvent = createLogEntry(LogLevelType.INFO, message, logMessage, businessContextId, extraInfo, message.getPayload(), null);
+		//Only log payload wgen DEBUG is defined in log4j.xml
+		if(messageLogger.isDebugEnabled()){
+			LogEvent logEvent = createLogEntry(LogLevelType.DEBUG, message, logMessage, businessContextId, extraInfo, message.getPayload(), null);
+			String xmlString = JAXB_UTIL.marshal(logEvent);
+			dispatchDebugEvent(xmlString);
+			String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent);
+			messageLogger.debug(logMsg);
+		}else if (messageLogger.isInfoEnabled()) {
+			LogEvent logEvent = createLogEntry(LogLevelType.INFO, message, logMessage, businessContextId, extraInfo, null, null);
 			String xmlString = JAXB_UTIL.marshal(logEvent);
 			dispatchInfoEvent(xmlString);
-			
-			if(log.isInfoEnabled()){
-				String logMsg = formatLogMessage(LOG_EVENT_INFO, logEvent);
-				log.info(logMsg);
-			}
+			String logMsg = formatLogMessage(LOG_EVENT_INFO, logEvent);
+			messageLogger.info(logMsg);
 		}
 	}
 
@@ -167,7 +172,7 @@ public class EventLogger {
 		dispatchErrorEvent(xmlString);
 		
 		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
-		log.error(logMsg);
+		messageLogger.error(logMsg);
 	}
 
 	//
@@ -182,12 +187,16 @@ public class EventLogger {
 		dispatchErrorEvent(xmlString);
 		
 		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
-		log.error(logMsg);
+		messageLogger.error(logMsg);
 	}
 
 	//----------------
 	
 	private void dispatchInfoEvent(String msg) {
+		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
+	}
+	
+	private void dispatchDebugEvent(String msg) {
 		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
 	}
 
@@ -338,12 +347,12 @@ public class EventLogger {
 
 		if (message != null) {
 
-			if (log.isDebugEnabled()) {
+			if (messageLogger.isDebugEnabled()) {
 				@SuppressWarnings("rawtypes")
 				Set names = message.getPropertyNames(PropertyScope.OUTBOUND);
 				for (Object object : names) {
 					Object value = message.getProperty(object.toString(), PropertyScope.OUTBOUND);
-					log.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
+					messageLogger.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
 				}
 			}
 			

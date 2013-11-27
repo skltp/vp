@@ -105,23 +105,14 @@
     <!--     	
     	For logging events to QUEUE using EventLogger:
     	
-    	INFO puts logevents and errorevents on log queue
+    	DEBUG puts logevents and errorevents on log queue, including payload in logevents
+    	INFO puts logevents and errorevents on log queue, excluding payload in logevents
     	ERROR will only put errorevents on log queue
     	 
     -->
 	<logger name="org.soitoolkit.commons.mule.messageLogger">
-		<level value="INFO" />
+		<level value="DEBUG" />
 	</logger>
-	
-	<!-- 
-		For logging events to APPENDER using EventLogger:
-		
-		INFO logs logevents and errorevents to selected appender
-    	ERROR will only log errorevents to selected appender
-	-->
-	 <logger name="se.skl.tp.vp.util.EventLogger">
-        <level value="INFO"/>
-     </logger>
 		
     <logger name="se.skl.tp.vp">
         <level value="DEBUG"/>
