@@ -34,7 +34,7 @@
 	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
 
 	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
-		<spring:property name="endpointAddress" value="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
+		<spring:property name="endpointAddress" value="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo/v2" />
 		<spring:property name="addressDelimiter" value="#" />
 		<spring:property name="hsaCache" ref="hsaCache"/>
 		<spring:property name="localTakCache" value="${user.home}${file.separator}.tk.localCache.test"/>
@@ -49,7 +49,7 @@
 
 	<!-- TODO: Add teststub-service specific definitions here -->
 	<flow name="vagval-teststub-flow">
-		<inbound-endpoint address="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo" />
+		<inbound-endpoint address="http://localhost:8888/tp-vagval-admin-services/SokVagvalsInfo/v2" />
 		<cxf:jaxws-service serviceClass="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMock" />
 		<component>
 			<singleton-object class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMock">
