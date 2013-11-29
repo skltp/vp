@@ -28,9 +28,10 @@
     xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
                http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd" >
 
-  	%s
+  	%1$s
 
 </mule>
