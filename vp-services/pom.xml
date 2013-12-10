@@ -53,7 +53,7 @@
         <dependency>
             <groupId>se.rivta.infrastructure.itintegration</groupId>
             <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
-            <version>2.0-RC1</version>
+            <version>2.0-RC2</version>
         </dependency>
 		
 		<!-- Ping -->

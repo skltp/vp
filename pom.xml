@@ -28,6 +28,24 @@
 		<developerConnection>scm:svn:https://skltp.googlecode.com/svn/tp/vp/trunk/</developerConnection>
 		<url>http://skltp.googlecode.com/svn/tp/vp/trunk/</url>
 	</scm>
+	
+	<repositories>
+		<!-- Sonatype staging repo added to be able to build VP using artifacts
+			not yet pushed to central maven. In this specific case its about
+			new version of itintegration registry constracts.
+			
+			<groupId>se.rivta.infrastructure.itintegration</groupId>
+            <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
+            <version>2.0-RC2</version>
+         -->
+	    <repository>
+	      <id>sonatype-nexus-staging-repository</id>
+	      <url>https://oss.sonatype.org/content/repositories/staging/</url>
+	      <snapshots>
+	        <enabled>false</enabled>
+	      </snapshots>
+	    </repository>
+  	</repositories>
 
 	<modules>
 		<module>vp-soitoolkit-mule-dependencies</module>
