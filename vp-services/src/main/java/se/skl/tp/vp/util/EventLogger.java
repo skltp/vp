@@ -144,19 +144,15 @@ public class EventLogger {
 		Map<String, String> businessContextId,
 		Map<String, String> extraInfo) {
 		
-		//Only log payload wgen DEBUG is defined in log4j.xml
+		//Only log payload when DEBUG is defined in log4j.xml
 		if(messageLogger.isDebugEnabled()){
 			LogEvent logEvent = createLogEntry(LogLevelType.DEBUG, message, logMessage, businessContextId, extraInfo, message.getPayload(), null);
-			String xmlString = JAXB_UTIL.marshal(logEvent);
-			dispatchDebugEvent(xmlString);
-			String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent);
-			messageLogger.debug(logMsg);
+			dispatchDebugEvent(logEvent);
+			logDebugEvent(logEvent);
 		}else if (messageLogger.isInfoEnabled()) {
 			LogEvent logEvent = createLogEntry(LogLevelType.INFO, message, logMessage, businessContextId, extraInfo, null, null);
-			String xmlString = JAXB_UTIL.marshal(logEvent);
-			dispatchInfoEvent(xmlString);
-			String logMsg = formatLogMessage(LOG_EVENT_INFO, logEvent);
-			messageLogger.info(logMsg);
+			dispatchInfoEvent(logEvent);
+			logInfoEvent(logEvent);
 		}
 	}
 
@@ -168,11 +164,8 @@ public class EventLogger {
 		Map<String, String> extraInfo) {
 
 		LogEvent logEvent = createLogEntry(LogLevelType.ERROR, message, error.toString(), businessContextId, extraInfo, message.getPayload(), error);
-		String xmlString = JAXB_UTIL.marshal(logEvent);
-		dispatchErrorEvent(xmlString);
-		
-		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
-		messageLogger.error(logMsg);
+		dispatchErrorEvent(logEvent);
+		logErrorEvent(logEvent);
 	}
 
 	//
@@ -183,24 +176,39 @@ public class EventLogger {
 		Map<String, String> extraInfo) {
 
 		LogEvent logEvent = createLogEntry(LogLevelType.ERROR, null, error.toString(), businessContextId, extraInfo, payload, error);
-		String xmlString = JAXB_UTIL.marshal(logEvent);
-		dispatchErrorEvent(xmlString);
-		
-		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
-		messageLogger.error(logMsg);
+		dispatchErrorEvent(logEvent);
+		logErrorEvent(logEvent);
 	}
 
 	//----------------
 	
-	private void dispatchInfoEvent(String msg) {
+	private void logDebugEvent(LogEvent logEvent) {
+		String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent);
+		messageLogger.debug(logMsg);	
+	}
+	
+	private void logInfoEvent(LogEvent logEvent) {
+		String logMsg = formatLogMessage(LOG_EVENT_INFO, logEvent);
+		messageLogger.info(logMsg);
+	}
+	
+	private void logErrorEvent(LogEvent logEvent) {
+		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
+		messageLogger.error(logMsg);
+	}
+	
+	private void dispatchInfoEvent(LogEvent logEvent) {
+		String msg = JAXB_UTIL.marshal(logEvent);
 		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
 	}
 	
-	private void dispatchDebugEvent(String msg) {
+	private void dispatchDebugEvent(LogEvent logEvent) {
+		String msg = JAXB_UTIL.marshal(logEvent);
 		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
 	}
 
-	private void dispatchErrorEvent(String msg) {
+	private void dispatchErrorEvent(LogEvent logEvent) {
+		String msg = JAXB_UTIL.marshal(logEvent);
 		dispatchEvent("SOITOOLKIT.LOG.ERROR", msg);
 	}
 
