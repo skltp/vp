@@ -25,6 +25,7 @@
     xmlns:https="http://www.mulesoft.org/schema/mule/https"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
     xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:spring="http://www.springframework.org/schema/beans"
     xsi:schemaLocation="
 		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-current.xsd
 		http://www.mulesoft.org/schema/mule/core	http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -33,13 +34,17 @@
 	" >
 
     <flow name="PingForConfiguration-rivtabp20-flow" >
-        <https:inbound-endpoint
-            name="PingForConfigurationResponderRivtabp20Service"
-            address="https://${TP_HOST}:${PINGFORCONFIGURATIONSERVICE_RIVTABP20_PORT}/${TP_BASE_URI}/${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_URI}"
-            connector-ref="VPProducerConnector"
-            exchange-pattern="request-response"
-            responseTransformer-refs="logRespOut" 
-            transformer-refs="createCorrId rivExtractor logReqIn"/>
+            
+         <inbound-endpoint
+	            name="PingForConfigurationResponderRivtabp20Service"
+	            address="${PINGFORCONFIGURATIONSERVICE_RIVTABP20_INBOUND_ENDPOINT}"
+	            exchange-pattern="request-response"
+	            responseTransformer-refs="filterResponseHeaders logRespOut" 
+	            transformer-refs="createCorrId rivExtractor logReqIn">
+	            <properties>
+                    <spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.itintegration.monitoring.PingForConfigurationResponder.1:${SERVICE_TIMEOUT_MS}}"/>
+                </properties>
+	    </inbound-endpoint>
  
         <cxf:jaxws-service
             namespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"            

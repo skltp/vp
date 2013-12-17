@@ -32,10 +32,11 @@
 
        <flow name="GetSupportedServiceContracts-V1-flow" >
 
-        <https:inbound-endpoint
-            address="https://${TP_HOST}:${GETSUPPORTEDSERVICECONTRACTS_RIVTABP21_PORT}/${TP_BASE_URI}/GetSupportedServiceContracts/1/rivtabp21"
-            connector-ref="VPProducerConnector"
-            exchange-pattern="request-response" />
+         <inbound-endpoint
+	           address="${GETSUPPORTEDSERVICECONTRACTS_V1_INBOUND_ENDPOINT}"
+	           exchange-pattern="request-response" 
+	           responseTransformer-refs="logRespOut" 
+	           transformer-refs="createCorrId logReqIn"/>
 
         <cxf:proxy-service
             service="GetSupportedServiceContractsResponderService"
@@ -53,10 +54,11 @@
     
     <flow name="GetSupportedServiceContracts-V2-flow" >
 
-        <https:inbound-endpoint
-            address="https://${TP_HOST}:${GETSUPPORTEDSERVICECONTRACTS_RIVTABP21_PORT}/${TP_BASE_URI}/GetSupportedServiceContracts/2/rivtabp21"
-            connector-ref="VPProducerConnector"
-            exchange-pattern="request-response" />
+    	 <inbound-endpoint
+	           address="${GETSUPPORTEDSERVICECONTRACTS_V2_INBOUND_ENDPOINT}"
+	           exchange-pattern="request-response" 
+	           responseTransformer-refs="logRespOut" 
+	           transformer-refs="createCorrId logReqIn"/>
 
         <cxf:proxy-service
             service="GetSupportedServiceContractsResponderService"
