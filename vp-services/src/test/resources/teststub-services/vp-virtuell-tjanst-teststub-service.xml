@@ -34,7 +34,7 @@
 		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
 
-      <flow name="vp-virtuell-tjanst-teststub-flow" >
+    <flow name="vp-virtuell-tjanst-teststub-flow" >
        
         <composite-source>
       	  	<https:inbound-endpoint
@@ -44,7 +44,7 @@
             	responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
             	<properties>
         			<spring:entry key="featureUseKeepAlive" value="true"/>
-              		<spring:entry key="featureResponseTimeout" value="5000"/>
+              		<spring:entry key="featureResponseTimeout" value="${TEST_NORMAL_TIMEOUT_MS}"/>
         		</properties>
         	</https:inbound-endpoint>
         	<http:inbound-endpoint
@@ -52,7 +52,7 @@
             	exchange-pattern="request-response" 
             	responseTransformer-refs="filterResponseHeaders">
               <properties>
-              <spring:entry key="featureResponseTimeout" value="5000"/>
+              <spring:entry key="featureResponseTimeout" value="${TEST_NORMAL_TIMEOUT_MS}"/>
             </properties>
         	</http:inbound-endpoint>
          </composite-source>
@@ -65,4 +65,70 @@
 
         <flow-ref name="vagval-dynamic-routing-flow" />
     </flow>
+
+    <flow name="vp-virtuell-tjanst-teststub-short-timeout-flow" >
+       
+        <composite-source>
+      	  	<https:inbound-endpoint
+        	    address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1-short-timeout"
+           		connector-ref="VPProducerConnector"
+            	exchange-pattern="request-response" 
+            	responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+            	<properties>
+        			<spring:entry key="featureUseKeepAlive" value="true"/>
+              		<spring:entry key="featureResponseTimeout" value="${TEST_SHORT_TIMEOUT_MS}"/>
+        		</properties>
+        	</https:inbound-endpoint>
+        	<http:inbound-endpoint
+        	    address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/tjanst1-short-timeout"
+            	exchange-pattern="request-response" 
+            	responseTransformer-refs="filterResponseHeaders">
+              <properties>
+              <spring:entry key="featureResponseTimeout" value="${TEST_SHORT_TIMEOUT_MS}"/>
+            </properties>
+        	</http:inbound-endpoint>
+         </composite-source>
+ 			
+        <cxf:proxy-service
+            namespace="urn:skl:tjanst1:rivtabp20"
+            payload="envelope"
+            service="Tjanst1Service"
+            wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
+
+        <flow-ref name="vagval-dynamic-routing-flow" />
+    </flow>
+
+    <flow name="vp-virtuell-tjanst-teststub-long-timeout-flow" >
+       
+        <composite-source>
+      	  	<https:inbound-endpoint
+        	    address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1-long-timeout"
+           		connector-ref="VPProducerConnector"
+            	exchange-pattern="request-response" 
+            	responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+            	<properties>
+        			<spring:entry key="featureUseKeepAlive" value="true"/>
+              		<spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+        		</properties>
+        	</https:inbound-endpoint>
+        	<http:inbound-endpoint
+        	    address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/tjanst1-long-timeout"
+            	exchange-pattern="request-response" 
+            	responseTransformer-refs="filterResponseHeaders">
+              <properties>
+              <spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+            </properties>
+        	</http:inbound-endpoint>
+         </composite-source>
+ 			
+        <cxf:proxy-service
+            namespace="urn:skl:tjanst1:rivtabp20"
+            payload="envelope"
+            service="Tjanst1Service"
+            wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
+
+        <flow-ref name="vagval-dynamic-routing-flow" />
+    </flow>
+
+
 </mule>

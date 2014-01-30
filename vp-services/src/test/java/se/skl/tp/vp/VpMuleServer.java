@@ -66,6 +66,16 @@ public class VpMuleServer {
 		vi.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
 		vi.adress = "https://localhost:19000/vardgivare-b/tjanst1";
 		vagvalInputs.add(vi);
+
+		vi = new VagvalMockInputRecord();
+		vi.receiverId = "vp-test-producer-no-connection";
+		vi.senderId = "tp";
+		vi.rivVersion = "RIVTABP20";
+		vi.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vi.adress = "https://www.google.com:81";
+		vagvalInputs.add(vi);
+
+		
 		svimi.setVagvalInputs(vagvalInputs);
 	}
 }

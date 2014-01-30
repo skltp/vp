@@ -27,24 +27,31 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 
 public class RestClient {
-	private MuleClient muleClient;
-	private String muleConnector;
+	private MuleClient muleClient = null;
+	private String muleConnector = null;
+	private int timeout_ms = -1;
+	
+	private static final Logger log = LoggerFactory.getLogger(RestClient.class);
+
+	public RestClient(MuleContext muleContext, String muleConnector, int timeout_ms) {
+		this(muleContext, muleConnector);
+		this.timeout_ms = timeout_ms;
+	}
 
 	public RestClient(MuleContext muleContext, String muleConnector) {
-		try {
-			muleClient = new MuleClient(muleContext);
-			this.muleConnector = muleConnector;
-		} catch (MuleException e) {
-			throw new RuntimeException(e);
-		}
+		this(muleContext);
+		this.muleConnector = muleConnector;
 	}
 
 	public RestClient(MuleContext muleContext) {
 		try {
 			muleClient = new MuleClient(muleContext);
-			this.muleConnector = null;
 		} catch (MuleException e) {
 			throw new RuntimeException(e);
 		}
@@ -237,7 +244,13 @@ public class RestClient {
 			url += "?connector=" + muleConnector;
 		}
 		try {
-			return muleClient.send(url, payload, properties);
+			if (timeout_ms == -1) {
+				log.debug("Call MuleClient.send() without timeout");
+				return muleClient.send(url, payload, properties);
+			} else {
+				log.debug("Call MuleClient.send() with timeout set to {} ms", timeout_ms);
+				return muleClient.send(url, payload, properties, timeout_ms);
+			}
 		} catch (MuleException e) {
 			throw new RuntimeException(e);
 		}

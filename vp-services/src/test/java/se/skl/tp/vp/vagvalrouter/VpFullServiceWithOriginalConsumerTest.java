@@ -39,6 +39,7 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 	private static final String PRODUCT_ID = "SW123";
 	private static final String PRODUCT_ID_EXCEPTION = "Exception";
 	private static final String TJANSTE_ADRESS = "https://localhost:20000/vp/tjanst1";
+	private static final String LOGICAL_ADDRESS = "vp-test-producer";
 	
 	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
 	
@@ -51,7 +52,7 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 
 		VagvalMockInputRecord vi_ORIGINAL_CONSUMER = new VagvalMockInputRecord();
-		vi_ORIGINAL_CONSUMER.receiverId = "vp-test-producer";
+		vi_ORIGINAL_CONSUMER.receiverId = LOGICAL_ADDRESS;
 		vi_ORIGINAL_CONSUMER.senderId = AUHTORIZED_CONSUMER_HSAID;
 		vi_ORIGINAL_CONSUMER.rivVersion = "RIVTABP20";
 		vi_ORIGINAL_CONSUMER.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
@@ -82,7 +83,7 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 		Map<String, String> properties = new HashMap<String, String>();
     	properties.put(VagvalRouter.X_VP_CONSUMER_ID, AUHTORIZED_CONSUMER_HSAID);
 
-    	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, properties);
+    	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());
 	}
 	
@@ -92,7 +93,7 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
     	properties.put(VagvalRouter.X_VP_CONSUMER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
 
     	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, properties);
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
     		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:skl:tjanst1:rivtabp20, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
@@ -105,7 +106,7 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
     	properties.put(VagvalRouter.X_VP_CONSUMER_ID, AUHTORIZED_CONSUMER_HSAID);
 
     	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID_EXCEPTION, TJANSTE_ADRESS, properties);
+    		testConsumer.callGetProductDetail(PRODUCT_ID_EXCEPTION, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
     		assertTrue(ex.getMessage().contains("<faultcode>soap:Server</faultcode>"));

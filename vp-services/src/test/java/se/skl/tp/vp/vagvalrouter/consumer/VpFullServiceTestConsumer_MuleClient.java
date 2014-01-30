@@ -101,20 +101,24 @@ public class VpFullServiceTestConsumer_MuleClient {
 		"</soapenv:Envelope>";
 	
 	
+	public VpFullServiceTestConsumer_MuleClient(MuleContext muleContext, String httpsConnector, int timeout_ms) {
+		restClient = new RestClient(muleContext , httpsConnector, timeout_ms);
+	}
+
 	public VpFullServiceTestConsumer_MuleClient(MuleContext muleContext, String httpsConnector) {
 		restClient = new RestClient(muleContext , httpsConnector);
 	}
 
-	public Product callGetProductDetail(String productId, String serviceAddress) throws Exception {
-		return callGetProductDetail(productId, serviceAddress, null);
+	public Product callGetProductDetail(String productId, String serviceAddress, String logicalAddress) throws Exception {
+		return callGetProductDetail(productId, serviceAddress, logicalAddress, null);
 	}
 
-	public Product callGetProductDetail(String productId, String serviceAddress, Map<String, String> properties) throws Exception {
+	public Product callGetProductDetail(String productId, String serviceAddress, String logicalAddress, Map<String, String> properties) throws Exception {
 		GetProductDetailType request = new GetProductDetailType();
 		request.setProductId(productId);
 
 		AttributedURIType logicalAddressHeader = new AttributedURIType();
-		logicalAddressHeader.setValue("vp-test-producer");
+		logicalAddressHeader.setValue(logicalAddress);
 
 		String xmlRequest = marshall(logicalAddressHeader, request);
 		
