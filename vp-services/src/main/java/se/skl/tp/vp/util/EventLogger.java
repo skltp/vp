@@ -62,6 +62,7 @@ import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType.BusinessCont
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 import org.soitoolkit.commons.mule.util.MuleUtil;
+import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 import org.soitoolkit.commons.mule.util.XmlUtil;
 
 /**
@@ -73,10 +74,19 @@ import org.soitoolkit.commons.mule.util.XmlUtil;
 public class EventLogger {
 
 	private static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
+	
+	/** Handle to the integration components configuration file; vp-config.properties */
+    private static final RecursiveResourceBundle rrb = new RecursiveResourceBundle("vp-config");
 
 	// Creating JaxbUtil objects (i.e. JaxbContext objects)  are costly, so we only keep one instance.
 	// According to https://jaxb.dev.java.net/faq/index.html#threadSafety this should be fine since they are thread safe!
 	private static final JaxbUtil JAXB_UTIL = new JaxbUtil(LogEvent.class);
+	
+	/** Property key for the log info queue */
+    public static final String PROPERTY_KEY_LOG_INFO_QUEUE = "SOITOOLKIT_LOG_INFO_QUEUE";
+
+    /** Property key for the log error queue */
+    public static final String PROPERTY_KEY_LOG_ERROR_QUEUE = "SOITOOLKIT_LOG_ERROR_QUEUE";
 
 	private static final String MSG_ID = "soi-toolkit.log";
 	private static final String LOG_EVENT_INFO = "logEvent-info";
@@ -136,6 +146,30 @@ public class EventLogger {
 	public void setJaxbToXml(JaxbObjectToXmlTransformer jaxbToXml) {
 		this.payloadToStringTransformer  = new PayloadToStringTransformer(jaxbToXml);
 	}
+	
+	/**
+     * Getting a property's value given a its key
+     * @param propertyKey the property key
+     * @return the value of the property or null if property wasn't found
+     */
+    String getPropertyValue(String propertyKey) {
+        return rrb.getString(propertyKey);
+    }
+
+    /**
+     * Looking up a queue name given a property key
+     * @param propertyKey the property key
+     * @return a queue name
+     * @throws throws a RuntimeException if queue name cannot be found 
+     */
+    String getQueueName(String propertyKey) {
+        String queueName = getPropertyValue(propertyKey);
+        if (queueName == null || queueName.length() == 0) {
+            throw new RuntimeException("Unable to get queue name for property " + propertyKey);
+        }
+
+        return queueName;
+    }
 
 	//
 	public void logInfoEvent (
@@ -199,17 +233,17 @@ public class EventLogger {
 	
 	private void dispatchInfoEvent(LogEvent logEvent) {
 		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
+		dispatchEvent(getQueueName(PROPERTY_KEY_LOG_INFO_QUEUE), msg);
 	}
 	
 	private void dispatchDebugEvent(LogEvent logEvent) {
 		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent("SOITOOLKIT.LOG.STORE", msg);
+		dispatchEvent(getQueueName(PROPERTY_KEY_LOG_INFO_QUEUE), msg);
 	}
 
 	private void dispatchErrorEvent(LogEvent logEvent) {
 		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent("SOITOOLKIT.LOG.ERROR", msg);
+		dispatchEvent(getQueueName(PROPERTY_KEY_LOG_ERROR_QUEUE), msg);
 	}
 
 	private void dispatchEvent(String queue, String msg) {
