@@ -20,8 +20,6 @@
  */
 package se.skl.tp.vp.util;
 
-import java.util.regex.Pattern;
-
 import javax.xml.namespace.QName;
 
 import org.mule.api.MuleMessage;
@@ -31,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
-import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 /**
  * Utility class for the virtualization platform
@@ -50,12 +45,13 @@ public final class VPUtil {
 	public static final String CONSUMER_CONNECTOR_HTTP_NAME = "VPInsecureConnector";
 	
 	public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
-	public static final String REVERSE_PROXY_HEADER_NAME = "x-vp-auth-cert";
 	
 	public static final String SESSION_ERROR = "sessionStatus";
 	public static final String SESSION_ERROR_DESCRIPTION = "sessionErrorDescription";
 	public static final String SESSION_ERROR_TECHNICAL_DESCRIPTION = "sessionErrorTechnicalDescription";
 	
+	//Session scoped variables used in internal flows, not to mix with http headers prefixed x-something used for external http headers
+	public static final String ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid";
 	public static final String RECEIVER_ID = "receiverid";
 	public static final String SENDER_ID = "senderid";
 	public static final String RIV_VERSION = "rivversion";
@@ -97,41 +93,6 @@ public final class VPUtil {
 		
 		return s.trim().length() == 0;
 	}
-	
-	public static String getSenderId(MuleMessage message, String whiteList, Pattern certExtractPattern) {
-		
-		String senderId = null;
-
-		// Start to look into the inbound property VagvalRouter.X_VP_CONSUMER_ID, will be filled in if an aggregating service use the VP.
-		log.debug("Exists sender id as inbound property {}?", VagvalRouter.X_VP_CONSUMER_ID);
-		senderId = message.getInboundProperty(VagvalRouter.X_VP_CONSUMER_ID, null);
-
-		if (senderId != null) {
-			log.debug("Sender id extracted from inbound property {}: {}", VagvalRouter.X_VP_CONSUMER_ID, senderId);
-
-			// Check whitelist (throws an exception if not ok) if found in the inbound property VagvalRouter.X_VP_CONSUMER_ID.
-			VPUtil.checkCallerOnWhiteList(message, whiteList, VagvalRouter.X_VP_CONSUMER_ID);
-
-		} else {
-			// Ok, no inbound property X_VP_CONSUMER_ID was found, look into the certificate instead
-			try {
-				log.debug("No, look into the senders certificate instead");
-				CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message, certExtractPattern, whiteList);
-				CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
-				senderId = certHelper.extractSenderIdFromCertificate();
-				log.debug("Sender id extracted from certificate {}", senderId);
-				
-			} catch (final VpSemanticException e) {
-				log.warn("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
-			} 	
-		}
-		
-		// Cache the retrieved value in the session property SENDER_ID
-		if (senderId != null) {
-			message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
-		}
-		return senderId;
-	}	
 	
 	public static void checkCallerOnWhiteList(MuleMessage message, String whiteList, String httpHeader) throws VpSemanticException {
 

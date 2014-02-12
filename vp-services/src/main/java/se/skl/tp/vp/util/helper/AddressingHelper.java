@@ -23,7 +23,6 @@ package se.skl.tp.vp.util.helper;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -37,8 +36,6 @@ import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
 import se.skl.tp.vp.vagvalrouter.VagvalInput;
 
 /**
@@ -50,9 +47,8 @@ public class AddressingHelper extends VPHelperSupport {
 
 	private VisaVagvalsInterface agent;
 
-	public AddressingHelper(MuleMessage muleMessage, final VisaVagvalsInterface agent, final Pattern pattern,
-			final String whiteList) {
-		super(muleMessage, pattern, whiteList);
+	public AddressingHelper(MuleMessage muleMessage, final VisaVagvalsInterface agent) {
+		super(muleMessage);
 
 		this.agent = agent;
 	}
@@ -116,23 +112,14 @@ public class AddressingHelper extends VPHelperSupport {
 		 */
 		return this.getAddressToVirtualService(services, input);
 	}
-	
-	private String getSessionProperty(String key) {
-		String value = (String) this.getMuleMessage().getProperty(key, PropertyScope.SESSION);
-		this.getLog().debug("session property {} = \"{}\"", key, value);
-		return value;
-	}
 
 	private VagvalInput createRequestToServiceDirectory() {
 
 		VagvalInput vagvalInput = new VagvalInput();
-		vagvalInput.senderId = VPUtil.getSenderId(this.getMuleMessage(), this.getWhiteList(), this.getPattern());
-		
-		this.getMuleMessage().setProperty(VPUtil.SENDER_ID, vagvalInput.senderId, PropertyScope.OUTBOUND);
-
-		vagvalInput.receiverId = getSessionProperty(VPUtil.RECEIVER_ID);
-		vagvalInput.rivVersion = getSessionProperty(VPUtil.RIV_VERSION);
-		vagvalInput.serviceNamespace = getSessionProperty(VPUtil.SERVICE_NAMESPACE);
+		vagvalInput.senderId = (String) this.getMuleMessage().getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
+		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
+		vagvalInput.rivVersion = (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
+		vagvalInput.serviceNamespace = (String) this.getMuleMessage().getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION);
 
 		return vagvalInput;
 	}

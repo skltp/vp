@@ -21,7 +21,9 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mule.tck.FunctionalTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
@@ -30,6 +32,7 @@ import se.skl.tjanst1.wsdl.Product;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
+import se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger;
 
 public class VpFullServiceTest extends FunctionalTestCase {
 
@@ -121,5 +124,48 @@ public class VpFullServiceTest extends FunctionalTestCase {
 			ts = System.currentTimeMillis() - ts;
 			assertTrue("Expected time to be longer than long_timeout_ms (" + long_timeout_ms + ") but was " + ts + " ms.", ts > long_timeout_ms);
 		}
+	}
+	
+	public void testMandatoryPropertiesArePropagatedToProducer() throws Exception {
+		
+		Map<String, String> properties = new HashMap<String, String>();
+
+    	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+		
+		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
+		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
+		assertEquals("SKLTP VP/2.0", VpTestProducerLogger.getLatestUserAgent());
+	}
+	
+	public void testVP007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
+	
+		final String NOT_AUHTORIZED_CONSUMER_HSAID = "UNKNOWN_CONSUMER";
+		
+ 		Map<String, String> properties = new HashMap<String, String>();
+    	properties.put(VagvalRouter.X_VP_SENDER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
+
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:skl:tjanst1:rivtabp20, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
+    	}
+	}
+	
+	public void testWhenProducerReturnsFaultItsPropagatedCorrectToConsumer() throws Exception {
+		
+		final String AUHTORIZED_CONSUMER_HSAID = "tp";
+		final String PRODUCT_ID_EXCEPTION = "Exception";
+		
+ 		Map<String, String> properties = new HashMap<String, String>();
+    	properties.put(VagvalRouter.X_VP_SENDER_ID, AUHTORIZED_CONSUMER_HSAID);
+
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID_EXCEPTION, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		assertTrue(ex.getMessage().contains("<faultcode>soap:Server</faultcode>"));
+    		assertTrue(ex.getMessage().contains("<faultstring>PP01 Product Does Not Exist</faultstring>"));
+    	}
 	}
 }

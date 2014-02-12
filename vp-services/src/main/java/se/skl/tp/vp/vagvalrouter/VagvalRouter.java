@@ -20,16 +20,12 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -67,38 +63,34 @@ public class VagvalRouter extends AbstractRecipientList {
      */
     public static final String X_SKLTP_PRODUCER_RESPONSETIME = "x-skltp-prt";
 
-    /**
-	 * HTTP Header forwarded to producer
+	/**
+	 * HTTP Header forwarded to producer. Note that header represent original consumer and should not be used for routing or authorization
+	 * in SKLTP VP. For routing and authorization use X_VP_SENDER_ID.
 	 * <p>
 	 * 
 	 * @since VP-2.0
 	 */
-	public static final String X_VP_PRODUCER_ID = "x-vp-producer-id";
-
+	public static final String X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "x-rivta-original-serviceconsumer-hsaid";
+	
 	/**
-	 * HTTP Header forwarded to producer.
-	 * <p>
+	 * HTTP Header x-vp-sender-id, identifies the consumer doing the actual call to SKLTP VP. The header x-vp-sender-id
+	 * should always exist in outbound calls for other SKLTP component that uses it.
 	 * 
-	 * @since VP-2.0
+	 * @since VP-2.2.3
 	 */
-	public static final String X_VP_CONSUMER_ID = "x-rivta-original-serviceconsumer-hsaid";
-
+	public static final String X_VP_SENDER_ID = "x-vp-sender-id";
+	
 	/**
-	 * HTTP Header forwarded to consumer
+	 * Incoming HTTP Header x-vp-auth-cert, carrying a X509 certificate, used when implementing a reverse proxy.
 	 * 
-	 * @since VP-2.0
+	 * @since VP-1.3
 	 */
-	public static final String X_VP_CORRELATION_ID = "x-vp-correlation-id";
+	public static final String REVERSE_PROXY_HEADER_NAME = "x-vp-auth-cert";
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalRouter.class);
 
 	private VisaVagvalsInterface vagvalAgent;
-
-	private Pattern pattern;
-
-	private String senderIdPropertyName;
-
-	private String whiteList;
 
 	private int responseTimeout;
 
@@ -110,7 +102,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * Headers to be blocked when invoking producer.
 	 */
 	private static final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
-			VPUtil.SENDER_ID, VPUtil.RIV_VERSION, VPUtil.SERVICE_NAMESPACE, VPUtil.REVERSE_PROXY_HEADER_NAME,
+			VPUtil.RIV_VERSION, VPUtil.SERVICE_NAMESPACE, REVERSE_PROXY_HEADER_NAME,
 			VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES", HttpConstants.HEADER_CONTENT_TYPE,
 			"http.disable.status.code.exception.check", }));
 
@@ -132,30 +124,18 @@ public class VagvalRouter extends AbstractRecipientList {
 	public AddressingHelper getAddressingHelper(final MuleMessage msg) {
 
 		if (this.addrHelper == null) {
-			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent, pattern, whiteList));
+			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent));
 		}
 
 		if (!this.addrHelper.getMuleMessage().equals(msg)) {
-			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent, pattern, whiteList));
+			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent));
 		}
 
 		return this.addrHelper;
 	}
 
-	public void setWhiteList(final String whiteList) {
-		this.whiteList = whiteList;
-	}
-
 	public void setResponseTimeout(final int responseTimeout) {
 		this.responseTimeout = responseTimeout;
-	}
-
-	public void setSenderIdPropertyName(String senderIdPropertyName) {
-		this.senderIdPropertyName = senderIdPropertyName;
-		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
-		if (logger.isInfoEnabled()) {
-			logger.info("senderIdPropertyName set to: " + senderIdPropertyName);
-		}
 	}
 
 	// Not private to make the method testable...
@@ -210,23 +190,15 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 
 		ExecutionTimer.start(VPUtil.TIMER_ENDPOINT);
-		MuleEvent replyEvent;
+		MuleEvent replyEvent = null;
 		try {
 			// Do the actual routing
 			replyEvent = super.route(event);
 		} finally {
 		    long endpointTime =  ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
-		    event.getMessage().setProperty(X_SKLTP_PRODUCER_RESPONSETIME, endpointTime, PropertyScope.OUTBOUND); 
-		}
-
-		/*
-		 * Restore properties
-		 */
-		for (final String prop : event.getMessage().getPropertyNames(PropertyScope.OUTBOUND)) {
-			if (!BLOCKED_REQ_HEADERS.contains(prop)) {
-				replyEvent.getMessage().setProperty((String) prop,
-						event.getMessage().getProperty((String) prop, PropertyScope.OUTBOUND), PropertyScope.OUTBOUND);
-			}
+		    
+		    //Make sure producer response time (endpoint time) is returned to sender
+		    replyEvent.getMessage().setProperty(X_SKLTP_PRODUCER_RESPONSETIME, endpointTime, PropertyScope.OUTBOUND); 
 		}
 
 		synchronized (statistics) {
@@ -248,39 +220,21 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 
 		String url = (String) recipient;
+		
+		//endpoint_url only set here in session to be able to log in EventLogger
 		message.setProperty(VPUtil.ENDPOINT_URL, url, PropertyScope.SESSION);
+		
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
 		eb.setResponseTimeout(selectResponseTimeout(message));
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 		eb.setEncoding("UTF-8");
 		message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8", PropertyScope.OUTBOUND);
 
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Setting HTTP properties from Mule SESSION:\n{} = {}\n{} = {}\n{} = {}", new Object[] {
-				X_VP_CORRELATION_ID, message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION),
-				X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION),
-				X_VP_PRODUCER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION)});
-		}
-
-		MessagePropertiesTransformer mt = createOutboundTransformer();
-		mt.getAddProperties().put(X_VP_CORRELATION_ID,
-				message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION));
-		mt.getAddProperties().put(X_VP_CONSUMER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
-		mt.getAddProperties().put(X_VP_PRODUCER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
-
-		// FIXME:
-		// This header should be removed (replaced by X_VP_PRODUCER_ID), but
-		// there's a need to be backward compatible
-		// because the header is actually in-use by insurance transformations.
-		mt.getAddProperties().put(VPUtil.RECEIVER_ID, message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
-
-		// XXX: Make sure SOAPAction is forwarded to producer
-		String action = message.getProperty("SOAPAction", PropertyScope.INBOUND);
-		if (action != null) {
-			mt.getAddProperties().put("SOAPAction", action);
-			message.setProperty("SOAPAction", action, PropertyScope.OUTBOUND);
-		}
+		MessagePropertiesTransformer mt = createOutboundTransformer();	
+		
+		propagateSenderIdToProducer(message, mt);
+		propagateOriginalServiceConsumerHsaIdToProducer(message, mt);
+		propagateSoapActionToProducer(message, mt);
 
 		eb.addMessageProcessor(mt);
 
@@ -297,6 +251,43 @@ public class VagvalRouter extends AbstractRecipientList {
 		} catch (EndpointException e) {
 			throw new VpTechnicalException(e);
 		}
+	}
+
+	// XXX: Make sure SOAPAction is forwarded to producer
+	private void propagateSoapActionToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
+		String action = message.getProperty("SOAPAction", PropertyScope.INBOUND);
+		if (action != null) {
+			mt.getAddProperties().put("SOAPAction", action);
+		}
+	}
+
+	/*
+	 * Propagate x-vp-sender-id as an outbound http property.
+	 */
+	private void propagateSenderIdToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
+		String senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
+		mt.getAddProperties().put(X_VP_SENDER_ID, senderId);
+	}
+
+	/*
+	 * Propagate x-rivta-original-serviceconsumer-hsaid as an outbound http property.
+	 */
+	private void propagateOriginalServiceConsumerHsaIdToProducer(MuleMessage message,MessagePropertiesTransformer mt) {
+		
+		String senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
+		
+		logger.debug("Exists original sender hsa id as inbound property {}?", VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID);
+		String originalServiceconsumerHsaid = message.getProperty(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyScope.SESSION);
+		
+		if(originalServiceconsumerHsaid == null){
+			logger.debug("No, original sender hsa id does not exist, instead set original sender hsa id = sender id: {}", senderId);
+			originalServiceconsumerHsaid = senderId;
+			//Put in session scope to be able to log in EventLogger.
+			message.setProperty(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalServiceconsumerHsaid, PropertyScope.SESSION);
+		}
+		
+		//Propagate the http header to producers
+		mt.getAddProperties().put(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalServiceconsumerHsaid);
 	}
 	
 	protected int selectResponseTimeout(MuleMessage message) {

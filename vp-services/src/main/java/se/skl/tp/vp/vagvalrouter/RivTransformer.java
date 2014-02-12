@@ -22,7 +22,6 @@ package se.skl.tp.vp.vagvalrouter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -54,10 +53,6 @@ public class RivTransformer extends AbstractMessageTransformer {
 	private static Logger log = LoggerFactory.getLogger(RivTransformer.class);
 
 	private VisaVagvalsInterface vagvalAgent;
-	private Pattern pattern;
-	private String senderIdPropertyName;
-
-	private String whiteList;
 
 	static final String RIV20 = "RIVTABP20";
 	static final String RIV21 = "RIVTABP21";
@@ -73,21 +68,9 @@ public class RivTransformer extends AbstractMessageTransformer {
 	public RivTransformer() {
 		super();
 	}
-	
-	public void setWhiteList(final String whiteList) {
-		this.whiteList = whiteList;
-	}
 
 	public void setVagvalAgent(final VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
-	}
-
-	public void setSenderIdPropertyName(final String senderIdPropertyName) {
-		this.senderIdPropertyName = senderIdPropertyName;
-		this.pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
-		if (logger.isDebugEnabled()) {
-			logger.debug("senderIdPropertyName set to: " + senderIdPropertyName);
-		}
 	}
 
 	@Override
@@ -95,7 +78,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 		log.debug("Riv transformer executing");
 
-		final AddressingHelper addrHelper = new AddressingHelper(msg, vagvalAgent, pattern, this.whiteList);
+		final AddressingHelper addrHelper = new AddressingHelper(msg, vagvalAgent);
 
 		/*
 		 * Check if virtualized service is a 2.0 service

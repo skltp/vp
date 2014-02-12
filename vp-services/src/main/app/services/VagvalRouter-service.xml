@@ -25,13 +25,23 @@
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
     xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
     xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 		http://www.mulesoft.org/schema/mule/core 	http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/cxf 	http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
 
     <flow name="vagval-dynamic-routing-flow" >
-
+    
+    	<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable">
+    		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+            <spring:property name="whiteList" value="${IP_WHITE_LIST}" />
+    	</custom-transformer>
+    
+    	<!-- Save the http header x-rivta-original-serviceconsumer-hsaid in session-property originalServiceconsumerHsaid -->
+    	<set-session-variable variableName="originalServiceconsumerHsaid" value="#[message.inboundProperties.get('x-rivta-original-serviceconsumer-hsaid')]" 
+    		doc:name="Save x-rivta-original-serviceconsumer-hsaid"/>
+   
         <transformer ref="createCorrId" />
         <transformer ref="XmlToXSR" />
         <transformer ref="rivExtractor" />
@@ -46,20 +56,13 @@
                 name="vagvalAgent"
                 ref="vagvalAgent" />
 
-            <spring:property
-                name="senderIdPropertyName"
-                value="${VAGVALROUTER_SENDERID}" />
-
 			<!-- Default value for response timeout is set in VagvalRouter -->
             <spring:property
                 name="responseTimeout"
                 value="${SERVICE_TIMEOUT_MS}" />
 
-            <spring:property
-                name="whiteList"
-                value="${IP_WHITE_LIST}" />
         </custom-processor>
-        
+              
         <response>
             <transformer ref="exceptionTransformer" />
             <object-to-string-transformer /> 

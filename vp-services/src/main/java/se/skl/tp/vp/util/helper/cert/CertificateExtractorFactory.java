@@ -27,8 +27,8 @@ import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.VPHelperSupport;
+import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 /**
  * Create a CertificateExtractor based on the mule message.
@@ -36,9 +36,14 @@ import se.skl.tp.vp.util.helper.VPHelperSupport;
 public class CertificateExtractorFactory extends VPHelperSupport {
 
 	private static Logger log = LoggerFactory.getLogger(CertificateExtractorFactory.class);
+	
+	private Pattern pattern;
+	private String whiteList;
 
 	public CertificateExtractorFactory(MuleMessage muleMessage, Pattern pattern, String whiteList) {
-		super(muleMessage, pattern, whiteList);
+		super(muleMessage);
+		this.pattern = pattern;
+		this.whiteList = whiteList;
 	}
 
 	/**
@@ -60,7 +65,15 @@ public class CertificateExtractorFactory extends VPHelperSupport {
 	}
 
 	private boolean isReverseProxy() {
-		return this.getMuleMessage().getProperty(VPUtil.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND) != null;
+		return this.getMuleMessage().getProperty(VagvalRouter.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND) != null;
+	}
+	
+	public Pattern getPattern() {
+		return this.pattern;
+	}
+	
+	public String getWhiteList() {
+		return this.whiteList;
 	}
 
 }

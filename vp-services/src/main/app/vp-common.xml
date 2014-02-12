@@ -135,12 +135,6 @@
         <spring:property
             name="vagvalAgent"
             ref="vagvalAgent" />
-        <spring:property
-            name="senderIdPropertyName"
-            value="${VAGVALROUTER_SENDERID}" />
-        <spring:property
-            name="whiteList"
-            value="${IP_WHITE_LIST}" />
    </custom-transformer>
 	
 	<custom-transformer name="exceptionTransformer" class="se.skl.tp.vp.vagvalrouter.ExceptionTransformer"/>
@@ -151,40 +145,30 @@
     <custom-transformer name="logReqIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="xreq-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
     
     <custom-transformer name="logReqOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="xreq-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
 
     <custom-transformer name="logRespIn" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="xresp-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
 
     <custom-transformer name="logRespOut" class="se.skl.tp.vp.util.LogTransformer">
 		<spring:property name="logType"  value="xresp-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-		<spring:property name="whiteList" value="${IP_WHITE_LIST}" />
     </custom-transformer>
     
     <message-properties-transformer name="filterResponseHeaders" scope="outbound">
-	    <add-message-property key="x-vp-correlation-id" value="#[groovy:message.getSessionProperty('soitoolkit_correlationId', 'none')]" />
 	    <delete-message-property key="SOAPAction" />
 	    <delete-message-property key="MULE_CORRELATION_GROUP_SIZE" />
 	    <delete-message-property key="MULE_CORRELATION_ID" />   	    	    
 	    <delete-message-property key="MULE_ENCODING" />
 	   	<delete-message-property key="http.method" />
 	    <delete-message-property key="http.status" />
-	    <delete-message-property key="senderid" />
 	    <delete-message-property key="LOCAL_CERTIFICATES" />
 	    <delete-message-property key="PEER_CERTIFICATES" />
 	</message-properties-transformer>

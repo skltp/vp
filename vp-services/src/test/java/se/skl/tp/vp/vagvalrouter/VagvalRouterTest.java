@@ -28,7 +28,6 @@ import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createRouting;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -79,7 +78,7 @@ public class VagvalRouterTest {
 		vagvalInput.serviceNamespace = "{urn:riv13606:v1}RIV";
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		helper = new AddressingHelper(msg, this.vagvalAgent, Pattern.compile("OU=([^,]+)"), null);
+		helper = new AddressingHelper(msg, this.vagvalAgent);
 	}
 
 	@Test
@@ -123,7 +122,7 @@ public class VagvalRouterTest {
 		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
 		
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		AddressingHelper myHelper = new AddressingHelper(msg, vagvalAgent, Pattern.compile("OU=([^,]+)"), null);
+		AddressingHelper myHelper = new AddressingHelper(msg, vagvalAgent);
 		
 		// Perform the test and ensure that we get a "VP008 no contact..." error message
 		try {

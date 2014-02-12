@@ -31,7 +31,7 @@ import java.security.cert.X509Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 /**
  * 
@@ -103,7 +103,7 @@ public class PemConverter {
 
 	static boolean isPEMCertificate(Object certificate) {
 		if (certificate != null && certificate instanceof String && containsCorrectPemHeaders((String) certificate)) {
-			log.debug("Found possible PEM-encoded certificate in httpheader {}", VPUtil.REVERSE_PROXY_HEADER_NAME);
+			log.debug("Found possible PEM-encoded certificate in httpheader {}", VagvalRouter.REVERSE_PROXY_HEADER_NAME);
 			return true;
 		}
 		return false;
@@ -117,7 +117,7 @@ public class PemConverter {
 
 	static boolean isX509Certificate(Object certificate) {
 		if (certificate instanceof X509Certificate) {
-			log.debug("Found X509Certificate in httpheader: {}", VPUtil.REVERSE_PROXY_HEADER_NAME);
+			log.debug("Found X509Certificate in httpheader: {}", VagvalRouter.REVERSE_PROXY_HEADER_NAME);
 			return true;
 		}
 		return false;

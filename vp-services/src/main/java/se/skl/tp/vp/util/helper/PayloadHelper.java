@@ -37,7 +37,7 @@ import se.skl.tp.vp.exceptions.VpTechnicalException;
 public class PayloadHelper extends VPHelperSupport {
 
 	public PayloadHelper(MuleMessage muleMessage) {
-		super(muleMessage, null, null);
+		super(muleMessage);
 	}
 
 	/**

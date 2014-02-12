@@ -31,13 +31,12 @@ import se.skl.tjanst1.wsdl.Product;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
+import se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger;
 
 public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 
-	private static final String NOT_AUHTORIZED_CONSUMER_HSAID = "some-not-authorized-consumer-hsaid";
-	private static final String AUHTORIZED_CONSUMER_HSAID = "some-authorized-consumer-hsaid";
+	private static final String AUHTORIZED_CONSUMER_HSAID = "tp";
 	private static final String PRODUCT_ID = "SW123";
-	private static final String PRODUCT_ID_EXCEPTION = "Exception";
 	private static final String TJANSTE_ADRESS = "https://localhost:20000/vp/tjanst1";
 	private static final String LOGICAL_ADDRESS = "vp-test-producer";
 	
@@ -51,6 +50,13 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 
+		/*
+		 * FIXME: This tests run in eclipse does not use the test data that is setup below. Instead it depends on the
+		 * case that a .tk.localCache.test exists with correct test data. In case this local file is
+		 * missing or it contains wrong data, the test fails!!
+		 * 
+		 * When running tests in maven however it seems as this test data is used?
+		 */
 		VagvalMockInputRecord vi_ORIGINAL_CONSUMER = new VagvalMockInputRecord();
 		vi_ORIGINAL_CONSUMER.receiverId = LOGICAL_ADDRESS;
 		vi_ORIGINAL_CONSUMER.senderId = AUHTORIZED_CONSUMER_HSAID;
@@ -78,40 +84,28 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 		}
 	}
 
-	public void testAuthorizedOriginalConsumer() throws Exception {
+	public void testOriginalConsumerIsSetToSameAsSenderIfNotProvided() throws Exception {
 		
 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_VP_CONSUMER_ID, AUHTORIZED_CONSUMER_HSAID);
+    	
+    	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+		assertEquals(PRODUCT_ID, p.getId());
+		
+		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
+		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
+	}
+	
+	public void testOriginalConsumerIsForwardedIfProvided() throws Exception {
+		
+		final String provicedOriginalServiceConsumerHsaId = "HSA-ID-ORGINALCONSUMER";
+		
+		Map<String, String> properties = new HashMap<String, String>();
+    	properties.put(VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, provicedOriginalServiceConsumerHsaId);
 
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());
-	}
-	
-	public void testNotAuthorizedOriginalConsumer() throws Exception {
 		
- 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_VP_CONSUMER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
-
-    	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:skl:tjanst1:rivtabp20, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
-    	}
+		assertEquals(provicedOriginalServiceConsumerHsaId, VpTestProducerLogger.getLatestRivtaOriginalSenderId());
+		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
 	}
-	
-	public void testProducerThrowsCorrectSoapFault() throws Exception {
-		
- 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_VP_CONSUMER_ID, AUHTORIZED_CONSUMER_HSAID);
-
-    	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID_EXCEPTION, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("<faultcode>soap:Server</faultcode>"));
-    		assertTrue(ex.getMessage().contains("<faultstring>PP01 Product Does Not Exist</faultstring>"));
-    	}
-	}
-	
 }

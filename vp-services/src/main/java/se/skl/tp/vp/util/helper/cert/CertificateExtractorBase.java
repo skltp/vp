@@ -38,9 +38,14 @@ import se.skl.tp.vp.util.helper.VPHelperSupport;
 public class CertificateExtractorBase extends VPHelperSupport {
 
 	private static Logger log = LoggerFactory.getLogger(CertificateExtractorBase.class);
+	
+	private Pattern pattern;
+	private String whiteList;
 
 	public CertificateExtractorBase(MuleMessage muleMessage, Pattern pattern, String whiteList) {
-		super(muleMessage, pattern, whiteList);
+		super(muleMessage);
+		this.pattern = pattern;
+		this.whiteList = whiteList;
 	}
 
 	String extractSenderIdFromCertificate(final X509Certificate certificate) {
@@ -57,6 +62,14 @@ public class CertificateExtractorBase extends VPHelperSupport {
 
 		final String principalName = certificate.getSubjectX500Principal().getName();
 		return extractSenderFromPrincipal(principalName);
+	}
+	
+	public Pattern getPattern() {
+		return this.pattern;
+	}
+	
+	public String getWhiteList() {
+		return this.whiteList;
 	}
 
 	private String convertFromHexToString(final String hexString) {

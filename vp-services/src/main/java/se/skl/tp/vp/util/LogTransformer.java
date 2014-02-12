@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
@@ -39,10 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
-
-import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
-import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
 
 /**
  * Transformer used to log messages passing a specific endpoint using the
@@ -59,25 +54,10 @@ public class LogTransformer extends AbstractMessageTransformer {
 	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
 
 	private final EventLogger eventLogger;
-
-	private Pattern pattern;
-	private String senderIdPropertyName;
-	private String whiteList;
-
 	
 	public LogTransformer() {
 		super();
 		this.eventLogger = new EventLogger();
-	}
-
-
-	public void setWhiteList(final String whiteList) {
-		this.whiteList = whiteList;
-	}
-
-	public void setSenderIdPropertyName(String senderIdPropertyName) {
-		this.senderIdPropertyName = senderIdPropertyName;
-		pattern = Pattern.compile(this.senderIdPropertyName + VPUtil.CERT_SENDERID_PATTERN);
 	}
 
 	//
@@ -165,19 +145,11 @@ public class LogTransformer extends AbstractMessageTransformer {
 			// FIXME: Added from ST v0.4.1
 			Map<String, String> evaluatedExtraInfo = evaluateMapInfo(extraInfo, message);
 
-			/*
-			 * Fetch senderid from certificate and append it as extra info
-			 */
+			
 			if (evaluatedExtraInfo == null) {
 				evaluatedExtraInfo = new HashMap<String, String>();
 			}
 			
-			String senderId = (String) message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
-
-			if (senderId == null) {
-				senderId = VPUtil.getSenderId(message, whiteList, pattern);
-			} 	
-
 			evaluatedExtraInfo.put("source", getClass().getName());
 			// producer elapsed time
 			ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_ENDPOINT);

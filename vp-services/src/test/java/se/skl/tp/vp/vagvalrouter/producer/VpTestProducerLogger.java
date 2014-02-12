@@ -20,6 +20,8 @@
  */
 package se.skl.tp.vp.vagvalrouter.producer;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Map;
 
 import org.mule.api.MuleMessage;
@@ -33,18 +35,48 @@ import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 public class VpTestProducerLogger extends AbstractMessageTransformer {
 
 	private static final Logger log = LoggerFactory.getLogger(VpTestProducerLogger.class);
+	
+	private static String latestSenderId = null;
+	private static String latestRivtaOriginalSenderId = null;
+	private static String latestUserAgent = null;
 
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
-
+		
 		@SuppressWarnings("unchecked")
 		Map<String, Object> httpHeaders = (Map<String, Object>)message.getInboundProperty("http.headers");
 		
-		Object orgConsumer = httpHeaders.get(VagvalRouter.X_VP_CONSUMER_ID);
-
-		log.info("Test producer called with {}: {}", VagvalRouter.X_VP_CONSUMER_ID, orgConsumer);
-
+		//Sender and original sender
+		String rivtaOriginalSenderId = (String)httpHeaders.get(VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID);
+		String vpSenderId = (String)httpHeaders.get(VagvalRouter.X_VP_SENDER_ID);
+		assertNotNull(vpSenderId);
+		assertNotNull(rivtaOriginalSenderId);
+	
+		//Should these headers exist, they are set in se.skl.tp.vp.vagvalrouter.VagvalRouter?
+		String userAgent = (String)httpHeaders.get("User-Agent");	
+		assertNotNull(userAgent);
+			
+		log.info("Test producer called with {}: {}", VagvalRouter.X_VP_SENDER_ID, vpSenderId);
+		latestSenderId = vpSenderId;
+	
+		log.info("Test producer called with {}: {}", VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, rivtaOriginalSenderId);
+		latestRivtaOriginalSenderId = rivtaOriginalSenderId;
+		
+		log.info("Test producer called with {}: {}", "User-Agent", userAgent);
+		latestUserAgent = userAgent;
+		
 		return message;
 	}
+	
+	public static String getLatestSenderId() {
+		return latestSenderId;
+	}
 
+	public static String getLatestRivtaOriginalSenderId() {
+		return latestRivtaOriginalSenderId;
+	}
+
+	public static String getLatestUserAgent() {
+		return latestUserAgent;
+	}
 }
