@@ -52,8 +52,12 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 		log.debug("Extracting from http header...");
 
-		// Check whitelist (throws an exception if not ok)
-		VPUtil.checkCallerOnWhiteList(getMuleMessage(), getWhiteList(), VagvalRouter.REVERSE_PROXY_HEADER_NAME);
+		// Check whitelist
+		String callersIp = VPUtil.extractIpAddress(getMuleMessage());
+		if(!VPUtil.isCallerOnWhiteList(callersIp, getWhiteList(), VagvalRouter.REVERSE_PROXY_HEADER_NAME)){
+			throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses. IP-address: " 
+					+ callersIp + ". HTTP header that caused checking: " + VagvalRouter.REVERSE_PROXY_HEADER_NAME);
+		}
 
 		log.debug("Extracting X509Certificate senderId from header");
 

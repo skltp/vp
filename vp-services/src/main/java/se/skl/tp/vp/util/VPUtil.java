@@ -76,7 +76,10 @@ public final class VPUtil {
 		return (qname == null) ? null : qname.getNamespaceURI();
 	}
 	
-	public static String extractIpAddress(final String remoteAddress) {
+	public static String extractIpAddress(final MuleMessage message) {
+		String remoteAddress = message.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		remoteAddress = remoteAddress.trim();
+		
 		final String s = remoteAddress.split(":")[0];
 		return s.substring(1, s.length());
 	}
@@ -94,14 +97,19 @@ public final class VPUtil {
 		return s.trim().length() == 0;
 	}
 	
-	public static void checkCallerOnWhiteList(MuleMessage message, String whiteList, String httpHeader) throws VpSemanticException {
-
-		String ip = VPUtil.extractIpAddress((String) message.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND));
-		ip = ip.trim();
+	/**
+	 * Check if the calling ip address is on accepted list of ip addresses or subdomains.
+	 * 
+	 * @param callerIp The callers ip
+	 * @param whiteList The comma separated list of ip addresses or subdomains 
+	 * @param httpHeader The http header causing the check in the white list
+	 * @return true if caller is on whitelist
+	 */
+	public static boolean isCallerOnWhiteList(String callerIp, String whiteList, String httpHeader) {
 		
-		log.debug("Check if caller {} is in white list berfore using HTTP header {}...", ip, httpHeader);
+		log.debug("Check if caller {} is in white list berfore using HTTP header {}...", callerIp, httpHeader);
 
-		if (VPUtil.isWhitespace(ip)) {
+		if (VPUtil.isWhitespace(callerIp)) {
 			throw new VpSemanticException(
 				"Could not extract the IP address of the caller. Cannot check whether caller is on the white list. HTTP header that caused checking: " + httpHeader);
 		}
@@ -110,18 +118,16 @@ public final class VPUtil {
 			throw new VpSemanticException(
 				"Could not check whether the caller is on the white list because the white list was empty. HTTP header that caused checking: " + httpHeader);
 		}
-
-		final String[] ips = whiteList.split(",");
-
-		for (final String s : ips) {
-			if (s.trim().equals(ip)) {
-				log.debug("Caller found in white list");
-				return;
+		
+		for (String ipAddress : whiteList.split(",")) {
+			if(callerIp.startsWith(ipAddress)){
+				log.debug("Caller matches ip address/subdomain in white list");
+				return true;
 			}
 		}
 
-		log.debug("Caller NOT found in white list");
-		throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses. IP-address: " + ip + ". HTTP header that caused checking: " + httpHeader);
+		log.warn("Caller was not on the white list of accepted IP-addresses. IP-address: {}, accepted IP-addresses: {}", callerIp, whiteList);
+		return false;
 	}
 	
 }

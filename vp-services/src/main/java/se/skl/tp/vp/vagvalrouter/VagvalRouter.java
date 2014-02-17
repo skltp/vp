@@ -195,10 +195,10 @@ public class VagvalRouter extends AbstractRecipientList {
 			// Do the actual routing
 			replyEvent = super.route(event);
 		} finally {
-		    long endpointTime =  ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
-		    
-		    //Make sure producer response time (endpoint time) is returned to sender
-		    replyEvent.getMessage().setProperty(X_SKLTP_PRODUCER_RESPONSETIME, endpointTime, PropertyScope.OUTBOUND); 
+		    if(replyEvent != null){
+		    	long endpointTime =  ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
+		    	replyEvent.getMessage().setProperty(X_SKLTP_PRODUCER_RESPONSETIME, endpointTime, PropertyScope.OUTBOUND);
+		    }
 		}
 
 		synchronized (statistics) {

@@ -78,7 +78,11 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 			 * ip addresses is needed. VPUtil.checkCallerOnWhiteList throws VpSemanticException in
 			 * case ip address is not in whitelist.
 			 */
-			VPUtil.checkCallerOnWhiteList(message, whiteList, VPUtil.SENDER_ID);
+			String callersIp = VPUtil.extractIpAddress(message);
+			if(!VPUtil.isCallerOnWhiteList(callersIp, whiteList, VPUtil.SENDER_ID)){
+				throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses. IP-address: " 
+						+ callersIp + ". HTTP header that caused checking: " + VPUtil.SENDER_ID);
+			}
 
 		} else {
 			/*
