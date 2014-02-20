@@ -76,8 +76,9 @@ public class EventLogger {
 
 	private static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
 	
-	/** Handle to the integration components configuration file; vp-config.properties */
-    private static final RecursiveResourceBundle rrb = new RecursiveResourceBundle("vp-config");
+	/** Handle to the integration components configuration file; vp-config.properties and/or 
+	 * vp-config-override.properties */
+    private static final RecursiveResourceBundle rrb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
 	// Creating JaxbUtil objects (i.e. JaxbContext objects)  are costly, so we only keep one instance.
 	// According to https://jaxb.dev.java.net/faq/index.html#threadSafety this should be fine since they are thread safe!

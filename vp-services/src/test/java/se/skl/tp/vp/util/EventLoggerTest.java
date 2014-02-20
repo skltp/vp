@@ -53,8 +53,15 @@ public class EventLoggerTest {
      */
     @Test
     public void testPropertyValueFound() {
-        assertEquals("SOITOOLKIT.LOG.STORE", eventLogger.getPropertyValue(EventLogger.PROPERTY_KEY_LOG_INFO_QUEUE));
         assertEquals("SOITOOLKIT.LOG.ERROR", eventLogger.getPropertyValue(EventLogger.PROPERTY_KEY_LOG_ERROR_QUEUE));
+    }
+    
+    /**
+     * A happy days to verify values in vp-config-override.properties really override
+     */
+    @Test
+    public void testOverriddenPropertyValueFound() {
+        assertEquals("SOITOOLKIT.LOG.STORE.OVERRIDE", eventLogger.getPropertyValue(EventLogger.PROPERTY_KEY_LOG_INFO_QUEUE));
     }
 
     /**
