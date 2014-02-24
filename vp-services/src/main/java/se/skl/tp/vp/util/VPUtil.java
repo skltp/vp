@@ -120,7 +120,7 @@ public final class VPUtil {
 		}
 		
 		for (String ipAddress : whiteList.split(",")) {
-			if(callerIp.startsWith(ipAddress)){
+			if(callerIp.startsWith(ipAddress.trim())){
 				log.debug("Caller matches ip address/subdomain in white list");
 				return true;
 			}

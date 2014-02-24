@@ -50,6 +50,14 @@ public class VPUtilTest {
 	}
 	
 	@Test
+	public void isCallerOnWhiteListOkWhenWhiteListContainsLeadingWiteSpaces(){
+		
+		final String WHITE_LIST_WITH_WHITE_SPACE="127.0.0.1, 127.0.0.2";
+		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.2 ", WHITE_LIST_WITH_WHITE_SPACE, VPUtil.SENDER_ID);
+		assertTrue(callerOnWhiteList);
+	}		
+	
+	@Test
 	public void isCallerOnWhiteListIpDoesNotMatch(){
 				
 		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("126.0.0.1", WHITE_LIST, VPUtil.SENDER_ID);
