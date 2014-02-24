@@ -59,6 +59,14 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
 		this.eventLogger.setJaxbToXml(jaxbToXml);
 	}
 	
+    /**
+     * Set the queue name for log error messages.
+     * 
+     * @param queueName
+     */
+    public void setLogErrorQueueName(String queueName) {
+        this.eventLogger.setLogErrorQueueName(queueName);
+    }
 	
 	//
 	static String nvl(String s) {

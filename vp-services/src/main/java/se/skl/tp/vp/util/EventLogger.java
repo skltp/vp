@@ -61,7 +61,6 @@ import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType.BusinessCont
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
 import org.soitoolkit.commons.mule.util.MuleUtil;
-import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 import org.soitoolkit.commons.mule.util.XmlUtil;
 
 
@@ -76,20 +75,10 @@ public class EventLogger {
 
 	private static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
 	
-	/** Handle to the integration components configuration file; vp-config.properties and/or 
-	 * vp-config-override.properties */
-    private static final RecursiveResourceBundle rrb = new RecursiveResourceBundle("vp-config","vp-config-override");
-
 	// Creating JaxbUtil objects (i.e. JaxbContext objects)  are costly, so we only keep one instance.
 	// According to https://jaxb.dev.java.net/faq/index.html#threadSafety this should be fine since they are thread safe!
 	private static final JaxbUtil JAXB_UTIL = new JaxbUtil(LogEvent.class);
 	
-	/** Property key for the log info queue */
-    public static final String PROPERTY_KEY_LOG_INFO_QUEUE = "SOITOOLKIT_LOG_INFO_QUEUE";
-
-    /** Property key for the log error queue */
-    public static final String PROPERTY_KEY_LOG_ERROR_QUEUE = "SOITOOLKIT_LOG_ERROR_QUEUE";
-
 	private static final String MSG_ID = "soi-toolkit.log";
 	private static final String LOG_EVENT_INFO = "logEvent-info";
 	private static final String LOG_EVENT_ERROR = "logEvent-error";
@@ -109,6 +98,10 @@ public class EventLogger {
 
 	private String serverId = null; // Can't read this one at class initialization because it is not set at that time. Can also be different for different loggers in the same JVM (e.g. multiple wars in one servlet container with shared classes?))
 	private MuleContext muleContext;
+	
+	private String logInfoQueueName = null;
+	private String logErrorQueueName = null;
+
 	
 	// Used to transform payloads that are jaxb-objects into a xml-string
 	private PayloadToStringTransformer payloadToStringTransformer;
@@ -149,28 +142,22 @@ public class EventLogger {
 		this.payloadToStringTransformer  = new PayloadToStringTransformer(jaxbToXml);
 	}
 	
-	/**
-     * Getting a property's value given a its key
-     * @param propertyKey the property key
-     * @return the value of the property or null if property wasn't found
+	 /**
+     * Specify to which queue error messages should be sent.
+     * 
+     * @param logErrorQueueName
      */
-    String getPropertyValue(String propertyKey) {
-        return rrb.getString(propertyKey);
+    public void setLogErrorQueueName(String logErrorQueueName) {
+        this.logErrorQueueName = logErrorQueueName;
     }
 
     /**
-     * Looking up a queue name given a property key
-     * @param propertyKey the property key
-     * @return a queue name
-     * @throws throws a RuntimeException if queue name cannot be found 
+     * Specify to which queue info messages should be sent.
+     * 
+     * @param logInfoQueueName
      */
-    String getQueueName(String propertyKey) {
-        String queueName = getPropertyValue(propertyKey);
-        if (queueName == null || queueName.length() == 0) {
-            throw new RuntimeException("Unable to get queue name for property " + propertyKey);
-        }
-
-        return queueName;
+    public void setLogInfoQueueName(String logInfoQueueName) {
+        this.logInfoQueueName = logInfoQueueName;
     }
 
 	//
@@ -235,17 +222,17 @@ public class EventLogger {
 	
 	private void dispatchInfoEvent(LogEvent logEvent) {
 		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent(getQueueName(PROPERTY_KEY_LOG_INFO_QUEUE), msg);
+		dispatchEvent(logInfoQueueName, msg);
 	}
 	
 	private void dispatchDebugEvent(LogEvent logEvent) {
 		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent(getQueueName(PROPERTY_KEY_LOG_INFO_QUEUE), msg);
+		dispatchEvent(logInfoQueueName, msg);
 	}
 
 	private void dispatchErrorEvent(LogEvent logEvent) {
 		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent(getQueueName(PROPERTY_KEY_LOG_ERROR_QUEUE), msg);
+		dispatchEvent(logErrorQueueName, msg);
 	}
 
 	private void dispatchEvent(String queue, String msg) {

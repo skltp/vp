@@ -36,6 +36,7 @@
     	<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable">
     		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
             <spring:property name="whiteList" value="${IP_WHITE_LIST}" />
+            <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
     	</custom-transformer>
     
     	<!-- Save the http header x-rivta-original-serviceconsumer-hsaid in session-property originalServiceconsumerHsaid -->
@@ -60,6 +61,8 @@
             <spring:property
                 name="responseTimeout"
                 value="${SERVICE_TIMEOUT_MS}" />
+                
+            <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
 
         </custom-processor>
               
@@ -71,6 +74,7 @@
         
         <custom-exception-strategy class="se.skl.tp.vp.util.VPExceptionStrategy" >
 			<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+			<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
         </custom-exception-strategy>
         
     </flow>

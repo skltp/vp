@@ -59,6 +59,24 @@ public class LogTransformer extends AbstractMessageTransformer {
 		super();
 		this.eventLogger = new EventLogger();
 	}
+	
+	/**
+     * Set the queue name for log error messages.
+     * 
+     * @param queueName
+     */
+    public void setLogErrorQueueName(String queueName) {
+        this.eventLogger.setLogErrorQueueName(queueName);
+    }
+
+    /**
+     * Set the queue name for log info messages.
+     * 
+     * @param queueName
+     */
+    public void setLogInfoQueueName(String queueName) {
+        this.eventLogger.setLogInfoQueueName(queueName);
+    }
 
 	//
 	@Override
