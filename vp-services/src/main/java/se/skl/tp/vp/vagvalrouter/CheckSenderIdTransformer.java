@@ -48,6 +48,12 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 	
 	private Pattern pattern;
 	
+	private String vpInstanceId;
+	
+	public void setVpInstanceId(String vpInstanceId) {
+		this.vpInstanceId = vpInstanceId;
+	}
+
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
 	}
@@ -66,23 +72,27 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
      */
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
-    	
-		log.debug("Exists x-vp-sender-id as inbound property {}?", VagvalRouter.X_VP_SENDER_ID);
+    		
 		String senderId = message.getProperty(VagvalRouter.X_VP_SENDER_ID, PropertyScope.INBOUND, null);
+		String senderVpInstanceId = message.getProperty(VagvalRouter.X_VP_INSTANCE_ID, PropertyScope.INBOUND, null);
 
-		if (senderId != null) {
+		log.debug("Is inbound properties x-vp-sender-id={} and x-vp-instance-id={} valid as identifier of consumer?", senderId, senderVpInstanceId);
+		
+		if (senderId != null && vpInstanceId.equals(senderVpInstanceId)) {
 			log.debug("Yes, sender id extracted from inbound property {}: {}, check whitelist!", VagvalRouter.X_VP_SENDER_ID, senderId);
 
 			/*
-			 * x-vp-sender-id exist as inbound property, a mandatory check against the whitelist of
-			 * ip addresses is needed. VPUtil.checkCallerOnWhiteList throws VpSemanticException in
-			 * case ip address is not in whitelist.
+			 * x-vp-sender-id exist as inbound property and x-vp-instance-id macthes this VP instance, a mandatory check against the whitelist of
+			 * ip addresses is needed. VPUtil.checkCallerOnWhiteList throws VpSemanticException in case ip address is not in whitelist.
 			 */
 			String callersIp = VPUtil.extractIpAddress(message);
 			if(!VPUtil.isCallerOnWhiteList(callersIp, whiteList, VPUtil.SENDER_ID)){
 				throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses. IP-address: " 
 						+ callersIp + ". HTTP header that caused checking: " + VPUtil.SENDER_ID);
 			}
+			
+			// Make sure the sender id is set in session scoped property for authorization and logging
+			message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
 
 		} else {
 			/*
@@ -99,14 +109,12 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 				senderId = certHelper.extractSenderIdFromCertificate();
 				log.debug("Sender id extracted from certificate {}", senderId);
 				
+				// Make sure the sender id is set in session scoped property for authorization and logging
+				message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);	
+				
 			} catch (final VpSemanticException e) {
 				log.warn("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
 			} 	
-		}
-		
-		// Make sure the sender id is set in session scoped property for e.g authorization and logging
-		if (senderId != null) {
-			message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
 		}
           
         return message;

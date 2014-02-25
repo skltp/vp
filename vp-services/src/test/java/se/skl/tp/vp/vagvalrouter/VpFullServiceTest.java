@@ -135,14 +135,39 @@ public class VpFullServiceTest extends FunctionalTestCase {
 		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
 		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
 		assertEquals("SKLTP VP/2.0", VpTestProducerLogger.getLatestUserAgent());
+		assertEquals("THIS_VP_INSTANCE_ID", VpTestProducerLogger.getLatestVpInstanceId());
+	}
+	
+	public void testInvalidVpInstanceIdTriggersCheckInConsumersCertificate() throws Exception {
+		
+		final String OTHER_VP_INSTANCE_ID = "OTHER_VP_INSTANCE_ID";
+		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
+		
+		final String PROVIDED_SENDER_ID = "SENDER_ID";
+		final String CONSUMERS_SENDER_ID_IN_CERT = "tp";
+		
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(VagvalRouter.X_VP_INSTANCE_ID, OTHER_VP_INSTANCE_ID);
+		properties.put(VagvalRouter.X_VP_SENDER_ID, PROVIDED_SENDER_ID);
+
+    	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+		
+		assertEquals(CONSUMERS_SENDER_ID_IN_CERT, VpTestProducerLogger.getLatestSenderId());
+		assertEquals(THIS_VP_INSTANCE_ID, VpTestProducerLogger.getLatestVpInstanceId());
 	}
 	
 	public void testVP007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
 	
 		final String NOT_AUHTORIZED_CONSUMER_HSAID = "UNKNOWN_CONSUMER";
+		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
 		
+		/*
+		 * Provide a valid vp instance id to trigger check if provided http header x-vp-sender-id
+		 * is a authorized consumer, otherwise sender id is extracted from certificate.
+		 */
  		Map<String, String> properties = new HashMap<String, String>();
     	properties.put(VagvalRouter.X_VP_SENDER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
+    	properties.put(VagvalRouter.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 
     	try {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);

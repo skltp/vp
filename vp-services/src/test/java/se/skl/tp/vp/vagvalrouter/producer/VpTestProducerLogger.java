@@ -39,6 +39,7 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 	private static String latestSenderId = null;
 	private static String latestRivtaOriginalSenderId = null;
 	private static String latestUserAgent = null;
+	private static String latestVpInstanceId = null;
 
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
@@ -49,6 +50,8 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 		//Sender and original sender
 		String rivtaOriginalSenderId = (String)httpHeaders.get(VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID);
 		String vpSenderId = (String)httpHeaders.get(VagvalRouter.X_VP_SENDER_ID);
+		String vpInstanceId = (String)httpHeaders.get(VagvalRouter.X_VP_INSTANCE_ID);
+		assertNotNull(vpInstanceId);
 		assertNotNull(vpSenderId);
 		assertNotNull(rivtaOriginalSenderId);
 	
@@ -58,6 +61,9 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 			
 		log.info("Test producer called with {}: {}", VagvalRouter.X_VP_SENDER_ID, vpSenderId);
 		latestSenderId = vpSenderId;
+		
+		log.info("Test producer called with {}: {}", VagvalRouter.X_VP_INSTANCE_ID, vpInstanceId);
+		latestVpInstanceId = vpInstanceId;
 	
 		log.info("Test producer called with {}: {}", VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, rivtaOriginalSenderId);
 		latestRivtaOriginalSenderId = rivtaOriginalSenderId;
@@ -78,5 +84,9 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 
 	public static String getLatestUserAgent() {
 		return latestUserAgent;
+	}
+
+	public static String getLatestVpInstanceId() {
+		return latestVpInstanceId;
 	}
 }

@@ -81,6 +81,15 @@ public class VagvalRouter extends AbstractRecipientList {
 	public static final String X_VP_SENDER_ID = "x-vp-sender-id";
 	
 	/**
+	 * HTTP header x-vp-instance-id, carrying information regarding the VP instance id, either incoming requests
+	 * or outgoing. This header can be used by other VP instances to make sure VP internal http headers are not
+	 * processed.
+	 * 
+	 * @since VP-2.2.4
+	 */
+	public static final String X_VP_INSTANCE_ID = "x-vp-instance-id";
+	
+	/**
 	 * Incoming HTTP Header x-vp-auth-cert, carrying a X509 certificate, used when implementing a reverse proxy.
 	 * 
 	 * @since VP-1.3
@@ -97,6 +106,12 @@ public class VagvalRouter extends AbstractRecipientList {
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 
 	private AddressingHelper addrHelper;
+	
+	private String vpInstanceId;
+	
+	public void setVpInstanceId(String vpInstanceId) {
+		this.vpInstanceId = vpInstanceId;
+	}
 
 	/**
 	 * Headers to be blocked when invoking producer.
@@ -232,7 +247,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		MessagePropertiesTransformer mt = createOutboundTransformer();	
 		
-		propagateSenderIdToProducer(message, mt);
+		propagateSenderIdAndVpInstanceIdToProducer(message, mt);
 		propagateOriginalServiceConsumerHsaIdToProducer(message, mt);
 		propagateSoapActionToProducer(message, mt);
 
@@ -262,11 +277,13 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 
 	/*
-	 * Propagate x-vp-sender-id as an outbound http property.
+	 * Propagate x-vp-sender-id and x-vp-instance-id from this VP instance as an outbound http property as they are both needed
+	 * togehter for another VP to determine if x-vp-sender-id is valid to use.
 	 */
-	private void propagateSenderIdToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
+	private void propagateSenderIdAndVpInstanceIdToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
 		String senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
 		mt.getAddProperties().put(X_VP_SENDER_ID, senderId);
+		mt.getAddProperties().put(X_VP_INSTANCE_ID, vpInstanceId);
 	}
 
 	/*
