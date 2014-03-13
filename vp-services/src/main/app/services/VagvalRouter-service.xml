@@ -26,10 +26,12 @@
     xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
     xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 		http://www.mulesoft.org/schema/mule/core 	http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-		http://www.mulesoft.org/schema/mule/cxf 	http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
+		http://www.mulesoft.org/schema/mule/cxf 	http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd" >
 
     <flow name="vagval-dynamic-routing-flow" >
     
@@ -72,10 +74,16 @@
             <transformer ref="logRespOut" />
         </response>
         
-        <custom-exception-strategy class="se.skl.tp.vp.util.VPExceptionStrategy" >
-			<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-			<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
-        </custom-exception-strategy>
+        <catch-exception-strategy>
+        	
+        	<custom-transformer class="se.skl.tp.vp.vagvalrouter.ExceptionLoggerTransformer">
+        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+				<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        	</custom-transformer>
+        	
+        	<custom-transformer class="se.skl.tp.vp.vagvalrouter.ExceptionMessageTransformer"/>
+        	
+        </catch-exception-strategy>
         
     </flow>
 

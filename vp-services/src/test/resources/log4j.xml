@@ -90,16 +90,16 @@
 
     <!-- Message logging using the old Mule <logger/> - element -->
     <logger name="org.mule.api.processor.LoggerMessageProcessor">
-        <level value="INFO" />
+        <level value="ERROR" />
     </logger>
 
     <!-- Message logging using the old Mule <log-component/> - element -->
     <logger name="org.mule.component.simple.LogComponent">
-        <level value="INFO" />
+        <level value="ERROR" />
     </logger>
 
     <logger name="org.soitoolkit.commons">
-		<level value="INFO" />
+		<level value="ERROR" />
 	</logger>
     
     <!--     	
@@ -115,11 +115,11 @@
 	</logger>
 		
     <logger name="se.skl.tp.vp">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
     
     <logger name="se.skl.tp.hsa">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
     
     <!-- Level INFO will give log output for reset cache to selected appender -->

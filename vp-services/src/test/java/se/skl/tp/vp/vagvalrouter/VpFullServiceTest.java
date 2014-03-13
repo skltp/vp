@@ -20,12 +20,18 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mule.tck.FunctionalTestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
 import se.skl.tjanst1.wsdl.Product;
@@ -34,7 +40,7 @@ import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 import se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger;
 
-public class VpFullServiceTest extends FunctionalTestCase {
+public class VpFullServiceTest extends AbstractTestCase {
 
 	private static final int    CLIENT_TIMEOUT_MS = 60000;
 	private static final String PRODUCT_ID = "SW123";
@@ -42,6 +48,7 @@ public class VpFullServiceTest extends FunctionalTestCase {
 	private static final String TJANSTE_ADRESS_SHORT_TIMEOUT  = "https://localhost:20000/vp/tjanst1-short-timeout";
 	private static final String TJANSTE_ADRESS_LONG_TIMEOUT   = "https://localhost:20000/vp/tjanst1-long-timeout";
 	private static final String LOGICAL_ADDRESS               = "vp-test-producer";
+	private static final String LOGICAL_ADDRESS_NOT_FOUND     = "unknown-logical-address";
 	private static final String LOGICAL_ADDRESS_NO_CONNECTION = "vp-test-producer-no-connection";
 
     private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config-override");
@@ -55,7 +62,10 @@ public class VpFullServiceTest extends FunctionalTestCase {
 	public VpFullServiceTest() {
 		super();
 		
-		setDisposeManagerPerSuite(true);
+		// Only start up Mule once to make the tests run faster...
+		// Set to false if tests interfere with each other when Mule is started
+		// only once.
+		setDisposeContextPerClass(true);
 		
 		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
@@ -89,19 +99,23 @@ public class VpFullServiceTest extends FunctionalTestCase {
 			"vp-teststubs-and-services-config.xml";
 	}
 	
-	@Override
-	protected void doSetUp() throws Exception {
+	@Before
+	public void doSetUp() throws Exception {
+		super.doSetUp();
+		
 		if (testConsumer == null) {
 			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector", CLIENT_TIMEOUT_MS);
 		}
 	}
 
+	@Test
 	public void testHappyDays() throws Exception {
 		
 		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
 		assertEquals(PRODUCT_ID, p.getId());
 	}
 
+	@Test
 	public void testShortConnectionTimeout() throws Exception {
 		
 		long ts = System.currentTimeMillis();
@@ -114,6 +128,7 @@ public class VpFullServiceTest extends FunctionalTestCase {
 		}
 	}
 
+	@Test
 	public void testLongConnectionTimeout() throws Exception {
 		
 		long ts = System.currentTimeMillis();
@@ -126,6 +141,7 @@ public class VpFullServiceTest extends FunctionalTestCase {
 		}
 	}
 	
+	@Test
 	public void testMandatoryPropertiesArePropagatedToProducer() throws Exception {
 		
 		Map<String, String> properties = new HashMap<String, String>();
@@ -138,6 +154,7 @@ public class VpFullServiceTest extends FunctionalTestCase {
 		assertEquals("THIS_VP_INSTANCE_ID", VpTestProducerLogger.getLatestVpInstanceId());
 	}
 	
+	@Test
 	public void testInvalidVpInstanceIdTriggersCheckInConsumersCertificate() throws Exception {
 		
 		final String OTHER_VP_INSTANCE_ID = "OTHER_VP_INSTANCE_ID";
@@ -156,7 +173,8 @@ public class VpFullServiceTest extends FunctionalTestCase {
 		assertEquals(THIS_VP_INSTANCE_ID, VpTestProducerLogger.getLatestVpInstanceId());
 	}
 	
-	public void testVP007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
+	@Test
+	public void vp007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
 	
 		final String NOT_AUHTORIZED_CONSUMER_HSAID = "UNKNOWN_CONSUMER";
 		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
@@ -177,6 +195,20 @@ public class VpFullServiceTest extends FunctionalTestCase {
     	}
 	}
 	
+	@Test
+	public void vp004IsThrownWhenNoLogicalAddressIsFound() throws Exception {
+		
+		Map<String, String> properties = new HashMap<String, String>();
+    	
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND, properties);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
+    	}
+	}
+	
+	@Test
 	public void testWhenProducerReturnsFaultItsPropagatedCorrectToConsumer() throws Exception {
 		
 		final String AUHTORIZED_CONSUMER_HSAID = "tp";

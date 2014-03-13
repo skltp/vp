@@ -18,38 +18,46 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.util;
+package se.skl.tp.vp.vagvalrouter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
+import se.skl.tp.vp.util.EventLogger;
+import se.skl.tp.vp.util.ExecutionTimer;
+import se.skl.tp.vp.util.VPUtil;
+
 /**
- * Logs error events on any kind of exception, and should be used for all VP services.
- * 
- * @author Peter
- * @since VP-2.0
+ * Transformer that is responsible for logging exceptions using EventLogger.
  */
-public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
-	private static final Logger log = LoggerFactory.getLogger(VPExceptionStrategy.class);
+public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
 	
-	private final EventLogger eventLogger;
+	private static final Logger log = LoggerFactory.getLogger(ExceptionLoggerTransformer.class);
+	
+	private final EventLogger eventLogger = new EventLogger();
 
-	public VPExceptionStrategy(MuleContext muleContext) {
-		super(muleContext);
-		this.eventLogger = new EventLogger(muleContext);
+	@Override
+	public Object transformMessage(MuleMessage message, String outputEncoding)
+			throws TransformerException {
+		
+		log.debug("Entering ExceptionLoggerTransformer to log exception...");
+		
+		eventLogger.setMuleContext(message.getMuleContext());	
+		logException(message.getExceptionPayload());
+		return message;
 	}
-
+	
 	/**
 	 * Setter for the jaxbToXml property
 	 * 
@@ -67,30 +75,22 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
     public void setLogErrorQueueName(String queueName) {
         this.eventLogger.setLogErrorQueueName(queueName);
     }
-	
-	//
-	static String nvl(String s) {
-		return (s == null) ? "" : s;
-	}
-
-
-	@Override
-	protected void logException(Throwable t) {
+    
+	protected void logException(ExceptionPayload exceptionPayload) {
                 
-		log.debug("Entering VPExceptionStrategy...");
-   		
 		Map<String, String> extraInfo = new HashMap<String, String>();
 		extraInfo.put("source", getClass().getName());
 		ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_ENDPOINT);
 		if (timer != null) {
 			extraInfo.put("time.producer", String.valueOf(timer.getElapsed()));
 		}
+	
+		Throwable rootException = exceptionPayload.getRootException();
 
-		MuleException muleException = ExceptionHelper.getRootMuleException(t);
-        if (muleException != null) {
+        if (rootException != null) {
 
-        	if (muleException instanceof MessagingException) {
-        		MessagingException me = (MessagingException)muleException;
+        	if (rootException instanceof MessagingException) {
+        		MessagingException me = (MessagingException)rootException;
             	
         		MuleMessage msg = me.getEvent().getMessage();
             	
@@ -105,16 +105,20 @@ public class VPExceptionStrategy extends DefaultMessagingExceptionStrategy  {
         		eventLogger.logErrorEvent(ex, msg, null, extraInfo); 
 
         	} else {
-                Map<?, ?> info = ExceptionHelper.getExceptionInfo(muleException);
-        		eventLogger.logErrorEvent(muleException, info.get("Payload"), null, extraInfo);                
+                Map<?, ?> info = ExceptionHelper.getExceptionInfo(rootException);
+        		eventLogger.logErrorEvent(rootException, info.get("Payload"), null, extraInfo);                
         	}
         	
         } else {
-    		eventLogger.logErrorEvent(t, "", null, extraInfo);
+    		eventLogger.logErrorEvent(exceptionPayload.getException(), "", null, extraInfo);
         }
         
         // stop request.
 		ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
 		log.info(ExecutionTimer.format());
+	}
+	
+	static String nvl(String s) {
+		return (s == null) ? "" : s;
 	}
 }
