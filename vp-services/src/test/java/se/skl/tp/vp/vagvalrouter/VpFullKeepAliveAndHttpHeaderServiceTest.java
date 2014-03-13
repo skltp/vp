@@ -26,18 +26,15 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpVersion;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.mule.tck.FunctionalTestCase;
 
-import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 
@@ -295,6 +292,17 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
         assertEquals(500, httppost.getStatusCode());
     }
 	
+	public void testHttp500IsReturnedForVP00xSoapFaults() throws Exception {
+		
+		/*
+		 * ExceptionMessageTransformer.java sets message.setProperty("http.status", 500, PropertyScope.OUTBOUND) to make
+		 * sure 500 is returned. This test verifies the transformer in a integrationtest.
+		 */
+		
+        PostMethod httppost = executeSoapCallUsingRequest("/vp/keep-alive-tjanst1", "testfiles/RequestTriggerVp004.xml");
+        assertEquals(500, httppost.getStatusCode());
+    }
+	
 	private PostMethod executeSoapCall(final String subUrl, final boolean doClose, final boolean doKeepAlive, final boolean version10) throws HttpException, IOException {
 		PostMethod httppost = new PostMethod(subUrl);
 		RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream("testfiles/ListProducts.xml"));
@@ -313,6 +321,15 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
         httppost.setRequestEntity(requestEntity);
         if(doClose) httppost.setRequestHeader("Connection", "close");
         if(doKeepAlive) httppost.setRequestHeader("Connection", "keep-alive");
+        client.executeMethod(httppost);
+        return httppost;
+    }
+	
+	private PostMethod executeSoapCallUsingRequest(final String subUrl, String requestFile) throws HttpException, IOException {
+        PostMethod httppost = new PostMethod(subUrl);
+        RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream(requestFile));
+        httppost.getParams().setVersion(HttpVersion.HTTP_1_1);
+        httppost.setRequestEntity(requestEntity);
         client.executeMethod(httppost);
         return httppost;
     }
