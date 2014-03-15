@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>se.skltp.vp</groupId>
 		<artifactId>vp-parent</artifactId>
-		<version>2.2.5-RC2-SNAPSHOT</version>
+		<version>2.2.5</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -60,17 +60,17 @@
 		<dependency>
 			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-schemas</artifactId>
-			<version>2.2.5-RC2-SNAPSHOT</version>
+			<version>2.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-ping-virtualisering</artifactId>
-			<version>2.2.5-RC2-SNAPSHOT</version>
+			<version>2.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-ping-test-producer</artifactId>
-			<version>2.2.5-RC2-SNAPSHOT</version>
+			<version>2.2.5</version>
 		</dependency>
 
 		<dependency>
@@ -102,7 +102,7 @@
 		<dependency>
 		  <groupId>se.skltp.vp</groupId>
 		  <artifactId>vp-hsa-cache</artifactId>
-		  <version>2.2.5-RC2-SNAPSHOT</version>
+		  <version>2.2.5</version>
 		</dependency>
     
         <dependency>
