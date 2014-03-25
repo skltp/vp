@@ -21,13 +21,10 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -134,7 +131,7 @@ public class TestDisableLogToJms extends AbstractTestCase {
 	@Test
 	public void testNoErrorLogToJmsQueue() throws Exception {
 		
-		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
 	 	
 		try {
 			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
@@ -143,6 +140,6 @@ public class TestDisableLogToJms extends AbstractTestCase {
 			// TODO: handle exception
 		}
 		
-		assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+		assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 0, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
 	}
 }

@@ -37,7 +37,6 @@ import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
 import se.skl.tjanst1.wsdl.Product;
-import se.skl.tp.vp.util.LogTransformer;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -63,6 +62,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private int long_timeout_ms = 0;
 
 	private static final String LOG_INFO_QUEUE = rb.getString("SOITOOLKIT_LOG_INFO_QUEUE");
+	private static final String LOG_ERROR_QUEUE = rb.getString("SOITOOLKIT_LOG_ERROR_QUEUE");
 	private AbstractJmsTestUtil jmsUtil = null;
 	
 	public VpFullServiceTest() {
@@ -129,11 +129,11 @@ public class VpFullServiceTest extends AbstractTestCase {
 	}
 
 	/**
-	 * Verify that VP send log events to JMS queue by default, i.e. when 
+	 * Verify that VP send info log events to JMS queue by default
 	 * @throws Exception
 	 */
 	@Test
-	public void testLogToJmsQueue() throws Exception {
+	public void testLogInfoToJmsQueue() throws Exception {
 		
 		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
 
@@ -141,6 +141,24 @@ public class VpFullServiceTest extends AbstractTestCase {
 		assertEquals(PRODUCT_ID, p.getId());
 
 		assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 2, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+	}
+	
+	/**
+	 * Verify that VP send error log events to JMS queue by default
+	 * @throws Exception
+	 */
+	@Test
+	public void testLogErrorToJmsQueue() throws Exception {
+		
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
+		
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		// TODO: handle exception
+    	}
+    	assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 1, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
 	}
 
 	@Test
