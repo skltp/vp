@@ -144,27 +144,6 @@ public class VpFullServiceTest extends AbstractTestCase {
 	}
 
 	@Test
-	public void testNoLogToJmsQueue() throws Exception {
-		
-		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
-
-		disableLogtoJmsQueue("logReqIn");
-		disableLogtoJmsQueue("logReqOut");
-		disableLogtoJmsQueue("logRespIn");
-		disableLogtoJmsQueue("logRespOut");
-		
-		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
-		assertEquals(PRODUCT_ID, p.getId());
-
-		assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
-	}
-
-	private void disableLogtoJmsQueue(String transformer) {
-		LogTransformer lt = (LogTransformer)muleContext.getRegistry().lookupObject(transformer);
-		lt.setEnableLogToJms(false);
-	}
-
-	@Test
 	public void testShortConnectionTimeout() throws Exception {
 		
 		long ts = System.currentTimeMillis();
