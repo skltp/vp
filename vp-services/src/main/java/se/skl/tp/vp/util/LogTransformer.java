@@ -53,13 +53,17 @@ public class LogTransformer extends AbstractMessageTransformer {
 
 	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
 
-	private final EventLogger eventLogger;
+	private final EventLogger eventLogger = new EventLogger();
 	
-	public LogTransformer() {
-		super();
-		this.eventLogger = new EventLogger();
+	/**
+	 * Enable logging to JMS, it true by default
+	 * 
+	 * @param logEnableToJms
+	 */
+	public void setEnableLogToJms(boolean logEnableToJms) {	
+		this.eventLogger.setEnableLogToJms(logEnableToJms);
 	}
-	
+
 	/**
      * Set the queue name for log error messages.
      * 

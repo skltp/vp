@@ -59,6 +59,15 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
 	}
 	
 	/**
+	 * Enable logging to JMS, it true by default
+	 * 
+	 * @param logEnableToJms
+	 */
+	public void setEnableLogToJms(boolean logEnableToJms) {	
+		this.eventLogger.setEnableLogToJms(logEnableToJms);
+	}
+
+	/**
 	 * Setter for the jaxbToXml property
 	 * 
 	 * @param jaxbToXml

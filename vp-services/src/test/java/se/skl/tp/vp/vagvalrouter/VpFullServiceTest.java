@@ -31,10 +31,13 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.soitoolkit.commons.mule.test.AbstractJmsTestUtil;
+import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
 import se.skl.tjanst1.wsdl.Product;
+import se.skl.tp.vp.util.LogTransformer;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -51,13 +54,16 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String LOGICAL_ADDRESS_NOT_FOUND     = "unknown-logical-address";
 	private static final String LOGICAL_ADDRESS_NO_CONNECTION = "vp-test-producer-no-connection";
 
-    private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config-override");
+    private static final RecursiveResourceBundle rb = new RecursiveResourceBundle(new String[] {"vp-config-override", "vp-config"});
 
 	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
 
 	private int normal_timeout_ms = 0;
 	private int short_timeout_ms = 0;
 	private int long_timeout_ms = 0;
+
+	private static final String LOG_INFO_QUEUE = rb.getString("SOITOOLKIT_LOG_INFO_QUEUE");
+	private AbstractJmsTestUtil jmsUtil = null;
 	
 	public VpFullServiceTest() {
 		super();
@@ -102,6 +108,13 @@ public class VpFullServiceTest extends AbstractTestCase {
 	@Before
 	public void doSetUp() throws Exception {
 		super.doSetUp();
+
+		// TODO: Fix lazy init of JMS connection et al so that we can create jmsutil in the declaration
+		// (The embedded ActiveMQ queue manager is not yet started by Mule when jmsutil is delcared...)
+		if (jmsUtil == null) jmsUtil = new ActiveMqJmsTestUtil();
+		
+		// Clear queues used for the logging
+		jmsUtil.clearQueues(LOG_INFO_QUEUE);
 		
 		if (testConsumer == null) {
 			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector", CLIENT_TIMEOUT_MS);
@@ -113,6 +126,42 @@ public class VpFullServiceTest extends AbstractTestCase {
 		
 		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
 		assertEquals(PRODUCT_ID, p.getId());
+	}
+
+	/**
+	 * Verify that VP send log events to JMS queue by default, i.e. when 
+	 * @throws Exception
+	 */
+	@Test
+	public void testLogToJmsQueue() throws Exception {
+		
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+
+		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
+		assertEquals(PRODUCT_ID, p.getId());
+
+		assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 2, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+	}
+
+	@Test
+	public void testNoLogToJmsQueue() throws Exception {
+		
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+
+		disableLogtoJmsQueue("logReqIn");
+		disableLogtoJmsQueue("logReqOut");
+		disableLogtoJmsQueue("logRespIn");
+		disableLogtoJmsQueue("logRespOut");
+		
+		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
+		assertEquals(PRODUCT_ID, p.getId());
+
+		assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+	}
+
+	private void disableLogtoJmsQueue(String transformer) {
+		LogTransformer lt = (LogTransformer)muleContext.getRegistry().lookupObject(transformer);
+		lt.setEnableLogToJms(false);
 	}
 
 	@Test

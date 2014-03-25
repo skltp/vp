@@ -77,6 +77,7 @@
         <catch-exception-strategy>
         	
         	<custom-transformer class="se.skl.tp.vp.vagvalrouter.ExceptionLoggerTransformer">
+				<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
         		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 				<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
         	</custom-transformer>

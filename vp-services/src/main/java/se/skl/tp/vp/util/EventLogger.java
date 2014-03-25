@@ -39,6 +39,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
@@ -73,6 +74,10 @@ import org.soitoolkit.commons.mule.util.XmlUtil;
  */
 public class EventLogger {
 
+	// Logger for normal logging of code execution	
+	private static final Logger log = LoggerFactory.getLogger(EventLogger.class);
+
+	// EventLogger specific logger of message execution in VP
 	private static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
 	
 	// Creating JaxbUtil objects (i.e. JaxbContext objects)  are costly, so we only keep one instance.
@@ -106,6 +111,7 @@ public class EventLogger {
 	// Used to transform payloads that are jaxb-objects into a xml-string
 	private PayloadToStringTransformer payloadToStringTransformer;
 
+	private static boolean s_enableLogToJms = true;
 
 	static {
 		try {
@@ -118,14 +124,20 @@ public class EventLogger {
 		}
 	}
 
-	public EventLogger() {		
+	/**
+	 * Enable logging to JMS, it true by default
+	 * 
+	 * @param logEnableToJms
+	 */
+	public void setEnableLogToJms(boolean enableLogToJms) {	
+		s_enableLogToJms = enableLogToJms;
+		
+		log.info("Logging to JMS is now {}", (s_enableLogToJms ? "enabled" : "disabled"));
+		if (log.isDebugEnabled()) {
+			ExceptionUtils.getFullStackTrace(new Exception());
+			log.debug("- setEnableLogToJms() is called from \n{}", ExceptionUtils.getFullStackTrace(new Exception()));			
+		}
 	}
-	
-	//
-	public EventLogger(MuleContext muleContext) {
-		setMuleContext(muleContext);
-	}
-	
 	
 	public void setMuleContext(MuleContext muleContext) {
 		messageLogger.debug("setMuleContext { muleContext: {} }", muleContext);
@@ -221,18 +233,24 @@ public class EventLogger {
 	}
 	
 	private void dispatchInfoEvent(LogEvent logEvent) {
-		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent(logInfoQueueName, msg);
+		if (s_enableLogToJms) {
+			String msg = JAXB_UTIL.marshal(logEvent);
+			dispatchEvent(logInfoQueueName, msg);
+		}
 	}
 	
 	private void dispatchDebugEvent(LogEvent logEvent) {
-		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent(logInfoQueueName, msg);
+		if (s_enableLogToJms) {
+			String msg = JAXB_UTIL.marshal(logEvent);
+			dispatchEvent(logInfoQueueName, msg);
+		}
 	}
 
 	private void dispatchErrorEvent(LogEvent logEvent) {
-		String msg = JAXB_UTIL.marshal(logEvent);
-		dispatchEvent(logErrorQueueName, msg);
+		if (s_enableLogToJms) {
+			String msg = JAXB_UTIL.marshal(logEvent);
+			dispatchEvent(logErrorQueueName, msg);
+		}
 	}
 
 	private void dispatchEvent(String queue, String msg) {
