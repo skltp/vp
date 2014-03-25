@@ -132,15 +132,15 @@ public class EventLogger {
 	public void setEnableLogToJms(boolean enableLogToJms) {	
 		s_enableLogToJms = enableLogToJms;
 		
-		log.info("Logging to JMS is now {}", (s_enableLogToJms ? "enabled" : "disabled"));
+		log.debug("Logging to JMS is now {}", (s_enableLogToJms ? "enabled" : "disabled"));
 		if (log.isDebugEnabled()) {
 			ExceptionUtils.getFullStackTrace(new Exception());
-			log.debug("- setEnableLogToJms() is called from \n{}", ExceptionUtils.getFullStackTrace(new Exception()));			
+			log.trace("- setEnableLogToJms() is called from \n{}", ExceptionUtils.getFullStackTrace(new Exception()));			
 		}
 	}
 	
 	public void setMuleContext(MuleContext muleContext) {
-		messageLogger.debug("setMuleContext { muleContext: {} }", muleContext);
+		log.debug("setMuleContext { muleContext: {} }", muleContext);
 		this.muleContext = muleContext;
 	}
 	
@@ -396,12 +396,12 @@ public class EventLogger {
 
 		if (message != null) {
 
-			if (messageLogger.isDebugEnabled()) {
+			if (log.isDebugEnabled()) {
 				@SuppressWarnings("rawtypes")
 				Set names = message.getPropertyNames(PropertyScope.OUTBOUND);
 				for (Object object : names) {
 					Object value = message.getProperty(object.toString(), PropertyScope.OUTBOUND);
-					messageLogger.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
+					log.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
 				}
 			}
 			
