@@ -21,6 +21,7 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -28,6 +29,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.jms.JMSException;
+import javax.jms.TextMessage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -159,6 +163,77 @@ public class VpFullServiceTest extends AbstractTestCase {
     		// TODO: handle exception
     	}
     	assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 1, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
+	}
+	
+	/**
+	 * Verify that VP send error log events to JMS queue by default
+	 * @throws Exception
+	 */
+	@Test
+	public void testErrorLogsContainsExtraInformation() throws Exception {
+		
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
+		
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		// TODO: handle exception
+    	}
+    	assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_ERROR_QUEUE).size());
+    	assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_INFO_QUEUE).size());
+    	
+    	TextMessage errorMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).get(0);
+    		
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>receiverid</name><value>unknown-logical-address</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>sessionStatus</name><value>true</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>sessionErrorDescription</name><value>VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:unknown-logical-address (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</value>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>sessionErrorTechnicalDescription</name><value>org.mule.api.transformer.TransformerMessagingException: VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:unknown-logical-address (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>cxf_service</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
+	}
+	
+	/**
+	 * Verify that VP send error log events to JMS queue by default
+	 * @throws Exception
+	 */
+	@Test
+	public void testErrorLogsCorrelatesToRequest() throws Exception {
+		
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
+		
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		// TODO: handle exception
+    	}
+    	assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_ERROR_QUEUE).size());
+    	assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_INFO_QUEUE).size());
+    	
+    	TextMessage errorMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).get(0);
+    	TextMessage infoMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).get(0);
+    		
+    	assertBusinessCorrelationId(errorMessage, infoMessage);
+	}
+
+	private void assertBusinessCorrelationId(TextMessage errorMessage, TextMessage infoMessage)
+			throws JMSException {
+		
+		int errCorrIdStart = errorMessage.getText().indexOf("<businessCorrelationId>") + "<businessCorrelationId>".length();
+    	int errCorrIdEnd = errorMessage.getText().indexOf("</businessCorrelationId>");
+    	
+    	int infoCorrIdStart = infoMessage.getText().indexOf("<businessCorrelationId>") + "<businessCorrelationId>".length();
+    	int infoCorrIdEnd = infoMessage.getText().indexOf("</businessCorrelationId>");
+    	
+    	String errorBusinessCorrelationId = errorMessage.getText().substring(errCorrIdStart, errCorrIdEnd);
+    	String infoBusinessCorrelationId = infoMessage.getText().substring(infoCorrIdStart, infoCorrIdEnd);
+    	
+    	assertNotNull(errorBusinessCorrelationId);
+    	assertNotNull(infoBusinessCorrelationId);
+    	assertEquals(errorBusinessCorrelationId, infoBusinessCorrelationId);
 	}
 
 	@Test

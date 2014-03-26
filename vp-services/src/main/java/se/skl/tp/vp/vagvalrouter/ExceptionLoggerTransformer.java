@@ -23,8 +23,7 @@ package se.skl.tp.vp.vagvalrouter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -54,7 +53,12 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
 		log.debug("Entering ExceptionLoggerTransformer to log exception...");
 		
 		eventLogger.setMuleContext(message.getMuleContext());	
-		logException(message.getExceptionPayload());
+		
+		Throwable ex = message.getExceptionPayload().getException();
+		
+		handleException(ex, message);
+		
+		//logException(message.getExceptionPayload());
 		return message;
 	}
 	
@@ -85,48 +89,60 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
         this.eventLogger.setLogErrorQueueName(queueName);
     }
     
-	protected void logException(ExceptionPayload exceptionPayload) {
-                
+	public void handleException(Throwable t, MuleMessage message) {
+		startTimer();
+		logException(t, message);		
+		stopTimer();
+	}
+
+	private void stopTimer() {
+		ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
+		log.info(ExecutionTimer.format());
+	}
+
+	private void startTimer() {
 		Map<String, String> extraInfo = new HashMap<String, String>();
 		extraInfo.put("source", getClass().getName());
 		ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_ENDPOINT);
 		if (timer != null) {
 			extraInfo.put("time.producer", String.valueOf(timer.getElapsed()));
 		}
-	
-		Throwable rootException = exceptionPayload.getRootException();
-
-        if (rootException != null) {
-
-        	if (rootException instanceof MessagingException) {
-        		MessagingException me = (MessagingException)rootException;
-            	
-        		MuleMessage msg = me.getEvent().getMessage();
-            	
-        		Throwable ex = (me.getCause() == null ? me : me.getCause());
-        		
-        		msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-        		msg.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, nvl(ex.getMessage()), PropertyScope.SESSION);
-        		msg.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, nvl(ex.toString()), PropertyScope.SESSION);
-            	msg.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-
-        		eventLogger.addSessionInfo(msg, extraInfo);
-        		eventLogger.logErrorEvent(ex, msg, null, extraInfo); 
-
-        	} else {
-                Map<?, ?> info = ExceptionHelper.getExceptionInfo(rootException);
-        		eventLogger.logErrorEvent(rootException, info.get("Payload"), null, extraInfo);                
-        	}
-        	
-        } else {
-    		eventLogger.logErrorEvent(exceptionPayload.getException(), "", null, extraInfo);
-        }
-        
-        // stop request.
-		ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
-		log.info(ExecutionTimer.format());
 	}
-	
+    
+	/**
+	 * Used to log the error passed into this Exception Listener
+	 * 
+	 * @param t
+	 *            the exception thrown
+	 */
+	protected void logException(Throwable t, MuleMessage message) {
+		
+		Map<String, String> extraInfo = new HashMap<String, String>();
+		extraInfo.put("source", getClass().getName());
+		
+		MuleException muleException = ExceptionHelper.getRootMuleException(t);
+		if (muleException != null) {
+			addErrorMessageProperties(muleException, message);
+
+    		eventLogger.addSessionInfo(message, extraInfo);
+    		eventLogger.logErrorEvent(muleException, message, null, extraInfo); 
+    		
+    		//logger.error(muleException.getDetailedMessage());
+		} else {
+			addErrorMessageProperties(t, message);
+
+    		eventLogger.addSessionInfo(message, extraInfo);
+			eventLogger.logErrorEvent(t, "", null, extraInfo);
+		}
+	}
+
+	private void addErrorMessageProperties(Throwable t, MuleMessage message) {
+		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, nvl(t.getMessage()), PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, nvl(t.toString()), PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
+	}
+    	
 	static String nvl(String s) {
 		return (s == null) ? "" : s;
 	}
