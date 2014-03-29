@@ -33,26 +33,29 @@
     <description>
 		Test konfiguration för att simulera Tjänstekatalogen
     </description>
-
-    <spring:bean
-        name="vagvalInfo"
-        class="se.skl.tp.vp.vagvalrouter.VagvalInfo" />
+    
+    <spring:bean name="vagvalInputs"
+		class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput" />
+	
+	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
+	
+	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
+		<spring:property name="endpointAddress" value="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2" />
+		<spring:property name="addressDelimiter" value="#" />
+		<spring:property name="hsaCache" ref="hsaCache"/>
+		<spring:property name="localTakCache" value="${user.home}${file.separator}.tk.localCache.test"/>
+	</spring:bean>
 
     <flow name="tk-teststub-flow" >
 
-        <inbound-endpoint address="${TP_SOKVAGVALSINFO_URL}" />
-
-        <cxf:jaxws-service
-            serviceClass="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub"
-            wsdlLocation="classpath:/VAGVAL_2_0_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-2.0.wsdl" />
-
-        <component>
-            <singleton-object class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoTestStub" >
-                <property
-                    key="vagvalInputs"
-                    value-ref="vagvalInputs" />
-            </singleton-object>
-        </component>
+        <inbound-endpoint address="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2" />
+        
+        <cxf:jaxws-service serviceClass="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer" />
+		<component>
+			<singleton-object class="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer">
+				<property key="vagvalInputs" value-ref="vagvalInputs" />
+			</singleton-object>
+		</component>
     </flow>
 
 </mule>

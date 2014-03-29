@@ -38,6 +38,8 @@ public class VpMuleServer {
 	public static final String MULE_CONFIG      = "vp-teststubs-and-services-config.xml"; // both teststubs and services
 //	public static final String MULE_CONFIG      = "vp-teststubs-only-config.xml"; // only teststubs
 //	public static final String MULE_CONFIG      = "vp-config.xml"; // only services
+	
+	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 
 	public static void main(String[] args) throws Exception {
  
@@ -57,25 +59,23 @@ public class VpMuleServer {
 		// when the call
 		// to the virtual service is made
 		// Note certificate serial number is used as sender
-		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
+		
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
-		VagvalMockInputRecord vi = new VagvalMockInputRecord();
-		vi.receiverId = "vp-test-producer";
-		vi.senderId = "tp";
-		vi.rivVersion = "RIVTABP20";
-		vi.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
-		vi.adress = "https://localhost:19000/vardgivare-b/tjanst1";
-		vagvalInputs.add(vi);
-
-		vi = new VagvalMockInputRecord();
-		vi.receiverId = "vp-test-producer-no-connection";
-		vi.senderId = "tp";
-		vi.rivVersion = "RIVTABP20";
-		vi.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
-		vi.adress = "https://www.google.com:81";
-		vagvalInputs.add(vi);
-
+		
+		vagvalInputs.add(createVagvalRecord("vp-test-producer", "RIVTABP20", "tp", "urn:skl:tjanst1:rivtabp20","https://localhost:19000/vardgivare-b/tjanst1"));
+		vagvalInputs.add(createVagvalRecord("vp-test-producer-no-connection", "RIVTABP20", "tp", "urn:skl:tjanst1:rivtabp20","https://www.google.com:81"));
 		
 		svimi.setVagvalInputs(vagvalInputs);
+	}
+	
+	private static VagvalMockInputRecord createVagvalRecord(String receiverId, String rivVersion, String senderId, String serviceNameSpace, String adress) {
+		
+		VagvalMockInputRecord vagvalInput = new VagvalMockInputRecord();
+		vagvalInput.receiverId = receiverId;
+		vagvalInput.rivVersion = rivVersion;
+		vagvalInput.senderId = senderId;
+		vagvalInput.serviceNamespace = serviceNameSpace;
+		vagvalInput.adress = adress;
+		return vagvalInput;
 	}
 }

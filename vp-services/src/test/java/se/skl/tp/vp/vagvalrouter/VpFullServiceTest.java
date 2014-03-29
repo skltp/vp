@@ -34,6 +34,7 @@ import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.AbstractJmsTestUtil;
 import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
@@ -69,6 +70,8 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String LOG_ERROR_QUEUE = rb.getString("SOITOOLKIT_LOG_ERROR_QUEUE");
 	private AbstractJmsTestUtil jmsUtil = null;
 	
+	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
+	
 	public VpFullServiceTest() {
 		super();
 		
@@ -77,27 +80,9 @@ public class VpFullServiceTest extends AbstractTestCase {
 		// only once.
 		setDisposeContextPerClass(true);
 		
-		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
-
-		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,               "https://localhost:19000/vardgivare-b/tjanst1"));
-		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_NO_CONNECTION, "https://www.google.com:81"));
-
-		svimi.setVagvalInputs(vagvalInputs);
-		
 		normal_timeout_ms = Integer.parseInt(rb.getString("TEST_NORMAL_TIMEOUT_MS"));
 		short_timeout_ms = Integer.parseInt(rb.getString("TEST_SHORT_TIMEOUT_MS"));
 		long_timeout_ms = Integer.parseInt(rb.getString("TEST_LONG_TIMEOUT_MS"));
-	}
-
-	private VagvalMockInputRecord createVagvalRecord(String receiverId, String adress) {
-		VagvalMockInputRecord vi_TP = new VagvalMockInputRecord();
-		vi_TP.receiverId = receiverId;
-		vi_TP.senderId = "tp";
-		vi_TP.rivVersion = "RIVTABP20";
-		vi_TP.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
-		vi_TP.adress = adress;
-		return vi_TP;
 	}
 	
 	@Override
@@ -107,6 +92,14 @@ public class VpFullServiceTest extends AbstractTestCase {
 			"vp-common.xml," +
 			"services/VagvalRouter-service.xml," +
 			"vp-teststubs-and-services-config.xml";
+	}
+	
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,               "https://localhost:19000/vardgivare-b/tjanst1"));
+		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_NO_CONNECTION, "https://www.google.com:81"));
+		svimi.setVagvalInputs(vagvalInputs);
 	}
 	
 	@Before
@@ -345,5 +338,15 @@ public class VpFullServiceTest extends AbstractTestCase {
     		assertTrue(ex.getMessage().contains("<faultcode>soap:Server</faultcode>"));
     		assertTrue(ex.getMessage().contains("<faultstring>PP01 Product Does Not Exist</faultstring>"));
     	}
+	}
+	
+	private static VagvalMockInputRecord createVagvalRecord(String receiverId, String adress) {
+		VagvalMockInputRecord vagvalInput = new VagvalMockInputRecord();
+		vagvalInput.receiverId = receiverId;
+		vagvalInput.senderId = "tp";
+		vagvalInput.rivVersion = "RIVTABP20";
+		vagvalInput.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vagvalInput.adress = adress;
+		return vagvalInput;
 	}
 }

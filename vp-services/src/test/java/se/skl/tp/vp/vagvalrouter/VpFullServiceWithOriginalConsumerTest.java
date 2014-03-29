@@ -20,12 +20,17 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mule.tck.FunctionalTestCase;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
 import se.skl.tjanst1.wsdl.Product;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
@@ -33,7 +38,7 @@ import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 import se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger;
 
-public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
+public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
 
 	private static final String AUHTORIZED_CONSUMER_HSAID = "tp";
 	private static final String PRODUCT_ID = "SW123";
@@ -42,30 +47,15 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 	
 	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
 	
+	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
+	
 	public VpFullServiceWithOriginalConsumerTest() {
 		super();
 		
-		setDisposeManagerPerSuite(true);
-		
-		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
-
-		/*
-		 * FIXME: This tests run in eclipse does not use the test data that is setup below. Instead it depends on the
-		 * case that a .tk.localCache.test exists with correct test data. In case this local file is
-		 * missing or it contains wrong data, the test fails!!
-		 * 
-		 * When running tests in maven however it seems as this test data is used?
-		 */
-		VagvalMockInputRecord vi_ORIGINAL_CONSUMER = new VagvalMockInputRecord();
-		vi_ORIGINAL_CONSUMER.receiverId = LOGICAL_ADDRESS;
-		vi_ORIGINAL_CONSUMER.senderId = AUHTORIZED_CONSUMER_HSAID;
-		vi_ORIGINAL_CONSUMER.rivVersion = "RIVTABP20";
-		vi_ORIGINAL_CONSUMER.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
-		vi_ORIGINAL_CONSUMER.adress = "https://localhost:19000/vardgivare-b/tjanst1";
-		
-		vagvalInputs.add(vi_ORIGINAL_CONSUMER);
-		svimi.setVagvalInputs(vagvalInputs);
+		// Only start up Mule once to make the tests run faster...
+		// Set to false if tests interfere with each other when Mule is started
+		// only once.
+		setDisposeContextPerClass(true);
 	}
 	
 	@Override
@@ -77,13 +67,21 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 			"vp-teststubs-and-services-config.xml";
 	}
 	
-	@Override
-	protected void doSetUp() throws Exception {
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		vagvalInputs.add(createVagvalRecord(AUHTORIZED_CONSUMER_HSAID, LOGICAL_ADDRESS, "https://localhost:19000/vardgivare-b/tjanst1"));
+		svimi.setVagvalInputs(vagvalInputs);
+	}
+	
+	@Before
+	public void doSetUp() throws Exception {
 		if (testConsumer == null) {
 			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector");
 		}
 	}
 
+	@Test
 	public void testOriginalConsumerIsSetToSameAsSenderIfNotProvided() throws Exception {
 		
 		Map<String, String> properties = new HashMap<String, String>();
@@ -95,6 +93,7 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
 	}
 	
+	@Test
 	public void testOriginalConsumerIsForwardedIfProvided() throws Exception {
 		
 		final String provicedOriginalServiceConsumerHsaId = "HSA-ID-ORGINALCONSUMER";
@@ -107,5 +106,15 @@ public class VpFullServiceWithOriginalConsumerTest extends FunctionalTestCase {
 		
 		assertEquals(provicedOriginalServiceConsumerHsaId, VpTestProducerLogger.getLatestRivtaOriginalSenderId());
 		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
+	}
+	
+	private static VagvalMockInputRecord createVagvalRecord(String senderId, String receiverId, String adress) {
+		VagvalMockInputRecord vagvalInput = new VagvalMockInputRecord();
+		vagvalInput.receiverId = receiverId;
+		vagvalInput.senderId = senderId;
+		vagvalInput.rivVersion = "RIVTABP20";
+		vagvalInput.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vagvalInput.adress = adress;
+		return vagvalInput;
 	}
 }

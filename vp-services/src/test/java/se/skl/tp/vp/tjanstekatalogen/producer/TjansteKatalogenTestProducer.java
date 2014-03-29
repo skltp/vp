@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.vagvalagent;
+package se.skl.tp.vp.tjanstekatalogen.producer;
 
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.AN_HOUR_AGO;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.IN_TEN_YEARS;
@@ -30,18 +30,22 @@ import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaVirtualiseringarResponseType;
 import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
 import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoIdType;
 import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
+import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.VagvalInput;
 
 /**
  * Denna klass används för att kunna simulera en tjänstekatalog med valfritt
- * innehåll. Används ihop med tp-vagval-agent-teststub-config så att det
+ * innehåll. Används ihop med tk-teststub-service.xml så att det
  * skapas en enpoint som svarar när vägvalsagenten anropar tjänstekatalogen
  * för att få en lista på alla vägval tp-vitualisering-DEV använder sig av
  * denna.
+ * 
+ * Se exempel i VPFullServiceTest.java eller VPMuleServer.java hur den kan användas.
  */
 
 @javax.jws.WebService(portName = "SokVagvalsSoap11LitDocPort", serviceName = "SokVagvalsServiceSoap11LitDocService", targetNamespace = "urn:skl:tp:vagvalsinfo:v2")
-public class SokVagvalsInfoMock implements SokVagvalsInfoInterface {
+public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 
 	private SokVagvalsInfoMockInput vagvalInputs;
 

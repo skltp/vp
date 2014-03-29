@@ -20,6 +20,12 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
@@ -33,34 +39,30 @@ import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
-import org.mule.tck.FunctionalTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 
 @SuppressWarnings("deprecation")
-public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase {
+public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 
-	
 	private HttpClient client;
 	private SslProtocolSocketFactory socketFactory;
-
+	
+	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 	
 	public VpFullKeepAliveAndHttpHeaderServiceTest() {
 		super();
-		setDisposeManagerPerSuite(true);
 		
-		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
-		VagvalMockInputRecord vi = new VagvalMockInputRecord();
-		vi.receiverId = "vp-test-producer";
-		vi.senderId = "tp";
-		vi.rivVersion = "RIVTABP20";
-		vi.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
-		vi.adress = "https://localhost:19000/vardgivare-b/tjanst1";
-		vagvalInputs.add(vi);
-		svimi.setVagvalInputs(vagvalInputs);
-		
+		// Only start up Mule once to make the tests run faster...
+		// Set to false if tests interfere with each other when Mule is started
+		// only once.
+		setDisposeContextPerClass(true);
 	}
 	
 	@Override
@@ -72,8 +74,15 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 			"vp-teststubs-and-services-config.xml";
 	}
 	
-	@Override
-	protected void doSetUp() throws Exception {
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		vagvalInputs.add(createVagvalRecord("vp-test-producer", "https://localhost:19000/vardgivare-b/tjanst1"));
+		svimi.setVagvalInputs(vagvalInputs);
+	}
+	
+	@Before
+	public void doSetUp() throws Exception {
 		InputStream keyStore = getClass().getClassLoader().getResourceAsStream("certs/client.jks");
 		InputStream trustStore = getClass().getClassLoader().getResourceAsStream("certs/truststore.jks");
 		
@@ -86,12 +95,12 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		
 	}
 		
-	@Override
-	protected void doTearDown() throws Exception {
-		
+	@After
+	public void doTearDown() throws Exception {
 		socketFactory.getSocket().close();
 	}
 	
+	@Test
 	public void testHttp11ToKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp11SoapCall("/vp/keep-alive-tjanst1");
@@ -103,6 +112,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		executeHttp11SoapCall("/vp/keep-alive-tjanst1");		
 	}
 	
+	@Test
 	public void testHttp11KeepAliveToKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp11SoapCallWithKeepAlive("/vp/keep-alive-tjanst1");
@@ -114,6 +124,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		executeHttp11SoapCall("/vp/keep-alive-tjanst1");
 	}
 	
+	@Test
 	public void testHttp11CloseToKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp11SoapCallWithClose("/vp/keep-alive-tjanst1");
@@ -131,6 +142,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}		
 	}
 	
+	@Test
 	public void testHttp11ToNonKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp11SoapCallWithClose("/vp/no-keep-alive-tjanst1");
@@ -148,6 +160,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}		
 	}
 	
+	@Test
 	public void testHttp11KeepAliveToNonKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp11SoapCallWithKeepAlive("/vp/no-keep-alive-tjanst1");
@@ -165,6 +178,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}		
 	}
 	
+	@Test
 	public void testHttp11CloseToNonKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp11SoapCallWithClose("/vp/no-keep-alive-tjanst1");
@@ -182,6 +196,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}		
 	}
 	
+	@Test
 	public void testHttp10ToKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp10SoapCall("/vp/keep-alive-tjanst1");
@@ -212,6 +227,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 	}
 	*/
 	
+	@Test
 	public void testHttp10CloseToKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp10SoapCallWithClose("/vp/keep-alive-tjanst1");
@@ -229,6 +245,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}
 	}
 	
+	@Test
 	public void testHttp10ToNonKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp10SoapCallWithClose("/vp/no-keep-alive-tjanst1");
@@ -246,6 +263,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}		
 	}
 	
+	@Test
 	public void testHttp10KeepAliveToNonKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp10SoapCallWithKeepAlive("/vp/no-keep-alive-tjanst1");
@@ -263,6 +281,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}		
 	}
 	
+	@Test
 	public void testHttp10CloseToNonKeepAliveEndpoint() throws Exception {
 
 		PostMethod httppost = executeHttp10SoapCallWithClose("/vp/no-keep-alive-tjanst1");
@@ -280,18 +299,21 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 		}
 	}
 	
+	@Test
 	public void testProducerResponseTimeIsReturnedWhenHttp200() throws Exception {
         PostMethod httppost = executeHttp11SoapCall("/vp/keep-alive-tjanst1");
         assertNotNull(httppost.getResponseHeader(VagvalRouter.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
         assertEquals(200, httppost.getStatusCode());
     }
 	
+	@Test
 	public void testProducerResponseTimeIsReturnedWhenHttp500() throws Exception {
         PostMethod httppost = executeHttp11SoapCallReturningHttp500("/vp/keep-alive-tjanst1");
         assertNotNull(httppost.getResponseHeader(VagvalRouter.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
         assertEquals(500, httppost.getStatusCode());
     }
 	
+	@Test
 	public void testHttp500IsReturnedForVP00xSoapFaults() throws Exception {
 		
 		/*
@@ -360,6 +382,16 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends FunctionalTestCase 
 
 	private PostMethod executeHttp10SoapCall(final String subUrl) throws HttpException, IOException {
 		return executeSoapCall(subUrl, false, false, true);
+	}
+	
+	private static VagvalMockInputRecord createVagvalRecord(String receiverId, String adress) {
+		VagvalMockInputRecord vagvalInput = new VagvalMockInputRecord();
+		vagvalInput.receiverId = receiverId;
+		vagvalInput.senderId = "tp";
+		vagvalInput.rivVersion = "RIVTABP20";
+		vagvalInput.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vagvalInput.adress = adress;
+		return vagvalInput;
 	}
 	
 }
