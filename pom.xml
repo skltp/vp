@@ -14,7 +14,7 @@
 
 	<groupId>se.skltp.vp</groupId>
 	<artifactId>vp-parent</artifactId>
-	<version>2.2.6-RC2-SNAPSHOT</version>
+	<version>2.2.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>vp-parent</name>
 	
