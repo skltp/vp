@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.junit.Before;
@@ -42,6 +43,7 @@ import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
 import se.skl.tjanst1.wsdl.Product;
+import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -121,15 +123,52 @@ public class VpFullServiceTest extends AbstractTestCase {
 	@Test
 	public void testHappyDays() throws Exception {
 		
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+		
 		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
 		assertEquals(PRODUCT_ID, p.getId());
 		
-		TextMessage errorMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).get(0);
+		//Verify log messages
+		assertEquals(2, jmsUtil.browseMessagesOnQueue(LOG_INFO_QUEUE).size());
 		
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>receiverid</name><value>vp-test-producer</value></extraInfo>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
+		List<Message> logMessages = jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE);
+		
+		TextMessage infoMessageReqIn = (TextMessage)logMessages.get(0);
+		assertInfoEventExtraInformation(infoMessageReqIn, "127.0.0.1");
+		
+		TextMessage infoMessageRespOut = (TextMessage)logMessages.get(1);
+		assertInfoEventExtraInformation(infoMessageRespOut, "127.0.0.1");
+	}
+	
+	@Test
+	public void tesLoadBalancerForwardedIpAdress() throws Exception {
+		
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(rb.getString("VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER"), "10.0.0.10");
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
+		
+		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+		assertEquals(PRODUCT_ID, p.getId());
+		
+		//Verify log messages
+		assertEquals(2, jmsUtil.browseMessagesOnQueue(LOG_INFO_QUEUE).size());
+		
+		List<Message> logMessages = jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE);
+		
+		TextMessage infoMessageReqIn = (TextMessage)logMessages.get(0);
+		assertInfoEventExtraInformation(infoMessageReqIn, "10.0.0.10");
+		
+		TextMessage infoMessageRespOut = (TextMessage)logMessages.get(1);
+		assertInfoEventExtraInformation(infoMessageRespOut, "10.0.0.10");
+	}
+
+	private void assertInfoEventExtraInformation(TextMessage infoMessage, String expectedSenderIpAdress)
+			throws JMSException {
+		assertTrue(infoMessage.getText().contains("<extraInfo><name>senderIpAdress</name><value>" + expectedSenderIpAdress + "</value></extraInfo>"));
+    	assertTrue(infoMessage.getText().contains("<extraInfo><name>receiverid</name><value>vp-test-producer</value></extraInfo>"));
+    	assertTrue(infoMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
+    	assertTrue(infoMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
+    	assertTrue(infoMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
 
 	/**

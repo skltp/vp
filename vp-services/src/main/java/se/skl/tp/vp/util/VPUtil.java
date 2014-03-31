@@ -56,6 +56,7 @@ public final class VPUtil {
 	public static final String RECEIVER_ID = "receiverid";
 	public static final String SENDER_ID = "senderid";
 	public static final String RIV_VERSION = "rivversion";
+	public static final String SENDER_IP_ADRESS = "senderIpAdress";
 	
 	public static final String CXF_SERVICE_NAMESPACE = "cxf_service";
 	public static final String WSDL_NAMESPACE = "wsdl_namespace";

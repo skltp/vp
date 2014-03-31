@@ -50,6 +50,8 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 	
 	private String vpInstanceId;
 	
+	private String senderIpAdressHttpHeader;
+	
 	public void setVpInstanceId(String vpInstanceId) {
 		this.vpInstanceId = vpInstanceId;
 	}
@@ -57,7 +59,11 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 	public void setWhiteList(final String whiteList) {
 		this.whiteList = whiteList;
 	}
-	
+
+	public void setSenderIpAdressHttpHeader(String senderIpAdressHttpHeader) {
+		this.senderIpAdressHttpHeader = senderIpAdressHttpHeader;
+	}
+
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
 		this.senderIdPropertyName = senderIdPropertyName;
 		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
@@ -75,7 +81,13 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
     		
 		String senderId = message.getProperty(VagvalRouter.X_VP_SENDER_ID, PropertyScope.INBOUND, null);
 		String senderVpInstanceId = message.getProperty(VagvalRouter.X_VP_INSTANCE_ID, PropertyScope.INBOUND, null);
-
+		
+		/*
+		 * Extract sender ip adress to session scope to be able to log in EventLogger.
+		 */
+		String senderIpAdress = extractSenderIpAdress(message);
+		message.setProperty(VPUtil.SENDER_IP_ADRESS, senderIpAdress, PropertyScope.SESSION);
+		
 		log.debug("Is inbound properties x-vp-sender-id={} and x-vp-instance-id={} valid as identifier of consumer?", senderId, senderVpInstanceId);
 		
 		if (senderId != null && vpInstanceId.equals(senderVpInstanceId)) {
@@ -85,9 +97,8 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 			 * x-vp-sender-id exist as inbound property and x-vp-instance-id macthes this VP instance, a mandatory check against the whitelist of
 			 * ip addresses is needed. VPUtil.checkCallerOnWhiteList throws VpSemanticException in case ip address is not in whitelist.
 			 */
-			String callersIp = VPUtil.extractIpAddress(message);
-			if(!VPUtil.isCallerOnWhiteList(callersIp, whiteList, VagvalRouter.X_VP_SENDER_ID)){
-				throw VPUtil.createVP011Exception(callersIp, VagvalRouter.X_VP_SENDER_ID);
+			if(!VPUtil.isCallerOnWhiteList(senderIpAdress, whiteList, VagvalRouter.X_VP_SENDER_ID)){
+				throw VPUtil.createVP011Exception(senderIpAdress, VagvalRouter.X_VP_SENDER_ID);
 			}
 			
 			// Make sure the sender id is set in session scoped property for authorization and logging
@@ -119,5 +130,18 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
           
         return message;
     }
+
+    /*
+     * Extract sender ip adress from configured VPUtil.VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER in
+     * vp-config.properties. In case no ip adress is provided fall back to let Mule extract ip
+     * adress.
+     */
+	private String extractSenderIpAdress(MuleMessage message) {
+		String senderIpAdress = (String)message.getInboundProperty(senderIpAdressHttpHeader);
+		if(senderIpAdress == null){
+			senderIpAdress = VPUtil.extractIpAddress(message);
+		}
+		return senderIpAdress;
+	}
 
 }

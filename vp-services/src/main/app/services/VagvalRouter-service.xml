@@ -39,6 +39,7 @@
     		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
             <spring:property name="whiteList" value="${IP_WHITE_LIST}" />
             <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
+            <spring:property name="senderIpAdressHttpHeader" value="${VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER}"/>
     	</custom-transformer>
     
     	<!-- Save the http header x-rivta-original-serviceconsumer-hsaid in session-property originalServiceconsumerHsaid -->

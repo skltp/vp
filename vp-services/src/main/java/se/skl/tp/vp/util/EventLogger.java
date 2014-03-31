@@ -528,6 +528,7 @@ public class EventLogger {
 		map.put(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, (String) message.getProperty(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyScope.SESSION));
 		map.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION));
 		map.put(VPUtil.WSDL_NAMESPACE, (String) message.getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION));
+		map.put(VPUtil.SENDER_IP_ADRESS, (String) message.getProperty(VPUtil.SENDER_IP_ADRESS, PropertyScope.SESSION));
 		
 		String endpoint = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION);
 		if (endpoint != null) {

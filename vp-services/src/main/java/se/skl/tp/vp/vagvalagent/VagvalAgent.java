@@ -170,6 +170,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	private SokVagvalsInfoInterface getPort() {
 	    if(port == null){
+	    	logger.info("Use TAK endpoint adress: {}", endpointAddressTjanstekatalog);
 	        SokVagvalsServiceSoap11LitDocService service = new SokVagvalsServiceSoap11LitDocService(
 	                ClientUtil.createEndpointUrlFromServiceAddress(endpointAddressTjanstekatalog));
 	        port = service.getSokVagvalsSoap11LitDocPort();
