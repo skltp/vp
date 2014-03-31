@@ -68,7 +68,7 @@ public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
 	}
 	
 	@BeforeClass
-	public static void beforeClass() throws Exception {
+	public static void setupTjanstekatalogen() throws Exception {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		vagvalInputs.add(createVagvalRecord(AUHTORIZED_CONSUMER_HSAID, LOGICAL_ADDRESS, "https://localhost:19000/vardgivare-b/tjanst1"));
 		svimi.setVagvalInputs(vagvalInputs);
