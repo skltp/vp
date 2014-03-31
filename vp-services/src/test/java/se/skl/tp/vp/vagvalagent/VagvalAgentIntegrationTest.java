@@ -75,7 +75,7 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 	}
 	
 	@BeforeClass
-	public static void beforeClass() throws Exception {
+	public static void setupTjanstekatalogen() throws Exception {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp20", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
