@@ -86,9 +86,8 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 			 * ip addresses is needed. VPUtil.checkCallerOnWhiteList throws VpSemanticException in case ip address is not in whitelist.
 			 */
 			String callersIp = VPUtil.extractIpAddress(message);
-			if(!VPUtil.isCallerOnWhiteList(callersIp, whiteList, VPUtil.SENDER_ID)){
-				throw new VpSemanticException("Caller was not on the white list of accepted IP-addresses. IP-address: " 
-						+ callersIp + ". HTTP header that caused checking: " + VPUtil.SENDER_ID);
+			if(!VPUtil.isCallerOnWhiteList(callersIp, whiteList, VagvalRouter.X_VP_SENDER_ID)){
+				throw VPUtil.createVP011Exception(callersIp, VagvalRouter.X_VP_SENDER_ID);
 			}
 			
 			// Make sure the sender id is set in session scoped property for authorization and logging
@@ -114,6 +113,7 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 				
 			} catch (final VpSemanticException e) {
 				log.warn("Could not extract sender id from certificate. Reason: {} ", e.getMessage());
+				throw e;
 			} 	
 		}
           

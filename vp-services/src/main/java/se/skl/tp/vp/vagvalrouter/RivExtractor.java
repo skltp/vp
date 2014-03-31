@@ -52,8 +52,10 @@ public class RivExtractor extends AbstractMessageTransformer {
 		ExecutionTimer.init();
 		ExecutionTimer.start(VPUtil.TIMER_TOTAL);
 		
-	
-		QName qname = (QName) msg.getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.INVOCATION);
+		/*
+		 * cxf_service is set by cxf:proxy_service on inbound.
+		 */
+		QName qname = (QName) msg.getProperty(VPUtil.CXF_SERVICE_NAMESPACE, PropertyScope.INVOCATION);
 		final String tns = VPUtil.extractNamespaceFromService(qname);
 
 		if (tns != null) {
@@ -64,10 +66,10 @@ public class RivExtractor extends AbstractMessageTransformer {
 			log.debug("RIV-version set to sessions scope: " + rivVersion);
 			msg.setProperty(VPUtil.RIV_VERSION, rivVersion, PropertyScope.SESSION);
 
-			log.debug("Service namespave set to session scope: " + tns);
-			msg.setProperty(VPUtil.SERVICE_NAMESPACE, tns, PropertyScope.SESSION);
+			log.debug("WSDL namespace set to session scope: " + tns);
+			msg.setProperty(VPUtil.WSDL_NAMESPACE, tns, PropertyScope.SESSION);
 		} else {
-			log.warn("No service namespace in invocation scope");			
+			log.warn("No CXF service namespace in invocation scope");			
 		}
 		
 		final PayloadHelper payloadHelper = new PayloadHelper(msg);

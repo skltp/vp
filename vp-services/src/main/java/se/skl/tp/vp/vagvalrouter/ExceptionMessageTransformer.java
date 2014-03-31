@@ -20,7 +20,8 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import static se.skl.tp.vp.util.VPUtil.generateSoap11FaultWithCause;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -32,36 +33,15 @@ public class ExceptionMessageTransformer extends AbstractMessageTransformer{
 	
 	private static final Logger log = LoggerFactory.getLogger(ExceptionMessageTransformer.class);
 
-	final static String SOAP_FAULT = 
-					"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-					"  <soapenv:Header/>" + 
-					"  <soapenv:Body>" + 
-					"    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-					"      <faultcode>soap:Server</faultcode>\n" + 
-					"      <faultstring>%s</faultstring>\n" +
-					"    </soap:Fault>" + 
-					"  </soapenv:Body>" + 
-					"</soapenv:Envelope>";
-
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
-		
+			
 		log.debug("Entering ExceptionMessageTransformer to transform exception to correct soap fault...");
 
 		String cause = message.getExceptionPayload().getMessage();
-		message.setPayload(transformToSoapFault(cause));
+		message.setPayload(generateSoap11FaultWithCause(cause));
 		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
 		return message;
 	}
-	
-	static final String escape(final String s) {
-		return StringEscapeUtils.escapeXml(s);
-	}
-	
-	static final String transformToSoapFault(final String cause) {
-		return String.format(SOAP_FAULT, escape(cause));
-	}
-
-
 }

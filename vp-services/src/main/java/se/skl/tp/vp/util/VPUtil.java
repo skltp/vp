@@ -22,6 +22,7 @@ package se.skl.tp.vp.util;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
@@ -55,7 +56,10 @@ public final class VPUtil {
 	public static final String RECEIVER_ID = "receiverid";
 	public static final String SENDER_ID = "senderid";
 	public static final String RIV_VERSION = "rivversion";
-	public static final String SERVICE_NAMESPACE = "cxf_service";
+	
+	public static final String CXF_SERVICE_NAMESPACE = "cxf_service";
+	public static final String WSDL_NAMESPACE = "wsdl_namespace";
+	
 	public static final String ENDPOINT_URL = "endpoint_url";
 	
 	public static final String IS_HTTPS = "isHttps";
@@ -65,6 +69,22 @@ public final class VPUtil {
 	public static final String TIMER_TOTAL = "total";
 	public static final String TIMER_ROUTE = "route";
 	public static final String TIMER_ENDPOINT = "endpoint_time";
+	
+	public static final String VP_SEMANTIC_EXCEPTION = "VpSemanticException";
+
+	/*
+	 * Generic soap fault template, just use String.format(SOAP_FAULT, message);
+	 */
+	private final static String SOAP_FAULT = 
+			"<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+			"  <soapenv:Header/>" + 
+			"  <soapenv:Body>" + 
+			"    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+			"      <faultcode>soap:Server</faultcode>\n" + 
+			"      <faultstring>%s</faultstring>\n" +
+			"    </soap:Fault>" + 
+			"  </soapenv:Body>" + 
+			"</soapenv:Envelope>";
 	
 	/**
 	 * Feature properties
@@ -98,7 +118,8 @@ public final class VPUtil {
 	}
 	
 	/**
-	 * Check if the calling ip address is on accepted list of ip addresses or subdomains.
+	 * Check if the calling ip address is on accepted list of ip addresses or subdomains. False
+	 * is always returned in case no whitelist exist or ip address is empty.
 	 * 
 	 * @param callerIp The callers ip
 	 * @param whiteList The comma separated list of ip addresses or subdomains 
@@ -109,14 +130,16 @@ public final class VPUtil {
 		
 		log.debug("Check if caller {} is in white list berfore using HTTP header {}...", callerIp, httpHeader);
 
+		//When no ip address exist we can not validate against whitelist
 		if (VPUtil.isWhitespace(callerIp)) {
-			throw new VpSemanticException(
-				"Could not extract the IP address of the caller. Cannot check whether caller is on the white list. HTTP header that caused checking: " + httpHeader);
+			log.warn("A potential empty ip address from the caller, ip adress is: {}. HTTP header that caused checking: {} ", callerIp, httpHeader);
+			return false;
 		}
-
+		
+		//When no whitelist exist we can not validate incoming ip address
 		if (VPUtil.isWhitespace(whiteList)) {
-			throw new VpSemanticException(
-				"Could not check whether the caller is on the white list because the white list was empty. HTTP header that caused checking: " + httpHeader);
+			log.warn("A check against the ip address whitelist was requested, but the whitelist is configured empty. Update VP configuration property IP_WHITE_LIST");
+			return false;
 		}
 		
 		for (String ipAddress : whiteList.split(",")) {
@@ -126,8 +149,33 @@ public final class VPUtil {
 			}
 		}
 
-		log.warn("Caller was not on the white list of accepted IP-addresses. IP-address: {}, accepted IP-addresses: {}", callerIp, whiteList);
+		log.warn("Caller was not on the white list of accepted IP-addresses. IP-address: {}, accepted IP-addresses in IP_WHITE_LIST: {}", callerIp, whiteList);
 		return false;
+	}
+	
+	/**
+     * Escapes the characters in a String using XML entities.
+     * 
+	 * @param string
+	 * @return escaped string
+	 */
+	public static final String escape(final String string) {
+		return StringEscapeUtils.escapeXml(string);
+	}
+	
+	/**
+	 * Generate soap 1.1 fault containing the value of parameter cause.
+	 * 
+	 * @param cause
+	 * @return soap 1.1 fault with cause
+	 */
+	public static final String generateSoap11FaultWithCause(final String cause) {
+		return String.format(SOAP_FAULT, escape(cause));
+	}
+	
+	public static VpSemanticException createVP011Exception(String callersIp, String httpHeaderCausingCheck){
+		return new VpSemanticException("VP011 Caller was not on the white list of accepted IP-addresses. IP-address: " 
+				+ callersIp + ". HTTP header that caused checking: " + httpHeaderCausingCheck);
 	}
 	
 }

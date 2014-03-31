@@ -58,7 +58,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String LOGICAL_ADDRESS_NOT_FOUND     = "unknown-logical-address";
 	private static final String LOGICAL_ADDRESS_NO_CONNECTION = "vp-test-producer-no-connection";
 
-    private static final RecursiveResourceBundle rb = new RecursiveResourceBundle(new String[] {"vp-config-override", "vp-config"});
+    private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
 	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
 
@@ -95,7 +95,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	}
 	
 	@BeforeClass
-	public static void beforeClass() throws Exception {
+	public static void setupTjanstekatalogen() throws Exception {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,               "https://localhost:19000/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_NO_CONNECTION, "https://www.google.com:81"));
@@ -123,6 +123,13 @@ public class VpFullServiceTest extends AbstractTestCase {
 		
 		Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
 		assertEquals(PRODUCT_ID, p.getId());
+		
+		TextMessage errorMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).get(0);
+		
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>receiverid</name><value>vp-test-producer</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
 
 	/**
@@ -130,7 +137,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	 * @throws Exception
 	 */
 	@Test
-	public void testLogInfoToJmsQueue() throws Exception {
+	public void testThatInfoEventsAreLoggedToJmsQueue() throws Exception {
 		
 		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
 
@@ -145,7 +152,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	 * @throws Exception
 	 */
 	@Test
-	public void testLogErrorToJmsQueue() throws Exception {
+	public void testThatErrorEventsAreLoggedToJmsQueue() throws Exception {
 		
 		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
 		
@@ -171,20 +178,14 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		// TODO: handle exception
+    		// Expected failure, proceed with assertions
     	}
-    	assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_ERROR_QUEUE).size());
-    	assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_INFO_QUEUE).size());
-    	
+    
     	TextMessage errorMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).get(0);
     		
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>receiverid</name><value>unknown-logical-address</value></extraInfo>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>sessionStatus</name><value>true</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>sessionErrorDescription</name><value>VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:unknown-logical-address (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</value>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>sessionErrorTechnicalDescription</name><value>org.mule.api.transformer.TransformerMessagingException: VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:unknown-logical-address (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</value></extraInfo>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>cxf_service</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
 	
@@ -201,15 +202,34 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		// TODO: handle exception
+    		// Expected failure, proceed with assertions
     	}
-    	assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_ERROR_QUEUE).size());
-    	assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_INFO_QUEUE).size());
-    	
+    	  	
+    	//Verify INFO end ERROR message correlates to each other
     	TextMessage errorMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).get(0);
     	TextMessage infoMessage = (TextMessage)jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).get(0);
-    		
     	assertBusinessCorrelationId(errorMessage, infoMessage);
+	}
+	
+	/**
+	 * Verify that VP send error log events to JMS queue by default
+	 * @throws Exception
+	 */
+	@Test
+	public void testWhenErrorOneInfoEventAndOneErrorEventIsCreated() throws Exception {
+		
+		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_ERROR_QUEUE).size());
+		
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		// Expected failure, proceed with assertions
+    	}
+    	
+    	//Verify one INFO event is logged for the request and one ERROR event is logged for the error
+    	assertEquals("Wrong number of messages on jms queue " + LOG_ERROR_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_ERROR_QUEUE).size());
+    	assertEquals("Wrong number of messages on jms queue " + LOG_INFO_QUEUE, 1, jmsUtil.browseMessagesOnQueue(LOG_INFO_QUEUE).size());
 	}
 
 	private void assertBusinessCorrelationId(TextMessage errorMessage, TextMessage infoMessage)
@@ -243,15 +263,16 @@ public class VpFullServiceTest extends AbstractTestCase {
 	}
 
 	@Test
-	public void testLongConnectionTimeout() throws Exception {
+	public void testVP009IsThrownWhenLongConnectionTimeout() throws Exception {
 		
 		long ts = System.currentTimeMillis();
 		try {
 			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_LONG_TIMEOUT, LOGICAL_ADDRESS_NO_CONNECTION);
 			fail("An timeout should have occurred");
-		} catch (Throwable e) {
+		} catch (Throwable ex) {
 			ts = System.currentTimeMillis() - ts;
 			assertTrue("Expected time to be longer than long_timeout_ms (" + long_timeout_ms + ") but was " + ts + " ms.", ts > long_timeout_ms);
+			assertTrue(ex.getMessage().contains("VP009 Error connecting to service producer at adress https://www.google.com:81"));
 		}
 	}
 	
@@ -288,7 +309,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	}
 	
 	@Test
-	public void vp007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
+	public void testVP007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
 	
 		final String NOT_AUHTORIZED_CONSUMER_HSAID = "UNKNOWN_CONSUMER";
 		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
@@ -309,8 +330,10 @@ public class VpFullServiceTest extends AbstractTestCase {
     	}
 	}
 	
+	//TODO: Lägg till test för VP001, VP002, VP003, VP005 och VP006
+	
 	@Test
-	public void vp004IsThrownWhenNoLogicalAddressIsFound() throws Exception {
+	public void testVP004IsThrownWhenNoLogicalAddressIsFound() throws Exception {
 		
 		Map<String, String> properties = new HashMap<String, String>();
     	

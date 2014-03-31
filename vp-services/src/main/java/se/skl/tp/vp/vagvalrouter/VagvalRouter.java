@@ -45,10 +45,13 @@ import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.mule.transport.http.HttpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
 import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skl.tp.vp.dashboard.ServiceStatistics;
+import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
+import se.skl.tp.vp.util.EventLogger;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
@@ -109,6 +112,13 @@ public class VagvalRouter extends AbstractRecipientList {
 	
 	private String vpInstanceId;
 	
+	private final EventLogger eventLogger = new EventLogger();
+	
+	/**
+	 * Set value to be used in HTTP header x-vp-instance-id.
+	 * 
+	 * @param vpInstanceId
+	 */
 	public void setVpInstanceId(String vpInstanceId) {
 		this.vpInstanceId = vpInstanceId;
 	}
@@ -117,7 +127,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * Headers to be blocked when invoking producer.
 	 */
 	private static final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
-			VPUtil.RIV_VERSION, VPUtil.SERVICE_NAMESPACE, REVERSE_PROXY_HEADER_NAME,
+			VPUtil.RIV_VERSION, VPUtil.WSDL_NAMESPACE, REVERSE_PROXY_HEADER_NAME,
 			VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES", HttpConstants.HEADER_CONTENT_TYPE,
 			"http.disable.status.code.exception.check", }));
 
@@ -157,6 +167,33 @@ public class VagvalRouter extends AbstractRecipientList {
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
 	}
+	
+	/**
+	 * Enable logging to JMS, it true by default
+	 * 
+	 * @param logEnableToJms
+	 */
+	public void setEnableLogToJms(boolean logEnableToJms) {	
+		this.eventLogger.setEnableLogToJms(logEnableToJms);
+	}
+
+	/**
+	 * Setter for the jaxbToXml property
+	 * 
+	 * @param jaxbToXml
+	 */
+	public void setJaxbObjectToXml(JaxbObjectToXmlTransformer jaxbToXml) {
+		this.eventLogger.setJaxbToXml(jaxbToXml);
+	}
+	
+    /**
+     * Set the queue name for log error messages.
+     * 
+     * @param queueName
+     */
+    public void setLogErrorQueueName(String queueName) {
+        this.eventLogger.setLogErrorQueueName(queueName);
+    }
 
 	@Override
 	protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
@@ -178,9 +215,19 @@ public class VagvalRouter extends AbstractRecipientList {
 	 */
 	@Override
 	public MuleEvent route(MuleEvent event) throws RoutingException {
+		
+		/*
+		 * VpSemanticException stored in INVOCATION scoped property 'VpSemanticException' goes here...
+		 */
+		VpSemanticException vpSemanticException = (VpSemanticException)event.getMessage().getInvocationProperty(VPUtil.VP_SEMANTIC_EXCEPTION);
+		if (vpSemanticException != null) {
+			setSoapFaultInResponse(event, vpSemanticException.getMessage());
+			logException(event.getMessage(), vpSemanticException);
+			return event;
+		}
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = event.getMessage().getProperty(VPUtil.SERVICE_NAMESPACE, PropertyScope.SESSION) + "-"
+		String serviceId = event.getMessage().getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION) + "-"
 				+ event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 
 		synchronized (statistics) {
@@ -209,6 +256,29 @@ public class VagvalRouter extends AbstractRecipientList {
 		try {
 			// Do the actual routing
 			replyEvent = super.route(event);
+		} catch (RoutingException re) {
+			/*
+			 * RoutingExceotion goes here, e.g when unable to connect to producer
+			 * or timeout occurs.
+			 */
+					
+			//TODO: Is it possible to get failing endpoint any other way, e.g from exception?
+			String addr = this.getAddressingHelper(event.getMessage()).getAddress();
+			String cause = "VP009 Error connecting to service producer at adress " + addr;
+			
+			setSoapFaultInResponse(event, cause);
+			logException(event.getMessage(), re);
+			return event;
+			
+		} catch (RuntimeException re) {
+			/*
+			 * VpSemanticException goes here...
+			 */
+			
+			setSoapFaultInResponse(event, re.getMessage());
+			logException(event.getMessage(), re);
+			return event;
+			
 		} finally {
 		    if(replyEvent != null){
 		    	long endpointTime =  ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
@@ -312,6 +382,23 @@ public class VagvalRouter extends AbstractRecipientList {
 		int responseTimeoutValue = message.getProperty(VPUtil.FEATURE_RESPONSE_TIMOEUT, PropertyScope.INVOCATION,responseTimeout);
 		logger.debug("Selected response timeout {}", responseTimeoutValue);
 		return responseTimeoutValue;
+	}
+	
+	private MuleEvent setSoapFaultInResponse(MuleEvent event, String cause){
+		String soapFault = VPUtil.generateSoap11FaultWithCause(cause);
+		event.getMessage().setPayload(soapFault);
+		event.getMessage().setExceptionPayload(null);
+		event.getMessage().setProperty("http.status", 500, PropertyScope.OUTBOUND);
+		event.getMessage().setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
+		return event;
+	}
+	
+	private void logException(MuleMessage message, Throwable t) {
+		Map<String, String> extraInfo = new HashMap<String, String>();
+		extraInfo.put("source", getClass().getName());
+		eventLogger.setMuleContext(message.getMuleContext());
+		eventLogger.addSessionInfo(message, extraInfo);
+		eventLogger.logErrorEvent(t, message, null, extraInfo);	
 	}
 
 	private Connector selectConsumerConnector(String url, MuleMessage message) {

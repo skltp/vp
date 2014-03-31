@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 
@@ -89,7 +90,17 @@ public class RivTransformer extends AbstractMessageTransformer {
 		 * Get the available RIV version from the service directory, and if the
 		 * version doesn't match, update to the producer version and transform
 		 */
-		final String rivProfile = addrHelper.getAvailableRivProfile();
+		String rivProfile = "";
+		try {
+			rivProfile = addrHelper.getAvailableRivProfile();
+		} catch (VpSemanticException e) {
+			/*
+			 * Set the exception in INVOVATION scoped property, to be able for
+			 * VagvalRouter to pick it up.
+			 */
+			msg.setInvocationProperty(VPUtil.VP_SEMANTIC_EXCEPTION, e);
+			return msg;
+		}
 		log.debug("RivProfile set to session scope: " + rivProfile);
 
 		if (rivVersion.equalsIgnoreCase(RIV20) && rivProfile.equalsIgnoreCase(RIV21)) {

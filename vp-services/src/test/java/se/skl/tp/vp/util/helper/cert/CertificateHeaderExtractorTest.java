@@ -89,7 +89,7 @@ public class CertificateHeaderExtractorTest {
 			fail("Exception not thrown when caller was not in the ip white list");
 		} catch (final VpSemanticException e) {
 			// OK
-			assertEquals("Caller was not on the white list of accepted IP-addresses. IP-address: 192.168.0.109. HTTP header that caused checking: x-vp-auth-cert", e.getMessage());
+			assertEquals("VP011 Caller was not on the white list of accepted IP-addresses. IP-address: 192.168.0.109. HTTP header that caused checking: x-vp-auth-cert", e.getMessage());
 		}
 
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VagvalRouter.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
