@@ -62,8 +62,15 @@ public class VpMuleServer {
 		
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		
+		//Test producers for urn:skl:tjanst1:rivtabp20
 		vagvalInputs.add(createVagvalRecord("vp-test-producer", "RIVTABP20", "tp", "urn:skl:tjanst1:rivtabp20","https://localhost:19000/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord("vp-test-producer-no-connection", "RIVTABP20", "tp", "urn:skl:tjanst1:rivtabp20","https://www.google.com:81"));
+		
+		//Ping virtual service
+		vagvalInputs.add(createVagvalRecord("ping", "RIVTABP20", "tp", "urn:riv:itinfra:tp:Ping:1:rivtabp20","http://localhost:10000/test/Ping_Service"));
+		
+		//Monitor ping rest service, used by e.g load balancers and monitoring software
+		vagvalInputs.add(createVagvalRecord("TEST_SERVICE_HSA_ID", "RIVTABP20", "tp", "urn:riv:itinfra:tp:Ping:1:rivtabp20","http://localhost:10000/test/Ping_Service"));
 		
 		svimi.setVagvalInputs(vagvalInputs);
 	}
