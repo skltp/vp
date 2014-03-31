@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<mule 
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:https="http://www.mulesoft.org/schema/mule/https"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:management="http://www.mulesoft.org/schema/mule/management"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans-current.xsd
+		http://www.mulesoft.org/schema/mule/core		http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/https		http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+		http://www.mulesoft.org/schema/mule/jms			http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+		http://www.mulesoft.org/schema/mule/management	http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd
+		http://www.mulesoft.org/schema/mule/http		http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+	">
+
+	<spring:bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<spring:property name="ignoreResourceNotFound" value="true" />
+		<spring:property name="locations">
+			<spring:list>
+				<spring:value>classpath:vp-security.properties</spring:value>
+				<spring:value>classpath:vp-security-override.properties</spring:value>
+				
+				<spring:value>classpath:vp-config.properties</spring:value>
+				<spring:value>classpath:vp-config-override.properties</spring:value>
+			</spring:list>
+		</spring:property>
+	</spring:bean>
+
+<!-- 
+    <management:jmx-default-config port="${JMX_PORT}" registerMx4jAdapter="false" >
+        <management:credentials>
+            <spring:entry key="${JMX_USER}" value="${JMX_PWD}"/>
+        </management:credentials>
+    </management:jmx-default-config> 
+ -->
+    
+	<!--  Allow tests to register dynamic listeners by specifying dynamic="true" -->
+	<!-- TODO: Is there a performance hit with this that is not acceptable in runtime?
+	           Then we maybe need a teststub-common-xml file in the end... -->
+  
+   	<notifications dynamic="true">
+		<notification event="COMPONENT-MESSAGE"/>
+		<notification event="ENDPOINT-MESSAGE"/>
+		<notification event="CONTEXT"/>
+  		<notification-listener ref="muleStartupNotification"/>
+	</notifications>
+
+  <!-- The default profile used by normal usage of mule-app, either deployed in mule or started using st-muleServer-helper-class. Not used by integration tests -->
+    <spring:beans profile="default">
+        <!-- Connectors et al that are specific for different environment specific config-files (local unit-test, integration-test or production environments) -->
+
+		<spring:import resource="classpath:vp-mule-http-consumer-connector.xml"/>
+		<spring:import resource="classpath:vp-mule-https-consumer-connector.xml"/>
+		<spring:import resource="classpath:vp-mule-https-consumer-keepalive-connector.xml"/>
+		<spring:import resource="classpath:vp-mule-https-producer-connector.xml"/>
+		 
+        <!-- TODO: Add import of environment specific configuration files here as required -->
+        
+        <!-- Import the JMS-provider used in production here, embedded JMS providers used for integration tests are loaded by the *IntegratIonTest.java classes directly -->  
+       
+    </spring:beans> 
+    
+     <spring:beans>
+     
+     	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
+     	
+  		<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
+			<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_URL}"/>
+			<spring:property name="addressDelimiter" value="#"/>
+			<spring:property name="hsaCache" ref="hsaCache"/>
+			<spring:property name="localTakCache" value="${LOCAL_TAK_CACHE}"/>
+		</spring:bean>
+		
+		<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
+			<spring:property name="vagvalAgent" ref="vagvalAgent"/>	
+			<spring:property name="hsaCache" ref="hsaCache"/>
+			<spring:property name="hsaFiles" value="${HSA_FILES}"/>
+		</spring:bean>
+		
+    </spring:beans>
+    
+    <configuration>
+		<default-dispatcher-threading-profile poolExhaustedAction="ABORT" maxThreadsActive="${TP_DISPATCH_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_DISPATCH_MAX_THREADS_IDLE}" threadTTL="${TP_DISPATCH_MAX_THREADS_TTL}"/>
+		<default-receiver-threading-profile poolExhaustedAction="ABORT" maxThreadsActive="${TP_RECEIVE_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_RECEIVE_MAX_THREADS_IDLE}" threadTTL="${TP_RECEIVE_MAX_THREADS_TTL}"/>
+	</configuration>
+    
+    <custom-transformer name="featureKeepAliveResponse" class="se.skl.tp.vp.feature.keepalive.KeepAliveResponseTransformer"/>
+        
+    <custom-transformer name="rivExtractor" class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
+    
+    <custom-transformer name="fixTransformer" class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
+	
+	<custom-transformer name="XmlToXSR" class="org.mule.module.xml.transformer.XmlToXMLStreamReader">
+   		<spring:property name="reversible" value="true"/>
+	</custom-transformer>
+	
+	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>
+
+	<custom-transformer name="createCorrId"  class="org.soitoolkit.commons.mule.log.correlationid.CreateCorrelationIdTransformer"/>
+
+	<custom-transformer name="objToXml" class="org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer">
+		<spring:property name="contextPath"  value="org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1"/>
+	</custom-transformer>
+
+	<custom-transformer name="xmlToObj" class="org.soitoolkit.commons.mule.jaxb.XmlToJaxbObjectTransformer">
+		<spring:property name="contextPath"  value="org.w3.wsaddressing10:se.riv.itintegration.monitoring.v1" />
+	</custom-transformer>
+	
+	<custom-transformer name="rivTransformer" class="se.skl.tp.vp.vagvalrouter.RivTransformer" >
+        <spring:property
+            name="vagvalAgent"
+            ref="vagvalAgent" />
+   </custom-transformer>
+	
+	<custom-transformer name="exceptionTransformer" class="se.skl.tp.vp.vagvalrouter.ExceptionTransformer"/>
+<!-- 	<custom-transformer name="createSoapFaultIfException" class="org.soitoolkit.commons.mule.soap.CreateSoapFaultIfExceptionTransformer"/> -->
+	
+	<custom-transformer name="mimeToStr" class="org.soitoolkit.commons.mule.mime.MimeToStringTransformer" />
+
+    <custom-transformer name="logReqIn" class="se.skl.tp.vp.util.LogTransformer">
+		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+		<spring:property name="logType"  value="xreq-in"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
+        <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+    </custom-transformer>
+    
+    <custom-transformer name="logReqOut" class="se.skl.tp.vp.util.LogTransformer">
+		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+		<spring:property name="logType"  value="xreq-out"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
+        <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+    </custom-transformer>
+
+    <custom-transformer name="logRespIn" class="se.skl.tp.vp.util.LogTransformer">
+		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+		<spring:property name="logType"  value="xresp-in"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
+        <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+    </custom-transformer>
+
+    <custom-transformer name="logRespOut" class="se.skl.tp.vp.util.LogTransformer">
+		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+		<spring:property name="logType"  value="xresp-out"/>
+		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
+        <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+    </custom-transformer>
+    
+    <message-properties-transformer name="filterResponseHeaders" scope="outbound">
+	    <delete-message-property key="SOAPAction" />
+	    <delete-message-property key="MULE_CORRELATION_GROUP_SIZE" />
+	    <delete-message-property key="MULE_CORRELATION_ID" />   	    	    
+	    <delete-message-property key="MULE_ENCODING" />
+	   	<delete-message-property key="http.method" />
+	    <delete-message-property key="http.status" />
+	    <delete-message-property key="LOCAL_CERTIFICATES" />
+	    <delete-message-property key="PEER_CERTIFICATES" />
+	</message-properties-transformer>
+    
+
+</mule>

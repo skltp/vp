@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
+
+    <description>
+		Test konfiguration för att simulera Tjänstekatalogen
+    </description>
+    
+    <spring:bean name="vagvalInputs"
+		class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput" />
+	
+	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
+	
+	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
+		<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_TESTSTUB_URL}" />
+		<spring:property name="addressDelimiter" value="#" />
+		<spring:property name="hsaCache" ref="hsaCache"/>
+		<spring:property name="localTakCache" value="${user.home}${file.separator}.tk.localCache.test"/>
+	</spring:bean>
+
+    <flow name="tk-teststub-flow" >
+
+        <inbound-endpoint address="${TP_SOKVAGVALSINFO_TESTSTUB_URL}"/>
+        
+        <cxf:jaxws-service
+            namespace="urn:skl:tp:vagvalsinfo:v2"            
+            serviceClass="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer"
+            wsdlLocation="classpath:/VAGVAL_2_0_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-2.0.wsdl" />
+        
+        <component>
+            <singleton-object class="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer" >
+            	<property key="vagvalInputs" value-ref="vagvalInputs" />
+            </singleton-object>
+        </component>
+       
+    </flow>
+
+</mule>
