@@ -51,7 +51,8 @@ import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 @SuppressWarnings("deprecation")
 public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 
-	private HttpClient client;
+	private HttpClient clientHttps;
+	private HttpClient clientHttp;
 	private SslProtocolSocketFactory socketFactory;
 	
 	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
@@ -89,15 +90,20 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		socketFactory = new SslProtocolSocketFactory(keyStore, "password", trustStore, "password");
 		
 		Protocol authhttps = new Protocol("https", socketFactory, 20000);
-
-		client = new HttpClient();
-		client.getHostConfiguration().setHost("localhost", 20000, authhttps);
+		clientHttps = new HttpClient();
+		clientHttps.getHostConfiguration().setHost("localhost", 20000, authhttps);
+		
+		clientHttp = new HttpClient();
+		clientHttp.getHostConfiguration().setHost("localhost", 8080);
 		
 	}
 		
 	@After
 	public void doTearDown() throws Exception {
-		socketFactory.getSocket().close();
+		//Might not be initialized when using http
+		if(socketFactory.getSocket() != null ){
+			socketFactory.getSocket().close();	
+		}
 	}
 	
 	@Test
@@ -314,14 +320,26 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
     }
 	
 	@Test
-	public void testHttp500IsReturnedForVP00xSoapFaults() throws Exception {
+	public void testHttp500IsReturnedForVP004SoapFaultsWhenUsingHttps() throws Exception {
 		
 		/*
-		 * ExceptionMessageTransformer.java sets message.setProperty("http.status", 500, PropertyScope.OUTBOUND) to make
+		 * VagvalRouter.java sets message.setProperty("http.status", 500, PropertyScope.OUTBOUND) to make
 		 * sure 500 is returned. This test verifies the transformer in a integrationtest.
 		 */
 		
-        PostMethod httppost = executeSoapCallUsingRequest("/vp/keep-alive-tjanst1", "testfiles/RequestTriggerVp004.xml");
+        PostMethod httppost = executeSoapCallUsingRequest("/vp/tjanst1", "testfiles/RequestTriggerVp004.xml");
+        assertEquals(500, httppost.getStatusCode());
+    }
+	
+	@Test
+	public void testHttp500IsReturnedForVP004SoapFaultsWhenUsingHttp() throws Exception {
+		
+		/*
+		 * VagvalRouter.java sets message.setProperty("http.status", 500, PropertyScope.OUTBOUND) to make
+		 * sure 500 is returned. This test verifies the transformer in a integrationtest.
+		 */
+		
+        PostMethod httppost = executeSoapCallUsingHttpRequest("/vp/tjanst1", "testfiles/RequestTriggerVp004.xml");
         assertEquals(500, httppost.getStatusCode());
     }
 	
@@ -332,7 +350,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		httppost.setRequestEntity(requestEntity);
 		if(doClose) httppost.setRequestHeader("Connection", "close");
 		if(doKeepAlive) httppost.setRequestHeader("Connection", "keep-alive");
-		client.executeMethod(httppost);
+		clientHttps.executeMethod(httppost);
 		return httppost;
 	}
 	
@@ -343,7 +361,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
         httppost.setRequestEntity(requestEntity);
         if(doClose) httppost.setRequestHeader("Connection", "close");
         if(doKeepAlive) httppost.setRequestHeader("Connection", "keep-alive");
-        client.executeMethod(httppost);
+        clientHttps.executeMethod(httppost);
         return httppost;
     }
 	
@@ -352,7 +370,18 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
         RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream(requestFile));
         httppost.getParams().setVersion(HttpVersion.HTTP_1_1);
         httppost.setRequestEntity(requestEntity);
-        client.executeMethod(httppost);
+        clientHttps.executeMethod(httppost);
+        return httppost;
+    }
+	
+	private PostMethod executeSoapCallUsingHttpRequest(final String subUrl, String requestFile) throws HttpException, IOException {
+        PostMethod httppost = new PostMethod(subUrl);
+        RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream(requestFile));
+        httppost.getParams().setVersion(HttpVersion.HTTP_1_1);
+        httppost.addRequestHeader(VagvalRouter.X_VP_INSTANCE_ID, "THIS_VP_INSTANCE_ID");
+        httppost.addRequestHeader(VagvalRouter.X_VP_SENDER_ID, "tp");
+        httppost.setRequestEntity(requestEntity);
+        clientHttp.executeMethod(httppost);
         return httppost;
     }
 	

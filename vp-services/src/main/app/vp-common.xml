@@ -180,7 +180,6 @@
 	    <delete-message-property key="MULE_CORRELATION_ID" />   	    	    
 	    <delete-message-property key="MULE_ENCODING" />
 	   	<delete-message-property key="http.method" />
-	    <delete-message-property key="http.status" />
 	    <delete-message-property key="LOCAL_CERTIFICATES" />
 	    <delete-message-property key="PEER_CERTIFICATES" />
 	</message-properties-transformer>
