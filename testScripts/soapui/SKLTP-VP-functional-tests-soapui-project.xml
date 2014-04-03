@@ -231,9 +231,9 @@
 </soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:test:PingResponder:1:ping"/><con:wsrmConfig version="1.2"/></con:call><con:call name="virtual ping https request no sleep - ok"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
   &lt;con:entry key="x-vp-sender-id" value="tp"/>
   &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/Ping/1/rivtabp20</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
+&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
    <soapenv:Header>
-      <add:To>ping-1</add:To>
+      <add:To>Ping</add:To>
    </soapenv:Header>
    <soapenv:Body>
       <urn:ping>
@@ -241,342 +241,20 @@
          <!--You may enter ANY elements at this point-->
       </urn:ping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:test:PingResponder:1:ping"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="Tjanst1SoapBinding" type="wsdl" bindingName="{urn:skl:tjanst1:rivtabp20}Tjanst1SoapBinding" soapVersion="1_1" anonymous="optional" definition="https://localhost:20000/vp/tjanst1?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://localhost:20000/vp/tjanst1?wsdl"><con:part><con:url>https://localhost:20000/vp/tjanst1?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="Tjanst1" targetNamespace="urn:skl:tjanst1:rivtabp20" xmlns="urn:skl:tjanst1:rivtabp20" xmlns:rivh="urn:riv:v1" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <wsdl:types>
-    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified">
-      <xsd:import namespace="urn:skl:tjanst1:rivtabp20" schemaLocation="https://localhost:20000/vp/tjanst1?xsd=tjanst1-1.0.xsd"/>
-      <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="https://localhost:20000/vp/tjanst1?xsd=../../core_components/ws-addressing-1.0.xsd"/>
-    </xsd:schema>
-  </wsdl:types>
-  <wsdl:message name="listProductsMsg">
-    <wsdl:part element="wsa:To" name="LogicalAddress"></wsdl:part>
-    <wsdl:part element="listProducts" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getProductDetailResponse">
-    <wsdl:part element="getProductDetailResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="listProductsResponse">
-    <wsdl:part element="listProductsResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="getProductDetailMsg">
-    <wsdl:part element="wsa:To" name="LogicalAddress"></wsdl:part>
-    <wsdl:part element="getProductDetailElem" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="Tjanst1Interface">
-    <wsdl:operation name="getProductDetail">
-      <wsdl:input message="getProductDetailMsg"></wsdl:input>
-      <wsdl:output message="getProductDetailResponse"></wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="listProducts">
-      <wsdl:input message="listProductsMsg"></wsdl:input>
-      <wsdl:output message="listProductsResponse"></wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="Tjanst1SoapBinding" type="Tjanst1Interface">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="getProductDetail">
-      <soap:operation soapAction="getProductDetail"/>
-      <wsdl:input>
-        <soap:header message="getProductDetailMsg" part="LogicalAddress" use="literal"></soap:header>
-        <soap:body parts="parameters" use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="listProducts">
-      <soap:operation soapAction="listProducts"/>
-      <wsdl:input>
-        <soap:header message="listProductsMsg" part="LogicalAddress" use="literal"></soap:header>
-        <soap:body parts="parameters" use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="Tjanst1Service">
-    <wsdl:port binding="Tjanst1SoapBinding" name="Tjanst1ImplPort">
-      <soap:address location="https://localhost:20000/vp/tjanst1"/>
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>https://localhost:20000/vp/tjanst1?xsd=tjanst1-1.0.xsd</con:url><con:content><![CDATA[<!--* Copyright 2009 Sjukvardsradgivningen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
-
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-
- *   Boston, MA 02111-1307  USA-->
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="urn:skl:tjanst1:rivtabp20" version="1.0" xmlns="urn:skl:tjanst1:rivtabp20" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:complexType name="product">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="description" type="xs:string"/>
-      <xs:element name="height" type="xs:int"/>
-      <xs:element minOccurs="0" name="id" type="xs:string"/>
-      <xs:element name="width" type="xs:int"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="listProducts" type="listProducts"/>
-  <xs:complexType name="listProducts">
-    <xs:sequence/>
-  </xs:complexType>
-  <xs:element name="listProductsResponse" type="listProductsResponse"/>
-  <xs:complexType name="listProductsResponse">
-    <xs:sequence>
-      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="getProductDetailElem" type="getProductDetailType"/>
-  <xs:complexType name="getProductDetailType">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="productId" type="xs:string"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="getProductDetailResponse" type="getProductDetailResponse"/>
-  <xs:complexType name="getProductDetailResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="product" type="product"/>
-    </xs:sequence>
-  </xs:complexType>
-</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>https://localhost:20000/vp/tjanst1?xsd=../../core_components/ws-addressing-1.0.xsd</con:url><con:content><![CDATA[<!--W3C XML Schema defined in the Web Services Addressing 1.0 specification
-    http://www.w3.org/TR/ws-addr-core
-
-   Copyright © 2005 World Wide Web Consortium,
-
-   (Massachusetts Institute of Technology, European Research Consortium for
-   Informatics and Mathematics, Keio University). All Rights Reserved. This
-   work is distributed under the W3C® Software License [1] in the hope that
-   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
-
-   $Id: ws-addr.xsd,v 1.4 2008/07/14 18:48:47 plehegar Exp $-->
-<xs:schema attributeFormDefault="unqualified" blockDefault="#all" elementFormDefault="qualified" finalDefault="" targetNamespace="http://www.w3.org/2005/08/addressing" xmlns:tns="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <!--Constructs from the WS-Addressing Core-->
-  <xs:element name="EndpointReference" type="tns:EndpointReferenceType"/>
-  <xs:complexType mixed="false" name="EndpointReferenceType">
-    <xs:sequence>
-      <xs:element name="Address" type="tns:AttributedURIType"/>
-      <xs:element minOccurs="0" name="ReferenceParameters" type="tns:ReferenceParametersType"/>
-      <xs:element minOccurs="0" ref="tns:Metadata"/>
-      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:complexType mixed="false" name="ReferenceParametersType">
-    <xs:sequence>
-      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="Metadata" type="tns:MetadataType"/>
-  <xs:complexType mixed="false" name="MetadataType">
-    <xs:sequence>
-      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="MessageID" type="tns:AttributedURIType"/>
-  <xs:element name="RelatesTo" type="tns:RelatesToType"/>
-  <xs:complexType mixed="false" name="RelatesToType">
-    <xs:simpleContent>
-      <xs:extension base="xs:anyURI">
-        <xs:attribute default="http://www.w3.org/2005/08/addressing/reply" name="RelationshipType" type="tns:RelationshipTypeOpenEnum" use="optional"/>
-        <xs:anyAttribute namespace="##other" processContents="lax"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:simpleType name="RelationshipTypeOpenEnum">
-    <xs:union memberTypes="tns:RelationshipType xs:anyURI"/>
-  </xs:simpleType>
-  <xs:simpleType name="RelationshipType">
-    <xs:restriction base="xs:anyURI">
-      <xs:enumeration value="http://www.w3.org/2005/08/addressing/reply"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="ReplyTo" type="tns:EndpointReferenceType"/>
-  <xs:element name="From" type="tns:EndpointReferenceType"/>
-  <xs:element name="FaultTo" type="tns:EndpointReferenceType"/>
-  <xs:element name="To" type="tns:AttributedURIType"/>
-  <xs:element name="Action" type="tns:AttributedURIType"/>
-  <xs:complexType mixed="false" name="AttributedURIType">
-    <xs:simpleContent>
-      <xs:extension base="xs:anyURI">
-        <xs:anyAttribute namespace="##other" processContents="lax"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <!--Constructs from the WS-Addressing SOAP binding-->
-  <xs:attribute name="IsReferenceParameter" type="xs:boolean"/>
-  <xs:simpleType name="FaultCodesOpenEnumType">
-    <xs:union memberTypes="tns:FaultCodesType xs:QName"/>
-  </xs:simpleType>
-  <xs:simpleType name="FaultCodesType">
-    <xs:restriction base="xs:QName">
-      <xs:enumeration value="tns:InvalidAddressingHeader"/>
-      <xs:enumeration value="tns:InvalidAddress"/>
-      <xs:enumeration value="tns:InvalidEPR"/>
-      <xs:enumeration value="tns:InvalidCardinality"/>
-      <xs:enumeration value="tns:MissingAddressInEPR"/>
-      <xs:enumeration value="tns:DuplicateMessageID"/>
-      <xs:enumeration value="tns:ActionMismatch"/>
-      <xs:enumeration value="tns:MessageAddressingHeaderRequired"/>
-      <xs:enumeration value="tns:DestinationUnreachable"/>
-      <xs:enumeration value="tns:ActionNotSupported"/>
-      <xs:enumeration value="tns:EndpointUnavailable"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="RetryAfter" type="tns:AttributedUnsignedLongType"/>
-  <xs:complexType mixed="false" name="AttributedUnsignedLongType">
-    <xs:simpleContent>
-      <xs:extension base="xs:unsignedLong">
-        <xs:anyAttribute namespace="##other" processContents="lax"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:element name="ProblemHeaderQName" type="tns:AttributedQNameType"/>
-  <xs:complexType mixed="false" name="AttributedQNameType">
-    <xs:simpleContent>
-      <xs:extension base="xs:QName">
-        <xs:anyAttribute namespace="##other" processContents="lax"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:element name="ProblemHeader" type="tns:AttributedAnyType"/>
-  <xs:complexType mixed="false" name="AttributedAnyType">
-    <xs:sequence>
-      <xs:any maxOccurs="1" minOccurs="1" namespace="##any" processContents="lax"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-  <xs:element name="ProblemIRI" type="tns:AttributedURIType"/>
-  <xs:element name="ProblemAction" type="tns:ProblemActionType"/>
-  <xs:complexType mixed="false" name="ProblemActionType">
-    <xs:sequence>
-      <xs:element minOccurs="0" ref="tns:Action"/>
-      <xs:element minOccurs="0" name="SoapAction" type="xs:anyURI"/>
-    </xs:sequence>
-    <xs:anyAttribute namespace="##other" processContents="lax"/>
-  </xs:complexType>
-</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/vp/tjanst1</con:endpoint><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint></con:endpoints><con:operation isOneWay="false" action="getProductDetail" name="getProductDetail" bindingOperationName="getProductDetail" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Mule problem with CDATA see fix SKLTP-217 - error"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456<![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header/><soapenv:Body><int:test/></soapenv:Body></soapenv:Envelope>]]]]>><![CDATA[</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="producer throws soap fault - error"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>Exception</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="https normal request - ok"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="VP009 Error connecting to service producer - response timeout - error"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>Timeout</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="consumer provides http header x-vp-sender-id and x-vp-instance-id - ok"><con:description>Bifogar x-vp-senderid=tp</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:test:PingResponder:1:ping"/><con:wsrmConfig version="1.2"/></con:call><con:call name="vp009- request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
   &lt;con:entry key="x-vp-sender-id" value="tp"/>
   &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
+&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
    <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
+      <add:To>PRODUCER-NOT-AVAILABLE</add:To>
    </soapenv:Header>
    <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
+      <urn:ping>
+         <urn:pingIn></urn:pingIn>
+         <!--You may enter ANY elements at this point-->
+      </urn:ping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="consumer provides htth header x-rivta-original-serviceconsumer - ok"><con:description>Bifogar http header x-rivta-original-serviceconsumer-hsaid</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="x-rivta-original-serviceconsumer-hsaid" value="HSA123456789" xmlns="http://eviware.com/soapui/config"/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="VP009 Error connecting to service producer - connect timeout - error"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer-no-connection</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="VP004 No Logical Adress found - error"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
-  &lt;con:entry key="x-vp-sender-id" value="tp"/>
-  &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>unknown-logical-adress</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call><con:call name="VP007 Authorization missing - error"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
-  &lt;con:entry key="x-vp-sender-id" value="unknown_sender_id"/>
-  &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="listProducts" name="listProducts" bindingOperationName="listProducts" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="https normal request - ok"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://localhost:20000/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:listProducts/>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="listProducts"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="PingForConfigurationResponderBinding" type="wsdl" bindingName="{urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20}PingForConfigurationResponderBinding" soapVersion="1_1" anonymous="optional" definition="https://localhost:23001/vp/PingForConfiguration/1/rivtabp20?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://localhost:23001/vp/PingForConfiguration/1/rivtabp20?wsdl"><con:part><con:url>https://localhost:23001/vp/PingForConfiguration/1/rivtabp20?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="PingForConfigurationInteraction" targetNamespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tjsi="urn:riv:itintegration:monitoring:PingForConfigurationInitiator:1" xmlns:tjsr="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1" xmlns:tns="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:test:PingResponder:1:ping"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="PingForConfigurationResponderBinding" type="wsdl" bindingName="{urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20}PingForConfigurationResponderBinding" soapVersion="1_1" anonymous="optional" definition="https://localhost:23001/vp/PingForConfiguration/1/rivtabp20?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://localhost:23001/vp/PingForConfiguration/1/rivtabp20?wsdl"><con:part><con:url>https://localhost:23001/vp/PingForConfiguration/1/rivtabp20?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="PingForConfigurationInteraction" targetNamespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tjsi="urn:riv:itintegration:monitoring:PingForConfigurationInitiator:1" xmlns:tjsr="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1" xmlns:tns="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <wsdl:types>
     <xs:schema targetNamespace="urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20">
       <xs:import namespace="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1" schemaLocation="https://localhost:23001/vp/PingForConfiguration/1/rivtabp20?xsd=PingForConfigurationResponder_1.0.xsd"/>
@@ -845,7 +523,7 @@
     </xs:sequence>
     <xs:anyAttribute namespace="##other" processContents="lax"/>
   </xs:complexType>
-</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/vp/services/PingForConfiguration/1/rivtabp20</con:endpoint><con:endpoint>http://localhost:8080/vp/services/PingForConfiguration/1/rivtabp21</con:endpoint></con:endpoints><con:operation isOneWay="false" action="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1:PingForConfiguration" name="PingForConfiguration" bindingOperationName="PingForConfiguration" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="RIVTABP21-Request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/services/PingForConfiguration/1/rivtabp21</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:riv:itintegration:registry:1" xmlns:urn1="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1">
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/vp/services/PingForConfiguration/1/rivtabp20</con:endpoint><con:endpoint>http://localhost:8080/vp/services/PingForConfiguration/1/rivtabp21</con:endpoint></con:endpoints><con:operation isOneWay="false" action="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1:PingForConfiguration" name="PingForConfiguration" bindingOperationName="PingForConfiguration" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="RIVTABP21-Request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:riv:itintegration:registry:1" xmlns:urn1="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1">
    <soapenv:Header>
       <urn:LogicalAddress>?</urn:LogicalAddress>
    </soapenv:Header>
@@ -944,280 +622,24 @@
       <wsdl:output message="ns1:GetLogicalAddresseesByServiceContractResponse" name="GetLogicalAddresseesByServiceContractResponse"></wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/vp/services/GetLogicalAddresseesByServiceContract/2/rivtabp21</con:endpoint></con:endpoints><con:operation isOneWay="false" action="urn:riv:infrastructure:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:2:GetLogicalAddresseesByServiceContract" name="GetLogicalAddresseesByServiceContract" bindingOperationName="GetLogicalAddresseesByServiceContract" type="Request-Response" outputName="GetLogicalAddresseesByServiceContractResponse" inputName="GetLogicalAddresseesByServiceContract" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="getLogicalAddresseesByServiceContractV2"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/services/GetLogicalAddresseesByServiceContract/2/rivtabp21</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:riv:infrastructure:itintegration:registry:2" xmlns:urn1="urn:riv:infrastructure:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:2">
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/vp/services/GetLogicalAddresseesByServiceContract/2/rivtabp21</con:endpoint></con:endpoints><con:operation isOneWay="false" action="urn:riv:infrastructure:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:2:GetLogicalAddresseesByServiceContract" name="GetLogicalAddresseesByServiceContract" bindingOperationName="GetLogicalAddresseesByServiceContract" type="Request-Response" outputName="GetLogicalAddresseesByServiceContractResponse" inputName="GetLogicalAddresseesByServiceContract" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="getLogicalAddresseesByServiceContractV2"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:riv:infrastructure:itintegration:registry:2" xmlns:urn1="urn:riv:infrastructure:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:2">
    <soapenv:Header>
       <urn:LogicalAddress>?</urn:LogicalAddress>
    </soapenv:Header>
    <soapenv:Body>
       <urn1:GetLogicalAddresseesByServiceContract>
-         <urn1:serviceConsumerHsaId>tp</urn1:serviceConsumerHsaId>
+         <urn1:serviceConsumerHsaId>HSASERVICES-100M</urn1:serviceConsumerHsaId>
          <urn1:serviceContractNameSpace>
-            <urn:ServiceContractNamespace>urn:skl:tjanst1:rivtabp20</urn:ServiceContractNamespace>
+            <urn:ServiceContractNamespace>urn:riv:itinfra:tp:Ping:1:rivtabp20</urn:ServiceContractNamespace>
             <!--You may enter ANY elements at this point-->
          </urn1:serviceContractNameSpace>
          <!--You may enter ANY elements at this point-->
       </urn1:GetLogicalAddresseesByServiceContract>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:infrastructure:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:2:GetLogicalAddresseesByServiceContract"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="SokVagvalsInfoInterfaceSoap11DocLitBinding" type="wsdl" bindingName="{urn:skl:tp:vagvalsinfo:v2}SokVagvalsInfoInterfaceSoap11DocLitBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?wsdl"><con:part><con:url>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="urn:skl:tp:vagvalsinfo:v2" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="urn:skl:tp:vagvalsinfo:v2" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <wsdl:import location="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?wsdl=vagvalsinfo-sokvagvalsinfo-2.0.wsdl" namespace="urn:skl:tp:vagvalsinfo:v2"></wsdl:import>
-  <wsdl:service name="SokVagvalsServiceSoap11LitDocService">
-    <wsdl:port binding="tns:SokVagvalsInfoInterfaceSoap11DocLitBinding" name="SokVagvalsSoap11LitDocPort">
-      <soap:address location="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2"/>
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?wsdl=vagvalsinfo-sokvagvalsinfo-2.0.wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="urn:skl:tp:vagvalsinfo:v2" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ps="urn:skl:tp:vagvalsinfo:v2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="urn:skl:tp:vagvalsinfo:v2" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified">
-      <xs:import namespace="urn:skl:tp:vagvalsinfo:v2" schemaLocation="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=vagvalsinfo-sokvagvalsinfo-2.0.xsd"/>
-    </xs:schema>
-  </wsdl:types>
-  <wsdl:message name="HamtaAllaAnropsBehorigheterRequest">
-    <wsdl:part element="tns:hamtaAllaAnropsBehorigheter" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="HamtaAllaVirtualiseringarRequest">
-    <wsdl:part element="tns:hamtaAllaVirtualiseringar" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="HamtaAllaAnropsBehorigheterResponse">
-    <wsdl:part element="tns:hamtaAllaAnropsBehorigheterResponse" name="response"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="HamtaAllaVirtualiseringarResponse">
-    <wsdl:part element="tns:hamtaAllaVirtualiseringarResponse" name="response"></wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="SokVagvalsInfoInterface">
-    <wsdl:operation name="hamtaAllaVirtualiseringar">
-      <wsdl:input message="tns:HamtaAllaVirtualiseringarRequest"></wsdl:input>
-      <wsdl:output message="tns:HamtaAllaVirtualiseringarResponse"></wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="hamtaAllaAnropsBehorigheter">
-      <wsdl:input message="tns:HamtaAllaAnropsBehorigheterRequest"></wsdl:input>
-      <wsdl:output message="tns:HamtaAllaAnropsBehorigheterResponse"></wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="SokVagvalsInfoInterfaceSoap11DocLitBinding" type="tns:SokVagvalsInfoInterface">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="hamtaAllaVirtualiseringar">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input>
-        <soap:body parts="parameters" use="literal"/>
-        <soap:header message="tns:HamtaAllaVirtualiseringarRequest" part="header" use="literal"></soap:header>
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="hamtaAllaAnropsBehorigheter">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input>
-        <soap:body parts="parameters" use="literal"/>
-        <soap:header message="tns:HamtaAllaAnropsBehorigheterRequest" part="header" use="literal"></soap:header>
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=vagvalsinfo-sokvagvalsinfo-2.0.xsd</con:url><con:content><![CDATA[<!--* Copyright 2009 Sjukvardsradgivningen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
-
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-
- *   Boston, MA 02111-1307  USA-->
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:skl:tp:vagvalsinfo:v2" version="2.0" xmlns="urn:skl:tp:vagvalsinfo:v2" xmlns:tns="urn:skl:tp:vagvalsinfo:v2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:annotation>
-    <xs:documentation>Tjänsteplattform
-		Tjänste-schema för SökVagvalsinfo</xs:documentation>
-  </xs:annotation>
-  <!--TODO: Use xs:import and different namespaces in xsd to support better handling of different versions, SKLTP-366-->
-  <xs:include schemaLocation="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=vagvalsinfo-anropsbehorighetsinfo-2.0.xsd"/>
-  <xs:include schemaLocation="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=vagvalsinfo-virtualiseringsinfo-2.0.xsd"/>
-  <xs:annotation>
-    <xs:documentation>Meddelanden för operationer i SokVagvalsInfoInterface</xs:documentation>
-  </xs:annotation>
-  <xs:annotation>
-    <xs:documentation>Operation hamtaAllaAnropsBehorigheter</xs:documentation>
-  </xs:annotation>
-  <xs:element name="hamtaAllaAnropsBehorigheter" nillable="true"/>
-  <xs:element name="hamtaAllaAnropsBehorigheterRequest" nillable="true" type="xs:NCName"/>
-  <xs:element name="hamtaAllaAnropsBehorigheterResponse" type="tns:hamtaAllaAnropsBehorigheterResponseType"/>
-  <xs:complexType name="hamtaAllaAnropsBehorigheterResponseType">
-    <xs:sequence>
-      <xs:element maxOccurs="unbounded" ref="tns:anropsBehorighetsInfo"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:annotation>
-    <xs:documentation>Operation hamtaAllaVirtualiseringar</xs:documentation>
-  </xs:annotation>
-  <xs:element name="hamtaAllaVirtualiseringar" nillable="true"/>
-  <xs:element name="hamtaAllaVirtualiseringarRequest" nillable="true" type="xs:NCName"/>
-  <xs:element name="hamtaAllaVirtualiseringarResponse" type="tns:hamtaAllaVirtualiseringarResponseType"/>
-  <xs:complexType name="hamtaAllaVirtualiseringarResponseType">
-    <xs:sequence>
-      <xs:element maxOccurs="unbounded" minOccurs="0" ref="tns:virtualiseringsInfo"/>
-    </xs:sequence>
-  </xs:complexType>
-</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=vagvalsinfo-anropsbehorighetsinfo-2.0.xsd</con:url><con:content><![CDATA[<!--* Copyright 2009 Sjukvardsradgivningen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
-
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-
- *   Boston, MA 02111-1307  USA-->
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:skl:tp:vagvalsinfo:v2" xmlns="urn:skl:tp:vagvalsinfo:v2" xmlns:core="urn:skl:tp:core:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import namespace="urn:skl:tp:core:v1" schemaLocation="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=../../core_components/vagvalsinfo-coretypes-1.0.xsd"/>
-  <xs:element name="anropsBehorighetsInfo" type="anropsBehorighetsInfoType"/>
-  <xs:complexType name="anropsBehorighetsInfoType">
-    <xs:sequence>
-      <xs:element name="anropsBehorighetsInfoId" type="anropsBehorighetsInfoIdType"/>
-      <xs:element name="receiverId" type="xs:string"/>
-      <xs:element name="senderId" type="xs:string"/>
-      <xs:element name="tjansteKontrakt" type="xs:NCName"/>
-      <xs:element name="fromTidpunkt" type="xs:dateTime"/>
-      <xs:element name="tomTidpunkt" type="xs:dateTime"/>
-      <xs:element maxOccurs="unbounded" minOccurs="0" name="filterInfo" nillable="true" type="filterInfoType"/>
-      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="filterInfoType">
-    <xs:sequence>
-      <xs:element maxOccurs="1" minOccurs="1" name="serviceDomain" type="xs:anyURI"/>
-      <xs:element maxOccurs="unbounded" minOccurs="0" name="categorization" nillable="true" type="xs:string"/>
-      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="anropsBehorighetsInfoIdType">
-    <xs:simpleContent>
-      <xs:extension base="core:UUID"/>
-    </xs:simpleContent>
-  </xs:complexType>
-</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=../../core_components/vagvalsinfo-coretypes-1.0.xsd</con:url><con:content><![CDATA[<!--* Copyright 2009 Sjukvardsradgivningen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
-
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-
- *   Boston, MA 02111-1307  USA-->
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:skl:tp:core:v1" xmlns="urn:skl:tp:core:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <!--bastyper för simpleTypes att användas generellt inom komponenten. 
-							Delar av dessa kan säker på sikt bytas mot ISO-typer.-->
-  <xs:simpleType name="UUID">
-    <xs:restriction base="xs:string">
-      <!--Behöver bytas mot en precis definition för ett UUID.
-							Tills vidare finns typen för att indikera när ett element ska ha
-							ett globalt unikt värde, snarare än ett specifikt format för detta värde.-->
-    </xs:restriction>
-  </xs:simpleType>
-</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=vagvalsinfo-virtualiseringsinfo-2.0.xsd</con:url><con:content><![CDATA[<!--* Copyright 2009 Sjukvardsradgivningen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
-
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-
- *   Boston, MA 02111-1307  USA-->
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:skl:tp:vagvalsinfo:v2" xmlns="urn:skl:tp:vagvalsinfo:v2" xmlns:core="urn:skl:tp:core:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import namespace="urn:skl:tp:core:v1" schemaLocation="http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2?xsd=../../core_components/vagvalsinfo-coretypes-1.0.xsd"/>
-  <xs:element name="virtualiseringsInfo" type="virtualiseringsInfoType"/>
-  <xs:complexType name="virtualiseringsInfoType">
-    <xs:sequence>
-      <xs:element name="virtualiseringsInfoId" type="virtualiseringsInfoIdType"/>
-      <xs:element name="receiverId" type="xs:string"/>
-      <xs:element name="rivProfil" type="xs:NCName"/>
-      <xs:element name="tjansteKontrakt" type="xs:NCName"/>
-      <xs:element name="fromTidpunkt" type="xs:dateTime"/>
-      <xs:element name="tomTidpunkt" type="xs:dateTime"/>
-      <xs:element name="adress" type="xs:string"/>
-      <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="virtualiseringsInfoIdType">
-    <xs:simpleContent>
-      <xs:extension base="core:UUID"/>
-    </xs:simpleContent>
-  </xs:complexType>
-</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="hamtaAllaAnropsBehorigheter" bindingOperationName="hamtaAllaAnropsBehorigheter" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="TAK - hämta anropsbehörigheter"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:skl:tp:vagvalsinfo:v2">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <urn:hamtaAllaAnropsBehorigheter>?</urn:hamtaAllaAnropsBehorigheter>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:skl:tp:vagvalsinfo:v2/SokVagvalsInfoInterface/hamtaAllaAnropsBehorigheterRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation isOneWay="false" action="" name="hamtaAllaVirtualiseringar" bindingOperationName="hamtaAllaVirtualiseringar" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="TAK - hämta routing information"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8082/tp-vagval-admin-services/SokVagvalsInfo/v2</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:skl:tp:vagvalsinfo:v2">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <urn:hamtaAllaVirtualiseringar>?</urn:hamtaAllaVirtualiseringar>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:skl:tp:vagvalsinfo:v2/SokVagvalsInfoInterface/hamtaAllaVirtualiseringarRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="http://localhost:21000" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart=""/><con:endpoints><con:endpoint>http://localhost:21000</con:endpoint></con:endpoints><con:resource name="Ping" path="/monitor/ping"><con:settings/><con:parameters/><con:method name="monor ping request" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>text/xml; charset=UTF-8</con:mediaType><con:status>200</con:status><con:params/><con:element>data</con:element></con:representation><con:request name="VP monitor ping request" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://localhost:21000</con:endpoint><con:request/><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource></con:interface><con:testSuite name="VP004 No logical Adress found - testsuite"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="VP004 No Logical Adress found" searchProperties="true" id="0ca00cf5-8159-457d-94c4-fb77c6b975dd"><con:settings/><con:testStep type="request" name="getProductDetail - VP004 No Logical Adress found - error"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>Tjanst1SoapBinding</con:interface><con:operation>getProductDetail</con:operation><con:request name="getProductDetail - VP004 No Logical Adress found - error" outgoingWss="" incomingWss="" timeout="" sslKeystore="" useWsAddressing="false" useWsReliableMessaging="false" wssPasswordType=""><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
-  &lt;con:entry key="x-vp-sender-id" value="tp"/>
-  &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>unknown-logical-adress</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" name="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>&lt;faultstring>VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:unknown-logical-adress&lt;/faultstring></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:loadTest name="VP004 No Logical Adress found - loadtest"><con:settings/><con:threadCount>30</con:threadCount><con:startDelay>0</con:startDelay><con:sampleInterval>250</con:sampleInterval><con:calculateTPSOnTimePassed>true</con:calculateTPSOnTimePassed><con:resetStatisticsOnThreadCountChange>true</con:resetStatisticsOnThreadCountChange><con:historyLimit>-1</con:historyLimit><con:testLimit>120</con:testLimit><con:limitType>TIME</con:limitType><con:loadStrategy><con:type>Simple</con:type></con:loadStrategy><con:assertion type="Step Status" name="Step Status"/><con:maxAssertionErrors>100</con:maxAssertionErrors><con:cancelExcessiveThreads>true</con:cancelExcessiveThreads><con:strategyInterval>500</con:strategyInterval></con:loadTest><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite name="VP007 Authorization missing - testsuite"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="VP007 Authorization missing" searchProperties="true" id="69d8d771-ce2e-460f-9bbb-4ed983000650"><con:settings/><con:testStep type="request" name="getProductDetail - VP007 Authorization missing - error"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>Tjanst1SoapBinding</con:interface><con:operation>getProductDetail</con:operation><con:request name="getProductDetail - VP007 Authorization missing - error" outgoingWss="" incomingWss="" timeout="" sslKeystore="" useWsAddressing="false" useWsReliableMessaging="false" wssPasswordType=""><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
-  &lt;con:entry key="x-vp-sender-id" value="unknown_sender_id"/>
-  &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/tjanst1</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
-   <soapenv:Header>
-      <add:To>vp-test-producer</add:To>
-   </soapenv:Header>
-   <soapenv:Body>
-      <urn:getProductDetailElem>
-         <!--Optional:-->
-         <productId>RW456</productId>
-      </urn:getProductDetailElem>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" name="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>&lt;faultstring>VP007 Authorization missing for serviceNamespace: urn:skl:tjanst1:rivtabp20, receiverId: vp-test-producer, senderId: unknown_sender_id&lt;/faultstring></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="getProductDetail"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:loadTest name="VP007 Authorization missing - loadtest"><con:settings/><con:threadCount>30</con:threadCount><con:startDelay>0</con:startDelay><con:sampleInterval>250</con:sampleInterval><con:calculateTPSOnTimePassed>true</con:calculateTPSOnTimePassed><con:resetStatisticsOnThreadCountChange>true</con:resetStatisticsOnThreadCountChange><con:historyLimit>-1</con:historyLimit><con:testLimit>60</con:testLimit><con:limitType>TIME</con:limitType><con:loadStrategy><con:type>Simple</con:type></con:loadStrategy><con:assertion type="Step Status" name="Step Status"/><con:maxAssertionErrors>100</con:maxAssertionErrors><con:cancelExcessiveThreads>true</con:cancelExcessiveThreads><con:strategyInterval>500</con:strategyInterval></con:loadTest><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite name="Functional VP tests"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC1: VP routing and authorization" searchProperties="true" id="f70bf755-35c8-46dd-ade8-12b02ed37654"><con:settings/><con:testStep type="request" name="Ping VP004 no logical adress found - http request"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>PingResponderBinding</con:interface><con:operation>ping</con:operation><con:request name="Ping VP004 no logical adress found - http request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
-  &lt;con:entry key="x-vp-sender-id" value="tp"/>
-  &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/Ping/1/rivtabp20</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:infrastructure:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:2:GetLogicalAddresseesByServiceContract"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="http://localhost:21000" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart=""/><con:endpoints><con:endpoint>http://localhost:21000</con:endpoint></con:endpoints><con:resource name="Ping" path="/monitor/ping"><con:settings/><con:parameters/><con:method name="monor ping request" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>text/xml; charset=UTF-8</con:mediaType><con:status>200</con:status><con:params/><con:element>data</con:element></con:representation><con:request name="VP monitor ping request" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://192.168.19.10:21000</con:endpoint><con:request/><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource></con:interface><con:testSuite name="VP004 No logical Adress found - testsuite"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="VP004 No Logical Adress found" searchProperties="true" id="0ca00cf5-8159-457d-94c4-fb77c6b975dd"><con:settings/><con:loadTest name="VP004 No Logical Adress found - loadtest"><con:settings/><con:threadCount>30</con:threadCount><con:startDelay>0</con:startDelay><con:sampleInterval>250</con:sampleInterval><con:calculateTPSOnTimePassed>true</con:calculateTPSOnTimePassed><con:resetStatisticsOnThreadCountChange>true</con:resetStatisticsOnThreadCountChange><con:historyLimit>-1</con:historyLimit><con:testLimit>120</con:testLimit><con:limitType>TIME</con:limitType><con:loadStrategy><con:type>Simple</con:type></con:loadStrategy><con:assertion type="Step Status" name="Step Status"/><con:maxAssertionErrors>100</con:maxAssertionErrors><con:cancelExcessiveThreads>true</con:cancelExcessiveThreads><con:strategyInterval>500</con:strategyInterval></con:loadTest><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite name="VP007 Authorization missing - testsuite"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="VP007 Authorization missing" searchProperties="true" id="69d8d771-ce2e-460f-9bbb-4ed983000650"><con:settings/><con:loadTest name="VP007 Authorization missing - loadtest"><con:settings/><con:threadCount>30</con:threadCount><con:startDelay>0</con:startDelay><con:sampleInterval>250</con:sampleInterval><con:calculateTPSOnTimePassed>true</con:calculateTPSOnTimePassed><con:resetStatisticsOnThreadCountChange>true</con:resetStatisticsOnThreadCountChange><con:historyLimit>-1</con:historyLimit><con:testLimit>60</con:testLimit><con:limitType>TIME</con:limitType><con:loadStrategy><con:type>Simple</con:type></con:loadStrategy><con:assertion type="Step Status" name="Step Status"/><con:maxAssertionErrors>100</con:maxAssertionErrors><con:cancelExcessiveThreads>true</con:cancelExcessiveThreads><con:strategyInterval>500</con:strategyInterval></con:loadTest><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite name="Functional VP tests"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC1: VP routing and authorization" searchProperties="true" id="f70bf755-35c8-46dd-ade8-12b02ed37654"><con:settings/><con:testStep type="request" name="Ping VP004 no logical adress found - http request"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>PingResponderBinding</con:interface><con:operation>ping</con:operation><con:request name="Ping VP004 no logical adress found - http request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
+  &lt;con:entry key="x-vp-sender-id" value="HSASERVICES-100M"/>
+  &lt;con:entry key="x-vp-instance-id" value="NTJP_TEST"/>
+&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
    <soapenv:Header>
       <add:To>unkown-logical-adress</add:To>
    </soapenv:Header>
@@ -1228,26 +650,38 @@
    </soapenv:Body>
 </soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>       &lt;faultstring>VP004 No Logical Adress found for serviceNamespace:urn:riv:itinfra:tp:Ping:1:rivtabp20, receiverId:unkown-logical-adress&lt;/faultstring></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="Ping VP007 authorization missing - http request"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>PingResponderBinding</con:interface><con:operation>ping</con:operation><con:request name="Ping VP007 authorization missing - http request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
   &lt;con:entry key="x-vp-sender-id" value="unknown-sender-id"/>
-  &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/Ping/1/rivtabp20</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
+  &lt;con:entry key="x-vp-instance-id" value="NTJP_TEST"/>
+&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
    <soapenv:Header>
-      <add:To>ping</add:To>
+      <add:To>Ping</add:To>
    </soapenv:Header>
    <soapenv:Body>
       <urn:ping>
          <urn:pingIn>Functional test</urn:pingIn>
       </urn:ping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token> &lt;faultstring>VP007 Authorization missing for serviceNamespace: urn:riv:itinfra:tp:Ping:1:rivtabp20, receiverId: ping, senderId: unknown-sender-id&lt;/faultstring></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="Ping routing and authorization ok - http request"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>PingResponderBinding</con:interface><con:operation>ping</con:operation><con:request name="Ping routing and authorization ok - http request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>&lt;faultstring>VP007 Authorization missing for serviceNamespace: urn:riv:itinfra:tp:Ping:1:rivtabp20, receiverId: Ping, senderId: unknown-sender-id&lt;/faultstring></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="Ping routing and authorization ok - http request"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>PingResponderBinding</con:interface><con:operation>ping</con:operation><con:request name="Ping routing and authorization ok - http request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
   &lt;con:entry key="x-vp-sender-id" value="tp"/>
   &lt;con:entry key="x-vp-instance-id" value="THIS_VP_INSTANCE_ID"/>
-&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/vp/Ping/1/rivtabp20</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
+&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
    <soapenv:Header>
-      <add:To>ping</add:To>
+      <add:To>Ping</add:To>
    </soapenv:Header>
    <soapenv:Body>
       <urn:ping>
          <urn:pingIn>Functional test</urn:pingIn>
       </urn:ping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>&lt;pingUt>Ping response from: Functional test&lt;/pingUt></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC2: VP error messages" searchProperties="true" id="b6a80268-6fae-407d-b428-2d954a36bdad"><con:settings/><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC3: VP internal services" searchProperties="true"><con:settings/><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:sensitiveInformation/></con:soapui-project>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>&lt;pingUt>Ping response from: Functional test&lt;/pingUt></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="Ping VP009 response timeout - http request"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>PingResponderBinding</con:interface><con:operation>ping</con:operation><con:request name="Ping VP009 response timeout - http request"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment xmlns:con="http://eviware.com/soapui/config">
+  &lt;con:entry key="x-vp-sender-id" value="HSASERVICES-100M"/>
+  &lt;con:entry key="x-vp-instance-id" value="NTJP_TEST"/>
+&lt;/xml-fragment></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint xsi:nil="true"/><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:itinfra:tp:PingResponder:1">
+   <soapenv:Header>
+      <add:To>Ping</add:To>
+   </soapenv:Header>
+   <soapenv:Body>
+      <urn:ping>
+         <urn:pingIn>sleep35000</urn:pingIn>
+      </urn:ping>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>faultstring>VP009 Error connecting to service producer at adress http://localhost:20001/teststubservice/Ping_Service/1&lt;/faultstring></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC2: VP error messages" searchProperties="true" id="b6a80268-6fae-407d-b428-2d954a36bdad"><con:settings/><con:properties/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TC3: VP internal services" searchProperties="true"><con:settings/><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:sensitiveInformation/></con:soapui-project>
