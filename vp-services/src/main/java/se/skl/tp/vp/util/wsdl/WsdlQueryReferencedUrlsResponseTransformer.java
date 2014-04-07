@@ -35,12 +35,20 @@ import org.slf4j.LoggerFactory;
  * requests to hit the reverse-proxy.
  * <p>
  * Ref: issue https://skl-tp.atlassian.net/browse/NTP-57
+ * <p>
+ * Curl example for testing:
+ * 
+ * <pre>
+ * curl -H "X-Forwarded-Proto: https" -H "x-forwarded-host: loadbalancer" -H "x-forwarded-port: 443" http://localhost:8080/vp/tjanst1?wsdl
+ * </pre>
  */
-public class WsdlQueryReferencedUrlsTransformer extends
+public class WsdlQueryReferencedUrlsResponseTransformer extends
 		AbstractMessageTransformer {
 	private static final Logger log = LoggerFactory
-			.getLogger(WsdlQueryReferencedUrlsTransformer.class);
+			.getLogger(WsdlQueryReferencedUrlsResponseTransformer.class);
 	private static final String HTTP_REQUEST_MESSAGE_PROPERTY = HttpConnector.HTTP_REQUEST_PROPERTY;
+	private static final String HTTP_METHOD_MESSAGE_PROPERTY = HttpConnector.HTTP_METHOD_PROPERTY;
+	private static final String HTTP_METHOD_GET = "GET";
 	/**
 	 * Default names for HTTP headers set by reverse-proxy.
 	 * <p>
@@ -81,14 +89,15 @@ public class WsdlQueryReferencedUrlsTransformer extends
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
 
-		String httpRequest = message
-				.getInboundProperty(HTTP_REQUEST_MESSAGE_PROPERTY);
-
-		if (httpRequest == null) {
-			throw new IllegalArgumentException("Expected property not set: "
-					+ HTTP_REQUEST_MESSAGE_PROPERTY);
+		String httpMethod = message
+				.getInboundProperty(HTTP_METHOD_MESSAGE_PROPERTY);
+		// it's always GET for quering with ?wsdl
+		if (!HTTP_METHOD_GET.equalsIgnoreCase(httpMethod)) {
+			return message;
 		}
 
+		String httpRequest = message
+				.getInboundProperty(HTTP_REQUEST_MESSAGE_PROPERTY);
 		String request = httpRequest.trim().toLowerCase();
 		if (request.endsWith("?wsdl") || request.endsWith(".xsd")) {
 			// request for WSDL or XSD
@@ -104,7 +113,7 @@ public class WsdlQueryReferencedUrlsTransformer extends
 		return message;
 	}
 
-	private void replaceBaseUrlPartsInWsdlOrXsd(MuleMessage message,
+	protected void replaceBaseUrlPartsInWsdlOrXsd(MuleMessage message,
 			BaseUrlModel baseUrlForwardedParts) {
 		Object objPayload = message.getPayload();
 
@@ -125,7 +134,7 @@ public class WsdlQueryReferencedUrlsTransformer extends
 		}
 	}
 
-	private BaseUrlModel extractForwardedHttpHeadersForBaseUrl(
+	protected BaseUrlModel extractForwardedHttpHeadersForBaseUrl(
 			MuleMessage message) {
 		BaseUrlModel baseUrl = new BaseUrlModel();
 		baseUrl.scheme = message
@@ -144,7 +153,7 @@ public class WsdlQueryReferencedUrlsTransformer extends
 	 * fronting reverse-proxy) references like: http://127.0.0.1:8080/vp/tjanst1
 	 * with URLs like: ${reverseProxyBaseUrl}/vp/tjanst1.
 	 * 
-	 * @param wsdl
+	 * @param wsdlOrXsd
 	 * @param reverseProxyBaseUrl
 	 *            The base url consists of scheme, host, port. Example:
 	 *            https://loadbalancer-host:443
@@ -152,11 +161,11 @@ public class WsdlQueryReferencedUrlsTransformer extends
 	 * @throws DocumentException
 	 * @throws IOException
 	 */
-	protected String replaceBaseUrlPartsInWsdlOrXsd(String wsdl,
+	protected String replaceBaseUrlPartsInWsdlOrXsd(String wsdlOrXsd,
 			BaseUrlModel reverseProxyBaseUrl) throws DocumentException,
 			IOException {
 
-		Document document = convertStringToDocument(wsdl);
+		Document document = convertStringToDocument(wsdlOrXsd);
 
 		// Dom4j with Xpath and namespaces:
 		// http://whileonefork.blogspot.se/2011/01/how-to-use-dom4j-xpath-with-xml.html

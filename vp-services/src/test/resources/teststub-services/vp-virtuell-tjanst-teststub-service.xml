@@ -41,7 +41,7 @@
         	    address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst1"
            		connector-ref="VPProducerConnector"
             	exchange-pattern="request-response" 
-            	responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+            	responseTransformer-refs="wsdlQueryResponse featureKeepAliveResponse filterResponseHeaders">
             	<properties>
         			<spring:entry key="featureUseKeepAlive" value="true"/>
               		<spring:entry key="featureResponseTimeout" value="${TEST_NORMAL_TIMEOUT_MS}"/>
@@ -50,7 +50,7 @@
         	<http:inbound-endpoint
         	    address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/tjanst1"
             	exchange-pattern="request-response" 
-            	responseTransformer-refs="filterResponseHeaders">
+            	responseTransformer-refs="wsdlQueryResponse filterResponseHeaders">
               <properties>
               <spring:entry key="featureResponseTimeout" value="${TEST_NORMAL_TIMEOUT_MS}"/>
             </properties>
