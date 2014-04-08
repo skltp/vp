@@ -44,7 +44,7 @@
                 address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/Ping/1/rivtabp20"
                 connector-ref="VPProducerConnector"
                 exchange-pattern="request-response" 
-                responseTransformer-refs="filterResponseHeaders logRespOut"
+                responseTransformer-refs="wsdlQueryResponse filterResponseHeaders logRespOut"
                 transformer-refs="createCorrId rivExtractor logReqIn">
                 <properties>
                     <spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.itinfra.tp.PingResponder.1:${SERVICE_TIMEOUT_MS}}"/>
@@ -54,7 +54,7 @@
             <http:inbound-endpoint
                 address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/Ping/1/rivtabp20"
                 exchange-pattern="request-response" 
-                responseTransformer-refs="filterResponseHeaders logRespOut"
+                responseTransformer-refs="wsdlQueryResponse filterResponseHeaders logRespOut"
                 transformer-refs="createCorrId rivExtractor logReqIn">
                 <properties>
                     <spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.itinfra.tp.PingResponder.1:${SERVICE_TIMEOUT_MS}}"/>
