@@ -28,6 +28,7 @@ import javax.jws.WebService;
 import org.mule.api.annotations.expressions.Lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
 import se.riv.itintegration.monitoring.v1.ConfigurationType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationResponseType;
@@ -44,6 +45,8 @@ import se.skl.tp.vp.vagvalagent.VagvalAgent;
 public class PingForConfigurationProducerRivTa21 implements PingForConfigurationResponderInterface {
 	
 	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationProducerRivTa21.class);
+	
+	private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
 	@Lookup("vagvalAgent")
 	private VagvalAgent vagvalAgent;
@@ -57,17 +60,29 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 		Integer authInfoSize = vagvalAgent.getAnropsBehorighetsInfoList().size();
 		Integer routingInfoSize = vagvalAgent.getVirtualiseringsInfo().size();
 		
-		if(log.isInfoEnabled()){
-			log.info("pingForConfiguration result, nr of authorizations:{}, nr of routing information:{}", authInfoSize.toString(), routingInfoSize.toString());
+		if(log.isDebugEnabled()){
+			log.debug("pingForConfiguration result, nr of authorizations:{}, nr of routing information:{}", authInfoSize.toString(), routingInfoSize.toString());
+		}
+		
+		if(!resourcesNeededForVpAvailable()){
+			log.error("Severe problem, vp reports needed resources are missing, routing size: {}", vagvalAgent.getVirtualiseringsInfo().size());
+			log.error("Severe problem, vp reports needed resources are missing, authorization size: {}", vagvalAgent.getAnropsBehorighetsInfoList().size());
+			throw new RuntimeException("VP012 Severe problem, vp does not have all necessary reources to operate");
 		}
 		
 		response.getConfiguration().add(createConfiguration("Applikation", "VP"));
 		response.getConfiguration().add(createConfiguration("Anropsbehörigheter", authInfoSize.toString()));
 		response.getConfiguration().add(createConfiguration("Logiska-adresser", routingInfoSize.toString()));
 		response.setPingDateTime(formatter.format(new Date()));
-		response.setVersion("V1.0");
+		response.setVersion(rb.getString("VP_VERSION"));
 		
 		return response;
+	}
+
+	boolean resourcesNeededForVpAvailable() {
+		return vagvalAgent != null
+				&& vagvalAgent.getAnropsBehorighetsInfoList().size() > 0
+				&& vagvalAgent.getVirtualiseringsInfo().size() > 0;
 	}
 
 	private ConfigurationType createConfiguration(String name, String value) {
@@ -75,6 +90,10 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 		configurationType.setName(name);
 		configurationType.setValue(value);
 		return configurationType;
+	}
+	
+	void setVagvalAgent(VagvalAgent vagvalAgent){
+		this.vagvalAgent = vagvalAgent;
 	}
 
 }

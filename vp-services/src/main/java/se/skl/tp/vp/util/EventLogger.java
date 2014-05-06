@@ -528,11 +528,6 @@ public class EventLogger {
 		map.put(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, (String) message.getProperty(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyScope.SESSION));
 		map.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION));
 		map.put(VPUtil.WSDL_NAMESPACE, (String) message.getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION));
-		/*
-		 * TODO: Log the same information in WSDL_NAMESPACE and CXF_SERVICE_NAMESPACE in VP 2.2.6 to be backwards 
-		 * compatible, remove logging of CXF_SERVICE_NAMESPACE when possible..
-		 */
-		map.put(VPUtil.CXF_SERVICE_NAMESPACE, (String) message.getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION));
 		map.put(VPUtil.SENDER_IP_ADRESS, (String) message.getProperty(VPUtil.SENDER_IP_ADRESS, PropertyScope.SESSION));
 		
 		String endpoint = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION);

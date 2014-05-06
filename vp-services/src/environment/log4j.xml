@@ -112,6 +112,11 @@
         <level value="ERROR"/>
     </logger>
     
+    <!-- Logger for the monitor/ping service -->
+    <logger name="se.skl.tp.vp.monitor.ping">
+        <level value="INFO"/>
+    </logger>
+    
     <!-- Level INFO will give log output for reset cache to selected appender -->
     <logger name="se.skl.tp.vp.vagvalagent.VagvalAgent">
         <level value="INFO"/>

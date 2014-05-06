@@ -40,7 +40,7 @@
 	            address="${PINGFORCONFIGURATIONSERVICE_RIVTABP21_INBOUND_ENDPOINT}"
 	            exchange-pattern="request-response"
 	            responseTransformer-refs="filterResponseHeaders logRespOut" 
-	            transformer-refs="createCorrId rivExtractor logReqIn">
+	            transformer-refs="logReqIn">
 	            <properties>
                     <spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.itintegration.monitoring.PingForConfigurationResponder.1:${SERVICE_TIMEOUT_MS}}"/>
                 </properties>

@@ -34,28 +34,6 @@
 						<configuration>
 							<sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
 							<wsdlOptions>
-
-								<wsdlOption>
-									<extraargs>
-										<extraarg>-validate</extraarg>
-										<extraarg>-p</extraarg>
-										Note: be careful when changing this - must be in sync for all
-										schemas generations in this namespace!
-										<extraarg>
-											urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20=se.riv.itintegration.monitoring.v1
-										</extraarg>
-										<extraarg>-p</extraarg>
-										<extraarg>
-											urn:riv:itintegration:monitoring:PingForConfigurationResponder:1=se.riv.itintegration.monitoring.v1
-										</extraarg>
-										<extraarg>-p</extraarg>
-										<extraarg>
-											http://www.w3.org/2005/08/addressing=org.w3.wsaddressing10
-										</extraarg>
-									</extraargs>
-									<wsdl>${schema.path}/TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP20.wsdl</wsdl>
-								</wsdlOption>
-
 								<wsdlOption>
 									<extraargs>
 										<extraarg>-validate</extraarg>

@@ -24,14 +24,20 @@ package se.skl.tp.vp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.test.StandaloneMuleServer;
+import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 
 
 public class VpMuleServer {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(VpMuleServer.class);
+	
+	private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
 	public static final String MULE_SERVER_ID   = "vp";
  
@@ -67,7 +73,7 @@ public class VpMuleServer {
 		vagvalInputs.add(createVagvalRecord("vp-test-producer-no-connection", "RIVTABP20", "tp", "urn:skl:tjanst1:rivtabp20","https://www.google.com:81"));
 		
 		//Ping virtual service
-		vagvalInputs.add(createVagvalRecord("ping", "RIVTABP20", "tp", "urn:riv:itinfra:tp:Ping:1:rivtabp20","http://localhost:10000/test/Ping_Service"));
+		vagvalInputs.add(createVagvalRecord("Ping", "RIVTABP20", "tp", "urn:riv:itinfra:tp:Ping:1:rivtabp20","http://localhost:10000/test/Ping_Service"));
 		
 		//Monitor ping rest service, used by e.g load balancers and monitoring software
 		vagvalInputs.add(createVagvalRecord("TEST_SERVICE_HSA_ID", "RIVTABP20", "tp", "urn:riv:itinfra:tp:Ping:1:rivtabp20","http://localhost:10000/test/Ping_Service"));
@@ -85,4 +91,19 @@ public class VpMuleServer {
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}
+	
+	/**
+     * Address based on usage of the servlet-transport and a config-property for the URI-part
+     * 
+     * @param serviceUrlPropertyName
+     * @return
+     */
+    public static String getAddress(String serviceUrlPropertyName) {
+
+        String url = rb.getString(serviceUrlPropertyName);
+
+	    logger.info("URL: {}", url);
+    	return url;
+ 
+    }	
 }
