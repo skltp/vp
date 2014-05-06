@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+		http://www.mulesoft.org/schema/mule/core 	http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/cxf 	http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd" >
+
+    <flow name="vagval-dynamic-routing-flow" >
+    
+    	<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable">
+    		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+            <spring:property name="whiteList" value="${IP_WHITE_LIST}" />
+            <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
+            <spring:property name="senderIpAdressHttpHeader" value="${VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER}"/>
+    	</custom-transformer>
+    
+    	<!-- Save the http header x-rivta-original-serviceconsumer-hsaid in session-property originalServiceconsumerHsaid -->
+    	<set-session-variable variableName="originalServiceconsumerHsaid" value="#[message.inboundProperties.get('x-rivta-original-serviceconsumer-hsaid')]" 
+    		doc:name="Save x-rivta-original-serviceconsumer-hsaid"/>
+   
+        <transformer ref="createCorrId" />
+        <transformer ref="XmlToXSR" />
+        <transformer ref="rivExtractor" />
+  		<transformer ref="logReqIn" />
+        <transformer ref="rivTransformer" />
+        
+        <cxf:proxy-client payload="envelope" />
+
+        <custom-processor class="se.skl.tp.vp.vagvalrouter.VagvalRouter" >
+
+            <spring:property name="vagvalAgent" ref="vagvalAgent" />
+
+			<!-- Default value for response timeout is set in VagvalRouter -->
+            <spring:property name="responseTimeout" value="${SERVICE_TIMEOUT_MS}" />
+            
+            <!-- Value for HTTP header x-vp-instance-id -->
+            <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
+			
+			<!-- EventLogger properties -->
+			<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+        	<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+			<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        </custom-processor>
+                
+        <response>
+       		<choice doc:name="Choice">
+         		<when expression="#[sessionVars[se.skl.tp.vp.util.VPUtil.SESSION_ERROR]]">
+            		<processor-chain>
+                		<!-- Exception occured, bypass response transformer -->
+                		<!-- Note: should be possible to leave this clause empty, but Mule 3.3 (and 3.4) refuse to run due to syntax error ... -->
+                		<logger level="DEBUG" message="In error flow, response tramsformer bypassed" category="se.skl.tp.vp.vagvalrouter"/>
+            		</processor-chain>
+          		</when>
+            	<otherwise>
+                	<processor-chain>
+           				<transformer ref="exceptionTransformer" />
+	            		<object-to-string-transformer /> 
+	            		<transformer ref="logRespOut" />
+                	</processor-chain>
+            	</otherwise>
+       		</choice>
+       	</response> 
+        
+        <catch-exception-strategy>
+        	
+        	<custom-transformer class="se.skl.tp.vp.vagvalrouter.ExceptionLoggerTransformer">
+        		<!-- EventLogger properties -->
+				<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+				<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        	</custom-transformer>
+        	
+        	<custom-transformer class="se.skl.tp.vp.vagvalrouter.ExceptionMessageTransformer"/>
+        	
+        </catch-exception-strategy>
+        
+    </flow>
+
+</mule>

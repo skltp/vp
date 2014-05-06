@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
+
+    <!-- Name of this file is mandatory and may not be changed. -->
+
+
+	<flow name="itinfra-tp-ping-virtualisering-1.2-SNAPSHOT-flow" >
+        <composite-source>
+
+            <https:inbound-endpoint
+                address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/Ping/1/rivtabp20"
+                connector-ref="VPProducerConnector"
+                exchange-pattern="request-response" 
+                responseTransformer-refs="wsdlQueryResponse filterResponseHeaders logRespOut"
+                transformer-refs="createCorrId rivExtractor logReqIn">
+                <properties>
+                    <spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.itinfra.tp.PingResponder.1:${SERVICE_TIMEOUT_MS}}"/>
+                </properties>
+            </https:inbound-endpoint>
+
+            <http:inbound-endpoint
+                address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/Ping/1/rivtabp20"
+                exchange-pattern="request-response" 
+                responseTransformer-refs="wsdlQueryResponse filterResponseHeaders logRespOut"
+                transformer-refs="createCorrId rivExtractor logReqIn">
+                <properties>
+                    <spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.itinfra.tp.PingResponder.1:${SERVICE_TIMEOUT_MS}}"/>
+                </properties>
+            </http:inbound-endpoint>
+
+        </composite-source>
+
+        <cxf:proxy-service
+            namespace="urn:riv:itinfra:tp:Ping:1:rivtabp20"
+            payload="envelope"
+            service="PingResponderService"
+            wsdlLocation="classpath:schemas/PingInteraction_1.0_rivtabp20.wsdl" />
+
+        <flow-ref name="vagval-dynamic-routing-flow" />
+    </flow>
+
+</mule>

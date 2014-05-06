@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<FileGetHsaUnitsResponse xmlns="urn:riv:hsa:HsaWsResponder:3">
+  <startDate>2013-03-15T15:38:42.597+01:00</startDate>
+  <endDate>2013-03-15T15:38:45.721+01:00</endDate>
+  <hsaUnits>
+    <hsaUnit>
+      <hsaIdentity>SE0000000001-1234</hsaIdentity>
+      <DN>ou=N�ssj� VC DLM,ou=N�ssj� Prim�rv�rdsomr�de,ou=H�glandets sjukv�rdsomr�de,o=Landstinget i J�nk�ping,l=VpW,c=SE</DN>
+      <name>N�ssj� VC DLM</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000000-1234</hsaIdentity>
+      <DN>ou=N�ssj� VC DLK,ou=N�ssj� Prim�rv�rdsomr�de,ou=H�glandets sjukv�rdsomr�de,o=Landstinget i J�nk�ping,l=VpW,c=SE</DN>
+      <name>N�ssj� Prim�rv�rdsomr�de</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000002-1234</hsaIdentity>
+      <DN>ou=N�ssj� Prim�rv�rdsomr�de,ou=H�glandets sjukv�rdsomr�de,o=Landstinget i J�nk�ping,l=VpW,c=SE</DN>
+      <name>N�ssj� Prim�rv�rdsomr�de</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000003-1234</hsaIdentity>
+      <DN>ou=H�glandets sjukv�rdsomr�de,o=Landstinget i J�nk�ping,l=VpW,c=SE</DN>
+      <name>H�glandets sjukv�rdsomr�de</name>
+    </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000004-1234</hsaIdentity>
+      <DN>o=Landstinget i J�nk�ping,l=VpW,c=SE</DN>
+      <name>Landstinget i J�nk�ping</name>
+    </hsaUnit>
+  </hsaUnits>
+</FileGetHsaUnitsResponse>

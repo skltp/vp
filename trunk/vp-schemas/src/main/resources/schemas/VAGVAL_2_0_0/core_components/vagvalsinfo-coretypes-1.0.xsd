@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright 2009 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ -->
+ 
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:skl:tp:core:v1" targetNamespace="urn:skl:tp:core:v1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!--
+							bastyper för simpleTypes att användas generellt inom komponenten. 
+							Delar av dessa kan säker på sikt bytas mot ISO-typer.
+	-->
+	<xs:simpleType name="UUID">
+		<xs:restriction base="xs:string">
+<!--
+							Behöver bytas mot en precis definition för ett UUID.
+							Tills vidare finns typen för att indikera när ett element ska ha
+							ett globalt unikt värde, snarare än ett specifikt format för detta värde.
+-->
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

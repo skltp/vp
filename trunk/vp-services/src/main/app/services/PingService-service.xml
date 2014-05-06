@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
+    							<http://cehis.se/>
+
+    This file is part of SKLTP.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-current.xsd
+		http://www.mulesoft.org/schema/mule/core	http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http    http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/cxf     http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+	" >
+
+    <flow name="PingService-flow" >
+        <inbound-endpoint address="${PINGSERVICE_INBOUND_URL}" />
+
+		<scripting:component>
+			<scripting:script engine="Groovy">
+				<scripting:text><![CDATA[
+					// Initialize logical-address and a test requet
+					def la = "${PINGSERVICE_TEST_LOGICAL_ADDRESS}"
+					def req = new se.riv.itintegration.monitoring.v1.PingForConfigurationType()
+					[la, req] as Object[]
+				]]></scripting:text>
+			</scripting:script>
+		</scripting:component>
+		    
+        <outbound-endpoint 
+            address="${PINGSERVICE_TEST_URL}"
+            responseTimeout="${PINGSERVICE_TEST_TIMEOUT_MS}"
+            exchange-pattern="request-response">
+            <cxf:jaxws-client 
+                port="PingForConfigurationResponderPort" 
+                operation="PingForConfiguration" 
+                clientClass="se.riv.itintegration.monitoring.v1.rivtabp21.PingForConfigurationResponderService"
+                wsdlLocation="classpath:/TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl"
+            />
+        </outbound-endpoint>
+        
+        <set-payload value="${PINGSERVICE_RESPONSE}"/>
+     
+       	<logger level="INFO" message="monitor/ping signals: #[payload]" category="se.skl.tp.vp.monitor.ping" doc:name="Log payload"/>
+
+        <catch-exception-strategy>
+            <!-- set http return status = 500 + payload = error... -->
+	        <scripting:component>
+	            <scripting:script engine="Groovy">
+	                <scripting:text><![CDATA[
+						" - Code: " + message.exceptionPayload.code + 
+						"\n - Exception: " + message.exceptionPayload.exception + 
+						"\n - RootException: " + message.exceptionPayload.rootException + 
+						"\n - Error message: " + message.exceptionPayload.message +
+						"\n - Info: " + message.exceptionPayload.info + 
+						"\n"
+	                ]]></scripting:text>
+	            </scripting:script>
+	        </scripting:component>
+            
+            <set-property propertyName="http.status" value="500"/>
+            <set-payload value="${PINGSERVICE_ERROR_RESPONSE} #[payload]"/>
+            <logger level="ERROR" message="monitor/ping signals : #[payload]" category="se.skl.tp.vp.monitor.ping" doc:name="Log payload"/>
+            
+        </catch-exception-strategy>
+    </flow>
+
+</mule>

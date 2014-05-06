@@ -1,0 +1,22 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1 http://maven.apache.org/xsd/assembly-1.1.1.xsd">
+  <id>virtuell-test-tjanst</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>src/test/resources/schemas</directory>
+      <outputDirectory>schemas</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+    </fileSet>
+  </fileSets>
+  <files>
+    <file>
+      <source>src/test/resources/teststub-services/vp-virtuell-tjanst-teststub-service.xml</source>
+      <destName>tp2-service-mule-descriptor.xml</destName>
+    </file>
+  </files>  
+</assembly>

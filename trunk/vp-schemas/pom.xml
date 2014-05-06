@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>se.skltp.vp</groupId>
+		<artifactId>vp-parent</artifactId>
+		<version>2.2.7-RC2</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>vp-schemas</artifactId>
+	<packaging>jar</packaging>
+	<name>vp-schemas</name>
+
+	<properties>
+		<!-- Properties for generating code from XML Schemas (JAXB) -->
+		<schema.path>${basedir}/src/main/resources/schemas</schema.path>
+		<cxf.version>2.5.1</cxf.version>
+	</properties>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>${cxf.version}</version>
+				<executions>
+					<execution>
+						<id>generate-sources-td-monitoring</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+							<wsdlOptions>
+								<wsdlOption>
+									<extraargs>
+										<extraarg>-validate</extraarg>
+										<extraarg>-p</extraarg>
+										Note: be careful when changing this - must be in sync for all
+										schemas generations in this namespace!
+										<extraarg>
+											urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21=se.riv.itintegration.monitoring.v1.rivtabp21
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											urn:riv:itintegration:monitoring:PingForConfigurationResponder:1=se.riv.itintegration.monitoring.v1
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											urn:riv:itintegration:registry:1=se.riv.itintegration.registry.v1
+										</extraarg>
+									</extraargs>
+									<wsdl>${schema.path}/TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl</wsdl>
+								</wsdlOption>
+							</wsdlOptions>
+
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+								
+					<execution>
+						<id>generate-sources-vagval</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+								<wsdlOptions>
+									<wsdlOption>
+											<wsdl>${schema.path}/VAGVAL_2_0_0/interactions/vagval/vagval-2.0.wsdl</wsdl>
+											<extraargs>
+												<extraarg>-validate</extraarg>
+												<extraarg>-p</extraarg>
+												<extraarg>urn:skl:tp:vagval:v2=se.skl.tp.vagval.wsdl.v2</extraarg>
+												<extraarg>-p</extraarg>
+												<extraarg>urn:skl:tp:vagvalsinfo:v2=se.skl.tp.vagvalsinfo.wsdl.v2</extraarg>
+											</extraargs>
+									</wsdlOption>
+									
+									<wsdlOption>
+											<wsdl>${schema.path}/VAGVAL_2_0_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-2.0.wsdl</wsdl>
+											<extraargs>
+												<extraarg>-validate</extraarg>
+												<extraarg>-p</extraarg>
+												<extraarg>urn:skl:tp:vagvalsinfo:v2=se.skl.tp.vagvalsinfo.wsdl.v2</extraarg>
+											</extraargs>
+									</wsdlOption>
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+		<resources>
+			<resource>
+				<directory>${schema.path}</directory>
+			</resource>
+		</resources>
+	</build>
+
+</project>
