@@ -115,8 +115,37 @@ class LoadTestVP extends Simulation {
       .pause(ping_minWaitMs, ping_maxWaitMs)
     }
 
+    //
+    //SendMedicalCertificateAnswer testtubbe i FkAdapter
+    //
+
+    val skltp_SendMedicalCertificateAnswer_headers = Map(
+      "Accept-Encoding" -> "gzip,deflate",
+      "Content-Type" -> "text/xml;charset=UTF-8",
+      "SOAPAction" -> "urn:riv:insuranceprocess:healthreporting:SendMedicalCertificateAnswerResponder:1:SendMedicalCertificateAnswer",
+      "Keep-Alive" -> "115")
+
+    val sendMedicalCertificateAnswer_noOfUsers      = 10
+    val sendMedicalCertificateAnswer_minWaitMs      = 500 milliseconds
+    val sendMedicalCertificateAnswer_maxWaitMs      = 1500 milliseconds
+
+    val scnSendMedicalCertificateAnswer = scenario("SendMedicalCertificateAnswer OK http scenario")
+    .during(testTimeSecs) {     
+      exec(
+        http("SendMedicalCertificateAnswer")
+          .post("/vp/SendMedicalCertificateAnswer/1/rivtabp20")
+          .headers(skltp_SendMedicalCertificateAnswer_headers)
+          .fileBody("SendMedicalCertificateAnswer.xml").asXML
+          .check(status.is(200))
+          .check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
+          .check(xpath("//resp:resultCode", List("pr" -> "urn:riv:insuranceprocess:healthreporting:SendMedicalCertificateAnswerResponder:1")).count.is(1))
+        )
+      .pause(sendMedicalCertificateAnswer_minWaitMs, sendMedicalCertificateAnswer_maxWaitMs)
+    }
+
     setUp(scnAdam.users(adam_noOfUsers).ramp(rampUpTimeSecs).protocolConfig(httpConf))
     setUp(scnErik.users(erik_noOfUsers).ramp(rampUpTimeSecs).protocolConfig(httpConf))
     setUp(scnKc.users(erik_noOfUsers).ramp(rampUpTimeSecs).protocolConfig(httpConf))
     setUp(scnPing.users(ping_noOfUsers).ramp(rampUpTimeSecs).protocolConfig(httpConf))
+    setUp(scnSendMedicalCertificateAnswer.users(sendMedicalCertificateAnswer_noOfUsers).ramp(rampUpTimeSecs).protocolConfig(httpConf))
 }
