@@ -25,7 +25,7 @@ class PingOkSimulationHttps extends Simulation {
   val skltp_headers = Map(
     "Accept-Encoding" -> "gzip,deflate",
     "Content-Type" -> "text/xml;charset=UTF-8",
-    "SOAPAction" -> "urn:riv:test:PingResponder:1:ping:ping",
+    "SOAPAction" -> "urn:riv:test:PingResponder:1:ping",
     "Keep-Alive" -> "115")
 
   val scn = scenario("Ping OK https scenario")

@@ -25,7 +25,7 @@ class PingVp009Simulation extends Simulation {
   val skltp_headers = Map(
     "Accept-Encoding" -> "gzip,deflate",
     "Content-Type" -> "text/xml;charset=UTF-8",
-    "SOAPAction" -> "urn:riv:test:PingResponder:1:ping:ping",
+    "SOAPAction" -> "urn:riv:test:PingResponder:1:ping",
     //"x-vp-sender-id" -> "HSASERVICES-100M",
     //"x-vp-instance-id" -> "NTjP_HSASERVICES-100S",
 		"Keep-Alive" -> "115")
