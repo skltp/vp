@@ -106,7 +106,7 @@ class LoadTestVP extends Simulation {
       exec(
         http("Ping")
           .post("/vp/Ping/1/rivtabp20")
-          .headers(skltp_headers)
+          .headers(skltp_ping_headers)
           .fileBody("Ping_ok.xml").asXML
           .check(status.is(200))
           .check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
