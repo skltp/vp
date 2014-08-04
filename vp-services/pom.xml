@@ -49,11 +49,14 @@
 			<version>${project.version}</version>
 		</dependency>
 
-        <!-- itintegration infrastructure schemas 2.0 from central maven (currently sonatype staging repo) -->
+        <!-- 
+        	Until rivta itintegration infrastructure schemas 2.0 is published in central maven a
+        	local se.skltp release of schemas us used. 
+        -->
         <dependency>
-            <groupId>se.rivta.infrastructure.itintegration</groupId>
-            <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
-            <version>2.0_RC6</version>
+			<groupId>se.skltp.infrastructure.itintegration</groupId>
+  			<artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
+			<version>2.0-RC1</version>
         </dependency>
 
 						<!-- Ping -->
