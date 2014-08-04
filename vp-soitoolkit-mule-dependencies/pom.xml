@@ -116,20 +116,6 @@
 			<version>${mule.version}</version>
 		</dependency>
 
-		<dependency>
-			<!-- commonretrypolicies from muleforge: http://www.mulesoft.org/documentation/display/COMMONRETRYPOLICIES/Home 
-				version 2.2.1 is for mule 2.2.x -->
-			<groupId>org.mule.modules</groupId>
-			<artifactId>commonretrypolicies</artifactId>
-			<version>${mule-module-commonretrypolicies}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.safehaus.jug</groupId>
-					<artifactId>jug</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
         <!-- NOTE: This is a muleforge module so watch out for dependencies here to old versions of Mule, need to be excluded as they are added in new versions!!! -->
         <dependency>
             <groupId>org.mule.modules</groupId>
