@@ -33,7 +33,18 @@
     <spring:beans>
 	    <!-- Connectors and endpoints that that are specific for different config-files (local unit-test, integration-test or production environments) -->
     	<!-- TODO: Add import of connector specific configuration files here as required -->
-        <spring:import resource="classpath:soitoolkit-mule-jms-connector-activemq-external.xml"/>
+    	
+    	<!-- 
+    		FIX for VP, to be removed when upgrading to soitoolkit 0.6.1
+    		
+    		To solve the problem that soi-toolkit 0.5.0 definies org.mule.modules.commonretrypolicies that is no longer available.
+    		
+    		http://grepcode.com/file/repo1.maven.org/maven2/org.soitoolkit.commons.components/soitoolkit-commons-mule/0.5.0/soitoolkit-mule-jms-connector-activemq-external.xml
+    		http://grepcode.com/file/repo1.maven.org/maven2/org.soitoolkit.commons.components/soitoolkit-commons-mule/0.6.1/soitoolkit-mule-jms-connector-activemq-external.xml
+    				
+    		<spring:import resource="classpath:soitoolkit-mule-jms-connector-activemq-external.xml"/>
+    	 -->
+        <spring:import resource="classpath:soitoolkit-mule-jms-connector-activemq-external-5_0_0-without-mule-commonretrypolicies.xml"/>
 
         <spring:import resource="classpath:vp-common.xml"/>
 <!-- 
