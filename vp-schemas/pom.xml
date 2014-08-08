@@ -28,39 +28,6 @@
 				<artifactId>cxf-codegen-plugin</artifactId>
 				<version>${cxf.version}</version>
 				<executions>
-					<execution>
-						<id>generate-sources-td-monitoring</id>
-						<phase>generate-sources</phase>
-						<configuration>
-							<sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
-							<wsdlOptions>
-								<wsdlOption>
-									<extraargs>
-										<extraarg>-validate</extraarg>
-										<extraarg>-p</extraarg>
-										Note: be careful when changing this - must be in sync for all
-										schemas generations in this namespace!
-										<extraarg>
-											urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21=se.riv.itintegration.monitoring.v1.rivtabp21
-										</extraarg>
-										<extraarg>-p</extraarg>
-										<extraarg>
-											urn:riv:itintegration:monitoring:PingForConfigurationResponder:1=se.riv.itintegration.monitoring.v1
-										</extraarg>
-										<extraarg>-p</extraarg>
-										<extraarg>
-											urn:riv:itintegration:registry:1=se.riv.itintegration.registry.v1
-										</extraarg>
-									</extraargs>
-									<wsdl>${schema.path}/TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl</wsdl>
-								</wsdlOption>
-							</wsdlOptions>
-
-						</configuration>
-						<goals>
-							<goal>wsdl2java</goal>
-						</goals>
-					</execution>
 								
 					<execution>
 						<id>generate-sources-vagval</id>
