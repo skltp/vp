@@ -38,15 +38,19 @@
 		</dependency>
 
         <!--
-            itintegration monitoring schemas 1.0 bundled in vp-schemas
             tp vagval schemas 2.0.0 bundled in vp-schemas.
-
-            When these are moved to central maven dependency can be removed here.
         -->
 		<dependency>
 			<groupId>se.skltp.vp</groupId>
 			<artifactId>vp-schemas</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- itintegration monitoring schemas för PingForConfiguration -->
+		<dependency>
+		  	<groupId>se.skltp.itintegration.monitoring</groupId>
+  			<artifactId>ServiceContracts_itintegration_monitoring</artifactId>
+			<version>1.0</version>
 		</dependency>
 
         <!-- 

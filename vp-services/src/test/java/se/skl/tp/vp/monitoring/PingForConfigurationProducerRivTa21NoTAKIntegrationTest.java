@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.pingforconfiguration;
+package se.skl.tp.vp.monitoring;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
-import se.riv.itintegration.monitoring.v1.PingForConfigurationType;
 import se.skl.tp.vp.VpMuleServer;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
@@ -68,10 +67,9 @@ public class PingForConfigurationProducerRivTa21NoTAKIntegrationTest extends Abs
 	public void pingForConfiguration_no_vagval_info_available(){
 			
 		PingForConfigurationTestConsumer consumer = new PingForConfigurationTestConsumer(VpMuleServer.getAddress("PINGFORCONFIGURATIONSERVICE_RIVTABP21_INBOUND_ENDPOINT"));
-		PingForConfigurationType pingRequest = new PingForConfigurationType();
 		
 		try {
-			consumer.callService("LOGICAL_ADDRESS", pingRequest);
+			consumer.callService("LOGICAL_ADDRESS");
 			fail("Exception excpected");
 		} catch (Exception e) {
 			assertNotNull(e.getMessage());

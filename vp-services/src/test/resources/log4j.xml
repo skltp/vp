@@ -32,21 +32,9 @@
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
+			<param name="ConversionPattern" value="%d %-5p %-30c - %m%n" />
 		</layout>
 	</appender>
-    
-    <appender name="ROLLINGFILE" class="org.apache.log4j.RollingFileAppender">
-        <param  name="file" value="${mule.home}/logs/mule-app-vp.log"/>
-        <param name="MaxBackupIndex" value="3" />
-        <param name="MaxFileSize" value="1MB" />
-        
-        <!-- The threshold level for this appender. -->
-        <!-- <param name="Threshold" value="ERROR"/> -->
-        <layout class="org.apache.log4j.PatternLayout">
-        	 <param name="ConversionPattern" value="%d %-5p %-30C - %m%n" />
-        </layout>
-    </appender>
     
     <!--
 		Loglevels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL} See:
@@ -122,9 +110,10 @@
         <level value="INFO"/>
     </logger>
     
-    <!-- Logger for the monitor/ping service -->
-    <logger name="se.skl.tp.vp.monitor.ping">
-        <level value="INFO"/>
+    <!-- Monitoring logs to separate log file, additivity makes sure not logged twice -->
+    <logger name="se.skl.tp.vp.monitoring" additivity="false">
+        <level value="DEBUG" />
+        <appender-ref ref="CONSOLE"/>
     </logger>
     
     <!-- Level INFO will give log output for reset cache to selected appender -->
@@ -156,8 +145,6 @@
        <priority value="WARN" />
 
         <appender-ref ref="CONSOLE"/>
-		<!--
-        <appender-ref ref="ROLLINGFILE" />
-		-->
+        
     </root>
 </log4j:configuration>

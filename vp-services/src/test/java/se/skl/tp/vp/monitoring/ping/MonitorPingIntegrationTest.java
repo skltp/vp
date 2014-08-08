@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.monitor.ping;
+package se.skl.tp.vp.monitoring.ping;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;

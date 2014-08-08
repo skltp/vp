@@ -57,14 +57,14 @@
             <cxf:jaxws-client 
                 port="PingForConfigurationResponderPort" 
                 operation="PingForConfiguration" 
-                clientClass="se.riv.itintegration.monitoring.v1.rivtabp21.PingForConfigurationResponderService"
-                wsdlLocation="classpath:/TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl"
+                clientClass="se.riv.itintegration.monitoring.rivtabp21.v1.PingForConfigurationResponderService"
+                wsdlLocation="classpath:/ServiceContracts_itintegration_monitoring/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl"
             />
         </outbound-endpoint>
         
         <set-payload value="${PINGSERVICE_RESPONSE}"/>
      
-       	<logger level="INFO" message="monitor/ping signals: #[payload]" category="se.skl.tp.vp.monitor.ping" doc:name="Log payload"/>
+       	<logger level="INFO" message="monitor/ping signals: #[payload]" category="se.skl.tp.vp.monitoring.ping" doc:name="Log payload"/>
 
         <catch-exception-strategy>
             <!-- set http return status = 500 + payload = error... -->

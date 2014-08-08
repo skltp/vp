@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.pingforconfiguration;
+package se.skl.tp.vp.monitoring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -32,7 +32,6 @@ import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
 import se.riv.itintegration.monitoring.v1.ConfigurationType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationResponseType;
-import se.riv.itintegration.monitoring.v1.PingForConfigurationType;
 import se.skl.tp.vp.VpMuleServer;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
@@ -68,11 +67,10 @@ public class PingForConfigurationProducerRivTa21IntegrationTest extends Abstract
 	}
 	
 	@Test
-	public void pingForConfiguration_ok(){
+	public void pingForConfiguration_ok() throws Exception{
 		
 		PingForConfigurationTestConsumer consumer = new PingForConfigurationTestConsumer(VpMuleServer.getAddress("PINGFORCONFIGURATIONSERVICE_RIVTABP21_INBOUND_ENDPOINT"));
-		PingForConfigurationType pingRequest = new PingForConfigurationType();
-		PingForConfigurationResponseType response = consumer.callService("LOGICAL_ADDRESS", pingRequest);
+		PingForConfigurationResponseType response = consumer.callService("LOGICAL_ADDRESS");
 		
 		assertNotNull(response);
 		assertEquals(3, response.getConfiguration().size());

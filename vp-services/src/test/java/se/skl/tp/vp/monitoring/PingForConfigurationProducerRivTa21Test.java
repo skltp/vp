@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.pingforconfiguration;
+package se.skl.tp.vp.monitoring;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,6 +34,7 @@ import org.junit.Test;
 
 import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skl.tp.vp.monitoring.PingForConfigurationProducerRivTa21;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 public class PingForConfigurationProducerRivTa21Test {

@@ -18,9 +18,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.pingforconfiguration;
+package se.skl.tp.vp.monitoring;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.jws.WebService;
@@ -29,34 +28,36 @@ import org.mule.api.annotations.expressions.Lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
+import org.soitoolkit.commons.mule.util.ThreadSafeSimpleDateFormat;
 
+import se.riv.itintegration.monitoring.rivtabp21.v1.PingForConfigurationResponderInterface;
 import se.riv.itintegration.monitoring.v1.ConfigurationType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationResponseType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationType;
-import se.riv.itintegration.monitoring.v1.rivtabp21.PingForConfigurationResponderInterface;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 @WebService(
 		serviceName = "PingForConfigurationResponderService", 
-		endpointInterface="se.riv.itintegration.monitoring.v1.rivtabp21.PingForConfigurationResponderInterface", 
+		endpointInterface="se.riv.itintegration.monitoring.rivtabp21.v1.PingForConfigurationResponderInterface", 
 		portName = "PingForConfigurationResponderPort", 
 		targetNamespace = "urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21",
-		wsdlLocation = "TD_MONITORING_1_0_0/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl")
+		wsdlLocation = "ServiceContracts_itintegration_monitoring/interactions/PingForConfigurationInteraction/PingForConfigurationInteraction_1.0_RIVTABP21.wsdl")
 public class PingForConfigurationProducerRivTa21 implements PingForConfigurationResponderInterface {
 	
 	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationProducerRivTa21.class);
-	
+	private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("yyyyMMddhhmmss");
 	private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
 	@Lookup("vagvalAgent")
 	private VagvalAgent vagvalAgent;
 
 	@Override
-	public PingForConfigurationResponseType pingForConfiguration(
-			String logicalAddress, PingForConfigurationType parameters) {
+	public PingForConfigurationResponseType pingForConfiguration(String logicalAddress,
+			PingForConfigurationType parameters) {
+		
+		log.info("PingForConfiguration requested for {}", rb.getString("APPLICATION_NAME"));
 		
 		PingForConfigurationResponseType response = new PingForConfigurationResponseType();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddhhmmss");
 		Integer authInfoSize = vagvalAgent.getAnropsBehorighetsInfoList().size();
 		Integer routingInfoSize = vagvalAgent.getVirtualiseringsInfo().size();
 		
@@ -70,11 +71,13 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 			throw new RuntimeException("VP012 Severe problem, vp does not have all necessary reources to operate");
 		}
 		
-		response.getConfiguration().add(createConfiguration("Applikation", "VP"));
+		response.getConfiguration().add(createConfiguration("Applikation", rb.getString("APPLICATION_NAME")));
 		response.getConfiguration().add(createConfiguration("Anropsbehörigheter", authInfoSize.toString()));
 		response.getConfiguration().add(createConfiguration("Logiska-adresser", routingInfoSize.toString()));
-		response.setPingDateTime(formatter.format(new Date()));
+		response.setPingDateTime(dateFormat.format(new Date()));
 		response.setVersion(rb.getString("VP_VERSION"));
+		
+		log.info("PingForConfiguration response returned for {}", rb.getString("APPLICATION_NAME"));
 		
 		return response;
 	}
@@ -86,6 +89,9 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 	}
 
 	private ConfigurationType createConfiguration(String name, String value) {
+		
+		log.debug("PingForConfiguration config added [{}: {}]", name, value);
+		
 		ConfigurationType configurationType = new ConfigurationType();
 		configurationType.setName(name);
 		configurationType.setValue(value);
