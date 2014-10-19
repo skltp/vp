@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT 
-	YOU ARE DOING! [soi-toolkit.gen.version=0.3.1] [soi-toolkit.gen.type=integrationComponent] 
+<!-- DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT
+	YOU ARE DOING! [soi-toolkit.gen.version=0.3.1] [soi-toolkit.gen.type=integrationComponent]
 	[soi-toolkit.gen.createDate=2011-06-30T14:55:14.006+02:00] [soi-toolkit.gen.artifactId=vp] -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -17,23 +17,24 @@
 	<version>2.2.9-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>vp-parent</name>
-	
+
 	<properties>
 		<compiler.target.version>1.6</compiler.target.version>
         <compiler.source.version>1.6</compiler.source.version>
 	</properties>
 
 	<scm>
-		<connection>scm:svn:https://skltp.googlecode.com/svn/tp/vp/trunk/</connection>
-		<developerConnection>scm:svn:https://skltp.googlecode.com/svn/tp/vp/trunk/</developerConnection>
-		<url>http://skltp.googlecode.com/svn/tp/vp/trunk/</url>
+		<url>http://github.com/skltp/vp</url>
+		<connection>scm:git:git://github.com/skltp/vp.git</connection>
+		<developerConnection>scm:git:git://github.com/skltp/vp.git</developerConnection>
+		<tag>HEAD</tag>
 	</scm>
-	
+
 	<repositories>
 		<!-- Sonatype staging repo added to be able to build VP using artifacts
 			not yet pushed to central maven. In this specific case its about
 			new version of itintegration registry constracts.
-			
+
 			<groupId>se.rivta.infrastructure.itintegration</groupId>
             <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
             <version>2.0-RC2</version>
@@ -80,7 +81,7 @@
 					<configuration>
 						<properties>
 							<year>2013</year>
-							<copyright>Center for eHalsa i samverkan (CeHis). 
+							<copyright>Center for eHalsa i samverkan (CeHis).
 							&lt;http://cehis.se/&gt;</copyright>
 							<product>SKLTP</product>
 						</properties>
@@ -106,6 +107,17 @@
 						</mapping>
 						<useDefaultMapping>true</useDefaultMapping>
 					</configuration>
+				</plugin>
+				<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<version>2.5.1</version>
+						<configuration>
+								<autoVersionSubmodules>true</autoVersionSubmodules>
+								<tagNameFormat>v@{project.version}</tagNameFormat>
+								<pushChanges>false</pushChanges>
+								<localCheckout>true</localCheckout>
+						</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
