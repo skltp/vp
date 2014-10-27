@@ -21,13 +21,11 @@
 package se.skl.tp.hsa.cache;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +67,7 @@ public class HsaCacheImpl implements HsaCache {
 	/**
 	 * Constructor that initializes the cache from a file.
 	 * 
-	 * @param filename
+	 * @param filenames
 	 */
 	public HsaCacheImpl(String ... filenames) {
 		this.init(filenames);
@@ -98,7 +96,7 @@ public class HsaCacheImpl implements HsaCache {
 	/**
 	 * Uses {@link HsaFileParser} and {@link HsaRelationBuilder} to populate cache.
 	 * 
-	 * @param filename path to file
+	 * @param filenames path to file
 	 * 
 	 * @throws XMLStreamException thrown on XML parsing error.
 	 * @throws IOException thrown if file cannot be read.
@@ -111,10 +109,59 @@ public class HsaCacheImpl implements HsaCache {
 		return builder.setRelations(hsaObjects);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see se.skl.tp.hsa.cache.HsaCache#getParent(java.lang.String)
-	 */
+    // public List<HsaNodeInfo> freeTextSearch(String searchText, int maxNoOFCharsNotMatching) {
+    public List<HsaNodeInfo> freeTextSearch(String searchText, int maxNoOfHits) {
+
+        // For future enhanced "close matching" search logic:
+        // StringUtils.getLevenshteinDistance()
+
+        log.debug("Looking for {} in the hsa-tree", searchText);
+
+        List<HsaNodeInfo> list = new ArrayList<HsaNodeInfo>();
+        String[] searchTexts = StringUtils.split((searchText == null) ? searchText : searchText.toUpperCase()); // Convert toUpper for performance reasons since StringUtil.containsIgnoreCase() perform an toUpper()
+
+        // If the search text only contains whitespace or is null then return an empty list
+        if (searchTexts == null || searchTexts.length == 0) return list;
+
+
+        // Ok so we have a search text with at least one word, let's look for matches in the hsa cache
+        Collection<HsaNode> nodes = cache.values();
+        for (HsaNode node: nodes) {
+            if (isMatch(searchTexts, node)) {
+                list.add(new HsaInfoImpl(node));
+
+                // Skip out if we reached maxNoOfHits...
+                if (maxNoOfHits != -1 && list.size() >= maxNoOfHits) break;
+            }
+        }
+
+        return list;
+    }
+
+    private boolean isMatch(String[] searchTexts, HsaNode node) {
+        boolean match = true;
+        for (String searchFragment: searchTexts) {
+
+            // Fail if this searchFragment can't be found in neither the HSA-id nor in the DN-string
+            if ((StringUtils.containsIgnoreCase(node.getHsaId(), searchFragment)) ||
+                (StringUtils.containsIgnoreCase(node.getDn().toString(), searchFragment))) {
+
+                log.debug("Found {} in {}", searchFragment, node.toString());
+
+            } else {
+
+                log.debug("Failed to find {} in {}, try next HSA-node", searchFragment, node.toString());
+                match = false;
+                break;
+            }
+        }
+        return match;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see se.skl.tp.hsa.cache.HsaCache#getParent(java.lang.String)
+     */
 	@Override
 	public String getParent(String hsaId) {
 		try {

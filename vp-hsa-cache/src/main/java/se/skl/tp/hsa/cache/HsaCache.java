@@ -33,14 +33,24 @@ public interface HsaCache {
 	 * Initialize the Cache. If the cache has a value before a call to this method, that state is 
 	 * retained in in case of an exception.
 	 * 
-	 * @param filename file to initialize from
+	 * @param filenames file to initialize from
 	 * 
 	 * @return a populated HsaCache or an unchanged HSA Cache in case of an exception
 	 * 
 	 * @throws HsaCacheInitializationException if a fatal error occurred initializing the file
 	 */
 	HsaCache init(String ... filenames) throws HsaCacheInitializationException;
-	
+
+    /**
+     * Free text search of the HSA tree. SEarch both HSA-ID and DN infomrmation.
+     * If the search text contains several words all must match either HSA-ID and DN infomrmation.
+     *
+     * @param searchText
+     * @param maxNoOfHits, -1 means all...
+     * @return
+     */
+    public List<HsaNodeInfo> freeTextSearch(String searchText, int maxNoOfHits);
+
 	/**
 	 * Get the parent HSA-ID for a specific HSA-ID. If the HSA-ID is not found in 
 	 * HSA cache the default root parent is returned, in this case the SE node. 
