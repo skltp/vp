@@ -54,10 +54,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import se.skl.tjanst1.wsdl.GetProductDetailResponse;
-import se.skl.tjanst1.wsdl.GetProductDetailType;
-import se.skl.tjanst1.wsdl.ObjectFactory;
-import se.skl.tjanst1.wsdl.Product;
+import se.skltp.tjanst1.v1.GetProductDetailResponse;
+import se.skltp.tjanst1.v1.GetProductDetailType;
+import se.skltp.tjanst1.v1.ObjectFactory;
+import se.skltp.tjanst1.v1.Product;
 import se.skl.tp.vp.soitoolkit060.duplicate.RestClient;
 
 /**
@@ -73,7 +73,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 	
 	private static final Logger log = LoggerFactory.getLogger(VpFullServiceTestConsumer_MuleClient.class);
 
-	private static final JaxbUtil jaxbUtil = new JaxbUtil("org.w3.wsaddressing10:se.skl.tjanst1.wsdl");
+	private static final JaxbUtil jaxbUtil = new JaxbUtil("org.w3.wsaddressing10:se.skltp.tjanst1.v1");
 
 	private static final ObjectFactory OF = new ObjectFactory();
 	private static final org.w3.wsaddressing10.ObjectFactory OF_ADDR = new org.w3.wsaddressing10.ObjectFactory();
@@ -87,6 +87,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 		namespaceMap.put("it-int",  "urn:riv:itintegration:registry:1");
 		namespaceMap.put("interop", "urn:riv:interoperability:headers:1");
 		namespaceMap.put("service", "urn:skl:tjanst1:rivtabp20");
+		namespaceMap.put("serviceContract", "urn:skl:tjanst1:1");
 	}
 
 	private static final String responseTemplate =
@@ -203,7 +204,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 			XPath xpath = XPathFactory.newInstance().newXPath();
 		    xpath.setNamespaceContext(new MapNamespaceContext(namespaceMap));
 
-			XPathExpression xpathRequest = xpath.compile("/soap:Envelope/soap:Body/service:getProductDetailResponse");
+			XPathExpression xpathRequest = xpath.compile("/soap:Envelope/soap:Body/serviceContract:getProductDetailResponse");
 
 			result = xpathRequest.evaluate(doc, XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {

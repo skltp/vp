@@ -28,11 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3.wsaddressing10.AttributedURIType;
 
-import se.skl.tjanst1.wsdl.GetProductDetailResponse;
-import se.skl.tjanst1.wsdl.GetProductDetailType;
-import se.skl.tjanst1.wsdl.Product;
-import se.skl.tjanst1.wsdl.Tjanst1Interface;
-import se.skl.tjanst1.wsdl.Tjanst1Service;
+import se.skltp.tjanst1.v1.GetProductDetailResponse;
+import se.skltp.tjanst1.v1.GetProductDetailType;
+import se.skltp.tjanst1.v1.Product;
+import se.skltp.tjanst1.wsdl.Tjanst1Interface;
+import se.skltp.tjanst1.wsdl.Tjanst1Service;
 import se.skl.tp.vp.util.ClientUtil;
 
 /**

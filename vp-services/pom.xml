@@ -225,7 +225,11 @@
 										</extraarg>
 										<extraarg>-p</extraarg>
 										<extraarg>
-											urn:skl:tjanst1:rivtabp20=se.skl.tjanst1.wsdl
+											urn:skl:tjanst1:rivtabp20=se.skltp.tjanst1.wsdl
+										</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>
+											urn:skl:tjanst1:1=se.skltp.tjanst1.v1
 										</extraarg>
 										<extraarg>-p</extraarg>
 										<extraarg>
