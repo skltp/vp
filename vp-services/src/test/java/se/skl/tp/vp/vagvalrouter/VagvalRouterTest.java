@@ -37,8 +37,8 @@ import org.mockito.Mockito;
 import org.mule.api.MuleMessage;
 
 import se.skl.tp.hsa.cache.HsaCache;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
@@ -50,23 +50,23 @@ public class VagvalRouterTest {
 	VagvalAgentMock vagvalAgent;
 	VagvalInput vagvalInput;
 	String serviceNamespace;
-	
+
 	private AddressingHelper helper;
-	
+
 	//JUnit will create a temporary folder before your test, and delete it afterwards
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
-	
+
 	@Before
 	public void setUp() throws Exception {
-	    
-	    File localTakCache = folder.newFile(".tk.localCache");    
+
+	    File localTakCache = folder.newFile(".tk.localCache");
 	    vagvalAgent = new VagvalAgentMock(new ArrayList<VirtualiseringsInfoType>(), new ArrayList<AnropsBehorighetsInfoType>());
 	    vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
-	    
+
 		vagvalRouter = new VagvalRouter();
 		vagvalRouter.setVagvalAgent(vagvalAgent);
-		
+
 		HsaCache hsaCacheMock = Mockito.mock(HsaCache.class);
 		Mockito.when(hsaCacheMock.getParent("VardgivareB")).thenReturn(HsaCache.DEFAUL_ROOTNODE);
 		vagvalAgent.setHsaCache(hsaCacheMock);
@@ -76,14 +76,14 @@ public class VagvalRouterTest {
 		vagvalInput.senderId = "TP-TEST";
 		vagvalInput.rivVersion = "urn:riv:v1";
 		vagvalInput.serviceNamespace = "{urn:riv13606:v1}RIV";
-		
+
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		helper = new AddressingHelper(msg, this.vagvalAgent);
 	}
 
 	@Test
 	public void testHappyDaysOneHit() throws Exception {
-		
+
 		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
 		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
@@ -114,16 +114,16 @@ public class VagvalRouterTest {
 		// This test however works fine on the original VagValAgent since it doesn't require any mocked TAK-info
 
 		// Remove local cached TAK file
-		File localTakCache = folder.newFile(".tk.localCache");	
+		File localTakCache = folder.newFile(".tk.localCache");
 		localTakCache.delete();
-		
+
 		// Setup VagvalAgent with no routing or access control added
 		VagvalAgent vagvalAgent = new VagvalAgent();
 		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
-		
+
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		AddressingHelper myHelper = new AddressingHelper(msg, vagvalAgent);
-		
+
 		// Perform the test and ensure that we get a "VP008 no contact..." error message
 		try {
 			myHelper.getAddressFromAgent(vagvalInput);

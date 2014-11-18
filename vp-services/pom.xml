@@ -16,6 +16,10 @@
 	<artifactId>vp-services</artifactId>
     <packaging>mule</packaging>
 	<name>vp-services</name>
+	
+	<properties>
+		<tak.version>1.4.2-SNAPSHOT</tak.version>
+    </properties>
 
 	<dependencies>
 		<dependency>
@@ -36,15 +40,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-        <!--
-            tp vagval schemas 2.0.0 bundled in vp-schemas.
-        -->
+		
+		<!-- TAK vagval schemas -->
 		<dependency>
-			<groupId>se.skltp.vp</groupId>
-			<artifactId>vp-schemas</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+			<groupId>se.skltp.tak</groupId>
+			<artifactId>tak-schemas</artifactId>
+			<version>${tak.version}</version>
+        </dependency>
+		
 		
 		<!-- itintegration monitoring schemas för PingForConfiguration -->
 		<dependency>

@@ -37,19 +37,19 @@ import org.junit.Test;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 
 public class BehorighetHandlerTest {
 
 	HsaCache hsaCache;
-	
+
 	@Before
 	public void beforeTest() throws Exception {
 
 		URL url = getClass().getClassLoader().getResource("hsacache.xml");
 		hsaCache = new HsaCacheImpl().init(url.getFile());
-	}	
-	
+	}
+
 	@Test
 	public void testMapCreation() throws Exception {
 
@@ -58,12 +58,12 @@ public class BehorighetHandlerTest {
 		authorization.add(createAuthorization("sender-2", "namnrymd-1", "receiver-1"));
 		authorization.add(createAuthorization("sender-3", "namnrymd-1", "receiver-1", getRelativeDate(TWO_HOURS_AGO), getRelativeDate(AN_HOUR_AGO)));
 		authorization.add(createAuthorization("sender-3", "namnrymd-1", "receiver-1", getRelativeDate(IN_ONE_HOUR), getRelativeDate(IN_TEN_YEARS)));
-		
+
 		BehorighetHandler bh = new BehorighetHandler(hsaCache, authorization);
-		
+
 		assertEquals(1, bh.lookupInPermissionMap("receiver-1", "sender-1", "namnrymd-1").size());
 		assertEquals(1, bh.lookupInPermissionMap("receiver-1", "sender-2", "namnrymd-1").size());
 		assertEquals(2, bh.lookupInPermissionMap("receiver-1", "sender-3", "namnrymd-1").size());
-		assertNull(bh.lookupInPermissionMap("receiver-1", "sender-4", "namnrymd-1"));		
+		assertNull(bh.lookupInPermissionMap("receiver-1", "sender-4", "namnrymd-1"));
 	}
 }

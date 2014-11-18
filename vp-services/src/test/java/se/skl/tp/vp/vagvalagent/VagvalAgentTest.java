@@ -51,11 +51,11 @@ import org.xml.sax.InputSource;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 
@@ -74,7 +74,7 @@ public class VagvalAgentTest {
 	private static final String HEALTHCAREPROVIDER_B = "SE0000000005-1234";
 	private static final String UNKNOWN_HEALTHCAREPROVIDER = "UNKNOWN";
 	private static final String SE = "SE";
-	
+
 	//JUnit will create a temporary folder before your test, and delete it afterwards
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -84,8 +84,8 @@ public class VagvalAgentTest {
 
 		URL url = getClass().getClassLoader().getResource("hsacache.xml");
 		HsaCache hsaCache = new HsaCacheImpl().init(url.getFile());
-		
-		File localTakCache = folder.newFile(".tk.localCache");    
+
+		File localTakCache = folder.newFile(".tk.localCache");
 
 		vagvalAgent = new VagvalAgentMock();
 		vagvalAgent.setAddressDelimiter("#");
@@ -398,14 +398,14 @@ public class VagvalAgentTest {
     @Test
     public void noContactWithTjanstekatalogenAlwaysReultsInLocalCacheIsRead()
             throws Exception {
-        
+
         SokVagvalsInfoInterface mockedTakService = mockedTakGivesNoResult();
-        
+
         // The local cache to read when TAK is not available
         URL localTakCache = getClass().getClassLoader().getResource("tklocalcache-test.xml");
-        
+
         VagvalAgent vagvalAgent = setupVagvalAgent(mockedTakService, localTakCache.getFile());
-        
+
         //Init VagvalAgent from local cache
         vagvalAgent.init(VagvalAgent.FORCE_RESET);
 
@@ -433,8 +433,8 @@ public class VagvalAgentTest {
 
     }
 
-  
-    
+
+
     @Test
     public void contactWithTjanstekatalogenAlwaysReultsInLocalCacheIsUpdated()
             throws Exception {
@@ -461,11 +461,11 @@ public class VagvalAgentTest {
         XMLAssert.assertXpathExists("/persistentCache/virtualiseringsInfo", new InputSource(new FileReader(localTakCache)));
         XMLAssert.assertXpathExists("/persistentCache/anropsBehorighetsInfo",new InputSource(new FileReader(localTakCache)));
     }
-    
+
     @Test
     public void contactWithTjanstekatalogenDuringInitIsReportedInProcessingLog()
             throws Exception {
-        
+
         // An empty tmp local cache is created
         File localTakCache = folder.newFile(".tk.empty.localCache");
 
@@ -482,11 +482,11 @@ public class VagvalAgentTest {
 
         vagvalAgent.setMockVirtualiseringsInfo(routing);
         vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
-        
+
         // Init VagvalAgent from local cache
         VagvalAgentProcessingLog processingLog = vagvalAgent
-                .init(VagvalAgent.FORCE_RESET);        
-       
+                .init(VagvalAgent.FORCE_RESET);
+
         List<String> log = processingLog.getLog();
         assertThat(log.get(0), containsString("Initialize VagvalAgent TAK resources.."));
         assertThat(log.get(1), containsString("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy..."));
@@ -494,22 +494,22 @@ public class VagvalAgentTest {
         assertThat(log.get(3), containsString("Init VagvalAgent loaded number of permissions: 1"));
         assertThat(log.get(4), containsString("Init VagvalAgent loaded number of virtualizations: 1"));
     }
-    
+
     @Test
     public void noContactWithTjanstekatalogenDuringInitIsReportedInProcessingLog()
             throws Exception {
-        
+
         SokVagvalsInfoInterface mockedTakService = mockedTakGivesNoResult();
-        
+
         // The local cache to read when TAK is not available
         URL localTakCache = getClass().getClassLoader().getResource("tklocalcache-test.xml");
-        
+
         VagvalAgent vagvalAgent = setupVagvalAgent(mockedTakService, localTakCache.getFile());
-        
+
         // Init VagvalAgent from local cache
         VagvalAgentProcessingLog processingLog = vagvalAgent
-                .init(VagvalAgent.FORCE_RESET);        
-       
+                .init(VagvalAgent.FORCE_RESET);
+
         List<String> log = processingLog.getLog();
         assertThat(log.get(0), containsString("Initialize VagvalAgent TAK resources.."));
         assertThat(log.get(1), containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
@@ -517,36 +517,36 @@ public class VagvalAgentTest {
         assertThat(log.get(3), containsString("Init VagvalAgent loaded number of permissions: 1"));
         assertThat(log.get(4), containsString("Init VagvalAgent loaded number of virtualizations: 1"));
     }
-    
+
     @Test
     public void corruptLocalTakCacheDuringRestoreIsReportedInProcessongLog()
             throws Exception {
-        
+
         SokVagvalsInfoInterface mockedTakService = mockedTakGivesNoResult();
-        
+
         // A corrupt local TAK cache
         File corruptLocalTakCache = folder.newFile(".tk.corrupt.localCache");
-        
+
         VagvalAgent vagvalAgent = setupVagvalAgent(mockedTakService, corruptLocalTakCache.getAbsolutePath());
-        
+
         // Init VagvalAgent from local cache
         VagvalAgentProcessingLog processingLog = vagvalAgent
-                .init(VagvalAgent.FORCE_RESET);        
-       
+                .init(VagvalAgent.FORCE_RESET);
+
         List<String> log = processingLog.getLog();
         assertThat(log.get(0), containsString("Initialize VagvalAgent TAK resources.."));
         assertThat(log.get(1), containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
         assertThat(log.get(2), containsString("Failed to restore virtualizations and permissions from local TAK copy:"));
         assertThat(log.get(3), containsString("Reason for failure: javax.xml.bind.UnmarshalException"));
     }
-    
+
     @Test
     public void noAuthorizationsLoadedGivesEmptyList(){
     	List<AnropsBehorighetsInfoType> authInfo = new VagvalAgent().getAnropsBehorighetsInfoList();
     	assertNotNull(authInfo);
     	assertTrue(authInfo.isEmpty());
     }
-    
+
     @Test
     public void noRoutingLoadedGivesEmptyList(){
     	List<VirtualiseringsInfoType> routingInfo = new VagvalAgent().getVirtualiseringsInfo();
@@ -577,7 +577,7 @@ public class VagvalAgentTest {
 		time.add(anHourAgo);
 		return time;
 	}
-	
+
     private SokVagvalsInfoInterface mockedTakGivesNoResult() {
         // Mock TAK service to return no result for authorizations and
         // virtualizations

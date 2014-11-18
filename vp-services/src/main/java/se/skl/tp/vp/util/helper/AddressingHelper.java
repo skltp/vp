@@ -29,10 +29,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
@@ -40,7 +40,7 @@ import se.skl.tp.vp.vagvalrouter.VagvalInput;
 
 /**
  * Helper class for working with addressing
- * 
+ *
  * @author Marcus Krantz [marcus.krantz@callistaenterprise.se]
  */
 public class AddressingHelper extends VPHelperSupport {

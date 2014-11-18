@@ -34,15 +34,15 @@ import org.slf4j.LoggerFactory;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 /**
- * 
+ *
  * GetLogicalAddressesByServiceContract by using the local cache instead of
  * calling Service Catalog every time.
- * 
+ *
  * @deprecated  As of release 2.2.2, replaced by {@link se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract}
  */
 @Deprecated

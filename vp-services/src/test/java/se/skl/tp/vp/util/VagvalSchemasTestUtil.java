@@ -25,18 +25,18 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoIdType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
 public class VagvalSchemasTestUtil {
-	
+
 	public static final Duration IN_TEN_YEARS;
 	public static final Duration AN_HOUR_AGO;
 	public static final Duration TWO_HOURS_AGO;
 	public static final Duration IN_ONE_HOUR;
-	
+
 	static {
 		Duration tenYearsDuration = null;
 		Duration anHourAgo = null;

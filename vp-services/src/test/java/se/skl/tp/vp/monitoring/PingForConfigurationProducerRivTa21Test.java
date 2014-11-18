@@ -32,72 +32,72 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.monitoring.PingForConfigurationProducerRivTa21;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 public class PingForConfigurationProducerRivTa21Test {
-	
+
 	public static List<AnropsBehorighetsInfoType> BEHORIGHETS_INFO_TYPES = new ArrayList<AnropsBehorighetsInfoType>();
 	public static List<VirtualiseringsInfoType> VIRTUALISERINGS_INFO_TYPES = new ArrayList<VirtualiseringsInfoType>();
-	
+
 	@BeforeClass
 	public static void beforeClass(){
 		BEHORIGHETS_INFO_TYPES.add(createAnropsBehorighetsInfo());
 		VIRTUALISERINGS_INFO_TYPES.add(createVirtualiseringsInfo());
 	}
-	
+
 	@Test
-	public void resourcesNeededForVpAvailable() {	
-		
+	public void resourcesNeededForVpAvailable() {
+
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
 		when(vagvalAgent.getAnropsBehorighetsInfoList()).thenReturn(BEHORIGHETS_INFO_TYPES);
 		when(vagvalAgent.getVirtualiseringsInfo()).thenReturn(VIRTUALISERINGS_INFO_TYPES);
-		
+
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
-		
+
 		assertTrue(pingRivTa21.resourcesNeededForVpAvailable());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void virtualiseringsInfoIsMissing() {
-		
+
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
 		when(vagvalAgent.getAnropsBehorighetsInfoList()).thenReturn(BEHORIGHETS_INFO_TYPES);
 		when(vagvalAgent.getVirtualiseringsInfo()).thenReturn(Collections.EMPTY_LIST);
-		
+
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
-		
+
 		assertFalse(pingRivTa21.resourcesNeededForVpAvailable());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void behorighetsInfoIsMissing() {
-		
+
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
 		when(vagvalAgent.getAnropsBehorighetsInfoList()).thenReturn(Collections.EMPTY_LIST);
 		when(vagvalAgent.getVirtualiseringsInfo()).thenReturn(VIRTUALISERINGS_INFO_TYPES);
-		
+
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
-		
+
 		assertFalse(pingRivTa21.resourcesNeededForVpAvailable());
 	}
-	
+
 	@Test
 	public void agentIsMissing() {
-		
+
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(null);
-		
+
 		assertFalse(pingRivTa21.resourcesNeededForVpAvailable());
 	}
-	
+
 	private static VirtualiseringsInfoType createVirtualiseringsInfo() {
 		VirtualiseringsInfoType infoType = new VirtualiseringsInfoType();
 		return infoType;
