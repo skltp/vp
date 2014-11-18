@@ -66,15 +66,15 @@ public class AddressingHelper extends VPHelperSupport {
 		}
 
 		if (rivProfiles.size() == 0) {
-			String errorMessage = ("VP005 No Logical Adress with matching Riv-version found for serviceNamespace :"
-					+ input.serviceNamespace + ", receiverId:" + input.receiverId + "RivVersion" + input.rivVersion);
+			String errorMessage = ("VP005 No ruting with matching Riv-version found for serviceContractNamespace :"
+					+ input.serviceContractNamespace + ", receiverId:" + input.receiverId + "RivVersion" + input.rivVersion);
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
 
 		if (rivProfiles.size() > 1) {
-			String errorMessage = "VP006 More than one Logical Adress with matching Riv-version found for serviceNamespace:"
-					+ input.serviceNamespace + ", receiverId:" + input.receiverId;
+			String errorMessage = "VP006 More than one route with matching Riv-version found for serviceContractNamespace:"
+					+ input.serviceContractNamespace + ", receiverId:" + input.receiverId;
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
@@ -119,7 +119,7 @@ public class AddressingHelper extends VPHelperSupport {
 		vagvalInput.senderId = (String) this.getMuleMessage().getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
 		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 		vagvalInput.rivVersion = (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
-		vagvalInput.serviceNamespace = (String) this.getMuleMessage().getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION);
+		vagvalInput.serviceContractNamespace = (String) this.getMuleMessage().getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION);
 
 		return vagvalInput;
 	}
@@ -127,7 +127,7 @@ public class AddressingHelper extends VPHelperSupport {
 	private void validateRequest(final VagvalInput request) {
 		if (this.getLog().isDebugEnabled()) {
 			this.getLog().debug(
-					"Calling vagvalAgent with serviceNamespace:" + request.serviceNamespace + ", receiverId:"
+					"Calling vagvalAgent with serviceNamespace:" + request.serviceContractNamespace + ", receiverId:"
 							+ request.receiverId + ", senderId: " + request.senderId);
 		}
 		if (request.rivVersion == null) {
@@ -148,7 +148,7 @@ public class AddressingHelper extends VPHelperSupport {
 	}
 
 	private VisaVagvalRequest createVisaVagvalRequest(final VagvalInput input) {
-		return this.createVisaVagvalRequest(input.senderId, input.receiverId, input.serviceNamespace);
+		return this.createVisaVagvalRequest(input.senderId, input.receiverId, input.serviceContractNamespace);
 	}
 
 	private VisaVagvalRequest createVisaVagvalRequest(String senderId, String receiverId, String tjansteGranssnitt) {
@@ -175,21 +175,21 @@ public class AddressingHelper extends VPHelperSupport {
 
 		if (noOfMatchingAdresses == 0) {
 			String errorMessage = ("VP005 No Logical Adress with matching Riv-version found for serviceNamespace :"
-					+ request.serviceNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion);
+					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion);
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
 
 		if (noOfMatchingAdresses > 1) {
 			String errorMessage = "VP006 More than one Logical Adress with matching Riv-version found for serviceNamespace:"
-					+ request.serviceNamespace + ", receiverId:" + request.receiverId;
+					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId;
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
 
 		if (adress == null || adress.trim().length() == 0) {
 			String errorMessage = ("VP010 Physical Adress field is empty in Service Producer for serviceNamespace :"
-					+ request.serviceNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion);
+					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion);
 			this.getLog().error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
@@ -210,7 +210,7 @@ public class AddressingHelper extends VPHelperSupport {
 		}
 
 		if (virtualiseringar.size() == 0) {
-			String errorMessage = "VP004 No Logical Adress found for serviceNamespace:" + request.serviceNamespace
+			String errorMessage = "VP004 No Logical Adress found for serviceNamespace:" + request.serviceContractNamespace
 					+ ", receiverId:" + request.receiverId;
 			this.getLog().info(errorMessage);
 			throw new VpSemanticException(errorMessage);

@@ -75,7 +75,7 @@ public class VagvalRouterTest {
 		vagvalInput.receiverId = "VardgivareB";
 		vagvalInput.senderId = "TP-TEST";
 		vagvalInput.rivVersion = "urn:riv:v1";
-		vagvalInput.serviceNamespace = "{urn:riv13606:v1}RIV";
+		vagvalInput.serviceContractNamespace = "{urn:riv13606:v1}RIV";
 
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		helper = new AddressingHelper(msg, this.vagvalAgent);

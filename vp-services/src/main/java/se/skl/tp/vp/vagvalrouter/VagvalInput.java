@@ -25,12 +25,12 @@ public class VagvalInput {
 	public String senderId;
 	public String receiverId;
 	public String rivVersion;
-	public String serviceNamespace;
+	public String serviceContractNamespace;
 
 	@Override
 	public String toString() {
 		return "VagvalInput: " + senderId + " " + receiverId + " " + rivVersion + " "
-				+ serviceNamespace;
+				+ serviceContractNamespace;
 	}
 
 }

@@ -80,7 +80,7 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 				abo.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
 				abo.setReceiverId(input.receiverId);
 				abo.setSenderId(input.senderId);
-				abo.setTjansteKontrakt(input.serviceNamespace);
+				abo.setTjansteKontrakt(input.serviceContractNamespace);
 				sampleResponse.getAnropsBehorighetsInfo().add(abo);
 			}
 
@@ -113,7 +113,7 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 				VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
 				viId.setValue(String.valueOf(id++));
 				vi.setVirtualiseringsInfoId(viId);
-				vi.setTjansteKontrakt(input.serviceNamespace);
+				vi.setTjansteKontrakt(input.serviceContractNamespace);
 				sampleResponse.getVirtualiseringsInfo().add(vi);
 
 			}

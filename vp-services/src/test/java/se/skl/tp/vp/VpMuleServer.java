@@ -87,7 +87,7 @@ public class VpMuleServer {
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.rivVersion = rivVersion;
 		vagvalInput.senderId = senderId;
-		vagvalInput.serviceNamespace = serviceNameSpace;
+		vagvalInput.serviceContractNamespace = serviceNameSpace;
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}

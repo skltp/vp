@@ -202,7 +202,7 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.rivVersion = rivVersion;
 		vagvalInput.senderId = senderId;
-		vagvalInput.serviceNamespace = serviceNameSpace;
+		vagvalInput.serviceContractNamespace = serviceNameSpace;
 		return vagvalInput;
 	}
 
