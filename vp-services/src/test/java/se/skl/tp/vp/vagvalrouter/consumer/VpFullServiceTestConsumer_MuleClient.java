@@ -32,21 +32,18 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.SOAPFault;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.cxf.binding.soap.SoapFault;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.xml.stax.MapNamespaceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
-import org.soitoolkit.commons.mule.util.MiscUtil;
 import org.soitoolkit.commons.xml.XPathUtil;
 import org.w3.wsaddressing10.AttributedURIType;
 import org.w3c.dom.Document;
@@ -54,11 +51,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import se.skltp.tjanst1.v1.GetProductDetailResponse;
-import se.skltp.tjanst1.v1.GetProductDetailType;
-import se.skltp.tjanst1.v1.ObjectFactory;
-import se.skltp.tjanst1.v1.Product;
 import se.skl.tp.vp.soitoolkit060.duplicate.RestClient;
+import se.skltp.domain.subdomain.getproducdetail.v1.GetProductDetailResponse;
+import se.skltp.domain.subdomain.getproducdetail.v1.GetProductDetailType;
+import se.skltp.domain.subdomain.getproducdetail.v1.ObjectFactory;
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 /**
  * Test consumer based on MuleClient and plain https, using jaxb, jaxp and xpath to create and parse soap-envelopes for requests and repsonses.
@@ -73,7 +70,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 	
 	private static final Logger log = LoggerFactory.getLogger(VpFullServiceTestConsumer_MuleClient.class);
 
-	private static final JaxbUtil jaxbUtil = new JaxbUtil("org.w3.wsaddressing10:se.skltp.tjanst1.v1");
+	private static final JaxbUtil jaxbUtil = new JaxbUtil("org.w3.wsaddressing10:se.skltp.domain.subdomain.getproducdetail.v1");
 
 	private static final ObjectFactory OF = new ObjectFactory();
 	private static final org.w3.wsaddressing10.ObjectFactory OF_ADDR = new org.w3.wsaddressing10.ObjectFactory();
@@ -86,8 +83,8 @@ public class VpFullServiceTestConsumer_MuleClient {
 		namespaceMap.put("soap",    "http://schemas.xmlsoap.org/soap/envelope/");
 		namespaceMap.put("it-int",  "urn:riv:itintegration:registry:1");
 		namespaceMap.put("interop", "urn:riv:interoperability:headers:1");
-		namespaceMap.put("service", "urn:skl:tjanst1:rivtabp20");
-		namespaceMap.put("serviceContract", "urn:skl:tjanst1:1");
+		namespaceMap.put("service", "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20");
+		namespaceMap.put("serviceContract", "urn:riv:domain:subdomain:GetProductDetailResponder:1");
 	}
 
 	private static final String responseTemplate =

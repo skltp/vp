@@ -21,8 +21,8 @@
  -->
  
 <xs:schema 
-	targetNamespace="urn:skl:tjanst1:1"
-	xmlns:tns="urn:skl:tjanst1:1"
+	targetNamespace="urn:riv:domain:subdomain:GetProductDetailResponder:1"
+	xmlns:tns="urn:riv:domain:subdomain:GetProductDetailResponder:1"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	attributeFormDefault="unqualified"
 	elementFormDefault="qualified"
@@ -34,19 +34,6 @@
 			<xs:element name="height" type="xs:int" />
 			<xs:element minOccurs="0" name="id" type="xs:string" />
 			<xs:element name="width" type="xs:int" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:element name="listProducts" type="tns:listProducts" />
-	<xs:complexType name="listProducts">
-		<xs:sequence />
-	</xs:complexType>
-
-	<xs:element name="listProductsResponse"
-		type="tns:listProductsResponse" />
-	<xs:complexType name="listProductsResponse">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string" />
 		</xs:sequence>
 	</xs:complexType>
 

@@ -416,7 +416,7 @@ public class VagvalAgentTest {
         assertEquals(1, authorization.size());
         assertEquals("vp-test-producer", authorization.get(0).getReceiverId());
         assertEquals("tp", authorization.get(0).getSenderId());
-        assertEquals("urn:skl:tjanst1:rivtabp20", authorization.get(0)
+        assertEquals("urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20", authorization.get(0)
                 .getTjansteKontrakt());
 
         // Verify virtualizations are loaded from local cache
@@ -428,7 +428,7 @@ public class VagvalAgentTest {
         assertEquals("https://localhost:19000/vardgivare-b/tjanst1",
                 virtualizations.get(0).getAdress());
         assertEquals("RIVTABP20", virtualizations.get(0).getRivProfil());
-        assertEquals("urn:skl:tjanst1:rivtabp20", virtualizations.get(0)
+        assertEquals("urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20", virtualizations.get(0)
                 .getTjansteKontrakt());
 
     }

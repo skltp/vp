@@ -105,7 +105,7 @@ public class MonitorPingIntegrationTest extends AbstractTestCase{
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.senderId = "tp";
 		vagvalInput.rivVersion = "RIVTABP20";
-		vagvalInput.serviceContractNamespace = "urn:skl:tjanst1:rivtabp20";
+		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20";
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}

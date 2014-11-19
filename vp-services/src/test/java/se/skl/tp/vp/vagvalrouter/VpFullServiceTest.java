@@ -42,12 +42,12 @@ import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
-import se.skltp.tjanst1.v1.Product;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 import se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger;
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 public class VpFullServiceTest extends AbstractTestCase {
 
@@ -167,7 +167,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		assertTrue(infoMessage.getText().contains("<extraInfo><name>senderIpAdress</name><value>" + expectedSenderIpAdress + "</value></extraInfo>"));
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>receiverid</name><value>vp-test-producer</value></extraInfo>"));
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
-    	assertTrue(infoMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
+    	assertTrue(infoMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20</value></extraInfo>"));
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
 
@@ -224,7 +224,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>receiverid</name><value>unknown-logical-address</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
-    	assertTrue(errorMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:skl:tjanst1:rivtabp20</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
 	
@@ -365,7 +365,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:skl:tjanst1:rivtabp20, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
+    		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
     	}
 	}
 	
@@ -380,7 +380,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
+    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
     	}
 	}
 	
@@ -407,7 +407,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.senderId = "tp";
 		vagvalInput.rivVersion = "RIVTABP20";
-		vagvalInput.serviceContractNamespace = "urn:skl:tjanst1:rivtabp20";
+		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20";
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}

@@ -54,7 +54,7 @@ public class WsdlQueryIntegrationTest extends AbstractTestCase {
 			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
 			"vp-common.xml," +
 			"services/VagvalRouter-service.xml," +
-			"vp-teststubs-and-services-config.xml";
+			"teststub-services/vp-virtuell-tjanst-teststub-service.xml";
 	}
 		
 	@Before
@@ -70,7 +70,7 @@ public class WsdlQueryIntegrationTest extends AbstractTestCase {
 
 		// can't use XMLUnit here - CXF changes the order or wsdl:message elemenst making XMLUnit-diff fail
 		assertTrue("Make sure we got a WSDL doc: " + wsdl, wsdl.trim().endsWith("</wsdl:definitions>"));
-		String xsdUrl = SERVICE_URL + "?xsd=tjanst1-1.0.xsd";
+		String xsdUrl = SERVICE_URL + "?xsd=GetProductDetailResponder_1.0.xsd";
 		assertTrue("CXF should do default url rewrite: " + wsdl, wsdl.contains("schemaLocation=\"" + xsdUrl + "\""));
 		assertTrue("CXF should do default url rewrite: " + wsdl, wsdl.contains("<soap:address location=\"" + SERVICE_URL + "\""));
 		
@@ -88,7 +88,7 @@ public class WsdlQueryIntegrationTest extends AbstractTestCase {
 		
 		String rewrittenServiceUrl = "http://vp-loadbalancer-dns-name:443/vp/tjanst1";
 		// can't use XMLUnit here - CXF changes the order or wsdl:message elements making XMLUnit-diff fail
-		String xsdUrl = rewrittenServiceUrl + "?xsd=tjanst1-1.0.xsd";
+		String xsdUrl = rewrittenServiceUrl + "?xsd=GetProductDetailResponder_1.0.xsd";
 		assertTrue("CXF should do default url rewrite: " + wsdl, wsdl.contains("schemaLocation=\"" + xsdUrl + "\""));
 		assertTrue("CXF should do default url rewrite: " + wsdl, wsdl.contains("<soap:address location=\"" + rewrittenServiceUrl + "\""));		
 	}	

@@ -39,7 +39,7 @@
 
 	    <cxf:jaxws-service
             serviceClass="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"
-					wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
+					wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl" />
 
         <component>
             <singleton-object class="se.skl.tp.vp.vagvalrouter.producer.VpFullServiceTestProducer"  />

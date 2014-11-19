@@ -32,11 +32,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
-import se.skltp.tjanst1.v1.Product;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 import se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger;
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
 
@@ -113,7 +113,7 @@ public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.senderId = senderId;
 		vagvalInput.rivVersion = "RIVTABP20";
-		vagvalInput.serviceContractNamespace = "urn:skl:tjanst1:rivtabp20";
+		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20";
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}

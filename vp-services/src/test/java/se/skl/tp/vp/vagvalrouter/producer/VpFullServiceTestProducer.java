@@ -20,9 +20,7 @@
  */
 package se.skl.tp.vp.vagvalrouter.producer;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.jws.WebService;
@@ -31,18 +29,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3.wsaddressing10.AttributedURIType;
 
-import se.skltp.tjanst1.v1.GetProductDetailResponse;
-import se.skltp.tjanst1.v1.GetProductDetailType;
-import se.skltp.tjanst1.v1.ListProducts;
-import se.skltp.tjanst1.v1.ListProductsResponse;
-import se.skltp.tjanst1.v1.Product;
-import se.skltp.tjanst1.wsdl.Tjanst1Interface;
+import se.skltp.domain.subdomain.getproducdetail.v1.GetProductDetailResponse;
+import se.skltp.domain.subdomain.getproducdetail.v1.GetProductDetailType;
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
+import se.skltp.domain.subdomain.getproducdetail.v1.rivtabp20.GetProductDetailResponderInterface;
 
-@WebService(serviceName = "Tjanst1Service"
-	, portName = "Tjanst1ImplPort"
-	, targetNamespace = "urn:skl:tjanst1:rivtabp20"
-	, name = "Tjanst1")
-public class VpFullServiceTestProducer implements Tjanst1Interface {
+@WebService(
+		serviceName = "GetProductDetailResponderService", 
+		endpointInterface="se.skltp.domain.subdomain.getproducdetail.v1.rivtabp20.GetProductDetailResponderInterface", 
+		portName = "GetProductDetailResponderPort", 
+		targetNamespace = "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20",
+		wsdlLocation = "schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl")
+public class VpFullServiceTestProducer implements GetProductDetailResponderInterface {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
     private Map<String, Product> productMap = new HashMap<String, Product>();
 
@@ -52,19 +50,7 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
         productMap.put(product.getId(), product);
         product = newProduct("RW456", "Round Widget", 5, 5);
         productMap.put(product.getId(), product);
-        logger.debug("WS initiated. Use /listProducts and /getProductDetail?productId=SW123");
-    }
-
-	public ListProductsResponse listProducts(AttributedURIType logicalAddress, ListProducts parameters) {
-    	logger.info("Producer-teststub. Start listProducts()");
-
-    	ListProductsResponse response = new ListProductsResponse();
-    	List<String> productListing = response.getItem();
-    	fillProductList(productListing);
-
-    	logger.info("Producer-teststub. End listProducts(), returning {} products.", response.getItem().size());
-    	
-        return response;
+        logger.debug("WS initiated. Use getProductDetail?productId=SW123");
     }
 
     public GetProductDetailResponse getProductDetail( AttributedURIType logicalAddress, GetProductDetailType parameters) {
@@ -99,13 +85,6 @@ public class VpFullServiceTestProducer implements Tjanst1Interface {
        
         return response;
     }
-
-	private void fillProductList(List<String> productListing) {
-        Collection<Product> products = productMap.values();
-        for (Product p : products) {
-            productListing.add(p.getId() + " - " + p.getDescription());
-        }
-	}
 
     private Product newProduct(String id, String description, int width, int height) {
         Product p = new Product();

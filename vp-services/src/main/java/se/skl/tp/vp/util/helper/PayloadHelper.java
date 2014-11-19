@@ -76,7 +76,8 @@ public class PayloadHelper extends VPHelperSupport {
 	private String parsePayloadForReceiver(final ReversibleXMLStreamReader reader) throws XMLStreamException {
 		String receiverId = null;
 		boolean headerFound = false;
-
+		boolean bodyFound = false;
+		
 		int event = reader.getEventType();
 
 		while (reader.hasNext()) {
@@ -84,6 +85,19 @@ public class PayloadHelper extends VPHelperSupport {
 
 			case XMLStreamConstants.START_ELEMENT:
 				String local = reader.getLocalName();
+				
+//				System.err.println(local);
+//				
+//				if(bodyFound){
+//					System.err.println(local);
+//					System.err.println(reader.getNamespaceURI());
+//					
+//					return receiverId;
+//				}
+//				
+//				if (local.equals("Body")) {
+//					bodyFound = true;
+//				}
 
 				if (local.equals("Header")) {
 					headerFound = true;
