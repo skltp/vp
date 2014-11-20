@@ -73,7 +73,7 @@ public class TestDisableLogToJms extends AbstractTestCase {
 		vi_TP.receiverId = receiverId;
 		vi_TP.senderId = "tp";
 		vi_TP.rivVersion = "RIVTABP20";
-		vi_TP.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20";
+		vi_TP.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetailResponder:1";
 		vi_TP.adress = adress;
 		return vi_TP;
 	}

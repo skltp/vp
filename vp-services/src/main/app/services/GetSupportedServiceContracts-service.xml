@@ -46,7 +46,7 @@
         <cxf:proxy-client />
 
         <outbound-endpoint
-            address="http://${TK_HOST}:${TK_PORT}/${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_URI}"
+            address="${GETSUPPORTEDSERVICECONTRACTS_OUTBOUND_URL}"
             exchange-pattern="request-response"
             connector-ref="VPInsecureConnector"
             responseTimeout="${SERVICE_TIMEOUT_MS}" />
@@ -68,7 +68,7 @@
         <cxf:proxy-client />
 
         <outbound-endpoint
-            address="http://${TK_HOST}:${TK_PORT}/${GETSUPPORTEDSERVICECONTRACTS_V2_OUTBOUND_URI}"
+            address="${GETSUPPORTEDSERVICECONTRACTS_V2_OUTBOUND_URL}"
             exchange-pattern="request-response"
             connector-ref="VPInsecureConnector"
             responseTimeout="${SERVICE_TIMEOUT_MS}" />

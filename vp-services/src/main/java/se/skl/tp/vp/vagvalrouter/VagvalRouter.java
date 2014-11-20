@@ -127,7 +127,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * Headers to be blocked when invoking producer.
 	 */
 	private static final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
-			VPUtil.RIV_VERSION, VPUtil.WSDL_NAMESPACE, REVERSE_PROXY_HEADER_NAME,
+			VPUtil.RIV_VERSION, VPUtil.WSDL_NAMESPACE, REVERSE_PROXY_HEADER_NAME,VPUtil.SERVICECONTRACT_NAMESPACE,
 			VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES", HttpConstants.HEADER_CONTENT_TYPE,
 			"http.disable.status.code.exception.check", }));
 
@@ -227,7 +227,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = event.getMessage().getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION) + "-"
+		String serviceId = event.getMessage().getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION) + "-"
 				+ event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 
 		synchronized (statistics) {

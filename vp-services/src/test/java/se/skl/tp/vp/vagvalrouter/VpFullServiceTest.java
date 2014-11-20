@@ -168,6 +168,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>receiverid</name><value>vp-test-producer</value></extraInfo>"));
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20</value></extraInfo>"));
+    	assertTrue(infoMessage.getText().contains("<extraInfo><name>servicecontract_namespace</name><value>urn:riv:domain:subdomain:GetProductDetailResponder:1</value></extraInfo>"));
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
 
@@ -225,6 +226,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>receiverid</name><value>unknown-logical-address</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>senderid</name><value>tp</value>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>servicecontract_namespace</name><value>urn:riv:domain:subdomain:GetProductDetailResponder:1</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
 	
@@ -365,7 +367,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
+    		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
     	}
 	}
 	
@@ -380,7 +382,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
+    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
     	}
 	}
 	
@@ -407,7 +409,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.senderId = "tp";
 		vagvalInput.rivVersion = "RIVTABP20";
-		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20";
+		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetailResponder:1";
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}

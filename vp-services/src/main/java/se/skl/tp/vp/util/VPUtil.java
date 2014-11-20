@@ -60,6 +60,7 @@ public final class VPUtil {
 	
 	public static final String CXF_SERVICE_NAMESPACE = "cxf_service";
 	public static final String WSDL_NAMESPACE = "wsdl_namespace";
+	public static final String SERVICECONTRACT_NAMESPACE = "servicecontract_namespace";
 	
 	public static final String ENDPOINT_URL = "endpoint_url";
 	

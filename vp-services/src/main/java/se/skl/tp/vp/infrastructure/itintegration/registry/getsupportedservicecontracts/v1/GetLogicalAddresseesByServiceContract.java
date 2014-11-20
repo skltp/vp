@@ -92,8 +92,8 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 
 	private boolean matchesRequested(AnropsBehorighetsInfoType authInfo,
 			GetLogicalAddresseesByServiceContractType request) {
-		String namespace = extractFirstPartOfNamespace(request.getServiceContractNameSpace()
-				.getServiceContractNamespace());
+		String namespace = request.getServiceContractNameSpace()
+				.getServiceContractNamespace();
 		return authInfo.getSenderId().equals(request.getServiceConsumerHsaId())
 				&& authInfo.getTjansteKontrakt().startsWith(namespace);
 	}
@@ -103,9 +103,4 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		return requestTime.compare(authInfo.getFromTidpunkt()) != DatatypeConstants.LESSER
 				&& requestTime.compare(authInfo.getTomTidpunkt()) != DatatypeConstants.GREATER;
 	}
-
-	static String extractFirstPartOfNamespace(String namespace) {
-		return namespace.split("Responder")[0];
-	}
-
 }

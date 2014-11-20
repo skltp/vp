@@ -404,7 +404,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.senderId = "tp";
 		vagvalInput.rivVersion = "RIVTABP20";
-		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20";
+		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetailResponder:1";
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}

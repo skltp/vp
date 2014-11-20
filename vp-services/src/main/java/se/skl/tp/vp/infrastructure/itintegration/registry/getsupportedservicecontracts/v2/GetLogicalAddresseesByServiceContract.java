@@ -64,31 +64,9 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 			return new GetLogicalAddresseesByServiceContractResponseType();
 		}
 
-		/*
-		 * This is a fix to solve the problem with TAK holding serviceinteraction namespace aand not servicecontract namespace. Because
-		 * VP should not infect other systems with this problem GetLogicalAddresseesByServiceContract needs to always return the
-		 * servicecontract namespace.
-		 *
-		 * Lets say these are registered in TAK:
-		 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21
-		 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20
-		 *
-		 * Then this code needs to solve to only return the servicecontract namespace, which is the same for different rivtabp versions:
-		 * urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1
-		 */
 		Map<String, LogicalAddresseeRecordType> uniqueLogicalAddresses = new HashMap<String,LogicalAddresseeRecordType>();
 		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
 			if (!contains(authInfo, uniqueLogicalAddresses) && validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
-
-				/*
-				 * FIXME: Hur skall vi hantera om filter i TAK finns definierat på både:
-				 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21
-				 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20
-				 *
-				 * Så länge som vi har kvar buggen med att wsdl namespace används i TAK?
-				 * Det går att komma runt genom att i TAK definera samma filter på alla
-				 * tjänsteinteraktioner.
-				 */
 
 				LogicalAddresseeRecordType logicalAddressee = new LogicalAddresseeRecordType();
 				logicalAddressee.setLogicalAddress(authInfo.getReceiverId());
@@ -147,26 +125,9 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 	 */
 	private boolean matchesRequested(AnropsBehorighetsInfoType authInfo,
 			GetLogicalAddresseesByServiceContractType request) {
-		String namespace = extractFirstPartOfNamespace(request.getServiceContractNameSpace()
-				.getServiceContractNamespace());
+		String namespace = request.getServiceContractNameSpace().getServiceContractNamespace();
 		return authInfo.getSenderId().equals(request.getServiceConsumerHsaId())
-				&& authInfo.getTjansteKontrakt().startsWith(namespace);
-	}
-
-	/*
-	 * Split the first part of a namespace to be able to compare with the service interaction namespace (wsdl)
-	 * declared in TAK.
-	 *
-	 * urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1
-	 * should return
-	 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule
-	 *
-	 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21
-	 * should return
-	 * urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21
-	 */
-	static String extractFirstPartOfNamespace(String namespace) {
-		return namespace.split("Responder")[0];
+				&& authInfo.getTjansteKontrakt().equals(namespace);
 	}
 
 	private boolean validAccordingToTime(AnropsBehorighetsInfoType authInfo) {

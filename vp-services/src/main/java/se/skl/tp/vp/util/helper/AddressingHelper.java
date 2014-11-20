@@ -119,7 +119,7 @@ public class AddressingHelper extends VPHelperSupport {
 		vagvalInput.senderId = (String) this.getMuleMessage().getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
 		vagvalInput.receiverId = (String) this.getMuleMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 		vagvalInput.rivVersion = (String) this.getMuleMessage().getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
-		vagvalInput.serviceContractNamespace = (String) this.getMuleMessage().getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION);
+		vagvalInput.serviceContractNamespace = (String) this.getMuleMessage().getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION);
 
 		return vagvalInput;
 	}

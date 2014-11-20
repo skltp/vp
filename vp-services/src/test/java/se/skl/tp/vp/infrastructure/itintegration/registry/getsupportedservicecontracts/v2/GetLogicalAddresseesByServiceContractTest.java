@@ -22,13 +22,11 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract.extractFirstPartOfNamespace;
 import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -38,12 +36,12 @@ import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyserv
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
 import se.rivta.infrastructure.itintegration.registry.v2.ServiceContractNamespaceType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.FilterInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.FilterInfoType;
 
 public class GetLogicalAddresseesByServiceContractTest {
 
@@ -65,48 +63,11 @@ public class GetLogicalAddresseesByServiceContractTest {
 	}
 
 	@Test
-	public void usingServiceContractWhenSearchingAmongServiceInteractions() {
-		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
-		service.setVagvalAgent(createVagvalAgentContainingServiceInteractionNamespaces());
-
-		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1",CONSUMER_HSAID_1);
-		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
-
-		assertEquals(2, response.getLogicalAddressRecord().size());
-		assertEquals(RECEIVERID_1, response.getLogicalAddressRecord().get(0).getLogicalAddress());
-		assertEquals(RECEIVERID_2, response.getLogicalAddressRecord().get(1).getLogicalAddress());
-	}
-
-	@Test
-	public void usingServiceInteractionWhenSearchingAmongServiceInteractions() {
-		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
-		service.setVagvalAgent(createVagvalAgentContainingServiceInteractionNamespaces());
-
-		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",CONSUMER_HSAID_1);
-		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
-
-		assertEquals(2, response.getLogicalAddressRecord().size());
-		assertEquals(RECEIVERID_1, response.getLogicalAddressRecord().get(0).getLogicalAddress());
-		assertEquals(RECEIVERID_2, response.getLogicalAddressRecord().get(1).getLogicalAddress());
-	}
-
-	@Test
 	public void senderDoesNotHaveAnyAuthorizedLogicalAddressesForServiceContract() {
 		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
 		service.setVagvalAgent(createVagvalAgentContainingServiceContractNamespaces());
 
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1", "NONE");
-		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
-
-		assertEquals(0, response.getLogicalAddressRecord().size());
-	}
-
-	@Test
-	public void senderDoesNotHaveAnyAuthorizedLogicalAddressesForServiceInteraction() {
-		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
-		service.setVagvalAgent(createVagvalAgentContainingServiceInteractionNamespaces());
-
-		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21", "NONE");
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 
 		assertEquals(0, response.getLogicalAddressRecord().size());
@@ -124,43 +85,9 @@ public class GetLogicalAddresseesByServiceContractTest {
 	}
 
 	@Test
-	public void oldServiceInteractionAuthorizationsShouldNotBeReturned() {
-		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
-		service.setVagvalAgent(createVagvalAgentContainingServiceInteractionNamespaces());
-
-		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21",CONSUMER_HSAID_1);
-		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
-
-		assertEquals(0, response.getLogicalAddressRecord().size());
-	}
-
-	@Test
-	public void requestWithoutMandatoryRivElementsShouldReturnEmptyResult() {
-		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
-		service.setVagvalAgent(createVagvalAgentContainingServiceInteractionNamespaces());
-
-		GetLogicalAddresseesByServiceContractType requestWithoutMandatoryElements = new GetLogicalAddresseesByServiceContractType();
-		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", requestWithoutMandatoryElements);
-
-		assertEquals(0, response.getLogicalAddressRecord().size());
-	}
-
-	@Test
 	public void requestIsInValidAccordingToRivSpec() {
 		GetLogicalAddresseesByServiceContractType requestWithoutMandatoryElements = new GetLogicalAddresseesByServiceContractType();
 		assertFalse(requestIsValidAccordingToRivSpec(requestWithoutMandatoryElements));
-	}
-
-	@Test
-	public void extractFirstPartOfNamespaceWhenResponderIsIncluded() {
-		String partOfNamespace = extractFirstPartOfNamespace("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1");
-		assertEquals("urn:riv:crm:scheduling:GetSubjectOfCareSchedule",partOfNamespace);
-	}
-
-	@Test
-	public void extractFirstPartOfNamespaceWhenResponderIsNotIncluded() {
-		String partOfNamespace = extractFirstPartOfNamespace("urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21");
-		assertEquals("urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",partOfNamespace);
 	}
 
 	@Test
@@ -220,19 +147,6 @@ public class GetLogicalAddresseesByServiceContractTest {
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1",createFilter("crm:scheduling", "Invitation")));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:itintegration.engagementindex:FindContentResponder:1",createFilter("itintegration:engagementindex", "Update")));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfigurationResponder:1"));
-
-		return new VagvalAgentMock(anropsBehorighetsInfo);
-	}
-
-	private VagvalAgent createVagvalAgentContainingServiceInteractionNamespaces() {
-
-		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",createFilter("crm:scheduling", "Booking", "Invitation")));
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20",createFilter("crm:scheduling", "Booking", "Invitation")));
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp21",createFilter("crm:scheduling", "Booking", "Invitation")));
-		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareSchedule:1:rivtabp20",createFilter("crm:scheduling", "Booking", "Invitation")));
-		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp21"));
-		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfiguration:1:rivtabp20"));
 
 		return new VagvalAgentMock(anropsBehorighetsInfo);
 	}
