@@ -32,9 +32,9 @@ import javax.xml.datatype.DatatypeConstants;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheInitializationException;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
 public class VagvalHandler {
@@ -59,15 +59,15 @@ public class VagvalHandler {
 		this.virtualiseringsInfo = virtualiseringsInfo;
 		this.virtualiseringsInfoMap = createVirtualiseringsInfoMap(virtualiseringsInfo);
 	}
-	
+
 	public int size() {
 		return virtualiseringsInfo.size();
 	}
-	
+
 	public List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
 		return virtualiseringsInfo;
 	}
-	
+
 	public VisaVagvalResponse getRoutingInformation(VisaVagvalRequest request, boolean useDeprecatedDefaultRouting, List<String> receiverAddresses) {
 		// Check if routing was found in TAK for requested receiver.
 		VisaVagvalResponse response = getRoutingInformationFromLeaf(request, useDeprecatedDefaultRouting, receiverAddresses);
@@ -85,7 +85,7 @@ public class VagvalHandler {
 	public boolean containsNoRouting(VisaVagvalResponse response) {
 		return response == null || response.getVirtualiseringsInfo().isEmpty();
 	}
-	
+
 	public VisaVagvalResponse getRoutingInformationFromLeaf(VisaVagvalRequest request, boolean useDeprecatedDefaultRouting, List<String> receiverAddresses) {
 
 		VisaVagvalResponse response = new VisaVagvalResponse();
@@ -94,10 +94,10 @@ public class VagvalHandler {
 		boolean addressFound = false;
 		for (String requestReceiverId : receiverAddresses) {
 			// Find all possible LogiskAdressat
-			
+
 			// Start to lookup elements matching recevier, tjanstekontrakt in the map
 			List<VirtualiseringsInfoType> matchingVirtualiseringsInfo = lookupInVirtualiseringsInfoMap(requestReceiverId, request.getTjanstegranssnitt());
-			
+
 			// Skip if no hit in the map
 			if (matchingVirtualiseringsInfo != null) {
 
@@ -110,7 +110,7 @@ public class VagvalHandler {
 					}
 				}
 			}
-			
+
 			// Only return 1 address if we do a delimiter search!
 			if (useDeprecatedDefaultRouting && addressFound) {
 				break;
@@ -142,31 +142,31 @@ public class VagvalHandler {
 			throw new VpSemanticException("VP011 Internal HSA cache is not available!", e);
 		}
 	}
-	
+
 	/* VIRTUALISERINGS-INFO MAP METHODS */
 
 	private Map<String, List<VirtualiseringsInfoType>> createVirtualiseringsInfoMap(List<VirtualiseringsInfoType> inVirtualiseringsInfo) {
 
 		Map<String, List<VirtualiseringsInfoType>> outVirtualiseringsInfoMap = new HashMap<String, List<VirtualiseringsInfoType>>();
-		
+
 		// Loop through all entries in the list and store them by recevier and tjanstekontrakt in a map for faster lookup
 		for (VirtualiseringsInfoType v : inVirtualiseringsInfo) {
 			String key = createVirtualiseringsInfoMapKey(v.getReceiverId(), v.getTjansteKontrakt());
-			
+
 			// Lookup the entry (list) in the map and create it if missing
 			List<VirtualiseringsInfoType> value = outVirtualiseringsInfoMap.get(key);
 			if (value == null) {
 				value = new ArrayList<VirtualiseringsInfoType>();
 				outVirtualiseringsInfoMap.put(key, value);
 			}
-			
+
 			// Add the record to the list
 			value.add(v);
 		}
 
 		return outVirtualiseringsInfoMap;
 	}
-	
+
 	List<VirtualiseringsInfoType> lookupInVirtualiseringsInfoMap(String receiverId, String tjansteKontrakt) {
 		String key = createVirtualiseringsInfoMapKey(receiverId, tjansteKontrakt);
 		return virtualiseringsInfoMap.get(key);

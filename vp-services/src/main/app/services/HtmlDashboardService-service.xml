@@ -36,7 +36,7 @@
     <flow name="htmlDashboardService-flow" >
 
         <inbound-endpoint
-            address="http://${TP_HOST}:${HTMLDASHBOARDSERVICE_PORT}/${HTMLDASHBOARDSERVICE_INBOUND_URI}"
+            address="${HTMLDASHBOARDSERVICE_INBOUND_URL}"
             connector-ref="VPInsecureConnector"
             responseTimeout="${SERVICE_TIMEOUT_MS}" />
 

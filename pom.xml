@@ -50,12 +50,10 @@
 
 	<modules>
 		<module>vp-soitoolkit-mule-dependencies</module>
-		<module>vp-schemas</module>
 		<module>vp-ping</module>
 		<module>vp-services</module>
 		<module>vp-teststub</module>
 		<module>vp-hsa-cache</module>
-		<module>vp-auto-deployer</module>
 	</modules>
 
 	<dependencies>

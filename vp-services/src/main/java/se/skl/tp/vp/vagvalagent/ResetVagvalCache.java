@@ -26,13 +26,13 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.PropertyScope;
 
-import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheResponse;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skltp.tak.vagval.wsdl.v2.ResetVagvalCacheResponse;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
 
 public class ResetVagvalCache implements Callable {
 
 	private VisaVagvalsInterface vagvalAgent;
-	
+
 	// Not private to make the method testable...
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
@@ -58,7 +58,7 @@ public class ResetVagvalCache implements Callable {
 
 		// Reset cache
 		ResetVagvalCacheResponse result = vagvalAgent.resetVagvalCache(null);
-		
+
 		// Return success of operation
 		return getResultAsString(result);
 	}
@@ -69,15 +69,15 @@ public class ResetVagvalCache implements Callable {
 		eventContext.getMessage().setProperty("Content-Length",
 				Integer.toString(content.getBytes(eventContext.getEncoding()).length), PropertyScope.INBOUND);
 	}
-	
+
 	private String getResultAsString(ResetVagvalCacheResponse result) {
-	
-	    
+
+
 	    StringBuffer resultAsString = new StringBuffer();
 	    for (String processingLog : result.getProcessingLog()) {
 	        resultAsString.append("<br>" + processingLog);
         }
-	   
+
 		return resultAsString.toString();
 	}
 }

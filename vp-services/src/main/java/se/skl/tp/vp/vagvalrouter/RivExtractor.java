@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.PayloadHelper;
+import se.skl.tp.vp.util.helper.PayloadHelper.PayloadInfo;
 
 public class RivExtractor extends AbstractMessageTransformer {
 
@@ -46,7 +47,7 @@ public class RivExtractor extends AbstractMessageTransformer {
 	public Object transformMessage(MuleMessage msg, String encoding)
 			throws TransformerException {
 		
-		log.debug("Extracting RIV-version and namespace");
+		log.debug("Extracting RIV-version, receiverId, wsdl namespace and servicecontract namespace");
 		
 		// open timers, and start total timer.
 		ExecutionTimer.init();
@@ -73,10 +74,17 @@ public class RivExtractor extends AbstractMessageTransformer {
 		}
 		
 		final PayloadHelper payloadHelper = new PayloadHelper(msg);
-		final String receiverId = payloadHelper.extractReceiverFromPayload();
-		if (receiverId != null) {
-			log.debug("Receiver id (route to) set to session scope: " + receiverId);
-			msg.setProperty(VPUtil.RECEIVER_ID, receiverId, PropertyScope.SESSION);
+		PayloadInfo payloadInfo = payloadHelper.extractInfoFromPayload();
+		
+		if(payloadInfo.getServiceContractNamespace() != null){
+			msg.setProperty(VPUtil.SERVICECONTRACT_NAMESPACE, payloadInfo.getServiceContractNamespace(), PropertyScope.SESSION);
+		}else{
+			log.warn("Service contract namespace was not found in the request");
+		}
+		
+		if (payloadInfo.getReceiverId() != null) {
+			log.debug("Receiver id (route to) set to session scope: " + payloadInfo.getReceiverId());
+			msg.setProperty(VPUtil.RECEIVER_ID, payloadInfo.getReceiverId(), PropertyScope.SESSION);
 		} else {
 			log.warn("Unable to extract receiverid from paylaod");			
 		}

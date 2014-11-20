@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skl.tp.vp.dashboard.ServiceStatistics;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
@@ -61,7 +61,7 @@ public class VagvalRouter extends AbstractRecipientList {
     /**
      * HTTP Header holding producer response time, forwarded to consumer.
      * <p>
-     * 
+     *
      * @since VP-2.2.1
      */
     public static final String X_SKLTP_PRODUCER_RESPONSETIME = "x-skltp-prt";
@@ -70,35 +70,35 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * HTTP Header forwarded to producer. Note that header represent original consumer and should not be used for routing or authorization
 	 * in SKLTP VP. For routing and authorization use X_VP_SENDER_ID.
 	 * <p>
-	 * 
+	 *
 	 * @since VP-2.0
 	 */
 	public static final String X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "x-rivta-original-serviceconsumer-hsaid";
-	
+
 	/**
 	 * HTTP Header x-vp-sender-id, identifies the consumer doing the actual call to SKLTP VP. The header x-vp-sender-id
 	 * should always exist in outbound calls for other SKLTP component that uses it.
-	 * 
+	 *
 	 * @since VP-2.2.3
 	 */
 	public static final String X_VP_SENDER_ID = "x-vp-sender-id";
-	
+
 	/**
 	 * HTTP header x-vp-instance-id, carrying information regarding the VP instance id, either incoming requests
 	 * or outgoing. This header can be used by other VP instances to make sure VP internal http headers are not
 	 * processed.
-	 * 
+	 *
 	 * @since VP-2.2.4
 	 */
 	public static final String X_VP_INSTANCE_ID = "x-vp-instance-id";
-	
+
 	/**
 	 * Incoming HTTP Header x-vp-auth-cert, carrying a X509 certificate, used when implementing a reverse proxy.
-	 * 
+	 *
 	 * @since VP-1.3
 	 */
 	public static final String REVERSE_PROXY_HEADER_NAME = "x-vp-auth-cert";
-	
+
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalRouter.class);
 
@@ -109,14 +109,14 @@ public class VagvalRouter extends AbstractRecipientList {
 	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 
 	private AddressingHelper addrHelper;
-	
+
 	private String vpInstanceId;
-	
+
 	private final EventLogger eventLogger = new EventLogger();
-	
+
 	/**
 	 * Set value to be used in HTTP header x-vp-instance-id.
-	 * 
+	 *
 	 * @param vpInstanceId
 	 */
 	public void setVpInstanceId(String vpInstanceId) {
@@ -127,7 +127,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * Headers to be blocked when invoking producer.
 	 */
 	private static final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
-			VPUtil.RIV_VERSION, VPUtil.WSDL_NAMESPACE, REVERSE_PROXY_HEADER_NAME,
+			VPUtil.RIV_VERSION, VPUtil.WSDL_NAMESPACE, REVERSE_PROXY_HEADER_NAME,VPUtil.SERVICECONTRACT_NAMESPACE,
 			VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES", HttpConstants.HEADER_CONTENT_TYPE,
 			"http.disable.status.code.exception.check", }));
 
@@ -167,28 +167,28 @@ public class VagvalRouter extends AbstractRecipientList {
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
 	}
-	
+
 	/**
 	 * Enable logging to JMS, it true by default
-	 * 
+	 *
 	 * @param logEnableToJms
 	 */
-	public void setEnableLogToJms(boolean logEnableToJms) {	
+	public void setEnableLogToJms(boolean logEnableToJms) {
 		this.eventLogger.setEnableLogToJms(logEnableToJms);
 	}
 
 	/**
 	 * Setter for the jaxbToXml property
-	 * 
+	 *
 	 * @param jaxbToXml
 	 */
 	public void setJaxbObjectToXml(JaxbObjectToXmlTransformer jaxbToXml) {
 		this.eventLogger.setJaxbToXml(jaxbToXml);
 	}
-	
+
     /**
      * Set the queue name for log error messages.
-     * 
+     *
      * @param queueName
      */
     public void setLogErrorQueueName(String queueName) {
@@ -215,7 +215,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 */
 	@Override
 	public MuleEvent route(MuleEvent event) throws RoutingException {
-		
+
 		/*
 		 * VpSemanticException stored in INVOCATION scoped property 'VpSemanticException' goes here...
 		 */
@@ -227,7 +227,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 
 		long beforeCall = System.currentTimeMillis();
-		String serviceId = event.getMessage().getProperty(VPUtil.WSDL_NAMESPACE, PropertyScope.SESSION) + "-"
+		String serviceId = event.getMessage().getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION) + "-"
 				+ event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 
 		synchronized (statistics) {
@@ -261,24 +261,24 @@ public class VagvalRouter extends AbstractRecipientList {
 			 * RoutingExceotion goes here, e.g when unable to connect to producer
 			 * or timeout occurs.
 			 */
-					
+
 			//TODO: Is it possible to get failing endpoint any other way, e.g from exception?
 			String addr = this.getAddressingHelper(event.getMessage()).getAddress();
 			String cause = "VP009 Error connecting to service producer at adress " + addr;
-			
+
 			setSoapFaultInResponse(event, cause);
 			logException(event.getMessage(), re);
 			return event;
-			
+
 		} catch (RuntimeException re) {
 			/*
 			 * VpSemanticException goes here...
 			 */
-			
+
 			setSoapFaultInResponse(event, re.getMessage());
 			logException(event.getMessage(), re);
 			return event;
-			
+
 		} finally {
 		    if(replyEvent != null){
 		    	long endpointTime =  ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
@@ -305,18 +305,18 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 
 		String url = (String) recipient;
-		
+
 		//endpoint_url only set here in session to be able to log in EventLogger
 		message.setProperty(VPUtil.ENDPOINT_URL, url, PropertyScope.SESSION);
-		
+
 		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
 		eb.setResponseTimeout(selectResponseTimeout(message));
 		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 		eb.setEncoding("UTF-8");
 		message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8", PropertyScope.OUTBOUND);
 
-		MessagePropertiesTransformer mt = createOutboundTransformer();	
-		
+		MessagePropertiesTransformer mt = createOutboundTransformer();
+
 		propagateSenderIdAndVpInstanceIdToProducer(message, mt);
 		propagateOriginalServiceConsumerHsaIdToProducer(message, mt);
 		propagateSoapActionToProducer(message, mt);
@@ -360,30 +360,30 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * Propagate x-rivta-original-serviceconsumer-hsaid as an outbound http property.
 	 */
 	private void propagateOriginalServiceConsumerHsaIdToProducer(MuleMessage message,MessagePropertiesTransformer mt) {
-		
+
 		String senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
-		
+
 		logger.debug("Exists original sender hsa id as inbound property {}?", VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID);
 		String originalServiceconsumerHsaid = message.getProperty(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyScope.SESSION);
-		
+
 		if(originalServiceconsumerHsaid == null){
 			logger.debug("No, original sender hsa id does not exist, instead set original sender hsa id = sender id: {}", senderId);
 			originalServiceconsumerHsaid = senderId;
 			//Put in session scope to be able to log in EventLogger.
 			message.setProperty(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalServiceconsumerHsaid, PropertyScope.SESSION);
 		}
-		
+
 		//Propagate the http header to producers
 		mt.getAddProperties().put(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalServiceconsumerHsaid);
 	}
-	
+
 	protected int selectResponseTimeout(MuleMessage message) {
 		//Feature: Select response timeout provided by invoked service or use global default in responseTimeout
 		int responseTimeoutValue = message.getProperty(VPUtil.FEATURE_RESPONSE_TIMOEUT, PropertyScope.INVOCATION,responseTimeout);
 		logger.debug("Selected response timeout {}", responseTimeoutValue);
 		return responseTimeoutValue;
 	}
-	
+
 	private MuleEvent setSoapFaultInResponse(MuleEvent event, String cause){
 		String soapFault = VPUtil.generateSoap11FaultWithCause(cause);
 		event.getMessage().setPayload(soapFault);
@@ -392,13 +392,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		event.getMessage().setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
 		return event;
 	}
-	
+
 	private void logException(MuleMessage message, Throwable t) {
 		Map<String, String> extraInfo = new HashMap<String, String>();
 		extraInfo.put("source", getClass().getName());
 		eventLogger.setMuleContext(message.getMuleContext());
 		eventLogger.addSessionInfo(message, extraInfo);
-		eventLogger.logErrorEvent(t, message, null, extraInfo);	
+		eventLogger.logErrorEvent(t, message, null, extraInfo);
 	}
 
 	private Connector selectConsumerConnector(String url, MuleMessage message) {
@@ -418,7 +418,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * TP forwards properties in mule header that should not be forwarded. In
 	 * the case the producer is another instance of TP (serivce platform) this
 	 * can be problematic.
-	 * 
+	 *
 	 * <message-properties-transformer name="deleteMuleHeaders">
 	 * <delete-message-property key="x-vp-auth-cert"/>
 	 * </message-properties-transformer>

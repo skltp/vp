@@ -16,6 +16,10 @@
 	<artifactId>vp-services</artifactId>
     <packaging>mule</packaging>
 	<name>vp-services</name>
+	
+	<properties>
+		<tak.version>1.4.2-SNAPSHOT</tak.version>
+    </properties>
 
 	<dependencies>
 		<dependency>
@@ -36,15 +40,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-        <!--
-            tp vagval schemas 2.0.0 bundled in vp-schemas.
-        -->
+		
+		<!-- TAK vagval schemas -->
 		<dependency>
-			<groupId>se.skltp.vp</groupId>
-			<artifactId>vp-schemas</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+			<groupId>se.skltp.tak</groupId>
+			<artifactId>tak-schemas</artifactId>
+			<version>${tak.version}</version>
+        </dependency>
+		
 		
 		<!-- itintegration monitoring schemas för PingForConfiguration -->
 		<dependency>
@@ -212,26 +215,24 @@
 						<configuration>
 							<sourceRoot>${basedir}/target/generated/src/test/java</sourceRoot>
 							<wsdlOptions>
+								
 								<wsdlOption>
 									<extraargs>
 										<extraarg>-p</extraarg>
-										<!-- Note: be careful when changing this - must be in sync for
-											all schemas generations in this namespace! -->
 										<extraarg>
-											urn:riv:v1=se.skl.riv.wsdl.v1
+											urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20=se.skltp.domain.subdomain.getproducdetail.v1.rivtabp20
 										</extraarg>
 										<extraarg>-p</extraarg>
 										<extraarg>
-											urn:skl:tjanst1:rivtabp20=se.skl.tjanst1.wsdl
+											urn:riv:domain:subdomain:GetProductDetailResponder:1=se.skltp.domain.subdomain.getproducdetail.v1
 										</extraarg>
 										<extraarg>-p</extraarg>
 										<extraarg>
 											http://www.w3.org/2005/08/addressing=org.w3.wsaddressing10
 										</extraarg>
 									</extraargs>
-									<wsdl>src/test/resources/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl</wsdl>
+									<wsdl>src/test/resources/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl</wsdl>
 								</wsdlOption>
-
 							</wsdlOptions>
 						</configuration>
 						<goals>

@@ -28,12 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3.wsaddressing10.AttributedURIType;
 
-import se.skl.tjanst1.wsdl.GetProductDetailResponse;
-import se.skl.tjanst1.wsdl.GetProductDetailType;
-import se.skl.tjanst1.wsdl.Product;
-import se.skl.tjanst1.wsdl.Tjanst1Interface;
-import se.skl.tjanst1.wsdl.Tjanst1Service;
 import se.skl.tp.vp.util.ClientUtil;
+import se.skltp.domain.subdomain.getproducdetail.v1.GetProductDetailResponse;
+import se.skltp.domain.subdomain.getproducdetail.v1.GetProductDetailType;
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
+import se.skltp.domain.subdomain.getproducdetail.v1.rivtabp20.GetProductDetailResponderInterface;
+import se.skltp.domain.subdomain.getproducdetail.v1.rivtabp20.GetProductDetailResponderService;
 
 /**
  * Test consumer based on JAX WS.
@@ -94,9 +94,9 @@ public class VpFullServiceTestConsumer_JAX_WS {
 		System.setProperty("javax.net.ssl.trustStore", "../certs/truststore.jks");
 		System.setProperty("javax.net.ssl.trustStorePassword", "password");
 		
-		Tjanst1Service ts = new Tjanst1Service(ClientUtil
+		GetProductDetailResponderService ts = new GetProductDetailResponderService(ClientUtil
 				.createEndpointUrlFromServiceAddress(serviceAddress));
-		Tjanst1Interface serviceInterface = ts.getTjanst1ImplPort();
+		GetProductDetailResponderInterface serviceInterface = ts.getGetProductDetailResponderPort();
 
 		GetProductDetailType t = new GetProductDetailType();
 		t.setProductId(productId);

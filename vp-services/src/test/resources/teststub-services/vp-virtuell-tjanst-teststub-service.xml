@@ -58,10 +58,10 @@
          </composite-source>
  			
         <cxf:proxy-service
-            namespace="urn:skl:tjanst1:rivtabp20"
+            namespace="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20"
             payload="envelope"
-            service="Tjanst1Service"
-            wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
+            service="GetProductDetailResponderService"
+            wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl" />
 
         <flow-ref name="vagval-dynamic-routing-flow" />
     </flow>
@@ -90,10 +90,10 @@
          </composite-source>
  			
         <cxf:proxy-service
-            namespace="urn:skl:tjanst1:rivtabp20"
+            namespace="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20"
             payload="envelope"
-            service="Tjanst1Service"
-            wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
+            service="GetProductDetailResponderService"
+            wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl" />
 
         <flow-ref name="vagval-dynamic-routing-flow" />
     </flow>
@@ -122,10 +122,10 @@
          </composite-source>
  			
         <cxf:proxy-service
-            namespace="urn:skl:tjanst1:rivtabp20"
+            namespace="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20"
             payload="envelope"
-            service="Tjanst1Service"
-            wsdlLocation="classpath:/schemas/interactions/tjanst1Interaction/tjanst1-1.0.wsdl" />
+            service="GetProductDetailResponderService"
+            wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl" />
 
         <flow-ref name="vagval-dynamic-routing-flow" />
     </flow>

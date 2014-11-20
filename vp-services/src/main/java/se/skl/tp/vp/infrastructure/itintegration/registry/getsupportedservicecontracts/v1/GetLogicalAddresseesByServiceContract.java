@@ -34,15 +34,15 @@ import org.slf4j.LoggerFactory;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 /**
- * 
+ *
  * GetLogicalAddressesByServiceContract by using the local cache instead of
  * calling Service Catalog every time.
- * 
+ *
  * @deprecated  As of release 2.2.2, replaced by {@link se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract}
  */
 @Deprecated
@@ -92,8 +92,8 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 
 	private boolean matchesRequested(AnropsBehorighetsInfoType authInfo,
 			GetLogicalAddresseesByServiceContractType request) {
-		String namespace = extractFirstPartOfNamespace(request.getServiceContractNameSpace()
-				.getServiceContractNamespace());
+		String namespace = request.getServiceContractNameSpace()
+				.getServiceContractNamespace();
 		return authInfo.getSenderId().equals(request.getServiceConsumerHsaId())
 				&& authInfo.getTjansteKontrakt().startsWith(namespace);
 	}
@@ -103,9 +103,4 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		return requestTime.compare(authInfo.getFromTidpunkt()) != DatatypeConstants.LESSER
 				&& requestTime.compare(authInfo.getTomTidpunkt()) != DatatypeConstants.GREATER;
 	}
-
-	static String extractFirstPartOfNamespace(String namespace) {
-		return namespace.split("Responder")[0];
-	}
-
 }
