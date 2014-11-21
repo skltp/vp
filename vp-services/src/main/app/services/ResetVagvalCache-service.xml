@@ -41,7 +41,7 @@
 
         <inbound-endpoint
             address="${RESETVAGVALCACHE_INBOUND_URL}"
-            responseTimeout="${SERVICE_TIMEOUT_MS}" 
+            responseTimeout="${RESETVAGVALCACHE_TIMEOUT_MS}" 
             connector-ref="VPInsecureConnector"
             />
 
