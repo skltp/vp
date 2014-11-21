@@ -18,7 +18,7 @@
 	<name>vp-services</name>
 	
 	<properties>
-		<tak.version>1.4.2-SNAPSHOT</tak.version>
+		<tak.version>1.4.2-RC1</tak.version>
     </properties>
 
 	<dependencies>
