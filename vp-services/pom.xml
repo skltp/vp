@@ -16,9 +16,9 @@
 	<artifactId>vp-services</artifactId>
     <packaging>mule</packaging>
 	<name>vp-services</name>
-	
+
 	<properties>
-		<tak.version>1.4.2-RC1</tak.version>
+		<tak.version>1.4.2-RC3</tak.version>
     </properties>
 
 	<dependencies>
@@ -40,15 +40,15 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- TAK vagval schemas -->
 		<dependency>
 			<groupId>se.skltp.tak</groupId>
 			<artifactId>tak-schemas</artifactId>
 			<version>${tak.version}</version>
         </dependency>
-		
-		
+
+
 		<!-- itintegration monitoring schemas för PingForConfiguration -->
 		<dependency>
 		  	<groupId>se.skltp.itintegration.monitoring</groupId>
@@ -56,9 +56,9 @@
 			<version>1.0</version>
 		</dependency>
 
-        <!-- 
+        <!--
         	Until rivta itintegration infrastructure schemas 2.0 is published in central maven a
-        	local se.skltp release of schemas us used. 
+        	local se.skltp release of schemas us used.
         -->
         <dependency>
 			<groupId>se.skltp.infrastructure.itintegration</groupId>
@@ -215,7 +215,7 @@
 						<configuration>
 							<sourceRoot>${basedir}/target/generated/src/test/java</sourceRoot>
 							<wsdlOptions>
-								
+
 								<wsdlOption>
 									<extraargs>
 										<extraarg>-p</extraarg>
