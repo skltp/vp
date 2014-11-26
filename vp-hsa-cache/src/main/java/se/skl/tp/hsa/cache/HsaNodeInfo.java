@@ -34,4 +34,5 @@ import java.util.List;
 public interface HsaNodeInfo {
     public String getHsaId();
     public String getDn();
+    public String getName();
 }

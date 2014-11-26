@@ -31,11 +31,11 @@ import org.junit.Test;
 public class HsaNodePrinterTest {
 	
 	String expected = 
-			"dn=o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000004-1234,lineNo=48"+ System.getProperty("line.separator") +
-			"  dn=ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000003-1234,lineNo=43"+ System.getProperty("line.separator") +
-			"    dn=ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000002-1234,lineNo=38"+ System.getProperty("line.separator") +
-			"      dn=ou=N\u00e4ssj\u00f6 VC DLK,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000000-1234,lineNo=33"+ System.getProperty("line.separator") +
-			"      dn=ou=N\u00e4ssj\u00f6 VC DLM,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000001-1234,lineNo=28"+ System.getProperty("line.separator");
+			"dn=o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000004-1234,name=Landstinget i J\u00f6nk\u00f6ping,lineNo=48"+ System.getProperty("line.separator") +
+			"  dn=ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000003-1234,name=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,lineNo=43"+ System.getProperty("line.separator") +
+			"    dn=ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000002-1234,name=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,lineNo=38"+ System.getProperty("line.separator") +
+			"      dn=ou=N\u00e4ssj\u00f6 VC DLK,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000000-1234,name=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,lineNo=33"+ System.getProperty("line.separator") +
+			"      dn=ou=N\u00e4ssj\u00f6 VC DLM,ou=N\u00e4ssj\u00f6 Prim\u00e4rv\u00e5rdsomr\u00e5de,ou=H\u00f6glandets sjukv\u00e5rdsomr\u00e5de,o=Landstinget i J\u00f6nk\u00f6ping,l=VpW,c=SE,hsaId=SE0000000001-1234,name=N\u00e4ssj\u00f6 VC DLM,lineNo=28"+ System.getProperty("line.separator");
 
 	
 	@Test

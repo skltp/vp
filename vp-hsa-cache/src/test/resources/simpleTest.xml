@@ -50,5 +50,10 @@
       <DN>o=Landstinget i Jönköping,l=VpW,c=SE</DN>
       <name>Landstinget i Jönköping</name>
     </hsaUnit>
+    <hsaUnit>
+      <hsaIdentity>SE0000000005-1234</hsaIdentity>
+      <DN>o=Landstinget i Kalmar län,l=VpW,c=SE</DN>
+      <name>UNIQUE_STRING_IN_FILE_TO_TEST_FREETEXT_SEARCH_ON_NAME</name>
+    </hsaUnit>
   </hsaUnits>
 </FileGetHsaUnitsResponse>
