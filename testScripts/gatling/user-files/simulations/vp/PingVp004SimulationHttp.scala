@@ -22,7 +22,7 @@ class PingVp004SimulationHttp extends Simulation {
   //
   //HTTP needs correct http headers x-vp-sender-id and x-vp-instance-id, and your
   //ip adress must be in VP config (vp-config-override.properties) whitelist.
-  
+
   val skltp_headers = Map(
     "Accept-Encoding" -> "gzip,deflate",
     "Content-Type" -> "text/xml;charset=UTF-8",
@@ -32,7 +32,7 @@ class PingVp004SimulationHttp extends Simulation {
     "Keep-Alive" -> "115")
 
   val scn = scenario("Ping VP004 http scenario")
-    .during(testTimeSecs) {     
+    .during(testTimeSecs) {
       exec(
         http("Ping")
           .post("/vp/Ping/1/rivtabp20")
@@ -41,7 +41,7 @@ class PingVp004SimulationHttp extends Simulation {
           .check(status.is(200))
           .check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
           .check(xpath("//faultstring", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
-          .check(xpath("//faultstring/text()", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).is("VP004 No Logical Adress found for serviceNamespace:urn:riv:itinfra:tp:Ping:1:rivtabp20, receiverId:ping-vp004"))
+          .check(xpath("//faultstring/text()", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).is("VP004 No Logical Adress found for serviceNamespace:urn:riv:itinfra:tp:PingResponder:1, receiverId:ping-vp004"))
         )
       .pause(minWaitMs, maxWaitMs)
     }
