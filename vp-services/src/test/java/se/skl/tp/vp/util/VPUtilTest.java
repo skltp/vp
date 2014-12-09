@@ -127,7 +127,7 @@ public class VPUtilTest {
 
 	@Test
 	public void transformToSoapFault_ok() {
-		String cause = "VP004 No Logical Adress found for serviceNamespace:urn:skl:tjanst1:rivtabp20, receiverId:vp-test-producer_kalle";
+		String cause = "VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:vp-test-producer_kalle";
 		String expectedResult = String.format(CORRECT_FORMATED_SOAP_FAULT, cause);
 		
 		String actualResult = VPUtil.generateSoap11FaultWithCause(cause);

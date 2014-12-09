@@ -37,19 +37,19 @@ import org.junit.Test;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
 public class VagvalHandlerTest {
 
 	HsaCache hsaCache;
-	
+
 	@Before
 	public void beforeTest() throws Exception {
 
 		URL url = getClass().getClassLoader().getResource("hsacache.xml");
 		hsaCache = new HsaCacheImpl().init(url.getFile());
-	}	
-	
+	}
+
 	@Test
 	public void testMapCreation() throws Exception {
 
@@ -58,9 +58,9 @@ public class VagvalHandlerTest {
 		routing.add(createRouting("sender-1", "rivversion-1", "namnrymd-1", "receiver-2"));
 		routing.add(createRouting("sender-1", "rivversion-1", "namnrymd-1", "receiver-3", getRelativeDate(TWO_HOURS_AGO), getRelativeDate(AN_HOUR_AGO)));
 		routing.add(createRouting("sender-1", "rivversion-1", "namnrymd-1", "receiver-3", getRelativeDate(IN_ONE_HOUR), getRelativeDate(IN_TEN_YEARS)));
-		
+
 		VagvalHandler bh = new VagvalHandler(hsaCache, routing);
-		
+
 		assertEquals(1, bh.lookupInVirtualiseringsInfoMap("receiver-1", "namnrymd-1").size());
 		assertEquals(1, bh.lookupInVirtualiseringsInfoMap("receiver-2", "namnrymd-1").size());
 		assertEquals(2, bh.lookupInVirtualiseringsInfoMap("receiver-3", "namnrymd-1").size());

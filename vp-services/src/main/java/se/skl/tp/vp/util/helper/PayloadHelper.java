@@ -41,15 +41,15 @@ public class PayloadHelper extends VPHelperSupport {
 	}
 
 	/**
-	 * Get the receiver from the payload.
+	 * Get the info from the payload.
 	 * 
-	 * @return the receiver or null if payload can't be parsed.
+	 * @return ReciverId, service contract namespace or null if not found
 	 */
-	public String extractReceiverFromPayload() {
+	public PayloadInfo extractInfoFromPayload() {
 		Object payload = getMuleMessage().getPayload();
 		if (!(payload instanceof ReversibleXMLStreamReader)) {
-			this.getLog().warn("Unable to extract important RIV information (receiverid): { payload: {} }", payload);
-			return null;
+			this.getLog().warn("Payload not xmlstream! Unable to extract important RIV information (receiverid, service contract namespace): { payload: {} }", payload);
+			return new PayloadInfo();
 		}
 		ReversibleXMLStreamReader reader = (ReversibleXMLStreamReader) payload;
 
@@ -61,7 +61,7 @@ public class PayloadHelper extends VPHelperSupport {
 		reader.setTracking(true);
 
 		try {
-			return this.parsePayloadForReceiver(reader);
+			return this.parsePayloadForInfo(reader);
 		} catch (final XMLStreamException e) {
 			throw new VpTechnicalException(e);
 		} finally {
@@ -73,10 +73,11 @@ public class PayloadHelper extends VPHelperSupport {
 		}
 	}
 
-	private String parsePayloadForReceiver(final ReversibleXMLStreamReader reader) throws XMLStreamException {
-		String receiverId = null;
+	private PayloadInfo parsePayloadForInfo(final ReversibleXMLStreamReader reader) throws XMLStreamException {
+		PayloadInfo payloadInfo = new PayloadInfo();
 		boolean headerFound = false;
-
+		boolean bodyFound = false;
+		
 		int event = reader.getEventType();
 
 		while (reader.hasNext()) {
@@ -85,6 +86,40 @@ public class PayloadHelper extends VPHelperSupport {
 			case XMLStreamConstants.START_ELEMENT:
 				String local = reader.getLocalName();
 
+//				Based on convention that payload is in following format
+//				
+//				<soapenv:Header>
+//					<urn:Actor>
+//						<urn:actorId>?</urn:actorId>
+//						<urn:actorType>?</urn:actorType>
+//					</urn:Actor>
+//					<urn1:LogicalAddress>HSA-VKK123</urn1:LogicalAddress>
+//				</soapenv:Header>
+//				<soapenv:Body>
+//					<urn2:GetSubjectOfCareSchedule>
+//						<urn2:healthcare_facility>HSA-VKK123</urn2:healthcare_facility>
+//						<urn2:subject_of_care>188803099368</urn2:subject_of_care>
+//					</urn2:GetSubjectOfCareSchedule>
+//				</soapenv:Body>
+				
+				
+				if(bodyFound){
+					// We have found the element we need in the Header and Body, i.e. we
+					// are done. Let's bail out!
+					payloadInfo.serviceContractNamespace = reader.getNamespaceURI();
+					
+					if(getLog().isDebugEnabled()){
+						getLog().debug("Payload parsed for information, return result: " + payloadInfo);
+					}
+					return payloadInfo;
+				}
+				
+				//Body found, next element is the service interaction e.g GetSubjectOfCareSchedule
+				if (local.equals("Body")) {
+					bodyFound = true;
+					break; //Break to the next element, the service interaction handled above
+				}
+
 				if (local.equals("Header")) {
 					headerFound = true;
 				}
@@ -92,25 +127,12 @@ public class PayloadHelper extends VPHelperSupport {
 				// Don't bother about riv-version in this code
 				if (headerFound && (local.equals("To") || local.equals("LogicalAddress"))) {
 					reader.next();
-					receiverId = reader.getText();
-					if (this.getLog().isDebugEnabled()) {
-						this.getLog().debug("found To in Header= " + receiverId);
-					}
+					payloadInfo.receiverId = reader.getText();
 				}
 
 				break;
 
 			case XMLStreamConstants.END_ELEMENT:
-				if (reader.getLocalName().equals("Header")) {
-					// We have found the end element of the Header, i.e. we
-					// are done. Let's bail out!
-					if (this.getLog().isDebugEnabled()) {
-						this.getLog().debug("We have found the end element of the Header, i.e. we are done.");
-					}
-					return receiverId;
-				}
-				break;
-
 			case XMLStreamConstants.CHARACTERS:
 				break;
 
@@ -126,6 +148,25 @@ public class PayloadHelper extends VPHelperSupport {
 			event = reader.next();
 		}
 
-		return receiverId;
+		return payloadInfo;
+	}
+	
+	/*
+	 * Contains information extracted from payload
+	 */
+	public class PayloadInfo{
+		String serviceContractNamespace;
+		String receiverId;
+		public String getServiceContractNamespace() {
+			return serviceContractNamespace;
+		}
+		public String getReceiverId() {
+			return receiverId;
+		}
+		@Override
+		public String toString() {
+			return "ReceiverId: " + receiverId + ", " +
+					"Service contract namespace: " + serviceContractNamespace;
+		}
 	}
 }

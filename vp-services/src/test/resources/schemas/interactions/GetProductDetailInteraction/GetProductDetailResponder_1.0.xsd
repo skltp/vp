@@ -21,11 +21,11 @@
  -->
  
 <xs:schema 
-	targetNamespace="urn:skl:tjanst1:rivtabp20"
-	xmlns="urn:skl:tjanst1:rivtabp20"
+	targetNamespace="urn:riv:domain:subdomain:GetProductDetailResponder:1"
+	xmlns:tns="urn:riv:domain:subdomain:GetProductDetailResponder:1"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	attributeFormDefault="unqualified"
-	elementFormDefault="unqualified"
+	elementFormDefault="qualified"
 	version="1.0">
 
 	<xs:complexType name="product">
@@ -37,30 +37,17 @@
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:element name="listProducts" type="listProducts" />
-	<xs:complexType name="listProducts">
-		<xs:sequence />
-	</xs:complexType>
-
-	<xs:element name="listProductsResponse"
-		type="listProductsResponse" />
-	<xs:complexType name="listProductsResponse">
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:string" />
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:element name="getProductDetailElem" type="getProductDetailType" />
+	<xs:element name="getProductDetailElem" type="tns:getProductDetailType" />
 	<xs:complexType name="getProductDetailType">
 		<xs:sequence>
 			<xs:element minOccurs="0" name="productId" type="xs:string" />
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:element name="getProductDetailResponse" type="getProductDetailResponse" />
+	<xs:element name="getProductDetailResponse" type="tns:getProductDetailResponse" />
 	<xs:complexType name="getProductDetailResponse">
 		<xs:sequence>
-			<xs:element minOccurs="0" name="product" type="product" />
+			<xs:element minOccurs="0" name="product" type="tns:product" />
 		</xs:sequence>
 	</xs:complexType>
 

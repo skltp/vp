@@ -33,10 +33,10 @@ import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
-import se.skl.tjanst1.wsdl.Product;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 public class TestDisableLogToJms extends AbstractTestCase {
 
@@ -73,7 +73,7 @@ public class TestDisableLogToJms extends AbstractTestCase {
 		vi_TP.receiverId = receiverId;
 		vi_TP.senderId = "tp";
 		vi_TP.rivVersion = "RIVTABP20";
-		vi_TP.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vi_TP.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetailResponder:1";
 		vi_TP.adress = adress;
 		return vi_TP;
 	}

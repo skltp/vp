@@ -20,14 +20,14 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 -->
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:skl:tjanst1:rivtabp20">
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:add="http://www.w3.org/2005/08/addressing" xmlns:urn="urn:riv:domain:subdomain:GetProductDetailResponder:1">
    <soapenv:Header>
       <add:To>vp-test-producer</add:To>
    </soapenv:Header>
    <soapenv:Body>
       <urn:getProductDetailElem>
          <!--Optional:-->
-         <productId>Exception</productId>
+         <urn:productId>Exception</urn:productId>
       </urn:getProductDetailElem>
    </soapenv:Body>
 </soapenv:Envelope>

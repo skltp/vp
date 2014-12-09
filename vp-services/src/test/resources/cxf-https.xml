@@ -42,7 +42,7 @@
            http://cxf.apache.org/transports/http/configuration  http://cxf.apache.org/schemas/configuration/http-conf.xsd
            http://www.springframework.org/schema/beans          http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-   <http:conduit name="{urn:skl:tjanst1:rivtabp20}Tjanst1ImplPort.http-conduit">
+   <http:conduit name="*">
     <http:tlsClientParameters disableCNCheck="true"> 
       <sec:trustManagers>
           <sec:keyStore type="JKS" password="password"

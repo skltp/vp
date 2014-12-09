@@ -112,7 +112,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		PostMethod httppost = executeHttp11SoapCall("/vp/keep-alive-tjanst1");
 
 		assertNull(httppost.getResponseHeader("Connection"));
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		executeHttp11SoapCall("/vp/keep-alive-tjanst1");		
@@ -124,7 +124,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		PostMethod httppost = executeHttp11SoapCallWithKeepAlive("/vp/keep-alive-tjanst1");
 
 		assertNull(httppost.getResponseHeader("Connection"));
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		executeHttp11SoapCall("/vp/keep-alive-tjanst1");
@@ -137,7 +137,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -155,7 +155,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 			
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -173,7 +173,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 			
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -191,7 +191,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -209,7 +209,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -219,20 +219,6 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		}	
 	}
 	
-	/*
-	public void testHttp10KeepAliveToKeepAliveEndpoint() throws Exception {
-
-		PostMethod httppost = executeHttp10SoapCallWithKeepAlive("/vp/keep-alive-tjanst1");
-
-		assertNotNull(httppost.getResponseHeader("Connection"));
-		assertEquals("keep-alive", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
-		assertEquals(200, httppost.getStatusCode());
-		
-		executeHttp10SoapCall("/vp/keep-alive-tjanst1");
-	}
-	*/
-	
 	@Test
 	public void testHttp10CloseToKeepAliveEndpoint() throws Exception {
 
@@ -240,7 +226,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -258,7 +244,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 			
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -276,7 +262,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 			
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -294,7 +280,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		
 		assertNotNull(httppost.getResponseHeader("Connection"));
 		assertEquals("close", httppost.getResponseHeader("Connection").getValue());
-		assertTrue(httppost.getResponseBodyAsString().contains("listProductsResponse"));
+		assertTrue(httppost.getResponseBodyAsString().contains("getProductDetailResponse"));
 		assertEquals(200, httppost.getStatusCode());
 		
 		try {
@@ -345,7 +331,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 	
 	private PostMethod executeSoapCall(final String subUrl, final boolean doClose, final boolean doKeepAlive, final boolean version10) throws HttpException, IOException {
 		PostMethod httppost = new PostMethod(subUrl);
-		RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream("testfiles/ListProducts.xml"));
+		RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream("testfiles/GetProduct.xml"));
 		httppost.getParams().setVersion(version10 ? HttpVersion.HTTP_1_0 : HttpVersion.HTTP_1_1);
 		httppost.setRequestEntity(requestEntity);
 		if(doClose) httppost.setRequestHeader("Connection", "close");
@@ -418,7 +404,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.senderId = "tp";
 		vagvalInput.rivVersion = "RIVTABP20";
-		vagvalInput.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vagvalInput.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetailResponder:1";
 		vagvalInput.adress = adress;
 		return vagvalInput;
 	}

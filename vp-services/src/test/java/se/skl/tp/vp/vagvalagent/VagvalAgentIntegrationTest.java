@@ -37,10 +37,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
-import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheRequest;
-import se.skl.tp.vagval.wsdl.v2.ResetVagvalCacheResponse;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalRequest;
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalResponse;
+import se.skltp.tak.vagval.wsdl.v2.ResetVagvalCacheRequest;
+import se.skltp.tak.vagval.wsdl.v2.ResetVagvalCacheResponse;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 
@@ -52,28 +52,28 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 	private static final String vardenhetA = "SE0000000001-1234";
 
 	private static final String konsumentA = "konsumentA";
-	
+
 	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
-	
+
 	public VagvalAgentIntegrationTest() {
 		super();
-		
+
 		// Only start up Mule once to make the tests run faster...
 		// Set to false if tests interfere with each other when Mule is started
 		// only once.
 		setDisposeContextPerClass(true);
 	}
-	
-	
+
+
 	@Override
 	protected String getConfigResources() {
-		return 
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
+		return
+			"soitoolkit-mule-jms-connector-activemq-embedded.xml," +
 			"vp-common.xml," +
 			"services/VagvalRouter-service.xml," +
 			"vp-teststubs-and-services-config.xml";
 	}
-	
+
 	@BeforeClass
 	public static void setupTjanstekatalogen() throws Exception {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
@@ -85,7 +85,7 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 	@Before
 	public void doSetUp() throws Exception {
 		super.doSetUp();
-				
+
 		vagvalAgent = (VagvalAgent) muleContext.getRegistry().lookupObject("vagvalAgent");
 	}
 
@@ -107,12 +107,12 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 
 	@Test
 	public void testVpSemanticExceptionVP007WhenUnauthorized() throws Exception {
-		
+
 		String tjansteKontrakt = "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1";
 		String senderId = "XXX";
 		String receiverId = vardgivareB;
 		Duration duration = null;
-		
+
 		try {
 			vagvalAgent.visaVagval(createVisaVagvalRequest(senderId, receiverId, duration, tjansteKontrakt));
 			fail("Exception expected");
@@ -127,7 +127,7 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 		String senderId = konsumentA;
 		String receiverId = vardgivareB;
 		Duration duration = null;
-		
+
 		VisaVagvalResponse vvResponse = vagvalAgent.visaVagval(createVisaVagvalRequest(senderId, receiverId, duration,tjansteKontrakt));
 		assertEquals("Wrong number of routings found for service contract", 0, vvResponse.getVirtualiseringsInfo().size());
 	}
@@ -138,7 +138,7 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 		String senderId = konsumentA;
 		String receiverId = "XXX";
 		Duration duration = null;
-		
+
 		VisaVagvalResponse vvResponse = vagvalAgent.visaVagval(createVisaVagvalRequest(senderId, receiverId, duration,tjansteKontrakt));
 		assertEquals("Wrong number of routings found for receiver", 0, vvResponse.getVirtualiseringsInfo().size());
 	}
@@ -150,7 +150,7 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 		String receiverId = vardgivareB;
 		Duration twentyYearsDuration = DatatypeFactory.newInstance().newDurationYearMonth(true, new BigInteger("20"),
 				new BigInteger("2"));
-		
+
 		VisaVagvalResponse vvResponse = vagvalAgent.visaVagval(createVisaVagvalRequest(senderId, receiverId, twentyYearsDuration,tjansteKontrakt));
 		assertEquals("Wrong amount of routings found for the duration", 0, vvResponse.getVirtualiseringsInfo().size());
 	}
@@ -195,14 +195,14 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 		ResetVagvalCacheRequest rvcR = new ResetVagvalCacheRequest();
 		return rvcR;
 	}
-	
+
 	private static VagvalMockInputRecord createVagvalRecord(String receiverId, String rivVersion, String senderId, String serviceNameSpace) {
-		
+
 		VagvalMockInputRecord vagvalInput = new VagvalMockInputRecord();
 		vagvalInput.receiverId = receiverId;
 		vagvalInput.rivVersion = rivVersion;
 		vagvalInput.senderId = senderId;
-		vagvalInput.serviceNamespace = serviceNameSpace;
+		vagvalInput.serviceContractNamespace = serviceNameSpace;
 		return vagvalInput;
 	}
 

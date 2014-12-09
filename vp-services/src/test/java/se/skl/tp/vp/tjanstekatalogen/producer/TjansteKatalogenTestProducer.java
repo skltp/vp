@@ -23,13 +23,14 @@ package se.skl.tp.vp.tjanstekatalogen.producer;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.AN_HOUR_AGO;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.IN_TEN_YEARS;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.getRelativeDate;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaAnropsBehorigheterResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.HamtaAllaVirtualiseringarResponseType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoIdType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaAnropsBehorigheterResponseType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaVirtualiseringarResponseType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoIdType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaTjanstekontraktResponseType;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.VagvalInput;
@@ -40,7 +41,7 @@ import se.skl.tp.vp.vagvalrouter.VagvalInput;
  * skapas en enpoint som svarar när vägvalsagenten anropar tjänstekatalogen
  * för att få en lista på alla vägval tp-vitualisering-DEV använder sig av
  * denna.
- * 
+ *
  * Se exempel i VPFullServiceTest.java eller VPMuleServer.java hur den kan användas.
  */
 
@@ -53,9 +54,13 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 		this.vagvalInputs = vagvalInputs;
 	}
 
+	public HamtaAllaTjanstekontraktResponseType hamtaAllaTjanstekontrakt(Object parameters){
+		return null;
+	}
+
 	/**
 	 * Hämta en lista av alla anropsbehörigheter.
-	 * 
+	 *
 	 * @param parameters
 	 *            - null, eftersom operationen inte har någon payload.
 	 */
@@ -75,7 +80,7 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 				abo.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
 				abo.setReceiverId(input.receiverId);
 				abo.setSenderId(input.senderId);
-				abo.setTjansteKontrakt(input.serviceNamespace);
+				abo.setTjansteKontrakt(input.serviceContractNamespace);
 				sampleResponse.getAnropsBehorighetsInfo().add(abo);
 			}
 
@@ -88,7 +93,7 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 
 	/**
 	 * Hämta en lista av alla virtualiseringar.
-	 * 
+	 *
 	 * @param parameters
 	 *            - null, eftersom operationen inte har någon payload.
 	 */
@@ -108,7 +113,7 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 				VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
 				viId.setValue(String.valueOf(id++));
 				vi.setVirtualiseringsInfoId(viId);
-				vi.setTjansteKontrakt(input.serviceNamespace);
+				vi.setTjansteKontrakt(input.serviceContractNamespace);
 				sampleResponse.getVirtualiseringsInfo().add(vi);
 
 			}

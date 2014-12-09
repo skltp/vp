@@ -39,14 +39,14 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 
 /**
  * Transforms messages between RIVTABP20 and RIVTABP21 and vice versa.
- * 
+ *
  * @author Marcus Krantz [marcus.krantz@callistaenterprise.se]
  */
 public class RivTransformer extends AbstractMessageTransformer {
@@ -112,7 +112,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 			this.doTransform(msg, RIV21_NS, RIV20_NS, RIV21_ELEM, RIV20_ELEM);
 			msg.setProperty(VPUtil.RIV_VERSION, rivProfile, PropertyScope.SESSION);
 		}
-		
+
 		return msg;
 	}
 
@@ -121,12 +121,12 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 		log.info("Transforming {} -> {}. Payload is of type {}", new Object[] { fromNs, toNs,
 				msg.getPayload().getClass().getName() });
-		
+
 		try {
 			ReversibleXMLStreamReader reader = (ReversibleXMLStreamReader) msg.getPayload();
-								
+
 			final ByteArrayOutputStream newContents = transformXml(reader, fromNs, toNs, fromElem, toElem);
-						
+
 			msg.setPayload(new ReversibleXMLStreamReader(XMLInputFactory.newInstance().createXMLStreamReader(
 					new ByteArrayInputStream(newContents.toByteArray()), "UTF-8")));
 
@@ -140,11 +140,11 @@ public class RivTransformer extends AbstractMessageTransformer {
 	// alternative
 	static ByteArrayOutputStream transformXml(XMLStreamReader reader,
 			final String fromAddressingNs,
-			final String toAddressingNs, final String fromAddressingElement, 
+			final String toAddressingNs, final String fromAddressingElement,
 			final String toAddressingElement) throws XMLStreamException {
-		
+
 		log.debug("RivTransformer transformXML");
-	
+
 		ByteArrayOutputStream os = new ByteArrayOutputStream(2048);
 		XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(os, "UTF-8");
 
@@ -188,17 +188,17 @@ public class RivTransformer extends AbstractMessageTransformer {
 		return os;
 	}
 
-	private static void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer, 
+	private static void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer,
 			final String fromAddressingNs,
-			final String toAddressingNs, 
-			final String fromAddressingElement, 
+			final String toAddressingNs,
+			final String fromAddressingElement,
 			final String toAddressingElement)
 			throws XMLStreamException {
-		
+
 		String uri = reader.getNamespaceURI();
 		if (fromAddressingNs.equals(uri)) {
 			if (log.isDebugEnabled()) {
-				log.debug("RivTransformer { fromNS: {}, toNS: {} }", new Object[] { fromAddressingNs, toAddressingNs });	
+				log.debug("RivTransformer { fromNS: {}, toNS: {} }", new Object[] { fromAddressingNs, toAddressingNs });
 			}
 			uri = toAddressingNs;
 		}
@@ -208,10 +208,10 @@ public class RivTransformer extends AbstractMessageTransformer {
 		if (fromAddressingElement.equals(local) && toAddressingNs.equals(uri)) {
 			local = toAddressingElement;
 			if (log.isDebugEnabled()) {
-				log.debug("RivTransformer { fromName: {}, toName: {}, uri: {} }", new Object[] { fromAddressingElement, toAddressingElement, uri });	
+				log.debug("RivTransformer { fromName: {}, toName: {}, uri: {} }", new Object[] { fromAddressingElement, toAddressingElement, uri });
 			}
 		}
-				
+
 		String prefix = reader.getPrefix();
 		if (prefix == null) {
 			prefix = "";
@@ -244,11 +244,11 @@ public class RivTransformer extends AbstractMessageTransformer {
 		// Write out the namespaces
 		for (int i = 0; i < reader.getNamespaceCount(); i++) {
 			String nsURI = reader.getNamespaceURI(i);
-			if (fromAddressingNs.equals(nsURI) && ("Envelope".equals(local) || "Header".equals(local) 
+			if (fromAddressingNs.equals(nsURI) && ("Envelope".equals(local) || "Header".equals(local)
 					|| toAddressingElement.equals(local))) {
 					nsURI = toAddressingNs;
 			}
-			
+
 			String nsPrefix = reader.getNamespacePrefix(i);
 			if (nsPrefix == null) {
 				nsPrefix = "";
@@ -274,12 +274,12 @@ public class RivTransformer extends AbstractMessageTransformer {
 			} else {
 				writer.writeNamespace(prefix, uri);
 			}
-		}        
+		}
 
 		// Write out attributes
 		for (int i = 0; i < reader.getAttributeCount(); i++) {
 			String ns = reader.getAttributeNamespace(i);
-			
+
 			if (fromAddressingNs.equals(ns) && toAddressingElement.equals(local)) {
 				ns = toAddressingNs;
 			}

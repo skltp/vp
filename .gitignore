@@ -3,3 +3,6 @@
 .settings
 .studio
 target
+*.iml
+.idea
+vp-auto-deployer/src/test/resources/test.jar

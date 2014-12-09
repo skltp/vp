@@ -51,9 +51,9 @@
         <inbound-endpoint address="${TP_SOKVAGVALSINFO_TESTSTUB_URL}"/>
         
         <cxf:jaxws-service
-            namespace="urn:skl:tp:vagvalsinfo:v2"            
+            namespace="urn:skltp:tak:vagvalsinfo:v2"            
             serviceClass="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer"
-            wsdlLocation="classpath:/VAGVAL_2_0_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-2.0.wsdl" />
+            wsdlLocation="classpath:/VAGVAL_2_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-2.0.wsdl" />
         
         <component>
             <singleton-object class="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer" >

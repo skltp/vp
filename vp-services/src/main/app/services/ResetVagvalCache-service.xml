@@ -40,8 +40,8 @@
     <flow name="resetVagvalCache-flow" >
 
         <inbound-endpoint
-            address="http://${TP_HOST}:${RESETVAGVALCACHE_PORT}/${RESETVAGVALCACHE_INBOUND_URI}"
-            responseTimeout="${SERVICE_TIMEOUT_MS}" 
+            address="${RESETVAGVALCACHE_INBOUND_URL}"
+            responseTimeout="${RESETVAGVALCACHE_TIMEOUT_MS}" 
             connector-ref="VPInsecureConnector"
             />
 

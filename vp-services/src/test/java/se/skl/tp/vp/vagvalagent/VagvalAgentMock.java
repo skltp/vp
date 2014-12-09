@@ -22,8 +22,8 @@ package se.skl.tp.vp.vagvalagent;
 
 import java.util.List;
 
-import se.skl.tp.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skl.tp.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
 public class VagvalAgentMock extends VagvalAgent {
 
@@ -34,25 +34,25 @@ public class VagvalAgentMock extends VagvalAgent {
 		this.virtualiseringsInfo = virtualiseringsInfo;
 		this.anropsBehorighetsInfo = anropsBehorighetsInfo;
 	}
-	
+
 	public VagvalAgentMock (List<AnropsBehorighetsInfoType> anropsBehorighetsInfo) {
 		this(null, anropsBehorighetsInfo);
 	}
-	
+
 	public VagvalAgentMock () {
 		this(null, null);
 	}
-	
+
 	@Override
 	protected List<VirtualiseringsInfoType> getVirtualiseringar() {
 		return virtualiseringsInfo;
 	}
-	
+
 	@Override
 	protected List<AnropsBehorighetsInfoType> getBehorigheter() {
 		return anropsBehorighetsInfo;
 	}
-	
+
 	@Override
 	public List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
 		return anropsBehorighetsInfo;
@@ -67,7 +67,7 @@ public class VagvalAgentMock extends VagvalAgent {
 	public void setMockVirtualiseringsInfo(List<VirtualiseringsInfoType> virtualiseringsInfo) {
 		this.virtualiseringsInfo = virtualiseringsInfo;
 	}
-	
+
 	public List<AnropsBehorighetsInfoType> getMockAnropsBehorighetsInfo() {
 		return anropsBehorighetsInfo;
 	}

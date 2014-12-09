@@ -20,7 +20,6 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -31,12 +30,9 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.soitoolkit.commons.mule.test.AbstractJmsTestUtil;
-import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
-import se.skl.tjanst1.wsdl.Product;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -71,7 +67,7 @@ public class CallerOnWhitelistIntegrationTest extends AbstractTestCase {
 		vi_TP.receiverId = receiverId;
 		vi_TP.senderId = "tp";
 		vi_TP.rivVersion = "RIVTABP20";
-		vi_TP.serviceNamespace = "urn:skl:tjanst1:rivtabp20";
+		vi_TP.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetailResponder:1";
 		vi_TP.adress = adress;
 		return vi_TP;
 	}
