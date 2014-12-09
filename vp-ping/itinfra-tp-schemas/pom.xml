@@ -30,14 +30,14 @@
 	<properties>
 		<schema.path>schemas</schema.path>
 	</properties>
-	
+
 	<parent>
   		<groupId>se.skltp.vp</groupId>
   		<artifactId>itinfra-tp</artifactId>
-  		<version>2.2.10-SNAPSHOT</version>
+  		<version>2.2.9</version>
   		<relativePath>../pom.xml</relativePath>
    </parent>
- 
+
 	<dependencies>
 	    <!-- cxf dependencies -->
         <dependency>
@@ -51,7 +51,7 @@
             <version>${cxf.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.springframework</groupId> 
+                    <groupId>org.springframework</groupId>
                     <artifactId>spring-web</artifactId>
                 </exclusion>
             </exclusions>
@@ -75,11 +75,11 @@
 						<phase>generate-sources</phase>
 						<configuration>
 							<sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
-							<wsdlOptions>						
+							<wsdlOptions>
 								<wsdlOption>
 									<extraargs>
 										<extraarg>-p</extraarg>
-										Note: be careful when changing this - must be in sync for all schemas generations in this namespace!										 
+										Note: be careful when changing this - must be in sync for all schemas generations in this namespace!
 										<extraarg>
 											urn:riv:itinfra:tp:Ping:1:rivtabp20=se.riv.itinfra.tp.ping.v1.rivtabp20
 										</extraarg>
@@ -93,7 +93,7 @@
 										</extraarg>
 									</extraargs>
 									<wsdl>${schema.path}/PingInteraction_1.0_rivtabp20.wsdl</wsdl>
-								</wsdlOption>								
+								</wsdlOption>
 							</wsdlOptions>
 						</configuration>
 						<goals>
@@ -102,9 +102,9 @@
 					</execution>
 				</executions>
 			</plugin>
-								
+
 		</plugins>
-		
+
 		 <resources>
       <resource>
         <directory>${schema.path}</directory>

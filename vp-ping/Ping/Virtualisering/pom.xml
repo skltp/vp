@@ -26,12 +26,12 @@
 	<artifactId>itinfra-tp-ping-virtualisering</artifactId>
 	<name>itinfra-tp-ping-virtualisering</name>
 	<url>http://maven.apache.org</url>
-	
+
  <parent>
   <groupId>se.skltp.vp</groupId>
   <artifactId>itinfra-tp-ping-service</artifactId>
-  <version>2.2.10-SNAPSHOT</version>
+  <version>2.2.9</version>
   <relativePath>../pom.xml</relativePath>
  </parent>
- 
+
 </project>

@@ -26,11 +26,11 @@
 	<packaging>pom</packaging>
  	<name>itinfra-tp-ping-service</name>
 	<url>http://maven.apache.org</url>
-	
+
 	<parent>
   		<groupId>se.skltp.vp</groupId>
   		<artifactId>itinfra-tp</artifactId>
-  		<version>2.2.10-SNAPSHOT</version>
+  		<version>2.2.9</version>
   		<relativePath>../pom.xml</relativePath>
    </parent>
 
