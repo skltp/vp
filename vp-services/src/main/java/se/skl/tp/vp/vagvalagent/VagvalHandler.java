@@ -103,8 +103,13 @@ public class VagvalHandler {
 
 				// Now look through that list for matching time intervals
 				for (VirtualiseringsInfoType vi : matchingVirtualiseringsInfo) {
-					if (request.getTidpunkt().compare(vi.getFromTidpunkt()) != DatatypeConstants.LESSER &&
-						request.getTidpunkt().compare(vi.getTomTidpunkt()) != DatatypeConstants.GREATER) {
+					
+					// Create year+month+day ints for easy comparing dates, shift year all to the left, then month and last day e.g. 20150123
+					int requestDate = request.getTidpunkt().getYear()*10000 + request.getTidpunkt().getMonth()*100 + request.getTidpunkt().getDay();
+					int virtFromDate = vi.getFromTidpunkt().getYear()*10000 + vi.getFromTidpunkt().getMonth()*100 + vi.getFromTidpunkt().getDay();
+					int virtTomDate = vi.getTomTidpunkt().getYear()*10000 + vi.getTomTidpunkt().getMonth()*100 + vi.getTomTidpunkt().getDay();
+									
+					if (requestDate >= virtFromDate && requestDate <= virtTomDate) {
 						addressFound = true;
 						response.getVirtualiseringsInfo().add(vi);
 					}
