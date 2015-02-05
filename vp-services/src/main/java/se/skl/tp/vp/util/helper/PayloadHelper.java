@@ -127,7 +127,10 @@ public class PayloadHelper extends VPHelperSupport {
 				// Don't bother about riv-version in this code
 				if (headerFound && (local.equals("To") || local.equals("LogicalAddress"))) {
 					reader.next();
-					payloadInfo.receiverId = reader.getText();
+					// Make sure that we have text in our element
+					if(!reader.isEndElement() && !reader.isWhiteSpace()){
+						payloadInfo.receiverId = reader.getText();
+					}				
 				}
 
 				break;
