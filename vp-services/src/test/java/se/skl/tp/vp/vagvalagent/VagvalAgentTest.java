@@ -542,14 +542,18 @@ public class VagvalAgentTest {
 
     @Test
     public void noAuthorizationsLoadedGivesEmptyList(){
-    	List<AnropsBehorighetsInfoType> authInfo = new VagvalAgent().getAnropsBehorighetsInfoList();
+    	VagvalAgent va = new VagvalAgent();
+    	va.setLocalTakCache("non-existing-file.txt");
+    	List<AnropsBehorighetsInfoType> authInfo = va.getAnropsBehorighetsInfoList();
     	assertNotNull(authInfo);
     	assertTrue(authInfo.isEmpty());
     }
 
     @Test
     public void noRoutingLoadedGivesEmptyList(){
-    	List<VirtualiseringsInfoType> routingInfo = new VagvalAgent().getVirtualiseringsInfo();
+    	VagvalAgent va = new VagvalAgent();
+    	va.setLocalTakCache("non-existing-file.txt");
+    	List<VirtualiseringsInfoType> routingInfo = va.getVirtualiseringsInfo();
     	assertNotNull(routingInfo);
     	assertTrue(routingInfo.isEmpty());
     }

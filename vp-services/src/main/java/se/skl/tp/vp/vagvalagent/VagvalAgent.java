@@ -54,6 +54,16 @@ import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.ClientUtil;
 
+/**
+ * Provides routing information.
+ * <p>Implementation notes: access to internal state in this class must be
+ * thread-safe since:</p>
+ * <ol>
+ * <li>TAK-data is loaded during startup (using init), only one thread is
+ * allowed to load TAK-data</li>
+ * <li>TAK-data can be refreshed from TAK during operation</li>
+ * </ol> 
+ */
 public class VagvalAgent implements VisaVagvalsInterface {
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalAgent.class);
@@ -82,6 +92,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	private String addressDelimiter;
 
 	private SokVagvalsInfoInterface port = null;
+	
+	private Object lockTakFetch = new Object();
 
 	public VagvalAgent() {
 
@@ -113,16 +125,66 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @return a processing log containing status for loading TAK resources
 	 */
 	public VagvalAgentProcessingLog init(boolean forceReset) {
-		if (forceReset || !isInitialized()) {
-			logger.info("Initialize VagvalAgent TAK resources...");
+		VagvalAgentProcessingLog processingLog = new VagvalAgentProcessingLog();
+		if (!forceReset) {
+			init(processingLog);
+		}
+		else {
+			boolean isRefreshSuccessful = refresh(processingLog);
+			processingLog.isRefreshRequested = forceReset;
+			processingLog.isRefreshSuccessful = isRefreshSuccessful;			
+		}
+		return processingLog;
+	}
+	
+	/**
+	 * Thread-safe initialization, allow only one thread to do initialization.
+	 * 
+	 * @param processingLog
+	 */
+	private synchronized void init(VagvalAgentProcessingLog processingLog) {
+		if (!isInitialized()) {
+			String logMsg = "init: not initialized, will do init ...";
+			logger.info(logMsg);
+			processingLog.addLog(logMsg);
+			refresh(processingLog);
+			logMsg = "init done, was successful: " + isInitialized();
+			logger.info(logMsg);
+			processingLog.addLog(logMsg);
+		}		
+	}
+	
+	/**
+	 * Fetch data from TAK, only update local state if fetch of TAK data is successful. 
+	 * <p>Update of local state must be thread-safe, but <b>fetching data from TAK must
+	 * not lock/force synchronize access to the local state since that will take some
+	 * time</b>, and we can't block reading local state during that time.  
+	 * 
+	 * @return true if refresh was successful
+	 */	
+	private boolean refresh(VagvalAgentProcessingLog processingLog) {
+		
+		boolean isRefreshSuccessful = false;
+		
+		// only let one thread at a time attempt to fetch and persist TAK data
+		synchronized (lockTakFetch) {
 
-			//Create a processing log
-			VagvalAgentProcessingLog processingLog = new VagvalAgentProcessingLog();
+			logger.info("Initialize VagvalAgent TAK resources...");
 			processingLog.addLog("Initialize VagvalAgent TAK resources...");
 
-			List<VirtualiseringsInfoType> v = getVirtualiseringar();
-			List<AnropsBehorighetsInfoType> p = getBehorigheter();
-			setState(v, p);
+			try {
+				// both TAK calls to fetch data must succeed to have a consistent state
+				List<VirtualiseringsInfoType> v = getVirtualiseringar();
+				List<AnropsBehorighetsInfoType> p = getBehorigheter();
+				if (v != null && p != null) {
+					// do thread-safe update of state
+					setState(v, p);
+					isRefreshSuccessful = true;
+				}
+			}
+			catch (Exception e) {				
+				logger.error("Failed to refresh TAK data", e);
+			}
 
 			if (isInitialized()) {
 			    processingLog.addLog("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy...");
@@ -140,14 +202,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			}
 
 			logger.info("Init VagvalAgent done");
-
-			return processingLog;
 		}
-		return null;
+		return isRefreshSuccessful;
 	}
 
 	/**
-	 * Sets state.
+	 * Sets state, must be thread-safe.
 	 *
 	 * @param v
 	 *            the virtualization state.
@@ -155,8 +215,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 *            the permission state.
 	 */
 	private synchronized void setState(List<VirtualiseringsInfoType> v, List<AnropsBehorighetsInfoType> p) {
-		this.vagvalHandler     = (v == null) ? null : new VagvalHandler(hsaCache, v);
-		this.behorighetHandler = (p == null) ? null : new BehorighetHandler(hsaCache, p);
+		this.vagvalHandler = new VagvalHandler(hsaCache, v);
+		this.behorighetHandler = new BehorighetHandler(hsaCache, p);
 	}
 
 	/**
@@ -187,7 +247,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 *
 	 * @return virtualizations, or null on any error.
 	 */
-	protected List<VirtualiseringsInfoType> getVirtualiseringar() {
+	protected List<VirtualiseringsInfoType> getVirtualiseringar() throws Exception {
 		List<VirtualiseringsInfoType> l = null;
 		try {
 			logger.info("Fetch all virtualizations from TAK...");
@@ -195,6 +255,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			l = t.getVirtualiseringsInfo();
 		} catch (Exception e) {
 			logger.error("Unable to get virtualizations from TAK", e);
+			throw e;
 		}
 		return l;
 	}
@@ -204,7 +265,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 *
 	 * @return permissions, or null on any error.
 	 */
-	protected List<AnropsBehorighetsInfoType> getBehorigheter() {
+	protected List<AnropsBehorighetsInfoType> getBehorigheter() throws Exception {
 		List<AnropsBehorighetsInfoType> l = null;
 		try {
 			logger.info("Fetch all permissions from TAK...");
@@ -212,6 +273,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			l = t.getAnropsBehorighetsInfo();
 		} catch (Exception e) {
 			logger.error("Unable to get permissions from TAK", e);
+			throw e;
 		}
 		return l;
 	}
@@ -244,7 +306,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			close(is);
 		}
 
-		setState((pc == null) ? null : pc.virtualiseringsInfo, (pc == null) ? null : pc.anropsBehorighetsInfo);
+		if (pc != null && pc.anropsBehorighetsInfo != null && pc.virtualiseringsInfo != null) {
+			setState(pc.virtualiseringsInfo, pc.anropsBehorighetsInfo);
+		}
 	}
 
 	// save object
@@ -280,18 +344,28 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	/**
+	 * @deprecated since VP 2.10, should be removed when the webservice
+	 * GetLogicalAddresseesByServiceContract is no longer produced by VP
+	 *  
 	 * Get authorization list from the internal TAK cache.
 	 * @return list of authorization, empty if no authorizations exists.
 	 */
-	public List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
+	@Deprecated
+	public synchronized List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
+		init(DONT_FORCE_RESET);
 		return (behorighetHandler == null) ? Collections.<AnropsBehorighetsInfoType>emptyList() : behorighetHandler.getAnropsBehorighetsInfoList();
 	}
 
 	/**
+	 * @deprecated since VP 2.10, should be removed when the webservice
+	 * GetLogicalAddresseesByServiceContract is no longer produced by VP
+	 *   
 	 * Get routing information list from the internal TAK cache.
 	 * @return list of routing information, empty if no routing information exists.
 	 */
-	public List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
+	@Deprecated
+	public synchronized List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
+		init(DONT_FORCE_RESET);
         return (vagvalHandler == null) ? Collections.<VirtualiseringsInfoType>emptyList(): vagvalHandler.getVirtualiseringsInfo();
     }
 
@@ -306,7 +380,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		//Force reset in init
         VagvalAgentProcessingLog processingLog = init(FORCE_RESET);
 
-		if (!isInitialized()) {
+		if (!processingLog.isRefreshSuccessful) {
 			response.setResetResult(false);
 			logger.info("Failed force reset VagvalAgent");
 		} else {
@@ -325,12 +399,13 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @throws VpSemanticException
 	 *             if no AnropsBehorighet is found
 	 */
-	public VisaVagvalResponse visaVagval(VisaVagvalRequest request) {
+	public synchronized VisaVagvalResponse visaVagval(VisaVagvalRequest request) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("entering vagvalAgent visaVagval");
 		}
 
 		// Dont force a reset, initialize only if needed
+		// Guards against ongoing/failed init during startup 
 		init(DONT_FORCE_RESET);
 
 		if (!isInitialized()) {
@@ -365,6 +440,20 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 		return response;
 	}
+	
+	/**
+	 * Read data without blocking for performance reasons.
+	 */
+	public int threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations() {
+		return vagvalHandler != null ? vagvalHandler.getVirtualiseringsInfo().size() : 0;		
+	}
+
+	/**
+	 * Read data without blocking for performance reasons.
+	 */
+	public int threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter() {
+		return behorighetHandler != null ? behorighetHandler.getAnropsBehorighetsInfoList().size() : 0;		
+	}	
 
 	/*
 	 * Extract all separate addresses in receiverId if it contains delimiter
