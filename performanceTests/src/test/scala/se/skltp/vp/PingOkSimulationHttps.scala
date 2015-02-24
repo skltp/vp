@@ -28,7 +28,6 @@ import scala.concurrent.duration._
 class PingOkSimulationHttps extends Simulation {
 
   val testTimeSecs   = 60
-  val noOfUsers      = 30
   val rampUpTimeSecs = 10
   val minWaitMs      = 500 milliseconds
   val maxWaitMs      = 1500 milliseconds
@@ -59,5 +58,5 @@ class PingOkSimulationHttps extends Simulation {
         )
       .pause(minWaitMs, maxWaitMs)
     }
-    setUp(scn.inject(rampUsers(noOfUsers) over (rampUpTimeSecs seconds)).protocols(httpConf))
+    setUp(scn.inject(rampUsers(Conf.noOfUsers.toInt) over (rampUpTimeSecs seconds)).protocols(httpConf))
 }

@@ -35,7 +35,7 @@
                 <configuration>
                   <simulationClass>${simulationClass}</simulationClass>
                   <jvmArgs>
-                    <jvmArg>-DbaseUrl=${baseUrl}</jvmArg>
+                  	<jvmArg>-DnoOfUsers=10</jvmArg>
                   </jvmArgs>
                 </configuration>
 				<executions>
