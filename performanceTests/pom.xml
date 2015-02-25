@@ -36,6 +36,7 @@
                   <simulationClass>${simulationClass}</simulationClass>
                   <jvmArgs>
                   	<jvmArg>-DnoOfUsers=10</jvmArg>
+                  	<jvmArg>-DbaseUrl=https://localhost:20000</jvmArg>
                   </jvmArgs>
                 </configuration>
 				<executions>
@@ -60,6 +61,24 @@
   		<id>PingHttps</id>
   		<properties>
   			<simulationClass>se.skltp.vp.PingOkSimulationHttps</simulationClass>
+  		</properties>
+  	</profile>
+  	<profile>
+  		<id>GetSubjectOfCareHttps</id>
+  		<properties>
+  			<simulationClass>se.skltp.vp.GetSubjectOfCareHttps</simulationClass>
+  		</properties>
+  	</profile>
+  	<profile>
+  		<id>SendMedicalCertificateAnswer</id>
+  		<properties>
+  			<simulationClass>se.skltp.vp.SendMedicalCertificateAnswerHttps</simulationClass>
+  		</properties>
+  	</profile>
+  	<profile>
+  		<id>LoadTestVP</id>
+  		<properties>
+  			<simulationClass>se.skltp.vp.LoadTestVP</simulationClass>
   		</properties>
   	</profile>
   </profiles>

@@ -25,13 +25,10 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 import scala.concurrent.duration._
 
-class PingOkSimulationHttps extends Simulation {
-  //NOTE!
-  //
-  //HTTPS towards VP needs a valid ssl certificat configured in <gatling_home>/conf/gatling.conf   
-  	
+class SendMedicalCertificateAnswerHttps extends Simulation {
+
   setUp(
-	  Scenarios.scn_PingOkSimulationHttps.inject(rampUsers(Conf.noOfUsers.toInt) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
+	  Scenarios.scn_SendMedicalCertificateAnswerHttps.inject(rampUsers(Conf.noOfUsers.toInt) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
   )
 }
 

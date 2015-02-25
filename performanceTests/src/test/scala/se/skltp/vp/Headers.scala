@@ -22,18 +22,31 @@ package se.skltp.vp
 
 object Headers {
 
-	val default = Map(
-			"Accept" -> """text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"""
-	)
+	// HTTP Headers
+	val pingHttp_header = Map(
+      "Accept-Encoding" -> "gzip,deflate",
+	  "Content-Type" -> "text/xml;charset=UTF-8",
+	  "SOAPAction" -> "urn:riv:test:PingResponder:1:ping",
+	  "x-vp-sender-id" -> "tp",
+	  "x-vp-instance-id" -> "THIS_VP_INSTANCE_ID",
+	  "Keep-Alive" -> "115")
 
-	val form_urlencoded = Map(
-			"Accept" -> """text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8""",
-			"Content-Type" -> """application/x-www-form-urlencoded""",
-			"Pragma" -> """no-cache"""
-	)
+  	// HTTPS Headers
+    val pingHttps_header = Map(
+      "Accept-Encoding" -> "gzip,deflate",
+      "Content-Type" -> "text/xml;charset=UTF-8",
+      "SOAPAction" -> "urn:riv:test:PingResponder:1:ping",
+      "Keep-Alive" -> "115")
 
-	val json = Map(
-			"Accept" -> """application/json, text/plain, */*""",
-			"Content-Type" -> """application/json;charset=UTF-8"""
-	)
-}
+	val getSubjectOfCareSchedule_header = Map(
+	  "Accept-Encoding" -> "gzip,deflate",
+	  "Content-Type" -> "text/xml;charset=UTF-8",
+	  "SOAPAction" -> "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1:GetSubjectOfCareSchedule",
+	  "Keep-Alive" -> "115")
+
+	val sendMedicalCertificateAnswer_headers = Map(
+	  "Accept-Encoding" -> "gzip,deflate",
+	  "Content-Type" -> "text/xml;charset=UTF-8",
+	  "SOAPAction" -> "urn:riv:insuranceprocess:healthreporting:SendMedicalCertificateAnswerResponder:1:SendMedicalCertificateAnswer",
+	  "Keep-Alive" -> "115")
+  }
