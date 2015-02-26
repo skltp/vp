@@ -81,5 +81,12 @@
   			<simulationClass>se.skltp.vp.LoadTestVP</simulationClass>
   		</properties>
   	</profile>
+  	<profile>
+  		<id>ResetCache</id>
+  		<properties>
+  			<simulationClass>se.skltp.vp.ResetCache</simulationClass>
+  		</properties>
+  	</profile>
+  	
   </profiles>
 </project>

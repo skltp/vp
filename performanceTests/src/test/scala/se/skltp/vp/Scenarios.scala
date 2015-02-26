@@ -51,6 +51,19 @@ object Scenarios {
         .pause(minWaitMs, maxWaitMs)
     }
 
+	// Resetcache var 10:e sekund
+	val scn_ResetCache = scenario("RC_Scenario")
+    	.during(testTimeSecs) {     
+			forever {
+				pace(10 seconds)
+				.exec(
+		          http("ResetCache")
+			      .get("/resetcache")
+			      .check(status.is(200))
+		        )
+			}
+		}
+
 	/*
 	 *	HTTPS scenarios
      */	
@@ -70,8 +83,23 @@ object Scenarios {
         .pause(minWaitMs, maxWaitMs)
     }
 	  
-	// GetSubjectOfCareSchedule	  
+	// GetSubjectOfCareSchedule 1
 	val scn_GetSubjectOfCareScheduleHttps = scenario("GetSubjectOfCareSchedule OK scenario 12:an, fall 1")
+	  .during(testTimeSecs) { 		
+	    exec(
+	      http("GetAggregatedSubjectOfCareSchedule")
+	        .post("/vp/GetSubjectOfCareSchedule/1/rivtabp21")
+			 .headers(Headers.getSubjectOfCareSchedule_header)
+		     .body(RawFileBody("data/GetSubjectOfCareSchedule_Mock_121212121212.xml")).asXML
+	  		 .check(status.is(200))
+	         .check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
+	         .check(xpath("//resp:timeslotDetail", List("resp" -> "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1")).count.is(1))
+	      )
+	    .pause(minWaitMs, maxWaitMs)
+	}
+
+	// GetSubjectOfCareSchedule 2
+	val scn_GetSubjectOfCareScheduleHttps_2 = scenario("GetSubjectOfCareSchedule OK scenario 12:an, fall 2")
 	  .during(testTimeSecs) { 		
 	    exec(
 	      http("GetAggregatedSubjectOfCareSchedule")
@@ -89,8 +117,8 @@ object Scenarios {
 	val scn_SendMedicalCertificateAnswerHttps = scenario("SendMedicalCertificateAnswer OK https scenario")
       .during(testTimeSecs) {     
 	    exec(
-	      http("SendMedicalCertificateAnswer")
-	        .post("/vp/SendMedicalCertificateAnswer/1/rivtabp20")
+	      http("SendMedicalCertificateAnswer") 
+            .post("/vp/SendMedicalCertificateAnswer/1/rivtabp20")
 	        .headers(Headers.sendMedicalCertificateAnswer_headers)
 	        .body(RawFileBody("data/SendMedicalCertificateAnswer.xml")).asXML
 			.check(status.is(200))
