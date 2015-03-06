@@ -1,6 +1,6 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Header>
-     <ns4:To xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns:ns3="urn:riv:insuranceprocess:healthreporting:2" xmlns:ns2="urn:riv:insuranceprocess:healthreporting:medcertqa:1" xmlns="urn:riv:insuranceprocess:healthreporting:SendMedicalCertificateAnswerResponder:1">Test</ns4:To>
+     <ns4:To xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns:ns3="urn:riv:insuranceprocess:healthreporting:2" xmlns:ns2="urn:riv:insuranceprocess:healthreporting:medcertqa:1" xmlns="urn:riv:insuranceprocess:healthreporting:SendMedicalCertificateAnswerResponder:1">CONSUMER_NOT_AUTHORIZED</ns4:To>
   </soap:Header>
   <soap:Body>
      <SendMedicalCertificateAnswer xmlns="urn:riv:insuranceprocess:healthreporting:SendMedicalCertificateAnswerResponder:1" xmlns:ns2="urn:riv:insuranceprocess:healthreporting:medcertqa:1" xmlns:ns3="urn:riv:insuranceprocess:healthreporting:2" xmlns:ns4="http://www.w3.org/2005/08/addressing">
