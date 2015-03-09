@@ -37,6 +37,7 @@
                   <jvmArgs>
                   	<jvmArg>-DnoOfUsers=10</jvmArg>
                   	<jvmArg>-DbaseUrl=https://localhost:20000</jvmArg>
+                  	<jvmArg>-DtestTimeSecs=30</jvmArg>
                   </jvmArgs>
                 </configuration>
 				<executions>
@@ -51,34 +52,28 @@
 		</plugins>
 	</build>
   <profiles>
-    <profile>
-      <id>PingHttp</id>
-      <properties>
-      	<simulationClass>se.skltp.vp.PingOkSimulationHttp</simulationClass>
-      </properties>
-    </profile>
-  	<profile>
-  		<id>PingHttps</id>
-  		<properties>
-  			<simulationClass>se.skltp.vp.PingOkSimulationHttps</simulationClass>
-  		</properties>
-  	</profile>
-  	<profile>
-  		<id>GetSubjectOfCareHttps</id>
-  		<properties>
-  			<simulationClass>se.skltp.vp.GetSubjectOfCareHttps</simulationClass>
-  		</properties>
-  	</profile>
-  	<profile>
-  		<id>SendMedicalCertificateAnswer</id>
-  		<properties>
-  			<simulationClass>se.skltp.vp.SendMedicalCertificateAnswerHttps</simulationClass>
-  		</properties>
-  	</profile>
   	<profile>
   		<id>LoadTestVP</id>
   		<properties>
   			<simulationClass>se.skltp.vp.LoadTestVP</simulationClass>
+  		</properties>
+  	</profile>
+  	<profile>
+  		<id>LoadTestVPSomeFail</id>
+  		<properties>
+  			<simulationClass>se.skltp.vp.LoadTestVPSomeFail</simulationClass>
+  		</properties>
+  	</profile>
+  	<profile>
+  		<id>LoadTestVPAllFail</id>
+  		<properties>
+  			<simulationClass>se.skltp.vp.LoadTestVPAllFail</simulationClass>
+  		</properties>
+  	</profile>
+  	<profile>
+  		<id>PingHttp</id>
+  		<properties>
+  			<simulationClass>se.skltp.vp.PingOkSimulationHttp</simulationClass>
   		</properties>
   	</profile>
   	<profile>

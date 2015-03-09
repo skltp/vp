@@ -25,7 +25,9 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
 object Conf {
-	var noOfUsers = System.getProperty("noOfUsers", "10")
+	var noOfUsers = System.getProperty("noOfUsers", "10").toInt
 	val baseUrl = System.getProperty("baseUrl", "https://localhost:20000")
     var httpConf = http.baseURL(baseUrl)
+	
+	var testTimeSecs = System.getProperty("testTimeSecs", "30").toInt
 }

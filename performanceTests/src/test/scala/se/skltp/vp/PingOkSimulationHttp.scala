@@ -33,6 +33,6 @@ class PingOkSimulationHttp extends Simulation {
   //ip adress must be in VP config (vp-config-override.properties) whitelist.
   
   setUp(
-	  Scenarios.scn_PingOkSimulationHttp.inject(rampUsers(Conf.noOfUsers.toInt) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
+	  Scenarios.scn_PingOkHttp.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
   )
 }

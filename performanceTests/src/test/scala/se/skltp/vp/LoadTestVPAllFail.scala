@@ -25,10 +25,11 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 import scala.concurrent.duration._
 
-class SendMedicalCertificateAnswerHttps extends Simulation {
-
-  setUp(
-	  Scenarios.scn_SendMedicalCertificateAnswerHttps.inject(rampUsers(Conf.noOfUsers.toInt) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
-  )
+class LoadTestVPAllFail extends Simulation {
+   
+    setUp(
+		Scenarios.scn_PingVP009.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_SendMedicalCertificateAnswerVP007.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_PingVP004.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
+	)
 }
-

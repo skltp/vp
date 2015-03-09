@@ -25,12 +25,15 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 import scala.concurrent.duration._
 
-class GetSubjectOfCareHttps extends Simulation {
-
-  	//
-  	//Mockad teststubbe GetAggregatedSubjectOfCareSchedule som svarar på 12:an med en post
-  	//
+class LoadTestVPSomeFail extends Simulation {
+   
     setUp(
-		Scenarios.scn_GetSubjectOfCareScheduleHttps.inject(rampUsers(Conf.noOfUsers.toInt) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
+		Scenarios.scn_PingVP009.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_SendMedicalCertificateAnswerVP007.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_PingVP004.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_SendMedicalCertificateAnswerHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_GetSubjectOfCareScheduleHttps_2.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_PingOk.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_GetSubjectOfCareScheduleHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
 	)
 }
