@@ -70,7 +70,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	public static final boolean FORCE_RESET = true;
 	public static final boolean DONT_FORCE_RESET = false;
 
-	// cache
+	/**
+	 * Persistent cache. 
+	 */
 	@XmlRootElement
 	static class PersistentCache implements Serializable {
 		private static final long serialVersionUID = 1L;
@@ -80,12 +82,21 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		private List<AnropsBehorighetsInfoType> anropsBehorighetsInfo;
 	}
 
+	/**
+	 * Runtime cache. 
+	 */
+	class TakCache {
+		VagvalHandler vagvalHandler;
+		BehorighetHandler behorighetHandler;
+	}
+	
 	private static final JaxbUtil JAXB = new JaxbUtil(PersistentCache.class);
 
 	private String localTakCache;
 
-	private VagvalHandler vagvalHandler = null;
-	private BehorighetHandler behorighetHandler = null;
+	private TakCache takCache;
+	private boolean takCacheIsInitialized = false;
+	
 	private HsaCache hsaCache;
 
 	private String endpointAddressTjanstekatalog;
@@ -116,12 +127,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	/**
-	 * Initialize VagvalAgent resources. Force a init by setting forceReset=true, use
-	 * constants VagvalAgent.FORCE_RESET or VagvalAgent.DONT_FORCE_RESET.
+	 * Initialize VagvalAgent resources.
 	 * If not forced, init checks if necessary resources are loaded, otherwise
 	 * resources are loaded.
 	 *
-	 * @param forceReset Force a init by setting forceReset=true
+	 * @param forceReset force a reset/refresh using true, false for init. Use
+	 * constants VagvalAgent.FORCE_RESET or VagvalAgent.DONT_FORCE_RESET.
 	 * @return a processing log containing status for loading TAK resources
 	 */
 	public VagvalAgentProcessingLog init(boolean forceReset) {
@@ -130,7 +141,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 			init(processingLog);
 		}
 		else {
-			boolean isRefreshSuccessful = refresh(processingLog);
+			boolean isRefreshSuccessful = refresh(false, processingLog);
 			processingLog.isRefreshRequested = forceReset;
 			processingLog.isRefreshSuccessful = isRefreshSuccessful;			
 		}
@@ -143,12 +154,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @param processingLog
 	 */
 	private synchronized void init(VagvalAgentProcessingLog processingLog) {
-		if (!isInitialized()) {
+		if (!takCacheIsInitialized) {
 			String logMsg = "init: not initialized, will do init ...";
 			logger.info(logMsg);
 			processingLog.addLog(logMsg);
-			refresh(processingLog);
-			logMsg = "init done, was successful: " + isInitialized();
+			refresh(true, processingLog);
+			logMsg = "init done, was successful: " + takCacheIsInitialized;
 			logger.info(logMsg);
 			processingLog.addLog(logMsg);
 		}		
@@ -162,7 +173,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * 
 	 * @return true if refresh was successful
 	 */	
-	private boolean refresh(VagvalAgentProcessingLog processingLog) {
+	private boolean refresh(boolean isInit, VagvalAgentProcessingLog processingLog) {
 		
 		boolean isRefreshSuccessful = false;
 		
@@ -177,8 +188,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				List<VirtualiseringsInfoType> v = getVirtualiseringar();
 				List<AnropsBehorighetsInfoType> p = getBehorigheter();
 				if (v != null && p != null) {
-					// do thread-safe update of state
-					setState(v, p);
+					// do thread-safe update of cache
+					updateTakCache(v, p);
 					isRefreshSuccessful = true;
 				}
 			}
@@ -186,19 +197,23 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				logger.error("Failed to refresh TAK data", e);
 			}
 
-			if (isInitialized()) {
+			if (isRefreshSuccessful) {
 			    processingLog.addLog("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy...");
 				saveToLocalCopy(localTakCache, processingLog);
-			} else {
+			} else if (isInit) {
+				// try to load from local file cache
 			    processingLog.addLog("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy...");
 				restoreFromLocalCopy(localTakCache, processingLog);
+			} else {
+				// refresh failed but cache was already initialized
+				processingLog.addLog("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Will continue to use already loaded TAK data.");				
 			}
 
-			if (isInitialized()) {
-				logger.info("Init VagvalAgent loaded number of permissions: {}", behorighetHandler.size());
-				logger.info("Init VagvalAgent loaded number of virtualizations: {}", vagvalHandler.size());
-				processingLog.addLog("Init VagvalAgent loaded number of permissions: " + behorighetHandler.size());
-				processingLog.addLog("Init VagvalAgent loaded number of virtualizations: " + vagvalHandler.size());
+			if (isRefreshSuccessful || (isInit && takCacheIsInitialized)) {
+				logger.info("Init VagvalAgent loaded number of permissions: {}", takCache.behorighetHandler.size());
+				logger.info("Init VagvalAgent loaded number of virtualizations: {}", takCache.vagvalHandler.size());
+				processingLog.addLog("Init VagvalAgent loaded number of permissions: " + takCache.behorighetHandler.size());
+				processingLog.addLog("Init VagvalAgent loaded number of virtualizations: " + takCache.vagvalHandler.size());
 			}
 
 			logger.info("Init VagvalAgent done");
@@ -214,18 +229,17 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @param p
 	 *            the permission state.
 	 */
-	private synchronized void setState(List<VirtualiseringsInfoType> v, List<AnropsBehorighetsInfoType> p) {
-		this.vagvalHandler = new VagvalHandler(hsaCache, v);
-		this.behorighetHandler = new BehorighetHandler(hsaCache, p);
-	}
-
-	/**
-	 * Return if cache has been initialized.
-	 *
-	 * @return true if cache has been initalized, otherwise false.
-	 */
-	private synchronized boolean isInitialized() {
-		return (this.behorighetHandler != null) && (this.vagvalHandler != null);
+	private synchronized void updateTakCache(List<VirtualiseringsInfoType> v, List<AnropsBehorighetsInfoType> p) {
+		TakCache takCache = new TakCache();
+		takCache.vagvalHandler = new VagvalHandler(hsaCache, v);
+		takCache.behorighetHandler = new BehorighetHandler(hsaCache, p);
+		// minimize impact (cache reading is not locking/synchronized) when
+		// cache is refreshed by setting the cache only when it is fully
+		// populated and ready for use
+		this.takCache = takCache;
+		if (!takCacheIsInitialized) {
+			takCacheIsInitialized = true;
+		}
 	}
 
 	private SokVagvalsInfoInterface getPort() {
@@ -307,15 +321,15 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		}
 
 		if (pc != null && pc.anropsBehorighetsInfo != null && pc.virtualiseringsInfo != null) {
-			setState(pc.virtualiseringsInfo, pc.anropsBehorighetsInfo);
+			updateTakCache(pc.virtualiseringsInfo, pc.anropsBehorighetsInfo);
 		}
 	}
 
 	// save object
 	private void saveToLocalCopy(String fileName, VagvalAgentProcessingLog processingLog) {
 		PersistentCache pc = new PersistentCache();
-		pc.anropsBehorighetsInfo = this.behorighetHandler.getAnropsBehorighetsInfoList();
-		pc.virtualiseringsInfo = this.vagvalHandler.getVirtualiseringsInfo();
+		pc.anropsBehorighetsInfo = takCache.behorighetHandler.getAnropsBehorighetsInfoList();
+		pc.virtualiseringsInfo = takCache.vagvalHandler.getVirtualiseringsInfo();
 
 		logger.info("Save virtualizations and permissions to local TAK copy: {}", fileName);
 		OutputStream os = null;
@@ -351,9 +365,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @return list of authorization, empty if no authorizations exists.
 	 */
 	@Deprecated
-	public synchronized List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
-		init(DONT_FORCE_RESET);
-		return (behorighetHandler == null) ? Collections.<AnropsBehorighetsInfoType>emptyList() : behorighetHandler.getAnropsBehorighetsInfoList();
+	//public synchronized List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
+	public List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
+		if (!takCacheIsInitialized) {
+			init(DONT_FORCE_RESET);	
+		}
+		return (takCache == null) ? Collections.<AnropsBehorighetsInfoType>emptyList() : takCache.behorighetHandler.getAnropsBehorighetsInfoList();
 	}
 
 	/**
@@ -364,9 +381,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @return list of routing information, empty if no routing information exists.
 	 */
 	@Deprecated
-	public synchronized List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
-		init(DONT_FORCE_RESET);
-        return (vagvalHandler == null) ? Collections.<VirtualiseringsInfoType>emptyList(): vagvalHandler.getVirtualiseringsInfo();
+	//public synchronized List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
+	public List<VirtualiseringsInfoType> getVirtualiseringsInfo() {
+		if (!takCacheIsInitialized) {
+			init(DONT_FORCE_RESET);	
+		}		
+        return (takCache == null) ? Collections.<VirtualiseringsInfoType>emptyList(): takCache.vagvalHandler.getVirtualiseringsInfo();
     }
 
 	/**
@@ -399,20 +419,30 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @throws VpSemanticException
 	 *             if no AnropsBehorighet is found
 	 */
-	public synchronized VisaVagvalResponse visaVagval(VisaVagvalRequest request) {
+	//public synchronized VisaVagvalResponse visaVagval(VisaVagvalRequest request) {
+	public VisaVagvalResponse visaVagval(VisaVagvalRequest request) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("entering vagvalAgent visaVagval");
 		}
 
 		// Dont force a reset, initialize only if needed
-		// Guards against ongoing/failed init during startup 
-		init(DONT_FORCE_RESET);
+		// Guards against ongoing/failed init during startup
+		// Note: try to not lock/synchronize during read, trade some thread-safety
+		// against performance for the case when the cache is refreshed
+		if (!takCacheIsInitialized) {
+			init(DONT_FORCE_RESET);
+		}
+		
 
-		if (!isInitialized()) {
+		if (!takCacheIsInitialized) {
 			String errorMessage = "VP008 No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call";
 			logger.error(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
+		
+		// hold a local copy of the TakCache to keep consistency during call if
+		// cache is refreshed (since we don't synchronize read access to cache)
+		TakCache takCacheForLocalMethodInvocation = this.takCache;
 
 		// Determine if delimiter is set and present in request logical address.
 		// Delimiter is used in deprecated default routing (VG#VE).
@@ -421,11 +451,11 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		List<String> receiverAddresses = extractReceiverAdresses(request, useDeprecatedDefaultRouting);
 
 		// Get possible routes (vagval)
-		VisaVagvalResponse response = vagvalHandler.getRoutingInformation(request, useDeprecatedDefaultRouting, receiverAddresses);
+		VisaVagvalResponse response = takCacheForLocalMethodInvocation.vagvalHandler.getRoutingInformation(request, useDeprecatedDefaultRouting, receiverAddresses);
 
 		// No routing was found neither on requested receiver nor using the HSA
 		// tree for parents. No need to continue to check authorization.
-		if (vagvalHandler.containsNoRouting(response)) {
+		if (takCacheForLocalMethodInvocation.vagvalHandler.containsNoRouting(response)) {
 			return response;
 		}
 
@@ -434,7 +464,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		// receiver parents using HSA tree.
 		//
 		// Note: If old school default routing (VG#VE)HSA tree is used then we only get one address (the first one found routing info for) to check permissions for.
-		if (!behorighetHandler.isAuthorized(request, receiverAddresses)) {
+		if (!takCacheForLocalMethodInvocation.behorighetHandler.isAuthorized(request, receiverAddresses)) {
 			throwNotAuthorizedException(request);
 		}
 
@@ -445,14 +475,14 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * Read data without blocking for performance reasons.
 	 */
 	public int threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations() {
-		return vagvalHandler != null ? vagvalHandler.getVirtualiseringsInfo().size() : 0;		
+		return takCache != null ? takCache.vagvalHandler.getVirtualiseringsInfo().size() : 0;		
 	}
 
 	/**
 	 * Read data without blocking for performance reasons.
 	 */
 	public int threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter() {
-		return behorighetHandler != null ? behorighetHandler.getAnropsBehorighetsInfoList().size() : 0;		
+		return takCache != null ? takCache.behorighetHandler.getAnropsBehorighetsInfoList().size() : 0;		
 	}	
 
 	/*
