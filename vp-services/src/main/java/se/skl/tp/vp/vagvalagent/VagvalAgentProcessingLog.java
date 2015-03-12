@@ -25,7 +25,9 @@ import java.util.List;
 
 public class VagvalAgentProcessingLog {
 
-    List<String> logBuffer = null;
+	boolean isRefreshRequested = false;
+	boolean isRefreshSuccessful = false; 
+    List<String> logBuffer = null;    
 
     public VagvalAgentProcessingLog() {
         logBuffer = new ArrayList<String>();

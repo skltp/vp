@@ -18,21 +18,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.hsa.cache;
+package se.skltp.vp 
 
-import org.apache.commons.lang.StringUtils;
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef._
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Represents information regarding a Hsa Node in the Tree.
- * 
- * @author magnus.larsson@callistaenterprise.se
- *
- */
-public interface HsaNodeInfo {
-    public String getHsaId();
-    public String getDn();
-    public String getName();
+object Conf {
+	var noOfUsers = System.getProperty("noOfUsers", "10").toInt
+	val baseUrl = System.getProperty("baseUrl", "https://localhost:20000")
+    var httpConf = http.baseURL(baseUrl)
+	
+	var testTimeSecs = System.getProperty("testTimeSecs", "30").toInt
 }

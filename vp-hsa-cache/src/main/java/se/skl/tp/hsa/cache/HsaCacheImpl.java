@@ -144,7 +144,8 @@ public class HsaCacheImpl implements HsaCache {
 
             // Fail if this searchFragment can't be found in neither the HSA-id nor in the DN-string
             if ((StringUtils.containsIgnoreCase(node.getHsaId(), searchFragment)) ||
-                (StringUtils.containsIgnoreCase(node.getDn().toString(), searchFragment))) {
+                (StringUtils.containsIgnoreCase(node.getDn().toString(), searchFragment)) ||
+                (StringUtils.containsIgnoreCase(node.getName(), searchFragment))) {
 
                 log.debug("Found {} in {}", searchFragment, node.toString());
 

@@ -64,12 +64,12 @@ public class HsaCacheSearchImplTest {
     }
 
     /**
-     * 1 node match "Nässjö VC DLM" in its DN
+     * 1 node match "Landstinget i Kalmar län" in its DN
      */
     @Test
     public void testSearchOneDN() {
 
-        String vc = "Nässjö VC DLM";
+        String vc = "Landstinget i Kalmar län";
         List<HsaNodeInfo> list = impl.freeTextSearch(vc, -1);
 
         assertEquals(1, list.size());
@@ -77,14 +77,38 @@ public class HsaCacheSearchImplTest {
     }
 
     /**
-     * 5 nodes match the HSA ID "SE 1234"
+     * 1 node match "UNIQUE_STRING_IN_FILE_TO_TEST_FREETEXT_SEARCH_ON_NAME" in its Name
+     */
+    @Test
+    public void testSearchOneName() {
+        String name = "UNIQUE_STRING_IN_FILE_TO_TEST_FREETEXT_SEARCH_ON_NAME";
+        List<HsaNodeInfo> list = impl.freeTextSearch(name, -1);
+
+        assertEquals(1, list.size());
+        assertEquals(name, list.get(0).getName());
+    }
+
+    /**
+     * 1 node match "UNIQUE_STRING_IN_FILE_TO_TEST_FREETEXT_SEARCH_ON_NAME" in its Name
+     */
+    @Test
+    public void testSearchOneNameUsingLowerCase() {
+        String name = "unique_STRING_IN_FILE_to_TEST_FREETEXT_search_ON_name";
+        List<HsaNodeInfo> list = impl.freeTextSearch(name, -1);
+
+        assertEquals(1, list.size());
+        assertEquals(name.toUpperCase(), list.get(0).getName());
+    }
+    
+    /**
+     * 6 nodes match the HSA ID "SE 1234"
      */
     @Test
     public void testSearchMultipleHsaId() {
 
         List<HsaNodeInfo> list = impl.freeTextSearch("SE 1234", -1);
 
-        assertEquals(5, list.size());
+        assertEquals(6, list.size());
     }
 
     /**

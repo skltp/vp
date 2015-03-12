@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project activeEnvironment="Default" name="SKLTP-VP-functional-tests" resourceRoot="" soapui-version="4.6.4" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="PingResponderBinding" type="wsdl" bindingName="{urn:riv:itinfra:tp:Ping:1:rivtabp20}PingResponderBinding" soapVersion="1_1" anonymous="optional" definition="https://localhost:20000/vp/Ping/1/rivtabp20?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://localhost:20000/vp/Ping/1/rivtabp20?wsdl"><con:part><con:url>https://localhost:20000/vp/Ping/1/rivtabp20?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="PingInteraction" targetNamespace="urn:riv:itinfra:tp:Ping:1:rivtabp20" xmlns="urn:riv:itinfra:tp:Ping:1:rivtabp20" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tjs="urn:riv:itinfra:tp:PingResponder:1" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<con:soapui-project activeEnvironment="Default" name="SKLTP-VP-functional-tests" resourceRoot="" soapui-version="4.6.4" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.actions.iface.tools.soapui.TestRunnerAction@values-local"><![CDATA[<xml-fragment xmlns:con="http://eviware.com/soapui/config">
+  <con:entry key="Environment" value="Default"/>
+  <con:entry key="Global Properties" value=""/>
+  <con:entry key="TestSuite" value="Functional VP tests"/>
+  <con:entry key="Password" value=""/>
+  <con:entry key="soapui-setings.xml Password" value=""/>
+  <con:entry key="TestRunner Path" value=""/>
+  <con:entry key="Tool Args" value=""/>
+  <con:entry key="Ignore Errors" value="false"/>
+  <con:entry key="Host:Port" value=""/>
+  <con:entry key="WSS Password Type" value=""/>
+  <con:entry key="Save Project" value="false"/>
+  <con:entry key="Enable UI" value="false"/>
+  <con:entry key="System Properties" value=""/>
+  <con:entry key="Domain" value=""/>
+  <con:entry key="Coverage Report" value="false"/>
+  <con:entry key="Export JUnit Results" value="false"/>
+  <con:entry key="Open Report" value="false"/>
+  <con:entry key="Project Properties" value=""/>
+  <con:entry key="Export All" value="false"/>
+  <con:entry key="Project Password" value=""/>
+  <con:entry key="Report Format(s)" value=""/>
+  <con:entry key="TestCase" value="TC3: VP internal services"/>
+  <con:entry key="Print Report" value="false"/>
+  <con:entry key="Username" value=""/>
+  <con:entry key="Root Folder" value=""/>
+  <con:entry key="Save After" value="false"/>
+  <con:entry key="Add Settings" value="false"/>
+  <con:entry key="Endpoint" value=""/>
+  <con:entry key="Select Report Type" value=""/>
+</xml-fragment>]]></con:setting></con:settings><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="PingResponderBinding" type="wsdl" bindingName="{urn:riv:itinfra:tp:Ping:1:rivtabp20}PingResponderBinding" soapVersion="1_1" anonymous="optional" definition="https://localhost:20000/vp/Ping/1/rivtabp20?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://localhost:20000/vp/Ping/1/rivtabp20?wsdl"><con:part><con:url>https://localhost:20000/vp/Ping/1/rivtabp20?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="PingInteraction" targetNamespace="urn:riv:itinfra:tp:Ping:1:rivtabp20" xmlns="urn:riv:itinfra:tp:Ping:1:rivtabp20" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tjs="urn:riv:itinfra:tp:PingResponder:1" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <wsdl:types>
     <xsd:schema elementFormDefault="qualified">
       <xsd:import namespace="urn:riv:itinfra:tp:PingResponder:1" schemaLocation="https://localhost:20000/vp/Ping/1/rivtabp20?xsd=PingResponder_1_0.xsd"/>
@@ -708,7 +738,7 @@ x-vp-instance-id=vp's instans id, finns i vp-config-override.properties, tex SKL
    </soapenv:Header>
    <soapenv:Body>
       <urn1:GetLogicalAddresseesByServiceContract>
-         <urn1:serviceConsumerHsaId>client</urn1:serviceConsumerHsaId>
+         <urn1:serviceConsumerHsaId>${#Project#x-vp-sender-id}</urn1:serviceConsumerHsaId>
          <urn1:serviceContractNameSpace>
             <urn:ServiceContractNamespace>urn:riv:itinfra:tp:PingResponder:1</urn:ServiceContractNamespace>
             <!--You may enter ANY elements at this point-->
@@ -723,7 +753,7 @@ count(//ns1:GetLogicalAddresseesByServiceContractResponse/*)</path><content>1</c
    <soap:Body>
       <GetLogicalAddresseesByServiceContractResponse xmlns="urn:riv:infrastructure:itintegration:registry:GetLogicalAddresseesByServiceContractResponder:2" xmlns:ns2="urn:riv:infrastructure:itintegration:registry:2">
          <logicalAddressRecord>
-            <logicalAddress>Ping</logicalAddress>
+            <logicalAddress>SE</logicalAddress>
          </logicalAddressRecord>
       </GetLogicalAddresseesByServiceContractResponse>
    </soap:Body>
@@ -742,4 +772,4 @@ count(//ns1:GetLogicalAddresseesByServiceContractResponse/*)</path><content>1</c
             <name>Applikation</name>
             <value>VP</value>
          </configuration>
-]]></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:assertion type="Simple Contains" name="Contains anropsbehorighet"><con:configuration><token>&lt;name>Anropsbehörigheter&lt;/name></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:assertion type="Simple Contains" name="Contains logiskaadresser"><con:configuration><token>&lt;name>Logiska-adresser&lt;/name></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:username xsi:nil="true"/><con:password xsi:nil="true"/><con:domain xsi:nil="true"/><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1:PingForConfiguration"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="restrequest" name="monitor ping request"><con:settings/><con:config service="Monitor Ping" resourcePath="/vp/monitor/ping" methodName="monitor ping request" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="monitor ping request" mediaType="application/xml"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://${#Project#httpEndpoint}</con:endpoint><con:request/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>TP is alive!</token><ignoreCase>true</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:username xsi:nil="true"/><con:password xsi:nil="true"/><con:domain xsi:nil="true"/><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:restRequest></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>httpEndpoint</con:name><con:value>33.33.33.33:8070</con:value></con:property><con:property><con:name>httpsEndpoint</con:name><con:value>33.33.33.33:20000</con:value></con:property><con:property><con:name>x-vp-instance-id</con:name><con:value>VP_INSTANCE_1</con:value></con:property><con:property><con:name>x-vp-sender-id</con:name><con:value>client</con:value></con:property></con:properties><con:wssContainer/><con:sensitiveInformation/></con:soapui-project>
+]]></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:assertion type="Simple Contains" name="Contains anropsbehorighet"><con:configuration><token>&lt;name>Anropsbehörigheter&lt;/name></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:assertion type="Simple Contains" name="Contains logiskaadresser"><con:configuration><token>&lt;name>Logiska-adresser&lt;/name></token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:username xsi:nil="true"/><con:password xsi:nil="true"/><con:domain xsi:nil="true"/><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="urn:riv:itintegration:monitoring:PingForConfigurationResponder:1:PingForConfiguration"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="restrequest" name="monitor ping request"><con:settings/><con:config service="Monitor Ping" resourcePath="/vp/monitor/ping" methodName="monitor ping request" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="monitor ping request" mediaType="application/xml"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://${#Project#httpEndpoint}</con:endpoint><con:request/><con:assertion type="Simple Contains" name="Contains"><con:configuration><token>TP is alive!</token><ignoreCase>true</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:credentials><con:username xsi:nil="true"/><con:password xsi:nil="true"/><con:domain xsi:nil="true"/><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:restRequest></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>httpEndpoint</con:name><con:value>localhost:8080</con:value></con:property><con:property><con:name>httpsEndpoint</con:name><con:value>localhost:20000</con:value></con:property><con:property><con:name>x-vp-instance-id</con:name><con:value>VP_INSTANCE_ID</con:value></con:property><con:property><con:name>x-vp-sender-id</con:name><con:value>tp</con:value></con:property></con:properties><con:wssContainer/><con:sensitiveInformation/></con:soapui-project>

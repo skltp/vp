@@ -58,22 +58,22 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 		log.info("PingForConfiguration requested for {}", rb.getString("APPLICATION_NAME"));
 		
 		PingForConfigurationResponseType response = new PingForConfigurationResponseType();
-		Integer authInfoSize = vagvalAgent.getAnropsBehorighetsInfoList().size();
-		Integer routingInfoSize = vagvalAgent.getVirtualiseringsInfo().size();
+		int authInfoSize = vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter();
+		int routingInfoSize = vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations();
 		
 		if(log.isDebugEnabled()){
-			log.debug("pingForConfiguration result, nr of authorizations:{}, nr of routing information:{}", authInfoSize.toString(), routingInfoSize.toString());
+			log.debug("pingForConfiguration result, nr of authorizations:{}, nr of routing information:{}", authInfoSize, routingInfoSize);
 		}
 		
 		if(!resourcesNeededForVpAvailable()){
-			log.error("Severe problem, vp reports needed resources are missing, routing size: {}", vagvalAgent.getVirtualiseringsInfo().size());
-			log.error("Severe problem, vp reports needed resources are missing, authorization size: {}", vagvalAgent.getAnropsBehorighetsInfoList().size());
+			log.error("Severe problem, vp reports needed resources are missing, routing size: {}", routingInfoSize);
+			log.error("Severe problem, vp reports needed resources are missing, authorization size: {}", authInfoSize);
 			throw new RuntimeException("VP012 Severe problem, vp does not have all necessary reources to operate");
 		}
 		
 		response.getConfiguration().add(createConfiguration("Applikation", rb.getString("APPLICATION_NAME")));
-		response.getConfiguration().add(createConfiguration("Anropsbehörigheter", authInfoSize.toString()));
-		response.getConfiguration().add(createConfiguration("Logiska-adresser", routingInfoSize.toString()));
+		response.getConfiguration().add(createConfiguration("Anropsbehörigheter", String.valueOf(authInfoSize)));
+		response.getConfiguration().add(createConfiguration("Logiska-adresser", String.valueOf(routingInfoSize)));
 		response.setPingDateTime(dateFormat.format(new Date()));
 		response.setVersion(rb.getString("VP_VERSION"));
 		
@@ -84,8 +84,8 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 
 	boolean resourcesNeededForVpAvailable() {
 		return vagvalAgent != null
-				&& vagvalAgent.getAnropsBehorighetsInfoList().size() > 0
-				&& vagvalAgent.getVirtualiseringsInfo().size() > 0;
+				&& vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter() > 0
+				&& vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations() > 0;
 	}
 
 	private ConfigurationType createConfiguration(String name, String value) {

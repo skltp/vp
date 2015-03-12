@@ -407,7 +407,7 @@ public class VagvalAgentTest {
         VagvalAgent vagvalAgent = setupVagvalAgent(mockedTakService, localTakCache.getFile());
 
         //Init VagvalAgent from local cache
-        vagvalAgent.init(VagvalAgent.FORCE_RESET);
+        vagvalAgent.init(VagvalAgent.DONT_FORCE_RESET);
 
         // Verify authorizations are loaded from local cache
         List<AnropsBehorighetsInfoType> authorization = vagvalAgent
@@ -456,7 +456,7 @@ public class VagvalAgentTest {
         vagvalAgent.setMockVirtualiseringsInfo(routing);
         vagvalAgent.setMockAnropsBehorighetsInfo(authorization);
 
-        vagvalAgent.init(VagvalAgent.FORCE_RESET);
+        vagvalAgent.init(VagvalAgent.DONT_FORCE_RESET);
 
         XMLAssert.assertXpathExists("/persistentCache/virtualiseringsInfo", new InputSource(new FileReader(localTakCache)));
         XMLAssert.assertXpathExists("/persistentCache/anropsBehorighetsInfo",new InputSource(new FileReader(localTakCache)));
@@ -485,14 +485,16 @@ public class VagvalAgentTest {
 
         // Init VagvalAgent from local cache
         VagvalAgentProcessingLog processingLog = vagvalAgent
-                .init(VagvalAgent.FORCE_RESET);
+                .init(VagvalAgent.DONT_FORCE_RESET);
 
         List<String> log = processingLog.getLog();
-        assertThat(log.get(0), containsString("Initialize VagvalAgent TAK resources.."));
-        assertThat(log.get(1), containsString("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy..."));
-        assertThat(log.get(2), containsString("Succesfully saved virtualizations and permissions to local TAK copy:"));
-        assertThat(log.get(3), containsString("Init VagvalAgent loaded number of permissions: 1"));
-        assertThat(log.get(4), containsString("Init VagvalAgent loaded number of virtualizations: 1"));
+        assertThat(log.get(0), containsString("init: not initialized, will do init ..."));
+        assertThat(log.get(1), containsString("Initialize VagvalAgent TAK resources.."));
+        assertThat(log.get(2), containsString("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy..."));
+        assertThat(log.get(3), containsString("Succesfully saved virtualizations and permissions to local TAK copy:"));
+        assertThat(log.get(4), containsString("Init VagvalAgent loaded number of permissions: 1"));
+        assertThat(log.get(5), containsString("Init VagvalAgent loaded number of virtualizations: 1"));
+        assertThat(log.get(6), containsString("init done, was successful: true"));
     }
 
     @Test
@@ -508,14 +510,16 @@ public class VagvalAgentTest {
 
         // Init VagvalAgent from local cache
         VagvalAgentProcessingLog processingLog = vagvalAgent
-                .init(VagvalAgent.FORCE_RESET);
+                .init(VagvalAgent.DONT_FORCE_RESET);
 
         List<String> log = processingLog.getLog();
-        assertThat(log.get(0), containsString("Initialize VagvalAgent TAK resources.."));
-        assertThat(log.get(1), containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
-        assertThat(log.get(2), containsString("Succesfully restored virtualizations and permissions from local TAK copy:"));
-        assertThat(log.get(3), containsString("Init VagvalAgent loaded number of permissions: 1"));
-        assertThat(log.get(4), containsString("Init VagvalAgent loaded number of virtualizations: 1"));
+        assertThat(log.get(0), containsString("init: not initialized, will do init ..."));
+        assertThat(log.get(1), containsString("Initialize VagvalAgent TAK resources.."));
+        assertThat(log.get(2), containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
+        assertThat(log.get(3), containsString("Succesfully restored virtualizations and permissions from local TAK copy:"));
+        assertThat(log.get(4), containsString("Init VagvalAgent loaded number of permissions: 1"));
+        assertThat(log.get(5), containsString("Init VagvalAgent loaded number of virtualizations: 1"));
+        assertThat(log.get(6), containsString("init done, was successful: true"));
     }
 
     @Test
@@ -531,25 +535,30 @@ public class VagvalAgentTest {
 
         // Init VagvalAgent from local cache
         VagvalAgentProcessingLog processingLog = vagvalAgent
-                .init(VagvalAgent.FORCE_RESET);
+                .init(VagvalAgent.DONT_FORCE_RESET);
 
         List<String> log = processingLog.getLog();
-        assertThat(log.get(0), containsString("Initialize VagvalAgent TAK resources.."));
-        assertThat(log.get(1), containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
-        assertThat(log.get(2), containsString("Failed to restore virtualizations and permissions from local TAK copy:"));
-        assertThat(log.get(3), containsString("Reason for failure: javax.xml.bind.UnmarshalException"));
+        assertThat(log.get(0), containsString("init: not initialized, will do init ..."));
+        assertThat(log.get(1), containsString("Initialize VagvalAgent TAK resources.."));
+        assertThat(log.get(2), containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
+        assertThat(log.get(3), containsString("Failed to restore virtualizations and permissions from local TAK copy:"));
+        assertThat(log.get(4), containsString("Reason for failure: javax.xml.bind.UnmarshalException"));
     }
 
     @Test
     public void noAuthorizationsLoadedGivesEmptyList(){
-    	List<AnropsBehorighetsInfoType> authInfo = new VagvalAgent().getAnropsBehorighetsInfoList();
+    	VagvalAgent va = new VagvalAgent();
+    	va.setLocalTakCache("non-existing-file.txt");
+    	List<AnropsBehorighetsInfoType> authInfo = va.getAnropsBehorighetsInfoList();
     	assertNotNull(authInfo);
     	assertTrue(authInfo.isEmpty());
     }
 
     @Test
     public void noRoutingLoadedGivesEmptyList(){
-    	List<VirtualiseringsInfoType> routingInfo = new VagvalAgent().getVirtualiseringsInfo();
+    	VagvalAgent va = new VagvalAgent();
+    	va.setLocalTakCache("non-existing-file.txt");
+    	List<VirtualiseringsInfoType> routingInfo = va.getVirtualiseringsInfo();
     	assertNotNull(routingInfo);
     	assertTrue(routingInfo.isEmpty());
     }

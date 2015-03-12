@@ -48,6 +48,7 @@ public class HsaFileParser {
  
 	private static final String ELEMENT_NAME_HSA_IDENTITY = "hsaIdentity";
 	private static final String ELEMENT_NAME_DN = "DN";
+	private static final String ELEMENT_NAME_NAME = "name";
 	private static final String ELEMENT_NAME_HSA_OBJECT = "hsaUnit";
 
 	private static Logger log = LoggerFactory.getLogger(HsaFileParser.class);
@@ -145,20 +146,16 @@ public class HsaFileParser {
 						continue;
 					}
 				}
-				// When we hit a <Attribute> tag with attribute 'name'
-/*
+
+				// When we hit a <name> tag
 				if (event.isStartElement()) {
 					StartElement startElement = event.asStartElement();
-					if (startElement.getName().getLocalPart() == ELEMENT_NAME_ATTRIBUTE) {
-						Attribute attribute = startElement.getAttributeByName(ATTRIBUTE_NAME_NAME);
-						if(attribute.getValue().equals(ATTRIBUTE_NAME_HSA_IDENTITY)) {
-		                	eventReader.nextTag();	// Read the S tag
-	                		entry.setHsaId(eventReader.nextEvent().asCharacters().getData());
-	                		continue;
-			            }
+					if (startElement.getName().getLocalPart() == ELEMENT_NAME_NAME) {
+						entry.setName(eventReader.nextEvent().asCharacters().getData());
+						continue;
 					}
 				}
-*/
+
 			}
 		} finally {
 			if(in != null) {

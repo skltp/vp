@@ -31,12 +31,19 @@ import static se.skl.tp.vp.util.VagvalSchemasTestUtil.getRelativeDate;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheImpl;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
 public class VagvalHandlerTest {
@@ -65,5 +72,32 @@ public class VagvalHandlerTest {
 		assertEquals(1, bh.lookupInVirtualiseringsInfoMap("receiver-2", "namnrymd-1").size());
 		assertEquals(2, bh.lookupInVirtualiseringsInfoMap("receiver-3", "namnrymd-1").size());
 		assertNull(bh.lookupInVirtualiseringsInfoMap("receiver-4", "namnrymd-1"));
+	}
+	
+	
+	@Test
+	public void testNearDates() throws Exception {
+
+		ArrayList<VirtualiseringsInfoType> routing = new ArrayList<VirtualiseringsInfoType>();
+		routing.add(createRouting("sender-1", "rivversion-1", "namnrymd-1", "receiver-2", getCalendarDate("2015-01-21T00:00:00.300"), getCalendarDate("2015-01-22T00:00:00.000")));
+		routing.add(createRouting("sender-1", "rivversion-1", "namnrymd-1", "receiver-2", getCalendarDate("2015-01-23T00:00:00.300"), getCalendarDate("2015-01-24T00:00:00.000")));
+
+		VagvalHandler bh = new VagvalHandler(hsaCache, routing);
+
+		VisaVagvalRequest request = new VisaVagvalRequest();
+		request.setReceiverId("receiver-2");
+		request.setSenderId("sender-1");
+		request.setTjanstegranssnitt("namnrymd-1");
+		request.setTidpunkt(getCalendarDate("2015-01-22T15:00:00.300"));
+		
+		List<String> receiverAddresses = new ArrayList<String>();
+		receiverAddresses.add("receiver-2");
+		
+		VisaVagvalResponse resp = bh.getRoutingInformationFromLeaf(request, false, receiverAddresses);
+		assertEquals(1, resp.getVirtualiseringsInfo().size());		
+	}
+
+	private XMLGregorianCalendar getCalendarDate(String dateAsString) throws Exception {
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(dateAsString);
 	}
 }

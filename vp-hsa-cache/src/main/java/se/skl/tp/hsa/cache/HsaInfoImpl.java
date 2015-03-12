@@ -39,4 +39,9 @@ public class HsaInfoImpl implements HsaNodeInfo {
     public String getDn() {
         return node.getDn().toString();
     }
+    
+    @Override
+    public String getName() {
+    	return node.getName();
+    }
 }

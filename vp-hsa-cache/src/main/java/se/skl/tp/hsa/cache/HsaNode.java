@@ -49,6 +49,12 @@ public class HsaNode {
 	private String hsaId;
 	
 	/**
+	 * Name of this node
+	 */
+	private String name;
+	
+	
+	/**
 	 * Parent for this node
 	 */
 	private HsaNode parent;
@@ -83,6 +89,14 @@ public class HsaNode {
 		return hsaId;
 	}
 	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public void setParent(HsaNode parent) {
 		this.parent = parent;
 	}
@@ -101,10 +115,10 @@ public class HsaNode {
 		
 	@Override
 	public String toString() {
-		return "dn="+dn+",hsaId="+hsaId+",lineNo="+lineNo;
+		return "dn="+dn+",hsaId="+hsaId+",name="+name+",lineNo="+lineNo;
 	}
 
 	public boolean isValid() {
-		return StringUtils.isNotBlank(hsaId) && dn != null;
+		return StringUtils.isNotBlank(hsaId) && dn != null && name != null;
 	}
 }

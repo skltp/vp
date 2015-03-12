@@ -38,22 +38,15 @@ import se.skl.tp.vp.monitoring.PingForConfigurationProducerRivTa21;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 public class PingForConfigurationProducerRivTa21Test {
-
-	public static List<AnropsBehorighetsInfoType> BEHORIGHETS_INFO_TYPES = new ArrayList<AnropsBehorighetsInfoType>();
-	public static List<VirtualiseringsInfoType> VIRTUALISERINGS_INFO_TYPES = new ArrayList<VirtualiseringsInfoType>();
-
-	@BeforeClass
-	public static void beforeClass(){
-		BEHORIGHETS_INFO_TYPES.add(createAnropsBehorighetsInfo());
-		VIRTUALISERINGS_INFO_TYPES.add(createVirtualiseringsInfo());
-	}
+	private static final Integer ONE = new Integer(1);
+	private static final Integer ZERO = new Integer(0);
 
 	@Test
 	public void resourcesNeededForVpAvailable() {
 
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
-		when(vagvalAgent.getAnropsBehorighetsInfoList()).thenReturn(BEHORIGHETS_INFO_TYPES);
-		when(vagvalAgent.getVirtualiseringsInfo()).thenReturn(VIRTUALISERINGS_INFO_TYPES);
+		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter()).thenReturn(ONE);
+		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations()).thenReturn(ONE);
 
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
@@ -66,8 +59,8 @@ public class PingForConfigurationProducerRivTa21Test {
 	public void virtualiseringsInfoIsMissing() {
 
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
-		when(vagvalAgent.getAnropsBehorighetsInfoList()).thenReturn(BEHORIGHETS_INFO_TYPES);
-		when(vagvalAgent.getVirtualiseringsInfo()).thenReturn(Collections.EMPTY_LIST);
+		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter()).thenReturn(ONE);
+		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations()).thenReturn(ZERO);
 
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
@@ -80,8 +73,8 @@ public class PingForConfigurationProducerRivTa21Test {
 	public void behorighetsInfoIsMissing() {
 
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
-		when(vagvalAgent.getAnropsBehorighetsInfoList()).thenReturn(Collections.EMPTY_LIST);
-		when(vagvalAgent.getVirtualiseringsInfo()).thenReturn(VIRTUALISERINGS_INFO_TYPES);
+		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter()).thenReturn(ZERO);
+		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations()).thenReturn(ONE);
 
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
@@ -96,16 +89,6 @@ public class PingForConfigurationProducerRivTa21Test {
 		pingRivTa21.setVagvalAgent(null);
 
 		assertFalse(pingRivTa21.resourcesNeededForVpAvailable());
-	}
-
-	private static VirtualiseringsInfoType createVirtualiseringsInfo() {
-		VirtualiseringsInfoType infoType = new VirtualiseringsInfoType();
-		return infoType;
-	}
-
-	private static AnropsBehorighetsInfoType createAnropsBehorighetsInfo() {
-		AnropsBehorighetsInfoType infoType = new AnropsBehorighetsInfoType();
-		return infoType;
 	}
 
 }

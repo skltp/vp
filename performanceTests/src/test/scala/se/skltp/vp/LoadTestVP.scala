@@ -18,21 +18,19 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.hsa.cache;
+package se.skltp.vp
 
-import org.apache.commons.lang.StringUtils;
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef._
+import scala.concurrent.duration._
 
-import java.util.ArrayList;
-import java.util.List;
+class LoadTestVP extends Simulation {
 
-/**
- * Represents information regarding a Hsa Node in the Tree.
- * 
- * @author magnus.larsson@callistaenterprise.se
- *
- */
-public interface HsaNodeInfo {
-    public String getHsaId();
-    public String getDn();
-    public String getName();
+    setUp(
+		Scenarios.scn_SendMedicalCertificateAnswerHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_GetSubjectOfCareScheduleHttps_2.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_PingOk.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_GetSubjectOfCareScheduleHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
+	)
 }
