@@ -73,7 +73,7 @@ public class MonitorPingIntegrationTest extends AbstractTestCase{
 
 	@Test
 	public void monitorPing() throws Exception {
-		MuleMessage message = new RestClient(muleContext).doHttpGetRequest_JsonConent(VpMuleServer.getAddress("PINGSERVICE_INBOUND_URL"));
+		MuleMessage message = new RestClient(muleContext).doHttpGetRequest_JsonContent(VpMuleServer.getAddress("PINGSERVICE_INBOUND_URL"));
 		String payload = payloadToString(message);
 		assertEquals("TP is alive!", payload);
 	}
