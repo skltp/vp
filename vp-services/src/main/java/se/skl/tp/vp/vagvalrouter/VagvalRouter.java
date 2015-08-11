@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
-import se.skl.tp.vp.dashboard.ServiceStatistics;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.EventLogger;
@@ -105,8 +104,6 @@ public class VagvalRouter extends AbstractRecipientList {
 	private VisaVagvalsInterface vagvalAgent;
 
 	private int responseTimeout;
-
-	private Map<String, ServiceStatistics> statistics = new HashMap<String, ServiceStatistics>();
 
 	private AddressingHelper addrHelper;
 
@@ -230,27 +227,6 @@ public class VagvalRouter extends AbstractRecipientList {
 		String serviceId = event.getMessage().getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION) + "-"
 				+ event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 
-		synchronized (statistics) {
-
-			if (statistics.keySet().size() == 0) {
-				try {
-					muleContext.getRegistry().registerObject("tp-statistics", statistics);
-				} catch (RegistrationException e) {
-					logger.error("Stats not possible to register" + e);
-					// Dont let this interfere with the actual processing of
-					// messages
-				}
-			}
-
-			ServiceStatistics serverStatistics = statistics.get(serviceId);
-			if (serverStatistics == null) {
-				serverStatistics = new ServiceStatistics();
-				serverStatistics.producerId = serviceId;
-				statistics.put(serviceId, serverStatistics);
-			}
-			serverStatistics.noOfCalls++;
-		}
-
 		ExecutionTimer.start(VPUtil.TIMER_ENDPOINT);
 		MuleEvent replyEvent = null;
 		try {
@@ -284,14 +260,6 @@ public class VagvalRouter extends AbstractRecipientList {
 		    	long endpointTime =  ExecutionTimer.stop(VPUtil.TIMER_ENDPOINT);
 		    	replyEvent.getMessage().setProperty(X_SKLTP_PRODUCER_RESPONSETIME, endpointTime, PropertyScope.OUTBOUND);
 		    }
-		}
-
-		synchronized (statistics) {
-			ServiceStatistics serverStatistics = statistics.get(serviceId);
-			serverStatistics.noOfSuccesfullCalls++;
-			long duration = System.currentTimeMillis() - beforeCall;
-			serverStatistics.totalDuration += duration;
-			serverStatistics.averageDuration = serverStatistics.totalDuration / serverStatistics.noOfSuccesfullCalls;
 		}
 
 		return replyEvent;
