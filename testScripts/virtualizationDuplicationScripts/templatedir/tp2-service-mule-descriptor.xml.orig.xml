@@ -1,0 +1,60 @@
+<!--
+ * Copyright 2009-2012 Sjukvardsradgivningen * * This library is free software;
+	you can redistribute it and/or modify * it under the terms of version 2.1
+	of the GNU Lesser General Public * License as published by the Free Software
+	Foundation. * * This library is distributed in the hope that it will be useful,
+	* but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY
+	or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU Lesser General Public
+	License for more details. * * You should have received a copy of the GNU
+	Lesser General Public * License along with this library; if not, write to
+	the * Free Software Foundation, Inc., 59 Temple Place, Suite 330, * Boston,
+	MA 02111-1307 USA
+-->
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/cxf  http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+               http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd" >
+
+    <!-- Name of this file is mandatory and may not be changed. -->
+
+	<flow name="clinicalprocess-healthcond-actoutcome-GetLaboratoryOrderOutcome-3.0-Interaction-virtualisering-flow" >
+		<composite-source>
+      	  	<https:inbound-endpoint
+        	    address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/clinicalprocess/healthcond/actoutcome/GetLaboratoryOrderOutcome/3/rivtabp21"
+           		connector-ref="VPProducerConnector"
+            	exchange-pattern="request-response"
+            	responseTransformer-refs="featureKeepAliveResponse wsdlQueryResponse filterResponseHeaders">
+            	<properties>
+        			<spring:entry key="featureUseKeepAlive" value="${feature.keepalive.urn.riv.clinicalprocess.healthcond.actoutcome.GetLaboratoryOrderOutcomeResponder.3:${feature.keepalive}}"/>
+              		<spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.clinicalprocess.healthcond.actoutcome.GetLaboratoryOrderOutcomeResponder.3:${SERVICE_TIMEOUT_MS}}"/>
+        		</properties>
+        	</https:inbound-endpoint>
+        	<http:inbound-endpoint
+        	    address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/clinicalprocess/healthcond/actoutcome/GetLaboratoryOrderOutcome/3/rivtabp21"
+            	exchange-pattern="request-response"
+            	responseTransformer-refs="wsdlQueryResponse filterResponseHeaders">
+              <properties>
+              <spring:entry key="featureResponseTimeout" value="${feature.featureresponsetimeout.urn.riv.clinicalprocess.healthcond.actoutcome.GetLaboratoryOrderOutcomeResponder.3:${SERVICE_TIMEOUT_MS}}"/>
+            </properties>
+        	</http:inbound-endpoint>
+         </composite-source>
+
+         <cxf:proxy-service
+            	namespace="urn:riv:clinicalprocess:healthcond:actoutcome:GetLaboratoryOrderOutcome:3:rivtabp21"
+            	payload="envelope"
+            	service="GetLaboratoryOrderOutcomeResponderService"
+            	wsdlLocation="classpath:/schemas/interactions/GetLaboratoryOrderOutcomeInteraction/GetLaboratoryOrderOutcomeInteraction_3.0_RIVTABP21.wsdl" />
+
+         <flow-ref name="vagval-dynamic-routing-flow" />
+
+    </flow>
+
+</mule>
