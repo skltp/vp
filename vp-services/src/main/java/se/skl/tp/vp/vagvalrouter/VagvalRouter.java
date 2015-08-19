@@ -65,6 +65,14 @@ public class VagvalRouter extends AbstractRecipientList {
      */
     public static final String X_SKLTP_PRODUCER_RESPONSETIME = "x-skltp-prt";
 
+    /**
+     * HTTP Header holding correlation id forwarded to producer.
+     * <p>
+     *
+     * @since VP-2.2.12
+     */
+    public static final String X_SKLTP_CORRELATION_ID = "x-skltp-correlation-id";
+
 	/**
 	 * HTTP Header forwarded to producer. Note that header represent original consumer and should not be used for routing or authorization
 	 * in SKLTP VP. For routing and authorization use X_VP_SENDER_ID.
@@ -288,6 +296,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		propagateSenderIdAndVpInstanceIdToProducer(message, mt);
 		propagateOriginalServiceConsumerHsaIdToProducer(message, mt);
 		propagateSoapActionToProducer(message, mt);
+		propagateCorrelationIdToProducer(message, mt);
 
 		eb.addMessageProcessor(mt);
 
@@ -328,7 +337,6 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * Propagate x-rivta-original-serviceconsumer-hsaid as an outbound http property.
 	 */
 	private void propagateOriginalServiceConsumerHsaIdToProducer(MuleMessage message,MessagePropertiesTransformer mt) {
-
 		String senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
 
 		logger.debug("Exists original sender hsa id as inbound property {}?", VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID);
@@ -343,6 +351,14 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		//Propagate the http header to producers
 		mt.getAddProperties().put(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalServiceconsumerHsaid);
+	}
+
+	/*
+	 * Propagate x-skltp-correlation-idas an outbound http property.
+	 */
+	private void propagateCorrelationIdToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
+		String correlationId = message.getProperty(VPUtil.CORRELATION_ID, PropertyScope.SESSION);
+		mt.getAddProperties().put(X_SKLTP_CORRELATION_ID, correlationId);
 	}
 
 	protected int selectResponseTimeout(MuleMessage message) {

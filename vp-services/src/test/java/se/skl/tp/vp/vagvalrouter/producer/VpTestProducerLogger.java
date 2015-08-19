@@ -40,6 +40,7 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 	private static String latestRivtaOriginalSenderId = null;
 	private static String latestUserAgent = null;
 	private static String latestVpInstanceId = null;
+	private static String latestCorrelationId = null;
 
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
@@ -54,6 +55,10 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 		assertNotNull(vpInstanceId);
 		assertNotNull(vpSenderId);
 		assertNotNull(rivtaOriginalSenderId);
+		
+		//Correlation id
+		String vpCorrelationId = (String)httpHeaders.get(VagvalRouter.X_SKLTP_CORRELATION_ID);
+		assertNotNull(vpCorrelationId);
 	
 		//Should these headers exist, they are set in se.skl.tp.vp.vagvalrouter.VagvalRouter?
 		String userAgent = (String)httpHeaders.get("User-Agent");	
@@ -67,7 +72,10 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 	
 		log.info("Test producer called with {}: {}", VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, rivtaOriginalSenderId);
 		latestRivtaOriginalSenderId = rivtaOriginalSenderId;
-		
+
+		log.info("Test producer called with {}: {}", VagvalRouter.X_SKLTP_CORRELATION_ID, vpCorrelationId);
+		latestCorrelationId = vpCorrelationId;
+
 		log.info("Test producer called with {}: {}", "User-Agent", userAgent);
 		latestUserAgent = userAgent;
 		
@@ -88,5 +96,9 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 
 	public static String getLatestVpInstanceId() {
 		return latestVpInstanceId;
+	}
+
+	public static String getLatestCorrelationId() {
+		return latestCorrelationId;
 	}
 }

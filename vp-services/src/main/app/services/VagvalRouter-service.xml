@@ -45,8 +45,9 @@
     	<!-- Save the http header x-rivta-original-serviceconsumer-hsaid in session-property originalServiceconsumerHsaid -->
     	<set-session-variable variableName="originalServiceconsumerHsaid" value="#[message.inboundProperties.get('x-rivta-original-serviceconsumer-hsaid')]" 
     		doc:name="Save x-rivta-original-serviceconsumer-hsaid"/>
+
+    	<custom-transformer class="se.skl.tp.vp.vagvalrouter.UseOrCreateCorrelationIdTransformer" doc:name="If Correlation Id exist in incoming http request use it otherwise create a new one and put in session variable"/>
    
-        <transformer ref="createCorrId" />
         <transformer ref="XmlToXSR" />
         <transformer ref="rivExtractor" />
   		<transformer ref="logReqIn" />

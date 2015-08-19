@@ -52,6 +52,7 @@ public final class VPUtil {
 	public static final String SESSION_ERROR_TECHNICAL_DESCRIPTION = "sessionErrorTechnicalDescription";
 	
 	//Session scoped variables used in internal flows, not to mix with http headers prefixed x-something used for external http headers
+	public static final String CORRELATION_ID = "soitoolkit_correlationId";
 	public static final String ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid";
 	public static final String RECEIVER_ID = "receiverid";
 	public static final String SENDER_ID = "senderid";
