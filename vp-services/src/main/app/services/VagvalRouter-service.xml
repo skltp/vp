@@ -65,10 +65,14 @@
             <!-- Value for HTTP header x-vp-instance-id -->
             <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
 			
+			<!-- Proprty if to propagate korrelation id to producer or not for HTTPS trafic -->
+			<spring:property name="propagateCorrelationIdForHttps" value="${VAGVALROUTER_PROPAGATE_CORRELATION_ID_FOR_HTTPS}"/>
+			
 			<!-- EventLogger properties -->
 			<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
         	<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 			<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+						
         </custom-processor>
                 
         <response>

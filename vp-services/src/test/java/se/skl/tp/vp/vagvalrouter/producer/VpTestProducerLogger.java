@@ -56,9 +56,8 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 		assertNotNull(vpSenderId);
 		assertNotNull(rivtaOriginalSenderId);
 		
-		//Correlation id
+		//Correlation id, sometimes (property) we will not send a correlation id to producer
 		String vpCorrelationId = (String)httpHeaders.get(VagvalRouter.X_SKLTP_CORRELATION_ID);
-		assertNotNull(vpCorrelationId);
 	
 		//Should these headers exist, they are set in se.skl.tp.vp.vagvalrouter.VagvalRouter?
 		String userAgent = (String)httpHeaders.get("User-Agent");	

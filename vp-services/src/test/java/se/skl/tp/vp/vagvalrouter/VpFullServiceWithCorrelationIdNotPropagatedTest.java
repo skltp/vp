@@ -21,14 +21,13 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,7 +39,7 @@ import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 import se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger;
 import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
-public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
+public class VpFullServiceWithCorrelationIdNotPropagatedTest extends AbstractTestCase {
 
 	private static final String AUHTORIZED_CONSUMER_HSAID = "tp";
 	private static final String PRODUCT_ID = "SW123";
@@ -51,7 +50,7 @@ public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
 	
 	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 	
-	public VpFullServiceWithCorrelationIdTest() {
+	public VpFullServiceWithCorrelationIdNotPropagatedTest() {
 		super();
 		
 		// Only start up Mule once to make the tests run faster...
@@ -62,8 +61,6 @@ public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
 	
 	@Override
 	protected String getConfigResources() {
-	   	// Set send correlation_id to true
-    	System.setProperty("VAGVALROUTER_PROPAGATE_CORRELATION_ID_FOR_HTTPS", "true");
 		return 
 			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
 			"vp-common.xml," +
@@ -85,35 +82,15 @@ public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
 		}
 	}
 
-	@After
-    public void tearDown() throws Exception {
-    	// Set send correlation_id to original value
-    	System.clearProperty("VAGVALROUTER_PROPAGATE_CORRELATION_ID_FOR_HTTPS");
-    }
-
 	@Test
-	public void testCorrelationIdCreatedIfNotProvided() throws Exception {
+	public void testCorrelationIdNotSetNotPropagated() throws Exception {
 		
 		Map<String, String> properties = new HashMap<String, String>();
     	
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());
 		
-		assertNotNull(VpTestProducerLogger.getLatestCorrelationId());
-	}
-	
-	@Test
-	public void testCorrelationIdForwardedIfProvided() throws Exception {
-		
-		final String providedCorrelationId = "1234567890";
-		
-		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_SKLTP_CORRELATION_ID, providedCorrelationId);
-
-    	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
-		assertEquals(PRODUCT_ID, p.getId());
-		
-		assertEquals(providedCorrelationId, VpTestProducerLogger.getLatestCorrelationId());
+		assertNull(VpTestProducerLogger.getLatestCorrelationId());
 	}
 	
 	private static VagvalMockInputRecord createVagvalRecord(String receiverId, String adress) {

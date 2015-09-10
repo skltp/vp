@@ -116,6 +116,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	private AddressingHelper addrHelper;
 
 	private String vpInstanceId;
+	
+	private Boolean propagateCorrelationIdForHttps;
 
 	private final EventLogger eventLogger = new EventLogger();
 
@@ -168,6 +170,10 @@ public class VagvalRouter extends AbstractRecipientList {
 		this.responseTimeout = responseTimeout;
 	}
 
+	public void setPropagateCorrelationIdForHttps(final Boolean propagateCorrelationIdForHttps) {
+		this.propagateCorrelationIdForHttps = propagateCorrelationIdForHttps;
+	}
+	
 	// Not private to make the method testable...
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
@@ -296,14 +302,14 @@ public class VagvalRouter extends AbstractRecipientList {
 		propagateSenderIdAndVpInstanceIdToProducer(message, mt);
 		propagateOriginalServiceConsumerHsaIdToProducer(message, mt);
 		propagateSoapActionToProducer(message, mt);
-		propagateCorrelationIdToProducer(message, mt);
+		propagateCorrelationIdToProducer(message, mt, url);
 
 		eb.addMessageProcessor(mt);
 
 		Connector connector = selectConsumerConnector(url, message);
 		eb.setConnector(connector);
 		logger.debug("VP Consumer connector to use: {}", connector.getName());
-
+		
 		try {
 			OutboundEndpoint ep = eb.buildOutboundEndpoint();
 			logger.debug("EndpointBuilder ready!!!");
@@ -354,11 +360,18 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 
 	/*
-	 * Propagate x-skltp-correlation-idas an outbound http property.
+	 * Propagate x-skltp-correlation-id as an outbound http property if HTTP trafic or HTTPS trafic and if property set for this!
 	 */
-	private void propagateCorrelationIdToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
+	private void propagateCorrelationIdToProducer(MuleMessage message, MessagePropertiesTransformer mt, String url) {
 		String correlationId = message.getProperty(VPUtil.CORRELATION_ID, PropertyScope.SESSION);
-		mt.getAddProperties().put(X_SKLTP_CORRELATION_ID, correlationId);
+				
+		if (!isURLHTTPS(url)) {
+			mt.getAddProperties().put(X_SKLTP_CORRELATION_ID, correlationId);						
+		} else {
+			if (propagateCorrelationIdForHttps) {
+				mt.getAddProperties().put(X_SKLTP_CORRELATION_ID, correlationId);										
+			}
+		}
 	}
 
 	protected int selectResponseTimeout(MuleMessage message) {
@@ -389,9 +402,9 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		boolean useKeepAlive = message.getProperty(VPUtil.FEATURE_USE_KEEP_ALIVE, PropertyScope.INVOCATION, false);
 
-		if (url.contains("https://") && useKeepAlive) {
+		if (isURLHTTPS(url) && useKeepAlive) {
 			return muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_HTTPS_KEEPALIVE_NAME);
-		} else if (url.contains("https://")) {
+		} else if (isURLHTTPS(url)) {
 			return muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_HTTPS_NAME);
 		} else {
 			return muleContext.getRegistry().lookupConnector(VPUtil.CONSUMER_CONNECTOR_HTTP_NAME);
@@ -416,5 +429,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		transformer.setAddProperties(new HashMap<String, Object>(ADD_HEADERS));
 		transformer.setDeleteProperties(BLOCKED_REQ_HEADERS);
 		return transformer;
+	}
+	
+	private Boolean isURLHTTPS(String url) {
+		if (url.contains("https://")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
