@@ -58,6 +58,8 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String TJANSTE_ADRESS_LONG_TIMEOUT   = "https://localhost:20000/vp/tjanst1-long-timeout";
 	private static final String LOGICAL_ADDRESS               = "vp-test-producer";
 	private static final String LOGICAL_ADDRESS_NOT_FOUND     = "unknown-logical-address";
+	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE     = " unknown-logical-address";
+	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER     = "unknown-logical-address ";
 	private static final String LOGICAL_ADDRESS_NO_CONNECTION = "vp-test-producer-no-connection";
 
     private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
@@ -346,6 +348,22 @@ public class VpFullServiceTest extends AbstractTestCase {
 	}
 
 	@Test
+	public void testVP002IsThrownWhenMissingVpInstanceId() throws Exception {
+		
+		final String PROVIDED_SENDER_ID = "SENDER_ID";
+		
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(VagvalRouter.X_VP_SENDER_ID, PROVIDED_SENDER_ID);
+
+    	try {
+        	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		assertTrue(ex.getMessage().contains("VP002 senderVpInstanceId does not have a value or match current VP instance id, probably bad client configuration. senderId: " + PROVIDED_SENDER_ID));
+    	}
+	}
+
+	@Test
 	public void testVP002IsThrownWhenInvalidVpInstanceId() throws Exception {
 		
 		final String OTHER_VP_INSTANCE_ID = "OTHER_VP_INSTANCE_ID";
@@ -399,7 +417,33 @@ public class VpFullServiceTest extends AbstractTestCase {
     		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
     	}
 	}
-	
+
+	@Test
+	public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceBefore() throws Exception {
+		
+		Map<String, String> properties = new HashMap<String, String>();
+    	
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE, properties);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ". Whitespace detected in incoming request!"));
+    	}
+	}
+
+	@Test
+	public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceAfter() throws Exception {
+		
+		Map<String, String> properties = new HashMap<String, String>();
+    	
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER, properties);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ". Whitespace detected in incoming request!"));
+    	}
+	}
+
 	@Test
 	public void testWhenProducerReturnsFaultItsPropagatedCorrectToConsumer() throws Exception {
 		

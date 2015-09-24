@@ -210,8 +210,13 @@ public class AddressingHelper extends VPHelperSupport {
 		}
 
 		if (virtualiseringar.size() == 0) {
+			// Check if whitespace in incoming receiverid and give a hint in the error message if found.
+			String whitespaceDetectedHintString = "";
+			if (request.receiverId.contains(" ")) {
+				whitespaceDetectedHintString = ". Whitespace detected in incoming request!";
+			}
 			String errorMessage = "VP004 No Logical Adress found for serviceNamespace:" + request.serviceContractNamespace
-					+ ", receiverId:" + request.receiverId;
+					+ ", receiverId:" + request.receiverId + whitespaceDetectedHintString;
 			this.getLog().info(errorMessage);
 			throw new VpSemanticException(errorMessage);
 		}
