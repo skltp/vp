@@ -81,19 +81,19 @@ public class VagvalRouterUnitTest extends AbstractMuleContextTestCase{
 	}
 	
 	private void verifyProperty(final String url, final boolean expectedResult) throws Exception {
+
+		final DefaultMuleEvent event = Mockito.mock(DefaultMuleEvent.class);	
+		final DefaultMuleMessage msg = Mockito.mock(DefaultMuleMessage.class);
 		
 		final VagvalRouter router = new VagvalRouter();
 		
 		final AddressingHelper helper = Mockito.mock(AddressingHelper.class);
-		Mockito.when(helper.getAddress()).thenReturn(url);
+		Mockito.when(helper.getAddress(msg)).thenReturn(url);
 		
 		router.setAddressingHelper(helper);
 		
-		final DefaultMuleEvent event = Mockito.mock(DefaultMuleEvent.class);	
-		final DefaultMuleMessage msg = Mockito.mock(DefaultMuleMessage.class);
 		
 		Mockito.when(event.getMessage()).thenReturn(msg);
-		Mockito.when(helper.getMuleMessage()).thenReturn(msg);
 				
 		final List<?> receipients = router.getRecipients(event);
 		
@@ -101,8 +101,7 @@ public class VagvalRouterUnitTest extends AbstractMuleContextTestCase{
 		assertEquals(1, receipients.size());
 		assertEquals(url, receipients.get(0));
 		
-		Mockito.verify(helper, Mockito.times(1)).getMuleMessage();
-		Mockito.verify(helper, Mockito.times(1)).getAddress();
+		Mockito.verify(helper, Mockito.times(1)).getAddress(msg);
 		Mockito.verifyNoMoreInteractions(helper);
 		
 		Mockito.verifyNoMoreInteractions(msg);

@@ -77,8 +77,7 @@ public class VagvalRouterTest {
 		vagvalInput.rivVersion = "urn:riv:v1";
 		vagvalInput.serviceContractNamespace = "{urn:riv13606:v1}RIV";
 
-		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		helper = new AddressingHelper(msg, this.vagvalAgent);
+		helper = new AddressingHelper(vagvalAgent);
 	}
 
 	@Test
@@ -121,8 +120,7 @@ public class VagvalRouterTest {
 		VagvalAgent vagvalAgent = new VagvalAgent();
 		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
 
-		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		AddressingHelper myHelper = new AddressingHelper(msg, vagvalAgent);
+		AddressingHelper myHelper = new AddressingHelper(vagvalAgent);
 
 		// Perform the test and ensure that we get a "VP008 no contact..." error message
 		try {

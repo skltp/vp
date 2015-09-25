@@ -54,6 +54,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 	private static Logger log = LoggerFactory.getLogger(RivTransformer.class);
 
 	private VisaVagvalsInterface vagvalAgent;
+	private AddressingHelper addrHelper;
 
 	static final String RIV20 = "RIVTABP20";
 	static final String RIV21 = "RIVTABP21";
@@ -72,14 +73,13 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 	public void setVagvalAgent(final VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
+		addrHelper = new AddressingHelper(vagvalAgent);
 	}
 
 	@Override
 	public Object transformMessage(MuleMessage msg, String encoding) throws TransformerException {
 
 		log.debug("Riv transformer executing");
-
-		final AddressingHelper addrHelper = new AddressingHelper(msg, vagvalAgent);
 
 		/*
 		 * Check if virtualized service is a 2.0 service
@@ -92,7 +92,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 		 */
 		String rivProfile = "";
 		try {
-			rivProfile = addrHelper.getAvailableRivProfile();
+			rivProfile = addrHelper.getAvailableRivProfile(msg);
 		} catch (VpSemanticException e) {
 			/*
 			 * Set the exception in INVOVATION scoped property, to be able for

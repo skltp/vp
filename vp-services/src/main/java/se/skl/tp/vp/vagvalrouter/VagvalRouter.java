@@ -33,7 +33,6 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transport.Connector;
@@ -47,13 +46,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
-import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.EventLogger;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
+import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
 
 public class VagvalRouter extends AbstractRecipientList {
 
@@ -149,21 +148,9 @@ public class VagvalRouter extends AbstractRecipientList {
 		ADD_HEADERS = Collections.unmodifiableMap(map);
 	}
 
-	void setAddressingHelper(final AddressingHelper helper) {
+	// for unit-testing only
+	void setAddressingHelper(AddressingHelper helper) {
 		this.addrHelper = helper;
-	}
-
-	public AddressingHelper getAddressingHelper(final MuleMessage msg) {
-
-		if (this.addrHelper == null) {
-			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent));
-		}
-
-		if (!this.addrHelper.getMuleMessage().equals(msg)) {
-			this.setAddressingHelper(new AddressingHelper(msg, vagvalAgent));
-		}
-
-		return this.addrHelper;
 	}
 
 	public void setResponseTimeout(final int responseTimeout) {
@@ -177,6 +164,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	// Not private to make the method testable...
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
+		addrHelper = new AddressingHelper(vagvalAgent);
 	}
 
 	/**
@@ -210,7 +198,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
 		ExecutionTimer.start(VPUtil.TIMER_ROUTE);
 		try {
-			String addr = this.getAddressingHelper(event.getMessage()).getAddress();
+			String addr = addrHelper.getAddress(event.getMessage());
 
 			logger.debug("Endpoint address is {}", addr);
 
@@ -253,7 +241,7 @@ public class VagvalRouter extends AbstractRecipientList {
 			 */
 
 			//TODO: Is it possible to get failing endpoint any other way, e.g from exception?
-			String addr = this.getAddressingHelper(event.getMessage()).getAddress();
+			String addr = addrHelper.getAddress(event.getMessage());
 			String cause = "VP009 Error connecting to service producer at adress " + addr;
 
 			setSoapFaultInResponse(event, cause);
