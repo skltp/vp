@@ -34,6 +34,7 @@ import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.MdcLogTrace;
 
 public class BehorighetHandler {
 
@@ -76,6 +77,7 @@ public class BehorighetHandler {
 	 * @return
 	 */
 	public boolean isAuthorized(VisaVagvalRequest request, List<String> receiverAddresses) {
+		
 		boolean authorized = true;
 		if (!isAuthorizedToLeaf(request, receiverAddresses)) {
 			if (!isAuthorizedToAnyParent(request)) {
@@ -86,22 +88,55 @@ public class BehorighetHandler {
 	}
 
 	private boolean isAuthorizedToLeaf(VisaVagvalRequest request, List<String> receiverAddresses) {
+		StringBuilder logTrace = new StringBuilder();
+		logTrace.append("(leaf)");
+		
 		for (String requestReceiverId : receiverAddresses) {
+			
+			logTrace.append(requestReceiverId);
+			logTrace.append(",");
+			
 			if (isAuthorized(request, requestReceiverId)) {
+				
+				logTrace.deleteCharAt(logTrace.length() -1);
+				MdcLogTrace.put(MdcLogTrace.ROUTER_RESOLVE_ANROPSBEHORIGHET_TRACE, logTrace.toString());
+				
 				return true;
 			}
 		}
+
+		logTrace.deleteCharAt(logTrace.length() -1);
+		MdcLogTrace.put(MdcLogTrace.ROUTER_RESOLVE_ANROPSBEHORIGHET_TRACE, logTrace.toString());
+		
 		return false;
 	}
 
 	private boolean isAuthorizedToAnyParent(VisaVagvalRequest request) {
 		String receiverId = request.getReceiverId();
+		
+		StringBuilder logTrace = new StringBuilder();
+		logTrace.append("(parent)");
+		logTrace.append(receiverId);
+		logTrace.append(",");
+		
 		while (receiverId != DEFAUL_ROOTNODE) {
 			receiverId = getParentInHsaCache(receiverId);
+			
+			logTrace.append(receiverId);
+			logTrace.append(",");
+			
 			if (isAuthorized(request, receiverId)) {
+				
+				logTrace.deleteCharAt(logTrace.length() -1);
+				MdcLogTrace.put(MdcLogTrace.ROUTER_RESOLVE_ANROPSBEHORIGHET_TRACE, logTrace.toString());
+				
 				return true;
 			}
 		}
+		
+		logTrace.deleteCharAt(logTrace.length() -1);
+		MdcLogTrace.put(MdcLogTrace.ROUTER_RESOLVE_ANROPSBEHORIGHET_TRACE, logTrace.toString());
+		
 		return false;
 	}
 

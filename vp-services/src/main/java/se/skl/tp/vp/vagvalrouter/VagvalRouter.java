@@ -108,8 +108,6 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private static final Logger logger = LoggerFactory.getLogger(VagvalRouter.class);
 
-	private VisaVagvalsInterface vagvalAgent;
-
 	private int responseTimeout;
 
 	private AddressingHelper addrHelper;
@@ -160,11 +158,9 @@ public class VagvalRouter extends AbstractRecipientList {
 	public void setPropagateCorrelationIdForHttps(final Boolean propagateCorrelationIdForHttps) {
 		this.propagateCorrelationIdForHttps = propagateCorrelationIdForHttps;
 	}
-	
-	// Not private to make the method testable...
+
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
-		this.vagvalAgent = vagvalAgent;
-		addrHelper = new AddressingHelper(vagvalAgent);
+		setAddressingHelper(new AddressingHelper(vagvalAgent));
 	}
 
 	/**
@@ -224,10 +220,6 @@ public class VagvalRouter extends AbstractRecipientList {
 			logException(event.getMessage(), vpSemanticException);
 			return event;
 		}
-
-		long beforeCall = System.currentTimeMillis();
-		String serviceId = event.getMessage().getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION) + "-"
-				+ event.getMessage().getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
 
 		ExecutionTimer.start(VPUtil.TIMER_ENDPOINT);
 		MuleEvent replyEvent = null;

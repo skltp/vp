@@ -36,6 +36,7 @@ import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.MdcLogTrace;
 
 public class VagvalHandler {
 
@@ -71,6 +72,19 @@ public class VagvalHandler {
 	public VisaVagvalResponse getRoutingInformation(VisaVagvalRequest request, boolean useDeprecatedDefaultRouting, List<String> receiverAddresses) {
 		// Check if routing was found in TAK for requested receiver.
 		VisaVagvalResponse response = getRoutingInformationFromLeaf(request, useDeprecatedDefaultRouting, receiverAddresses);
+
+		// logTrace
+		if (!containsNoRouting(response)) {
+			StringBuilder logTrace = new StringBuilder();
+			logTrace.append("(leaf)");
+			for (String ra : receiverAddresses) {
+				logTrace.append(ra);
+				logTrace.append(",");
+				
+			}
+			logTrace.deleteCharAt(logTrace.length() -1);
+			MdcLogTrace.put(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE, logTrace.toString());
+		}
 
 		// No routing information found for requested receiver, check in the HSA
 		// tree if there is any routing information registered on parents.
@@ -127,15 +141,27 @@ public class VagvalHandler {
 	public VisaVagvalResponse getRoutingInformationFromParent(VisaVagvalRequest request, List<String> receiverAddresses) {
 
 		VisaVagvalResponse response = new VisaVagvalResponse();
-
 		String receiverId = receiverAddresses.get(0);
+		
+		StringBuilder logTrace = new StringBuilder();
+		logTrace.append("(parent)");
+		logTrace.append(receiverId);
+		logTrace.append(",");
+
 		while (response.getVirtualiseringsInfo().isEmpty() && receiverId != DEFAUL_ROOTNODE) {
 			receiverId = getParent(receiverId);
+			
+			logTrace.append(receiverId);
+			logTrace.append(",");
+			
 			// FIXME: When deprecated default routing is removed
 			// construction using Arrays.asList(receiverId) can be replaced
 			// with String
 			response = getRoutingInformationFromLeaf(request, false, Arrays.asList(receiverId));
 		}
+		
+		logTrace.deleteCharAt(logTrace.length() -1);
+		MdcLogTrace.put(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE, logTrace.toString());
 
 		return response;
 	}

@@ -531,6 +531,12 @@ public class EventLogger {
 		map.put(VPUtil.SERVICECONTRACT_NAMESPACE, (String) message.getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION));
 		map.put(VPUtil.SENDER_IP_ADRESS, (String) message.getProperty(VPUtil.SENDER_IP_ADRESS, PropertyScope.SESSION));
 		
+		// extract MDC data
+		if (MdcLogTrace.get(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE) != null) {
+			map.put(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE, MdcLogTrace.get(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE));
+			map.put(MdcLogTrace.ROUTER_RESOLVE_ANROPSBEHORIGHET_TRACE, MdcLogTrace.get(MdcLogTrace.ROUTER_RESOLVE_ANROPSBEHORIGHET_TRACE));
+		}
+		
 		String endpoint = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION);
 		if (endpoint != null) {
 			map.put(VPUtil.ENDPOINT_URL, endpoint);
