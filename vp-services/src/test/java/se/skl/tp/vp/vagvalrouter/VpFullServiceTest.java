@@ -346,40 +346,6 @@ public class VpFullServiceTest extends AbstractTestCase {
 		assertEquals(CONSUMERS_SENDER_ID_IN_CERT, VpTestProducerLogger.getLatestSenderId());
 		assertEquals(THIS_VP_INSTANCE_ID, VpTestProducerLogger.getLatestVpInstanceId());
 	}
-
-	@Test
-	public void testVP002IsThrownWhenMissingVpInstanceId() throws Exception {
-		
-		final String PROVIDED_SENDER_ID = "SENDER_ID";
-		
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(VagvalRouter.X_VP_SENDER_ID, PROVIDED_SENDER_ID);
-
-    	try {
-        	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP002 senderVpInstanceId does not have a value or match current VP instance id, probably bad client configuration. senderId: " + PROVIDED_SENDER_ID));
-    	}
-	}
-
-	@Test
-	public void testVP002IsThrownWhenInvalidVpInstanceId() throws Exception {
-		
-		final String OTHER_VP_INSTANCE_ID = "OTHER_VP_INSTANCE_ID";
-		final String PROVIDED_SENDER_ID = "SENDER_ID";
-		
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(VagvalRouter.X_VP_INSTANCE_ID, OTHER_VP_INSTANCE_ID);
-		properties.put(VagvalRouter.X_VP_SENDER_ID, PROVIDED_SENDER_ID);
-
-    	try {
-        	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP002 senderVpInstanceId does not have a value or match current VP instance id, probably bad client configuration. senderId: " + PROVIDED_SENDER_ID));
-    	}
-	}
 	
 	@Test
 	public void testVP007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
