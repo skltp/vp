@@ -104,11 +104,12 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 			// Make sure the sender id is set in session scoped property for authorization and logging
 			message.setProperty(VPUtil.SENDER_ID, senderId, PropertyScope.SESSION);
 
-		} else if (( senderId != null && senderVpInstanceId == null) ||
-				   (senderId != null && senderVpInstanceId != null && !vpInstanceId.equals(senderVpInstanceId))) {
-			String errorMessage = "VP002 senderVpInstanceId does not have a value or match current VP instance id, probably bad client configuration." + 
-					" senderId: " + senderId;
-					throw new VpSemanticException(errorMessage); 
+			// This change SKLTP-674 could not be made active before incoming HTTPS trafic are stripped from these properties
+//		} else if (( senderId != null && senderVpInstanceId == null) ||
+//				   (senderId != null && senderVpInstanceId != null && !vpInstanceId.equals(senderVpInstanceId))) {
+//			String errorMessage = "VP002 senderVpInstanceId does not have a value or match current VP instance id, probably bad client configuration." + 
+//					" senderId: " + senderId;
+//					throw new VpSemanticException(errorMessage); 
 		} else {
 			/*
 			 * x-vp-sender-id was not found in inbound properties, lets look up sender id into the certificate instead.
