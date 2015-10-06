@@ -19,8 +19,8 @@
 	<name>vp-parent</name>
 
 	<properties>
-		<compiler.target.version>1.6</compiler.target.version>
-        <compiler.source.version>1.6</compiler.source.version>
+		<vp.mule.version>3.3.1</vp.mule.version>
+		<vp.cxf.version>2.5.1</vp.cxf.version>
 	</properties>
 
 	<scm>
@@ -49,25 +49,11 @@
   	</repositories>
 
 	<modules>
-		<module>vp-soitoolkit-mule-dependencies</module>
 		<module>vp-ping</module>
 		<module>vp-services</module>
 		<module>vp-teststub</module>
 		<module>vp-hsa-cache</module>
 	</modules>
-
-	<dependencies>
-
-		<!-- TEST DEPENDENCIES -->
-
-		<dependency>
-			<groupId>org.soitoolkit.commons.poms</groupId>
-			<artifactId>soitoolkit-test-dependencies</artifactId>
-			<version>${soitoolkit.version}</version>
-			<type>pom</type>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<pluginManagement>
