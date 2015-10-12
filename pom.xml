@@ -19,8 +19,8 @@
 	<name>vp-parent</name>
 
 	<properties>
-		<vp.mule.version>3.3.1</vp.mule.version>
-		<vp.cxf.version>2.5.1</vp.cxf.version>
+		<vp.mule.version>3.7.0</vp.mule.version>
+		<vp.cxf.version>2.7.15</vp.cxf.version>
 	</properties>
 
 	<scm>

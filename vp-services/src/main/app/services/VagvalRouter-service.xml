@@ -108,6 +108,21 @@
         	
         	<custom-transformer class="se.skl.tp.vp.vagvalrouter.ExceptionMessageTransformer"/>
         	
+<!--
+SKLTP-630: issues for Mule 3.7:
+
+1. https://www.mulesoft.org/jira/browse/MULE-8913
+	Caused by: org.mule.api.registry.ResolverException: There are two transformers that are an exact match for input: "class java.lang.String", output: "interface javax.xml.stream.XMLStreamReader". Transformers are: "XmlToXSR(class org.mule.module.xml.transformer.XmlToXMLStreamReader)" and "XmlToXSR(class org.mule.module.xml.transformer.XmlToXMLStreamReader)"
+	
+        	<transformer ref="XmlToXSR" />	
+
+2. https://www.mulesoft.org/jira/browse/MULE-8508
+	CXF NullPointerException
+	#HD: Happens after having added an XmlToXSR transformer for issue MULE-8913
+	#HD: deprecated code in XmlToXSR / org.mule.module.xml.transformer.XmlToXMLStreamReader transformer
+		for Mule 3.7, maybe fails to get the MuleEvent in exception-strategy ? 
+-->
+
         </catch-exception-strategy>
         
     </flow>

@@ -66,7 +66,7 @@
 			<version>2.0-RC1</version>
         </dependency>
 
-						<!-- Ping -->
+		<!-- Ping -->
 		<dependency>
 			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-schemas</artifactId>
@@ -83,24 +83,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Mockito -->
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-			<version>1.8.5</version>
-		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
-			<version>1.8.5</version>
-		</dependency>
-
-		<dependency>
-		  <groupId>org.bouncycastle</groupId>
-		  <artifactId>bcprov-jdk16</artifactId>
-		  <version>1.45</version>
+			<version>1.10.19</version>
 		</dependency>
 
 		<dependency>
@@ -112,7 +99,7 @@
         <dependency>
           <groupId>xmlunit</groupId>
           <artifactId>xmlunit</artifactId>
-          <version>1.4</version>
+          <version>1.5</version>
         </dependency>
 
 	</dependencies>
@@ -137,6 +124,21 @@
 
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
+			</plugin>
+
+			<!-- setup/debug of dependencies: dump all dependencies for inspection into dir target/dependency -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
             <plugin>

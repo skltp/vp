@@ -42,6 +42,7 @@ public class ExceptionMessageTransformer extends AbstractMessageTransformer{
 		String cause = message.getExceptionPayload().getMessage();
 		message.setPayload(generateSoap11FaultWithCause(cause));
 		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
+		message.setExceptionPayload(null);
 		return message;
 	}
 }
