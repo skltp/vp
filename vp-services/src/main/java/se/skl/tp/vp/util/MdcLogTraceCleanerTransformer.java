@@ -20,41 +20,22 @@
  */
 package se.skl.tp.vp.util;
 
-import org.slf4j.MDC;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageTransformer;
 
 /**
- * Used to record important data that should be logged using the SLF4J MDC.
- * <p>
- * Note that MDC is a thread-bound context, will not work seamlessly
- * thread-switching is in play or asynch I/O.
- * </p>
+ * Clear the MDC.
  * 
  * @author hakan
  */
-public class MdcLogTrace {
-	/**
-	 * The hsaId used for routing and a breadcrumb from the hsa-tree traversal
-	 * (if the tree was traversed).
-	 */
-	public static final String ROUTER_RESOLVE_VAGVAL_TRACE = "routerVagvalTrace";
-	/**
-	 * The hsaId used for behorighet (authorization) and a breadcrumb from the
-	 * hsa-tree traversal (if the tree was traversed).
-	 */
-	public static final String ROUTER_RESOLVE_ANROPSBEHORIGHET_TRACE = "routerBehorighetTrace";
+public class MdcLogTraceCleanerTransformer extends AbstractMessageTransformer {
 
-	/**
-	 * Clear the MDC.
-	 */
-	public static void clear() {
-		MDC.clear();
+	@Override
+	public Object transformMessage(MuleMessage message, String outputEncoding)
+			throws TransformerException {
+		MdcLogTrace.clear();
+		return message;
 	}
 
-	public static void put(String key, String val) {
-		MDC.put(key, val);
-	}
-
-	public static String get(String key) {
-		return MDC.get(key);
-	}
 }

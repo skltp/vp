@@ -35,8 +35,7 @@
 
     <flow name="vagval-dynamic-routing-flow" >
     
-    	<!-- Clear the MDC that collects and carries tracing info for logging -->
-    	<set-variable variableName="mdcHasBeenCleared" value="#[se.skl.tp.vp.util.MdcLogTrace.clear()]" doc:name="Clear MDC"/>
+    	<custom-transformer class="se.skl.tp.vp.util.MdcLogTraceCleanerTransformer" doc:name="Clear the MDC that collects and carries tracing info for logging"/>
     	
     	<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable">
     		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
