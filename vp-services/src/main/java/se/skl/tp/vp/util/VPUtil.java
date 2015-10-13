@@ -74,6 +74,11 @@ public final class VPUtil {
 	public static final String TIMER_ENDPOINT = "endpoint_time";
 	
 	public static final String VP_SEMANTIC_EXCEPTION = "VpSemanticException";
+	
+	// Invocation scoped variables, not to mix with external http headers
+	public static final String VP_X_FORWARDED_PROTO = "httpXForwardedProto";
+	public static final String VP_X_FORWARDED_HOST = "httpXForwardedHost";
+	public static final String VP_X_FORWARDED_PORT = "httpXForwardedPort";
 
 	/*
 	 * Generic soap fault template, just use String.format(SOAP_FAULT, message);

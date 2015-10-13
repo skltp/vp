@@ -36,6 +36,9 @@
     <flow name="vagval-dynamic-routing-flow" >
     
     	<custom-transformer class="se.skl.tp.vp.util.MdcLogTraceCleanerTransformer" doc:name="Clear the MDC that collects and carries tracing info for logging"/>
+    	<set-variable variableName="httpXForwardedProto" value="#[message.inboundProperties['${VP_HTTP_HEADER_NAME_FORWARDED_PROTO}']]" doc:name="Store HTTP header under well known name for logging"/>
+    	<set-variable variableName="httpXForwardedHost" value="#[message.inboundProperties['${VP_HTTP_HEADER_NAME_FORWARDED_HOST}']]" doc:name="Store HTTP header under well known name for logging"/>
+    	<set-variable variableName="httpXForwardedPort" value="#[message.inboundProperties['${VP_HTTP_HEADER_NAME_FORWARDED_PORT}']]" doc:name="Store HTTP header under well known name for logging"/>
     	
     	<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable">
     		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />

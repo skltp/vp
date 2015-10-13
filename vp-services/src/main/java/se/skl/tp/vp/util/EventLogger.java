@@ -531,6 +531,28 @@ public class EventLogger {
 		map.put(VPUtil.SERVICECONTRACT_NAMESPACE, (String) message.getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION));
 		map.put(VPUtil.SENDER_IP_ADRESS, (String) message.getProperty(VPUtil.SENDER_IP_ADRESS, PropertyScope.SESSION));
 		
+		// extract inbound/invocation scoped data
+		{
+			String httpXForwardedProto = message.getInvocationProperty(VPUtil.VP_X_FORWARDED_PROTO);
+			if (httpXForwardedProto != null) {
+				map.put(VPUtil.VP_X_FORWARDED_PROTO, httpXForwardedProto);
+				// only log on first occasion
+				message.removeProperty(VPUtil.VP_X_FORWARDED_PROTO, PropertyScope.INVOCATION);
+			}
+			String httpXForwardedHost = message.getInvocationProperty(VPUtil.VP_X_FORWARDED_HOST);
+			if (httpXForwardedHost != null) {
+				map.put(VPUtil.VP_X_FORWARDED_HOST, httpXForwardedHost);
+				// only log on first occasion
+				message.removeProperty(VPUtil.VP_X_FORWARDED_HOST, PropertyScope.INVOCATION);
+			}
+			String httpXForwardedPort = message.getInvocationProperty(VPUtil.VP_X_FORWARDED_PORT);
+			if (httpXForwardedPort != null) {
+				map.put(VPUtil.VP_X_FORWARDED_PORT, httpXForwardedPort);
+				// only log on first occasion
+				message.removeProperty(VPUtil.VP_X_FORWARDED_PORT, PropertyScope.INVOCATION);
+			}
+		}
+		
 		// extract MDC data
 		if (MdcLogTrace.get(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE) != null) {
 			map.put(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE, MdcLogTrace.get(MdcLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE));

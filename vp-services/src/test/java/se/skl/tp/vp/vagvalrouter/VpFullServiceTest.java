@@ -142,10 +142,35 @@ public class VpFullServiceTest extends AbstractTestCase {
 		assertInfoEventExtraInformation(infoMessageRespOut, "127.0.0.1");
 	}
 	
+	/**
+	 * Test for scenario where a reverse-proxy/loadbalancer sits in front of VP
+	 * and is required to forward original request info to VP for:
+	 * <ol>
+	 * <li>X-Forwarded-Proto</li>
+	 * <li>X-Forwarded-Host</li>
+	 * <li>X-Forwarded-Port</li>
+	 * <li>X-Forwarded-For</li>
+	 * </ol>
+	 * <p>The information is needed for:
+	 * <ul>
+	 * <li>re-writing URL's in WSDL's returned for WSDL lookups using ?wsdl</li>
+	 * <li>logging/tracing</li>
+	 * </ul>
+	 */
+/*
+	VP_HTTP_HEADER_NAME_FORWARDED_PROTO=X-Forwarded-Proto
+			VP_HTTP_HEADER_NAME_FORWARDED_HOST=X-Forwarded-Host
+			VP_HTTP_HEADER_NAME_FORWARDED_PORT=X-Forwarded-Port
+
+			VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER=X-Forwarded-For
+*/
 	@Test
-	public void tesLoadBalancerForwardedIpAdress() throws Exception {
+	public void testLoadBalancerXForwardedInfo() throws Exception {
 		
 		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_PROTO"), "https");
+		properties.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_HOST"), "skltp-lb.example.org");
+		properties.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_PORT"), "443");
 		properties.put(rb.getString("VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER"), "10.0.0.10");
 		assertEquals(0, jmsUtil.consumeMessagesOnQueue(LOG_INFO_QUEUE).size());
 		
@@ -159,6 +184,10 @@ public class VpFullServiceTest extends AbstractTestCase {
 		
 		TextMessage infoMessageReqIn = (TextMessage)logMessages.get(0);
 		assertInfoEventExtraInformation(infoMessageReqIn, "10.0.0.10");
+		assertTrue("X-Forwarded-Proto present in logmessage", infoMessageReqIn.getText().contains("<extraInfo><name>httpXForwardedProto</name><value>https</value></extraInfo>"));
+		assertTrue("X-Forwarded-Host present in logmessage", infoMessageReqIn.getText().contains("<extraInfo><name>httpXForwardedHost</name><value>skltp-lb.example.org</value></extraInfo>"));
+		assertTrue("X-Forwarded-Port present in logmessage", infoMessageReqIn.getText().contains("<extraInfo><name>httpXForwardedPort</name><value>443</value></extraInfo>"));
+		
 		
 		TextMessage infoMessageRespOut = (TextMessage)logMessages.get(1);
 		assertInfoEventExtraInformation(infoMessageRespOut, "10.0.0.10");
