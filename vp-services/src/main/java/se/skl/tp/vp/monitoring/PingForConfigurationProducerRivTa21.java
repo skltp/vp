@@ -34,6 +34,8 @@ import se.riv.itintegration.monitoring.rivtabp21.v1.PingForConfigurationResponde
 import se.riv.itintegration.monitoring.v1.ConfigurationType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationResponseType;
 import se.riv.itintegration.monitoring.v1.PingForConfigurationType;
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
+import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 @WebService(
@@ -68,7 +70,7 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 		if(!resourcesNeededForVpAvailable()){
 			log.error("Severe problem, vp reports needed resources are missing, routing size: {}", routingInfoSize);
 			log.error("Severe problem, vp reports needed resources are missing, authorization size: {}", authInfoSize);
-			throw new RuntimeException("VP012 Severe problem, vp does not have all necessary reources to operate");
+			throw new RuntimeException(VpSemanticErrorCodeEnum.VP012 + " Severe problem, vp does not have all necessary reources to operate");
 		}
 		
 		response.getConfiguration().add(createConfiguration("Applikation", rb.getString("APPLICATION_NAME")));

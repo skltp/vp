@@ -259,6 +259,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>wsdl_namespace</name><value>urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>servicecontract_namespace</name><value>urn:riv:domain:subdomain:GetProductDetailResponder:1</value></extraInfo>"));
     	assertTrue(errorMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
+    	assertTrue(errorMessage.getText().contains("<extraInfo><name>errorCode</name><value>VP004</value></extraInfo>"));
 	}
 	
 	/**

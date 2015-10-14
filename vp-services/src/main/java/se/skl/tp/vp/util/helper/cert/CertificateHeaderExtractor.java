@@ -29,6 +29,7 @@ import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalrouter.VagvalRouter;
@@ -69,13 +70,16 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 				return extractFromPemFormatCertificate(certificate);
 			} else {
 				log.error("Unkown certificate type found in httpheader: {}", VagvalRouter.REVERSE_PROXY_HEADER_NAME);
-				throw new VpSemanticException("VP002 Exception, unkown certificate type found in httpheader "
-						+ VagvalRouter.REVERSE_PROXY_HEADER_NAME);
+				throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002
+						+ " Exception, unkown certificate type found in httpheader "
+						+ VagvalRouter.REVERSE_PROXY_HEADER_NAME,
+						VpSemanticErrorCodeEnum.VP002);
 			}
 		} catch (Exception e) {
 			log.error("Error occured parsing certificate in httpheader: {}", VagvalRouter.REVERSE_PROXY_HEADER_NAME, e);
-			throw new VpSemanticException("VP002 Exception occured parsing certificate in httpheader "
-					+ VagvalRouter.REVERSE_PROXY_HEADER_NAME);
+			throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002
+					+ " Exception occured parsing certificate in httpheader "
+					+ VagvalRouter.REVERSE_PROXY_HEADER_NAME, VpSemanticErrorCodeEnum.VP002);
 		}
 
 	}

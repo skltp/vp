@@ -29,6 +29,7 @@ import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 
@@ -64,10 +65,11 @@ public class CertificateChainExtractor extends CertificateExtractorBase implemen
 				return (X509Certificate) certificateChain[0];
 			} catch (final ClassCastException e) {
 				throw new VpSemanticException(
-						"VP002 No senderId found in Certificate: First certificate in chain is not X509Certificate");
+						VpSemanticErrorCodeEnum.VP002 + " No senderId found in Certificate: First certificate in chain is not X509Certificate",
+						VpSemanticErrorCodeEnum.VP002);
 			}
 		} else {
-			throw new VpSemanticException("VP002 no certificates. The certificate chain was null");
+			throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002 + " no certificates. The certificate chain was null", VpSemanticErrorCodeEnum.VP002);
 		}
 	}
 }

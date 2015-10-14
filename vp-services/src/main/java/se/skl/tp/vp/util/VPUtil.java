@@ -29,6 +29,7 @@ import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
 /**
@@ -50,6 +51,7 @@ public final class VPUtil {
 	public static final String SESSION_ERROR = "sessionStatus";
 	public static final String SESSION_ERROR_DESCRIPTION = "sessionErrorDescription";
 	public static final String SESSION_ERROR_TECHNICAL_DESCRIPTION = "sessionErrorTechnicalDescription";
+	public static final String SESSION_ERROR_CODE = "errorCode";
 	
 	//Session scoped variables used in internal flows, not to mix with http headers prefixed x-something used for external http headers
 	public static final String CORRELATION_ID = "soitoolkit_correlationId";
@@ -182,8 +184,8 @@ public final class VPUtil {
 	}
 	
 	public static VpSemanticException createVP011Exception(String callersIp, String httpHeaderCausingCheck){
-		return new VpSemanticException("VP011 Caller was not on the white list of accepted IP-addresses. IP-address: " 
-				+ callersIp + ". HTTP header that caused checking: " + httpHeaderCausingCheck);
+		return new VpSemanticException(VpSemanticErrorCodeEnum.VP011 + " Caller was not on the white list of accepted IP-addresses. IP-address: " 
+				+ callersIp + ". HTTP header that caused checking: " + httpHeaderCausingCheck, VpSemanticErrorCodeEnum.VP011);
 	}
 	
 }

@@ -35,6 +35,7 @@ import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
@@ -65,17 +66,17 @@ public class AddressingHelper {
 		}
 
 		if (rivProfiles.size() == 0) {
-			String errorMessage = ("VP005 No ruting with matching Riv-version found for serviceContractNamespace :"
-					+ input.serviceContractNamespace + ", receiverId:" + input.receiverId + "RivVersion" + input.rivVersion);
+			String errorMessage = VpSemanticErrorCodeEnum.VP005 + " No ruting with matching Riv-version found for serviceContractNamespace :"
+					+ input.serviceContractNamespace + ", receiverId:" + input.receiverId + "RivVersion" + input.rivVersion;
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP005);
 		}
 
 		if (rivProfiles.size() > 1) {
-			String errorMessage = "VP006 More than one route with matching Riv-version found for serviceContractNamespace:"
+			String errorMessage = VpSemanticErrorCodeEnum.VP006 + " More than one route with matching Riv-version found for serviceContractNamespace:"
 					+ input.serviceContractNamespace + ", receiverId:" + input.receiverId;
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP006);
 		}
 
 		return rivProfiles.iterator().next();
@@ -130,19 +131,19 @@ public class AddressingHelper {
 							+ request.receiverId + ", senderId: " + request.senderId);
 		}
 		if (request.rivVersion == null) {
-			String errorMessage = ("VP001 No RIV version configured");
+			String errorMessage = VpSemanticErrorCodeEnum.VP001 + " No RIV version configured";
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP001);
 		}
 		if (request.senderId == null) {
-			String errorMessage = ("VP002 No sender ID (from_address) found in certificate");
+			String errorMessage = VpSemanticErrorCodeEnum.VP002 + " No sender ID (from_address) found in certificate";
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP002);
 		}
 		if (request.receiverId == null) {
-			String errorMessage = ("VP003 No receiver ID (to_address) found in message");
+			String errorMessage = VpSemanticErrorCodeEnum.VP003 + " No receiver ID (to_address) found in message";
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP003);
 		}
 	}
 
@@ -173,24 +174,24 @@ public class AddressingHelper {
 		}
 
 		if (noOfMatchingAdresses == 0) {
-			String errorMessage = ("VP005 No Logical Adress with matching Riv-version found for serviceNamespace :"
-					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion);
+			String errorMessage = VpSemanticErrorCodeEnum.VP005 + " No Logical Adress with matching Riv-version found for serviceNamespace :"
+					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion;
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP005);
 		}
 
 		if (noOfMatchingAdresses > 1) {
-			String errorMessage = "VP006 More than one Logical Adress with matching Riv-version found for serviceNamespace:"
+			String errorMessage = VpSemanticErrorCodeEnum.VP006 + " More than one Logical Adress with matching Riv-version found for serviceNamespace:"
 					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId;
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP006);
 		}
 
 		if (adress == null || adress.trim().length() == 0) {
-			String errorMessage = ("VP010 Physical Adress field is empty in Service Producer for serviceNamespace :"
-					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion);
+			String errorMessage = VpSemanticErrorCodeEnum.VP010 + " Physical Adress field is empty in Service Producer for serviceNamespace :"
+					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion;
 			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP010);
 		}
 
 		return adress;
@@ -214,10 +215,10 @@ public class AddressingHelper {
 			if (request.receiverId.contains(" ")) {
 				whitespaceDetectedHintString = ". Whitespace detected in incoming request!";
 			}
-			String errorMessage = "VP004 No Logical Adress found for serviceNamespace:" + request.serviceContractNamespace
+			String errorMessage = VpSemanticErrorCodeEnum.VP004 + " No Logical Adress found for serviceNamespace:" + request.serviceContractNamespace
 					+ ", receiverId:" + request.receiverId + whitespaceDetectedHintString;
 			log.info(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP004);
 		}
 
 		return virtualiseringar;

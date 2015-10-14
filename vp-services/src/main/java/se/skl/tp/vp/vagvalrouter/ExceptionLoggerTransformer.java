@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
+import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.EventLogger;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
@@ -140,7 +142,14 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
 		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
 		message.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, nvl(t.getMessage()), PropertyScope.SESSION);
 		message.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, nvl(t.toString()), PropertyScope.SESSION);
-		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
+		String errorCode = "";
+		if (t instanceof VpSemanticException) {
+			errorCode = ((VpSemanticException) t).getErrorCode().toString();	
+		}
+		else if (t.getCause() instanceof VpSemanticException) {
+			errorCode = ((VpSemanticException) t.getCause()).getErrorCode().toString();
+		}
+		message.setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
 	}
     	
 	static String nvl(String s) {

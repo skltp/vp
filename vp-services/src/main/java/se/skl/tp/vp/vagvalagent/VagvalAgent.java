@@ -51,6 +51,7 @@ import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaVirtualiseringarResponseType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.SokVagvalsInfoInterface;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.SokVagvalsServiceSoap11LitDocService;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.ClientUtil;
 
@@ -435,9 +436,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		
 
 		if (!takCacheIsInitialized) {
-			String errorMessage = "VP008 No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call";
+			String errorMessage = VpSemanticErrorCodeEnum.VP008 + " No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call";
 			logger.error(errorMessage);
-			throw new VpSemanticException(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP008);
 		}
 		
 		// hold a local copy of the TakCache to keep consistency during call if
@@ -506,9 +507,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	private void throwNotAuthorizedException(VisaVagvalRequest request) {
-		String errorMessage = ("VP007 Authorization missing for serviceNamespace: " + request.getTjanstegranssnitt()
-				+ ", receiverId: " + request.getReceiverId() + ", senderId: " + request.getSenderId());
+		String errorMessage = VpSemanticErrorCodeEnum.VP007 + " Authorization missing for serviceNamespace: " + request.getTjanstegranssnitt()
+				+ ", receiverId: " + request.getReceiverId() + ", senderId: " + request.getSenderId();
 		logger.info(errorMessage);
-		throw new VpSemanticException(errorMessage);
+		throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP007);
 	}
 }

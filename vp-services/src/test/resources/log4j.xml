@@ -36,6 +36,18 @@
 		</layout>
 	</appender>
     
+    <!-- TEST: write log to target dir to aid in troubleshooting -->
+    <appender name="ROLLINGFILE" class="org.apache.log4j.RollingFileAppender">
+        <param  name="file" value="target/mule-app-vp.log"/>
+        <param name="MaxBackupIndex" value="3" />
+        <param name="MaxFileSize" value="20MB" />
+        <!-- The threshold level for this appender. -->
+        <!-- <param name="Threshold" value="ERROR"/> -->
+        <layout class="org.apache.log4j.PatternLayout">
+        	 <param name="ConversionPattern" value="%d %-5p %-30c - %m%n" />
+        </layout>
+    </appender>
+    
     <!--
 		Loglevels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL} See:
 		http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Level.html
@@ -145,6 +157,9 @@
        <priority value="WARN" />
 
         <appender-ref ref="CONSOLE"/>
+        <!--
+        <appender-ref ref="ROLLINGFILE"/>
+        -->
         
     </root>
 </log4j:configuration>

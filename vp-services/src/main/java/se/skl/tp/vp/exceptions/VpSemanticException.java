@@ -19,45 +19,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package se.skl.tp.vp.exceptions;
-/**
- * Copyright 2009 Sjukvardsradgivningen
- *
- *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of version 2.1 of the GNU Lesser General Public
-
- *   License as published by the Free Software Foundation.
- *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-
- *   GNU Lesser General Public License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public
- *   License along with this library; if not, write to the
- *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-
- *   Boston, MA 02111-1307  USA
- */
-
 
 public class VpSemanticException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public VpSemanticException() {
-	}
+	private VpSemanticErrorCodeEnum errorCode;
 
-	public VpSemanticException(String message) {
+	public VpSemanticException(String message, VpSemanticErrorCodeEnum errorCode) {
 		super(message);
+		this.errorCode = errorCode;
 	}
 
-	public VpSemanticException(Throwable cause) {
-		super(cause);
-	}
-
-	public VpSemanticException(String message, Throwable cause) {
+	public VpSemanticException(String message,
+			VpSemanticErrorCodeEnum errorCode, Throwable cause) {
 		super(message, cause);
+		this.errorCode = errorCode;
+	}
+
+	public VpSemanticErrorCodeEnum getErrorCode() {
+		// never return null, eliminate need for null-checking
+		if (errorCode != null) {
+			return errorCode;
+		}
+		return VpSemanticErrorCodeEnum.UNSET;
 	}
 
 }

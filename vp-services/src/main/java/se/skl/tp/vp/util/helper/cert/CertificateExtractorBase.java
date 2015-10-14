@@ -28,6 +28,7 @@ import org.mule.api.MuleMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.helper.VPHelperSupport;
 
@@ -90,7 +91,8 @@ public class CertificateExtractorBase extends VPHelperSupport {
 			log.debug("Found sender id: {}", senderId);
 			return senderId.startsWith("#") ? this.convertFromHexToString(senderId.substring(5)) : senderId;
 		} else {
-			throw new VpSemanticException("VP002 No senderId found in Certificate: " + principalName);
+			throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002 + " No senderId found in Certificate: " + principalName,
+					VpSemanticErrorCodeEnum.VP002);
 		}
 	}
 

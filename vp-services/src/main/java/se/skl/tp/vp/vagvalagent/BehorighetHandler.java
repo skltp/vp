@@ -33,6 +33,7 @@ import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.MdcLogTrace;
 
@@ -162,7 +163,10 @@ public class BehorighetHandler {
 		try {
 			return hsaCache.getParent(receiverId);
 		} catch (HsaCacheInitializationException e) {
-			throw new VpSemanticException("VP011 Internal HSA cache is not available!", e);
+			throw new VpSemanticException(VpSemanticErrorCodeEnum.VP011
+					+ " Internal HSA cache is not available!",
+					VpSemanticErrorCodeEnum.VP011,
+					e);
 		}
 	}
 

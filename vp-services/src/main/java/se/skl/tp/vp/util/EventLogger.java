@@ -570,6 +570,8 @@ public class EventLogger {
 					VPUtil.nvl((String) message.getProperty(VPUtil.SESSION_ERROR_DESCRIPTION, PropertyScope.SESSION)));
 			map.put(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION,
 					VPUtil.nvl((String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.SESSION)));
+			map.put(VPUtil.SESSION_ERROR_CODE,
+					VPUtil.nvl((String) message.getProperty(VPUtil.SESSION_ERROR_CODE, PropertyScope.SESSION)));
 		}
 	}
 }

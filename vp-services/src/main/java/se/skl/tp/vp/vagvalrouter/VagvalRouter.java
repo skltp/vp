@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.EventLogger;
@@ -216,7 +217,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		 */
 		VpSemanticException vpSemanticException = (VpSemanticException)event.getMessage().getInvocationProperty(VPUtil.VP_SEMANTIC_EXCEPTION);
 		if (vpSemanticException != null) {
-			setSoapFaultInResponse(event, vpSemanticException.getMessage());
+			setSoapFaultInResponse(event, vpSemanticException.getMessage(), vpSemanticException.getErrorCode().toString());
 			logException(event.getMessage(), vpSemanticException);
 			return event;
 		}
@@ -234,9 +235,8 @@ public class VagvalRouter extends AbstractRecipientList {
 
 			//TODO: Is it possible to get failing endpoint any other way, e.g from exception?
 			String addr = addrHelper.getAddress(event.getMessage());
-			String cause = "VP009 Error connecting to service producer at adress " + addr;
-
-			setSoapFaultInResponse(event, cause);
+			String cause = VpSemanticErrorCodeEnum.VP009 + " Error connecting to service producer at adress " + addr;
+			setSoapFaultInResponse(event, cause, VpSemanticErrorCodeEnum.VP009.toString());
 			logException(event.getMessage(), re);
 			return event;
 
@@ -244,8 +244,11 @@ public class VagvalRouter extends AbstractRecipientList {
 			/*
 			 * VpSemanticException goes here...
 			 */
-
-			setSoapFaultInResponse(event, re.getMessage());
+			String errorCode = "";
+			if (re instanceof VpSemanticException) {
+				errorCode = ((VpSemanticException) re).getErrorCode().toString();
+			}
+			setSoapFaultInResponse(event, re.getMessage(), errorCode);
 			logException(event.getMessage(), re);
 			return event;
 
@@ -361,12 +364,13 @@ public class VagvalRouter extends AbstractRecipientList {
 		return responseTimeoutValue;
 	}
 
-	private MuleEvent setSoapFaultInResponse(MuleEvent event, String cause){
+	private MuleEvent setSoapFaultInResponse(MuleEvent event, String cause, String errorCode){
 		String soapFault = VPUtil.generateSoap11FaultWithCause(cause);
 		event.getMessage().setPayload(soapFault);
 		event.getMessage().setExceptionPayload(null);
 		event.getMessage().setProperty("http.status", 500, PropertyScope.OUTBOUND);
 		event.getMessage().setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
+		event.getMessage().setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
 		return event;
 	}
 
