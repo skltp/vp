@@ -92,7 +92,8 @@
             	<otherwise>
                 	<processor-chain>
            				<transformer ref="exceptionTransformer" />
-	            		<object-to-string-transformer /> 
+	            		<object-to-string-transformer />
+	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckEmptyPayloadTransformer"/>
 	            		<transformer ref="logRespOut" />
                 	</processor-chain>
             	</otherwise>

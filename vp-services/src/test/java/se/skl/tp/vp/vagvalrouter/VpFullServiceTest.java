@@ -61,6 +61,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE     = " unknown-logical-address";
 	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER     = "unknown-logical-address ";
 	private static final String LOGICAL_ADDRESS_NO_CONNECTION = "vp-test-producer-no-connection";
+	private static final String LOGICAL_ADDRESS_ZERO_LENGTH = "zeroLength";
 
     private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
@@ -103,6 +104,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,               "https://localhost:19000/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_NO_CONNECTION, "https://www.google.com:81"));
+        vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_ZERO_LENGTH,    "http://localhost:8081/zeroLength"));
 		svimi.setVagvalInputs(vagvalInputs);
 	}
 	
@@ -202,6 +204,23 @@ public class VpFullServiceTest extends AbstractTestCase {
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>servicecontract_namespace</name><value>urn:riv:domain:subdomain:GetProductDetailResponder:1</value></extraInfo>"));
     	assertTrue(infoMessage.getText().contains("<extraInfo><name>rivversion</name><value>RIVTABP20</value></extraInfo>"));
 	}
+
+	
+	/**
+	 * Verify that we handle a response from service producer with a 0 length response.
+	 * @throws Exception
+	 */
+	@Test
+	public void testZeroLengthResponseMessage() throws Exception {
+		
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_ZERO_LENGTH);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+			assertTrue(ex.getMessage().contains("No content found!"));
+    	}
+	}
+	
 
 	/**
 	 * Verify that VP send info log events to JMS queue by default
