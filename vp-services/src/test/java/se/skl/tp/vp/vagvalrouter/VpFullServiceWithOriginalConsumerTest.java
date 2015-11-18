@@ -89,8 +89,7 @@ public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());
 		
-		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
-		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
+		assertEquals(AUHTORIZED_CONSUMER_HSAID, VpTestProducerLogger.getLatestRivtaOriginalSenderId());
 	}
 	
 	@Test
@@ -105,7 +104,6 @@ public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
 		assertEquals(PRODUCT_ID, p.getId());
 		
 		assertEquals(provicedOriginalServiceConsumerHsaId, VpTestProducerLogger.getLatestRivtaOriginalSenderId());
-		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
 	}
 	
 	private static VagvalMockInputRecord createVagvalRecord(String senderId, String receiverId, String adress) {

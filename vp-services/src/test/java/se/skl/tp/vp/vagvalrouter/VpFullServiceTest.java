@@ -57,6 +57,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String TJANSTE_ADRESS_SHORT_TIMEOUT  = "https://localhost:20000/vp/tjanst1-short-timeout";
 	private static final String TJANSTE_ADRESS_LONG_TIMEOUT   = "https://localhost:20000/vp/tjanst1-long-timeout";
 	private static final String LOGICAL_ADDRESS               = "vp-test-producer";
+	private static final String LOGICAL_ADDRESS_HTTP               = "vp-test-producer_http";
 	private static final String LOGICAL_ADDRESS_NOT_FOUND     = "unknown-logical-address";
 	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE     = " unknown-logical-address";
 	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER     = "unknown-logical-address ";
@@ -103,6 +104,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	public static void setupTjanstekatalogen() throws Exception {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,               "https://localhost:19000/vardgivare-b/tjanst1"));
+		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_HTTP,               "http://localhost:19001/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_NO_CONNECTION, "https://www.google.com:81"));
         vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_ZERO_LENGTH,    "http://localhost:8081/zeroLength"));
 		svimi.setVagvalInputs(vagvalInputs);
@@ -118,6 +120,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		
 		// Clear queues used for the logging
 		jmsUtil.clearQueues(LOG_INFO_QUEUE);
+		jmsUtil.clearQueues(LOG_ERROR_QUEUE);
 		
 		if (testConsumer == null) {
 			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector", CLIENT_TIMEOUT_MS);
@@ -369,20 +372,18 @@ public class VpFullServiceTest extends AbstractTestCase {
 	}
 	
 	@Test
-	public void testMandatoryPropertiesArePropagatedToProducer() throws Exception {
+	public void testMandatoryPropertiesArePropagatedToExternalProducer() throws Exception {
 		
 		Map<String, String> properties = new HashMap<String, String>();
 
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		
 		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
-		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
 		assertEquals("SKLTP VP/2.0", VpTestProducerLogger.getLatestUserAgent());
-		assertEquals("THIS_VP_INSTANCE_ID", VpTestProducerLogger.getLatestVpInstanceId());
 	}
 	
 	@Test
-	public void testValidVpInstanceId() throws Exception {
+	public void testValidVpInstanceIdToExternalProducer() throws Exception {
 		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
 		final String CONSUMERS_SENDER_ID_IN_CERT = "tp";
 		
@@ -391,6 +392,22 @@ public class VpFullServiceTest extends AbstractTestCase {
 		properties.put(VagvalRouter.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
 
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
+		
+    	//externt https connection it should not propagate
+		assertEquals(null, VpTestProducerLogger.getLatestSenderId());
+		assertEquals(null, VpTestProducerLogger.getLatestVpInstanceId());
+	}
+	
+	@Test
+	public void testValidVpInstanceIdToInternalProducer() throws Exception {
+		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
+		final String CONSUMERS_SENDER_ID_IN_CERT = "tp";
+		
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(VagvalRouter.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
+		properties.put(VagvalRouter.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
+
+    	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_HTTP, properties);
 		
 		assertEquals(CONSUMERS_SENDER_ID_IN_CERT, VpTestProducerLogger.getLatestSenderId());
 		assertEquals(THIS_VP_INSTANCE_ID, VpTestProducerLogger.getLatestVpInstanceId());

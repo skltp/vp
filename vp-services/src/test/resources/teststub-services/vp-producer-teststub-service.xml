@@ -31,10 +31,16 @@
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
    
       <flow name="vp-producer-teststub-flow" >
-
+	
+		<composite-source>
+		
         <inbound-endpoint address="https://localhost:19000/vardgivare-b/tjanst1"  
             connector-ref="VPProducerConnector"/>
-
+            
+        <inbound-endpoint address="http://localhost:19001/vardgivare-b/tjanst1"  
+            connector-ref="VPInsecureConnector"/>
+		
+		</composite-source>
 		<custom-transformer class="se.skl.tp.vp.vagvalrouter.producer.VpTestProducerLogger"/>
 
 	    <cxf:jaxws-service
