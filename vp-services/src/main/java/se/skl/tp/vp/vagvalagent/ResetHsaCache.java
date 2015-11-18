@@ -54,9 +54,17 @@ public class ResetHsaCache implements Callable {
 	private String resetCache(final MuleEventContext eventContext) {
 		try {
 			log.info("Start a reset of HSA cache using files: {} ...", Arrays.toString(hsaFiles));
-			hsaCache.init(hsaFiles);
-			log.info("Succesfully reset HSA cache");
-			return "Succesfully reset HSA cache using files: " + Arrays.toString(hsaFiles);
+			HsaCache cache = hsaCache.init(hsaFiles);
+			int cacheSize = cache.getHSACacheSize();
+			if (cacheSize > 0) {
+				log.info("Succesfully reset HSA cache. HSA cache now contains: " + cacheSize + " entries");
+				return "Succesfully reset HSA cache using files: " + Arrays.toString(hsaFiles) + 
+						"\nHSA cache now contains: " + cacheSize + " entries";
+			} else {
+				log.warn("HSA cache reset to 0 entries, HSA cache is now empty!");
+				return "Warning: HSA cache reset to 0 entries using files: " + 
+						Arrays.toString(hsaFiles) + " HSA cache is now empty!";
+			}
 		} catch (HsaCacheInitializationException e) {
 			log.error("Reset HSA cache failed", e);
 			return "Reset HSA cache failed using files: " + Arrays.toString(hsaFiles);

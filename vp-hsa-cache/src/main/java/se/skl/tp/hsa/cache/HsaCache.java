@@ -73,5 +73,12 @@ public interface HsaCache {
 	 * @throws HsaCacheInitializationException if the cache has not been initialized
 	 */
 	List<String> getChildren(String hsaId) throws HsaCacheNodeNotFoundException;
+
+	/**
+	 * Get the number of entries in the HSA cache
+	 * 
+	 * @return {@link int} Number of entries
+	 */
+	int getHSACacheSize();
 	
 }

@@ -209,6 +209,15 @@ public class HsaCacheImpl implements HsaCache {
 		return cache.get(hsaId);
 	}
 	
+	/*
+     * (non-Javadoc)
+     * @see se.skl.tp.hsa.cache.HsaCache#getHSACacheSize(java.lang.String)
+     */
+	@Override
+	public int getHSACacheSize() {
+		return cache.size();
+	}
+	
 	/**
 	 * Log Warnings
 	 * 
