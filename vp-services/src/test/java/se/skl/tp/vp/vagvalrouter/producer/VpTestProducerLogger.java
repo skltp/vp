@@ -30,6 +30,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 public class VpTestProducerLogger extends AbstractMessageTransformer {
@@ -52,8 +53,15 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 		String rivtaOriginalSenderId = (String)httpHeaders.get(VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID);
 		String vpSenderId = (String)httpHeaders.get(VagvalRouter.X_VP_SENDER_ID);
 		String vpInstanceId = (String)httpHeaders.get(VagvalRouter.X_VP_INSTANCE_ID);
-		assertNotNull(vpInstanceId);
-		assertNotNull(vpSenderId);
+		
+		String hostName = message.getInboundProperty("MULE_ENDPOINT");
+		if (!hostName.contains(VPUtil.HTTPS_PROTOCOL)) {
+			assertNotNull(vpInstanceId);
+			assertNotNull(vpSenderId);
+		} else {
+			assertNull(vpInstanceId);
+			assertNull(vpSenderId);
+		}
 		assertNotNull(rivtaOriginalSenderId);
 		
 		//Correlation id, sometimes (property) we will not send a correlation id to producer

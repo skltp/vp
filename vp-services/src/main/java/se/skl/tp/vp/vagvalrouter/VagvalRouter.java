@@ -39,13 +39,13 @@ import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
+import org.mule.routing.CorrelationMode;
 import org.mule.routing.outbound.AbstractRecipientList;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.mule.transport.http.HttpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
-
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
@@ -116,7 +116,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	private String vpInstanceId;
 	
 	private Boolean propagateCorrelationIdForHttps;
-
+	
 	private final EventLogger eventLogger = new EventLogger();
 
 	/**
@@ -162,6 +162,13 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		setAddressingHelper(new AddressingHelper(vagvalAgent));
+	}
+	
+	public void setDisableMuleCorrelation(boolean disabled) {
+		 if (disabled) 
+		 {
+			 setEnableCorrelation(CorrelationMode.NEVER);
+		 }
 	}
 
 	/**
@@ -225,6 +232,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		ExecutionTimer.start(VPUtil.TIMER_ENDPOINT);
 		MuleEvent replyEvent = null;
 		try {
+			setDisableMuleCorrelation(true);
 			// Do the actual routing
 			replyEvent = super.route(event);
 		} catch (RoutingException re) {
@@ -281,12 +289,14 @@ public class VagvalRouter extends AbstractRecipientList {
 		message.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8", PropertyScope.OUTBOUND);
 
 		MessagePropertiesTransformer mt = createOutboundTransformer();
-
-		propagateSenderIdAndVpInstanceIdToProducer(message, mt);
+		
+		if (!isURLHTTPS(url)) {
+			propagateSenderIdAndVpInstanceIdToProducer(message, mt);
+		}
 		propagateOriginalServiceConsumerHsaIdToProducer(message, mt);
 		propagateSoapActionToProducer(message, mt);
 		propagateCorrelationIdToProducer(message, mt, url);
-
+		
 		eb.addMessageProcessor(mt);
 
 		Connector connector = selectConsumerConnector(url, message);
@@ -416,7 +426,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 	
 	private Boolean isURLHTTPS(String url) {
-		if (url.contains("https://")) {
+		if (url.contains(VPUtil.HTTPS_PROTOCOL)) {
 			return true;
 		} else {
 			return false;
