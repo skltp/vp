@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -112,8 +113,8 @@ public class CallerOnWhitelistIntegrationTest extends AbstractTestCase {
 		 * a check on the ip whitelist.
 		 */
  		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_VP_SENDER_ID, X_VP_SENDER_ID);
-    	properties.put(VagvalRouter.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
+    	properties.put(HttpHeaders.X_VP_SENDER_ID, X_VP_SENDER_ID);
+    	properties.put(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
 		
 		try {
 			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_HTTP, LOGICAL_ADDRESS, properties);
@@ -131,7 +132,7 @@ public class CallerOnWhitelistIntegrationTest extends AbstractTestCase {
 		 * a check on the ip whitelist.
 		 */
  		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.REVERSE_PROXY_HEADER_NAME, "kalle");
+    	properties.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, "kalle");
 		
 		try {
 			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_HTTP, LOGICAL_ADDRESS, properties);

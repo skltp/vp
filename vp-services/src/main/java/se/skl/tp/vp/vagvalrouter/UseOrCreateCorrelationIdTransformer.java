@@ -28,6 +28,7 @@ import org.mule.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
 
 /**
@@ -44,7 +45,7 @@ public class UseOrCreateCorrelationIdTransformer extends AbstractMessageTransfor
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
     		
-		String correlationId = message.getProperty(VagvalRouter.X_SKLTP_CORRELATION_ID, PropertyScope.INBOUND, null);
+		String correlationId = message.getProperty(HttpHeaders.X_SKLTP_CORRELATION_ID, PropertyScope.INBOUND, null);
 		
 		if (correlationId == null) {
 			log.debug("Correlation id not found in http header create a new one!");			

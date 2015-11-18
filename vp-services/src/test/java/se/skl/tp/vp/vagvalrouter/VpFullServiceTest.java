@@ -42,6 +42,7 @@ import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
@@ -388,8 +389,8 @@ public class VpFullServiceTest extends AbstractTestCase {
 		final String CONSUMERS_SENDER_ID_IN_CERT = "tp";
 		
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(VagvalRouter.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
-		properties.put(VagvalRouter.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
+		properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
+		properties.put(HttpHeaders.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
 
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		
@@ -404,8 +405,8 @@ public class VpFullServiceTest extends AbstractTestCase {
 		final String CONSUMERS_SENDER_ID_IN_CERT = "tp";
 		
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(VagvalRouter.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
-		properties.put(VagvalRouter.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
+		properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
+		properties.put(HttpHeaders.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
 
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_HTTP, properties);
 		
@@ -424,8 +425,8 @@ public class VpFullServiceTest extends AbstractTestCase {
 		 * is a authorized consumer, otherwise sender id is extracted from certificate.
 		 */
  		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_VP_SENDER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
-    	properties.put(VagvalRouter.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
+    	properties.put(HttpHeaders.X_VP_SENDER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
+    	properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 
     	try {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
@@ -484,8 +485,8 @@ public class VpFullServiceTest extends AbstractTestCase {
 		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
 
  		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_VP_SENDER_ID, AUHTORIZED_CONSUMER_HSAID);
-    	properties.put(VagvalRouter.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
+    	properties.put(HttpHeaders.X_VP_SENDER_ID, AUHTORIZED_CONSUMER_HSAID);
+    	properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 
     	try {
     		testConsumer.callGetProductDetail(PRODUCT_ID_EXCEPTION, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);

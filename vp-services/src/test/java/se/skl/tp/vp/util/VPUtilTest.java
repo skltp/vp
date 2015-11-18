@@ -23,12 +23,13 @@ package se.skl.tp.vp.util;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
 import static org.mockito.Mockito.*;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vp.vagvalrouter.ExceptionMessageTransformer;
-import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 public class VPUtilTest {
 	
@@ -59,7 +60,7 @@ public class VPUtilTest {
 	@Test
 	public void isCallerOnWhiteListOk(){
 				
-		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.1", WHITE_LIST, VagvalRouter.X_VP_SENDER_ID);
+		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.1", WHITE_LIST, HttpHeaders.X_VP_SENDER_ID);
 		assertTrue(callerOnWhiteList);
 	}
 	
@@ -67,14 +68,14 @@ public class VPUtilTest {
 	public void isCallerOnWhiteListOkWhenWhiteListContainsLeadingWiteSpaces(){
 		
 		final String WHITE_LIST_WITH_WHITE_SPACE="127.0.0.1, 127.0.0.2";
-		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.2 ", WHITE_LIST_WITH_WHITE_SPACE, VagvalRouter.X_VP_SENDER_ID);
+		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.2 ", WHITE_LIST_WITH_WHITE_SPACE, HttpHeaders.X_VP_SENDER_ID);
 		assertTrue(callerOnWhiteList);
 	}		
 	
 	@Test
 	public void isCallerOnWhiteListIpDoesNotMatch(){
 				
-		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("126.0.0.1", WHITE_LIST, VagvalRouter.X_VP_SENDER_ID);
+		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("126.0.0.1", WHITE_LIST, HttpHeaders.X_VP_SENDER_ID);
 		assertFalse(callerOnWhiteList);
 	}
 	
@@ -82,7 +83,7 @@ public class VPUtilTest {
 	public void isCallerOnWhiteListMatchesSubdomain(){
 		
 		String whiteListOfSubDomains = "127.0.0,127.0.1.0";		
-		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.1", whiteListOfSubDomains, VagvalRouter.X_VP_SENDER_ID);
+		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.1", whiteListOfSubDomains, HttpHeaders.X_VP_SENDER_ID);
 		assertTrue(callerOnWhiteList);
 	}
 	
@@ -90,7 +91,7 @@ public class VPUtilTest {
 	public void isCallerOnWhiteListDoesNotMatchSubdomain(){
 		
 		String whiteListOfSubDomains = "127.0.0,127.0.1";		
-		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.2.1", whiteListOfSubDomains, VagvalRouter.X_VP_SENDER_ID);
+		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.2.1", whiteListOfSubDomains, HttpHeaders.X_VP_SENDER_ID);
 		assertFalse(callerOnWhiteList);
 	}
 	
@@ -98,28 +99,28 @@ public class VPUtilTest {
 	public void isCallerOnWhiteListReturnsFalseWhenIpAddressIsEmpty(){		
 		
 		String ipAddress = "";
-		assertFalse(VPUtil.isCallerOnWhiteList(ipAddress, WHITE_LIST, VagvalRouter.X_VP_SENDER_ID));
+		assertFalse(VPUtil.isCallerOnWhiteList(ipAddress, WHITE_LIST, HttpHeaders.X_VP_SENDER_ID));
 	}
 	
 	@Test
 	public void isCallerOnWhiteListReturnsFalseWhenIpAddressIsNull(){		
 		
 		String ipAddress = null;
-		assertFalse(VPUtil.isCallerOnWhiteList(ipAddress, WHITE_LIST, VagvalRouter.X_VP_SENDER_ID));
+		assertFalse(VPUtil.isCallerOnWhiteList(ipAddress, WHITE_LIST, HttpHeaders.X_VP_SENDER_ID));
 	}
 	
 	@Test
 	public void isCallerOnWhiteListReturnsFalseWhenWhiteListIsEmpty(){
 			
 		String whiteList = "";
-		assertFalse(VPUtil.isCallerOnWhiteList("127.0.0.1", whiteList, VagvalRouter.X_VP_SENDER_ID));
+		assertFalse(VPUtil.isCallerOnWhiteList("127.0.0.1", whiteList, HttpHeaders.X_VP_SENDER_ID));
 	}
 	
 	@Test
 	public void isCallerOnWhiteListReturnsFalseWhenWhiteListIsNull(){
 			
 		String whiteList = null;
-		assertFalse(VPUtil.isCallerOnWhiteList("127.0.0.1", whiteList, VagvalRouter.X_VP_SENDER_ID));
+		assertFalse(VPUtil.isCallerOnWhiteList("127.0.0.1", whiteList, HttpHeaders.X_VP_SENDER_ID));
 	}
 	
 	

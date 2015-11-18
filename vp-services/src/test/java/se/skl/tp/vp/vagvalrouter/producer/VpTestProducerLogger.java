@@ -31,8 +31,8 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
-import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 public class VpTestProducerLogger extends AbstractMessageTransformer {
 
@@ -51,9 +51,9 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 		Map<String, Object> httpHeaders = (Map<String, Object>)message.getInboundProperty("http.headers");
 		
 		//Sender and original sender
-		String rivtaOriginalSenderId = (String)httpHeaders.get(VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID);
-		String vpSenderId = (String)httpHeaders.get(VagvalRouter.X_VP_SENDER_ID);
-		String vpInstanceId = (String)httpHeaders.get(VagvalRouter.X_VP_INSTANCE_ID);
+		String rivtaOriginalSenderId = (String)httpHeaders.get(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID);
+		String vpSenderId = (String)httpHeaders.get(HttpHeaders.X_VP_SENDER_ID);
+		String vpInstanceId = (String)httpHeaders.get(HttpHeaders.X_VP_INSTANCE_ID);
 		
 		String hostName = message.getInboundProperty("MULE_ENDPOINT");
 		if (!hostName.contains(VPUtil.HTTPS_PROTOCOL)) {
@@ -66,22 +66,22 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 		assertNotNull(rivtaOriginalSenderId);
 		
 		//Correlation id, sometimes (property) we will not send a correlation id to producer
-		String vpCorrelationId = (String)httpHeaders.get(VagvalRouter.X_SKLTP_CORRELATION_ID);
+		String vpCorrelationId = (String)httpHeaders.get(HttpHeaders.X_SKLTP_CORRELATION_ID);
 	
 		//Should these headers exist, they are set in se.skl.tp.vp.vagvalrouter.VagvalRouter?
 		String userAgent = (String)httpHeaders.get("User-Agent");	
 		assertNotNull(userAgent);
 			
-		log.info("Test producer called with {}: {}", VagvalRouter.X_VP_SENDER_ID, vpSenderId);
+		log.info("Test producer called with {}: {}", HttpHeaders.X_VP_SENDER_ID, vpSenderId);
 		latestSenderId = vpSenderId;
 		
-		log.info("Test producer called with {}: {}", VagvalRouter.X_VP_INSTANCE_ID, vpInstanceId);
+		log.info("Test producer called with {}: {}", HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
 		latestVpInstanceId = vpInstanceId;
 	
-		log.info("Test producer called with {}: {}", VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, rivtaOriginalSenderId);
+		log.info("Test producer called with {}: {}", HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, rivtaOriginalSenderId);
 		latestRivtaOriginalSenderId = rivtaOriginalSenderId;
 
-		log.info("Test producer called with {}: {}", VagvalRouter.X_SKLTP_CORRELATION_ID, vpCorrelationId);
+		log.info("Test producer called with {}: {}", HttpHeaders.X_SKLTP_CORRELATION_ID, vpCorrelationId);
 		latestCorrelationId = vpCorrelationId;
 
 		log.info("Test producer called with {}: {}", "User-Agent", userAgent);

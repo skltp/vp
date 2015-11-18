@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
 import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
@@ -79,8 +80,8 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
     		
-		String senderId = message.getProperty(VagvalRouter.X_VP_SENDER_ID, PropertyScope.INBOUND, null);
-		String senderVpInstanceId = message.getProperty(VagvalRouter.X_VP_INSTANCE_ID, PropertyScope.INBOUND, null);
+		String senderId = message.getProperty(HttpHeaders.X_VP_SENDER_ID, PropertyScope.INBOUND, null);
+		String senderVpInstanceId = message.getProperty(HttpHeaders.X_VP_INSTANCE_ID, PropertyScope.INBOUND, null);
 		
 		/*
 		 * Extract sender ip adress to session scope to be able to log in EventLogger.
@@ -91,14 +92,14 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 		log.debug("Is inbound properties x-vp-sender-id={} and x-vp-instance-id={} valid as identifier of consumer?", senderId, senderVpInstanceId);
 		
 		if (senderId != null && vpInstanceId.equals(senderVpInstanceId)) {
-			log.debug("Yes, sender id extracted from inbound property {}: {}, check whitelist!", VagvalRouter.X_VP_SENDER_ID, senderId);
+			log.debug("Yes, sender id extracted from inbound property {}: {}, check whitelist!", HttpHeaders.X_VP_SENDER_ID, senderId);
 
 			/*
 			 * x-vp-sender-id exist as inbound property and x-vp-instance-id macthes this VP instance, a mandatory check against the whitelist of
 			 * ip addresses is needed. VPUtil.checkCallerOnWhiteList throws VpSemanticException in case ip address is not in whitelist.
 			 */
-			if(!VPUtil.isCallerOnWhiteList(senderIpAdress, whiteList, VagvalRouter.X_VP_SENDER_ID)){
-				throw VPUtil.createVP011Exception(senderIpAdress, VagvalRouter.X_VP_SENDER_ID);
+			if(!VPUtil.isCallerOnWhiteList(senderIpAdress, whiteList, HttpHeaders.X_VP_SENDER_ID)){
+				throw VPUtil.createVP011Exception(senderIpAdress, HttpHeaders.X_VP_SENDER_ID);
 			}
 			
 			// Make sure the sender id is set in session scoped property for authorization and logging
