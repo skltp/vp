@@ -32,6 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -89,8 +90,7 @@ public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());
 		
-		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
-		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
+		assertEquals(AUHTORIZED_CONSUMER_HSAID, VpTestProducerLogger.getLatestRivtaOriginalSenderId());
 	}
 	
 	@Test
@@ -99,13 +99,12 @@ public class VpFullServiceWithOriginalConsumerTest extends AbstractTestCase {
 		final String provicedOriginalServiceConsumerHsaId = "HSA-ID-ORGINALCONSUMER";
 		
 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, provicedOriginalServiceConsumerHsaId);
+    	properties.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, provicedOriginalServiceConsumerHsaId);
 
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());
 		
 		assertEquals(provicedOriginalServiceConsumerHsaId, VpTestProducerLogger.getLatestRivtaOriginalSenderId());
-		assertEquals("tp", VpTestProducerLogger.getLatestSenderId());
 	}
 	
 	private static VagvalMockInputRecord createVagvalRecord(String senderId, String receiverId, String adress) {

@@ -45,6 +45,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 
@@ -294,14 +295,14 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 	@Test
 	public void testProducerResponseTimeIsReturnedWhenHttp200() throws Exception {
         PostMethod httppost = executeHttp11SoapCall("/vp/keep-alive-tjanst1");
-        assertNotNull(httppost.getResponseHeader(VagvalRouter.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
+        assertNotNull(httppost.getResponseHeader(HttpHeaders.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
         assertEquals(200, httppost.getStatusCode());
     }
 	
 	@Test
 	public void testProducerResponseTimeIsReturnedWhenHttp500() throws Exception {
         PostMethod httppost = executeHttp11SoapCallReturningHttp500("/vp/keep-alive-tjanst1");
-        assertNotNull(httppost.getResponseHeader(VagvalRouter.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
+        assertNotNull(httppost.getResponseHeader(HttpHeaders.X_SKLTP_PRODUCER_RESPONSETIME).getValue());
         assertEquals(500, httppost.getStatusCode());
     }
 	
@@ -364,8 +365,8 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
         PostMethod httppost = new PostMethod(subUrl);
         RequestEntity requestEntity = new InputStreamRequestEntity(getClass().getClassLoader().getResourceAsStream(requestFile));
         httppost.getParams().setVersion(HttpVersion.HTTP_1_1);
-        httppost.addRequestHeader(VagvalRouter.X_VP_INSTANCE_ID, "THIS_VP_INSTANCE_ID");
-        httppost.addRequestHeader(VagvalRouter.X_VP_SENDER_ID, "tp");
+        httppost.addRequestHeader(HttpHeaders.X_VP_INSTANCE_ID, "THIS_VP_INSTANCE_ID");
+        httppost.addRequestHeader(HttpHeaders.X_VP_SENDER_ID, "tp");
         httppost.setRequestEntity(requestEntity);
         clientHttp.executeMethod(httppost);
         return httppost;

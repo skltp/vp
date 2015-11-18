@@ -68,6 +68,7 @@ public final class VPUtil {
 	public static final String ENDPOINT_URL = "endpoint_url";
 	
 	public static final String IS_HTTPS = "isHttps";
+	public static final String HTTPS_PROTOCOL = "https://";
 	
 	public static final String CERT_SENDERID_PATTERN = "=([^,]+)";
 	

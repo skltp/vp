@@ -37,8 +37,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
-import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 public class CertificateChainExtractorTest {
 
@@ -56,7 +56,7 @@ public class CertificateChainExtractorTest {
 		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, pattern, "127.0.0.1");
 		final String senderId = helper.extractSenderIdFromCertificate();
 
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VagvalRouter.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND);
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
 
@@ -79,7 +79,7 @@ public class CertificateChainExtractorTest {
 			assertEquals("VP002 no certificates. The certificate chain was null", e.getMessage());
 		}
 
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VagvalRouter.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND);
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
 	}
@@ -108,7 +108,7 @@ public class CertificateChainExtractorTest {
 					e.getMessage());
 		}
 
-		Mockito.verify(msg, Mockito.times(0)).getProperty(VagvalRouter.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
 		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND);
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
 	}

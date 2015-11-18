@@ -30,7 +30,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
-import se.skl.tp.vp.vagvalrouter.VagvalRouter;
+import se.skl.tp.vp.util.HttpHeaders;
 
 public class CertificateExtractorFactoryTest {
 
@@ -38,7 +38,7 @@ public class CertificateExtractorFactoryTest {
 	public void extractFromHeaderWhenReveresedProxyHeaderExist() throws Exception {
 
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		Mockito.when(msg.getProperty(VagvalRouter.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND)).thenReturn("ANY VALUE");
+		Mockito.when(msg.getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND)).thenReturn("ANY VALUE");
 		Pattern pattern = null;
 
 		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, "127.0.0.1");

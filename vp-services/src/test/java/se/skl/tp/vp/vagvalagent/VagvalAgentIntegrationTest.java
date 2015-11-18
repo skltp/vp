@@ -32,18 +32,18 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.springframework.context.annotation.DependsOn;
 
+import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skltp.tak.vagval.wsdl.v2.ResetVagvalCacheRequest;
 import se.skltp.tak.vagval.wsdl.v2.ResetVagvalCacheResponse;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
-import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 
 public class VagvalAgentIntegrationTest extends AbstractTestCase {
 
@@ -76,14 +76,22 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 	}
 
 	@Before
-	public void setupTjanstekatalogen() throws Exception {
+	public void doSetUp() throws Exception {
 		super.doSetUp();
+		
 		vagvalAgent = (VagvalAgent) muleContext.getRegistry().lookupObject("vagvalAgent");
+		
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp20", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		svimi.setVagvalInputs(vagvalInputs);
+
 		vagvalAgent.resetVagvalCache(createResetVagvalCacheRequest());
+	}
+	
+	@After
+	public void doTearDown() throws Exception {
+		svimi.reset();
 	}
 
 	@Test

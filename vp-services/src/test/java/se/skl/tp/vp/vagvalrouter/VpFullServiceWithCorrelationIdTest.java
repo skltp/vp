@@ -34,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -108,7 +109,7 @@ public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
 		final String providedCorrelationId = "1234567890";
 		
 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(VagvalRouter.X_SKLTP_CORRELATION_ID, providedCorrelationId);
+    	properties.put(HttpHeaders.X_SKLTP_CORRELATION_ID, providedCorrelationId);
 
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());

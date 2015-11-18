@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
-import se.skl.tp.vp.vagvalrouter.VagvalRouter;
 
 /**
  * Extractor used when extracting certificate from header
@@ -55,13 +55,13 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 		// Check whitelist
 		String callersIp = VPUtil.extractIpAddress(getMuleMessage());
-		if(!VPUtil.isCallerOnWhiteList(callersIp, getWhiteList(), VagvalRouter.REVERSE_PROXY_HEADER_NAME)){
-			throw VPUtil.createVP011Exception(callersIp, VagvalRouter.REVERSE_PROXY_HEADER_NAME);
+		if(!VPUtil.isCallerOnWhiteList(callersIp, getWhiteList(), HttpHeaders.REVERSE_PROXY_HEADER_NAME)){
+			throw VPUtil.createVP011Exception(callersIp, HttpHeaders.REVERSE_PROXY_HEADER_NAME);
 		}
 
 		log.debug("Extracting X509Certificate senderId from header");
 
-		Object certificate = this.getMuleMessage().getProperty(VagvalRouter.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
+		Object certificate = this.getMuleMessage().getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
 
 		try {
 			if (isX509Certificate(certificate)) {
@@ -69,17 +69,17 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 			} else if (PemConverter.isPEMCertificate(certificate)) {
 				return extractFromPemFormatCertificate(certificate);
 			} else {
-				log.error("Unkown certificate type found in httpheader: {}", VagvalRouter.REVERSE_PROXY_HEADER_NAME);
+				log.error("Unkown certificate type found in httpheader: {}", HttpHeaders.REVERSE_PROXY_HEADER_NAME);
 				throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002
 						+ " Exception, unkown certificate type found in httpheader "
-						+ VagvalRouter.REVERSE_PROXY_HEADER_NAME,
+						+ HttpHeaders.REVERSE_PROXY_HEADER_NAME,
 						VpSemanticErrorCodeEnum.VP002);
 			}
 		} catch (Exception e) {
-			log.error("Error occured parsing certificate in httpheader: {}", VagvalRouter.REVERSE_PROXY_HEADER_NAME, e);
+			log.error("Error occured parsing certificate in httpheader: {}", HttpHeaders.REVERSE_PROXY_HEADER_NAME, e);
 			throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002
 					+ " Exception occured parsing certificate in httpheader "
-					+ VagvalRouter.REVERSE_PROXY_HEADER_NAME, VpSemanticErrorCodeEnum.VP002);
+					+ HttpHeaders.REVERSE_PROXY_HEADER_NAME, VpSemanticErrorCodeEnum.VP002);
 		}
 
 	}
@@ -96,7 +96,7 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 	static boolean isX509Certificate(Object certificate) {
 		if (certificate instanceof X509Certificate) {
-			log.debug("Found X509Certificate in httpheader: {}", VagvalRouter.REVERSE_PROXY_HEADER_NAME);
+			log.debug("Found X509Certificate in httpheader: {}", HttpHeaders.REVERSE_PROXY_HEADER_NAME);
 			return true;
 		}
 		return false;
