@@ -51,7 +51,7 @@ import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 public class VpFullServiceTest extends AbstractTestCase {
 
-	private static final int    CLIENT_TIMEOUT_MS = 60000;
+	private static final int    CLIENT_TIMEOUT_MS = 600000000;
 	private static final String PRODUCT_ID = "SW123";
 	private static final String TJANSTE_ADRESS = "https://localhost:20000/vp/tjanst1";
 	private static final String TJANSTE_ADRESS_SHORT_TIMEOUT  = "https://localhost:20000/vp/tjanst1-short-timeout";
@@ -118,6 +118,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		
 		// Clear queues used for the logging
 		jmsUtil.clearQueues(LOG_INFO_QUEUE);
+		jmsUtil.clearQueues(LOG_ERROR_QUEUE);
 		
 		if (testConsumer == null) {
 			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector", CLIENT_TIMEOUT_MS);

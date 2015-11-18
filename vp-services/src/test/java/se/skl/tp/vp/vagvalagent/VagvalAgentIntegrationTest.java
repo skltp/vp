@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
+import org.springframework.context.annotation.DependsOn;
 
 import se.skltp.tak.vagval.wsdl.v2.ResetVagvalCacheRequest;
 import se.skltp.tak.vagval.wsdl.v2.ResetVagvalCacheResponse;
@@ -74,19 +75,15 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 			"vp-teststubs-and-services-config.xml";
 	}
 
-	@BeforeClass
-	public static void setupTjanstekatalogen() throws Exception {
+	@Before
+	public void setupTjanstekatalogen() throws Exception {
+		super.doSetUp();
+		vagvalAgent = (VagvalAgent) muleContext.getRegistry().lookupObject("vagvalAgent");
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp20", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		svimi.setVagvalInputs(vagvalInputs);
-	}
-
-	@Before
-	public void doSetUp() throws Exception {
-		super.doSetUp();
-
-		vagvalAgent = (VagvalAgent) muleContext.getRegistry().lookupObject("vagvalAgent");
+		vagvalAgent.resetVagvalCache(createResetVagvalCacheRequest());
 	}
 
 	@Test
