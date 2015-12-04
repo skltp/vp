@@ -23,8 +23,6 @@
         <compiler.source.version>1.6</compiler.source.version>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
 		<sonar.jdbc.url>jdbc:jtds:sqlserver://localhost;databaseName=sonar;SelectMethod=Cursor</sonar.jdbc.url>
-		<sonar.jdbc.username>sonar</sonar.jdbc.username>
-		<sonar.jdbc.password>123</sonar.jdbc.password>
 	</properties>
 
 	<scm>
