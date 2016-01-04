@@ -158,11 +158,11 @@ public class GetLogicalAddresseesByServiceContractTest {
 		behorighetsInfoType.setTjansteKontrakt(tjansteKontrakt);
 
 		Calendar calAWeekAgo = Calendar.getInstance ();
-		calAWeekAgo.roll(Calendar.WEEK_OF_YEAR, false);
+		calAWeekAgo.add(Calendar.WEEK_OF_YEAR, -1);
 		Date aWeekAgo = calAWeekAgo.getTime ();
 
 		Calendar calAWeekAhead = Calendar.getInstance ();
-		calAWeekAhead.roll(Calendar.WEEK_OF_YEAR, true);
+		calAWeekAhead.add(Calendar.WEEK_OF_YEAR, 1);
 		Date aWeekAhead = calAWeekAhead.getTime ();
 
 		behorighetsInfoType.setTomTidpunkt(XmlGregorianCalendarUtil.fromDate(aWeekAhead));
