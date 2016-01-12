@@ -64,7 +64,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 
     private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
-	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
+	private VpFullServiceTestConsumer_MuleClient testConsumer = null;
 
 	private int normal_timeout_ms = 0;
 	private int short_timeout_ms = 0;
@@ -82,7 +82,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		// Only start up Mule once to make the tests run faster...
 		// Set to false if tests interfere with each other when Mule is started
 		// only once.
-		setDisposeContextPerClass(true);
+		//setDisposeContextPerClass(true);
 		
 		normal_timeout_ms = Integer.parseInt(rb.getString("TEST_NORMAL_TIMEOUT_MS"));
 		short_timeout_ms = Integer.parseInt(rb.getString("TEST_SHORT_TIMEOUT_MS"));
@@ -106,9 +106,8 @@ public class VpFullServiceTest extends AbstractTestCase {
 		svimi.setVagvalInputs(vagvalInputs);
 	}
 	
-	@Before
+	@Override
 	public void doSetUp() throws Exception {
-		super.doSetUp();
 
 		// TODO: Fix lazy init of JMS connection et al so that we can create jmsutil in the declaration
 		// (The embedded ActiveMQ queue manager is not yet started by Mule when jmsutil is delcared...)
@@ -117,9 +116,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		// Clear queues used for the logging
 		jmsUtil.clearQueues(LOG_INFO_QUEUE);
 		
-		if (testConsumer == null) {
-			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector", CLIENT_TIMEOUT_MS);
-		}
+		testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector", CLIENT_TIMEOUT_MS);
 	}
 
 	@Test
