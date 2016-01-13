@@ -64,6 +64,25 @@
             wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl" />
 
         <flow-ref name="vagval-dynamic-routing-flow" />
+        
+        <!--
+        #MULE-370
+        
+        Mule-3.7.0: workaround for bugs: MULE-8913, MULE-8508:
+        This is where the transformer XmlToXMLStreamReader_BugfixedForMule370 will
+        be applied (using autodiscovery) for cases where the payload is not an
+        XMLStreamReader.
+        For example after a fault where the payload might be a String containing a
+        Soap-fault, like in the testcase CallerOnWhitelistIntegrationTest.
+        
+        NOTE: explicitly adding the transformer in the exception strategy does not
+        work, for some reason, gives errors like:
+          org.xml.sax.SAXParseException; Premature end of file.
+        for no obvious reason. 
+        -->
+        <!--
+        <logger level="DEBUG" message="Virtualization: after dynamic flow, payload: #[payload.getClass()]" category="se.skl.tp.vp.vagvalrouter"/>
+        -->
     </flow>
 
     <flow name="vp-virtuell-tjanst-teststub-short-timeout-flow" >
