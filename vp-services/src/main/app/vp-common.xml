@@ -47,6 +47,8 @@
 				
 				<spring:value>classpath:vp-config.properties</spring:value>
 				<spring:value>classpath:vp-config-override.properties</spring:value>
+
+				<spring:value>classpath:vp-build.properties</spring:value>
 			</spring:list>
 		</spring:property>
 	</spring:bean>

@@ -106,8 +106,20 @@
 
 	<build>
         <resources>
+        	<!-- filter property file to get VP version in property file consistent from the build -->
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                	<include>vp-build.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                	<exclude>vp-build.properties</exclude>
+                </excludes>
             </resource>
             <resource>
                 <!-- To get mule-config files from the Mule Studio defined resource-folder in the classpath... -->
