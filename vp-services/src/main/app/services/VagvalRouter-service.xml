@@ -53,7 +53,9 @@
 
     	<custom-transformer class="se.skl.tp.vp.vagvalrouter.UseOrCreateCorrelationIdTransformer" doc:name="If Correlation Id exist in incoming http request use it otherwise create a new one and put in session variable"/>
    
-        <transformer ref="XmlToXSR" />
+        <custom-transformer class="org.mule.module.xml.transformer.XmlToXMLStreamReader">
+        	<spring:property name="reversible" value="true"/>
+        </custom-transformer>
         <transformer ref="rivExtractor" />
   		<transformer ref="logReqIn" />
         <transformer ref="rivTransformer" />
@@ -110,7 +112,7 @@
         	</custom-transformer>
         	
         	<custom-transformer class="se.skl.tp.vp.vagvalrouter.ExceptionMessageTransformer"/>
-        	
+
         </catch-exception-strategy>
         
     </flow>

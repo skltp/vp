@@ -183,7 +183,7 @@ public class RestClient {
 	 */
 	public MuleMessage doHttpSendRequest(String url, String method, String payload, String contentType) {    	
 
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, Object> properties = new HashMap<String, Object>();
     	properties.put("http.method",    method);
     	properties.put("Content-Type",   contentType);
 
@@ -204,7 +204,7 @@ public class RestClient {
 	 */
 	public MuleMessage doHttpSendRequest(String url, String method, String payload, String contentType, Map<String, String> inProperties) {    	
 
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, Object> properties = new HashMap<String, Object>();
     	properties.put("http.method",    method);
     	properties.put("Content-Type",   contentType);
 
@@ -229,7 +229,7 @@ public class RestClient {
 	 */
 	public MuleMessage doHttpReceiveRequest(String url, String method, String acceptConentType, String acceptCharSet) {    	
 
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, Object> properties = new HashMap<String, Object>();
     	properties.put("http.method",    method);
     	properties.put("Accept",         acceptConentType);
     	properties.put("Accept-Charset", acceptCharSet);
@@ -239,7 +239,7 @@ public class RestClient {
     	return response;
 	}
 
-	private MuleMessage send(String url, String payload, Map<String, String> properties) {
+	private MuleMessage send(String url, String payload, Map<String, Object> properties) {
 		if (muleConnector != null) {
 			url += "?connector=" + muleConnector;
 		}

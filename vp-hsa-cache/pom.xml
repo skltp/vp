@@ -4,18 +4,19 @@
     <parent>
 		<groupId>se.skltp.vp</groupId>
 		<artifactId>vp-parent</artifactId>
-		<version>2.3.1-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
   <artifactId>vp-hsa-cache</artifactId>
 
   <dependencies>
-	<dependency>
-		<groupId>se.skltp.vp</groupId>
-		<artifactId>vp-soitoolkit-mule-dependencies</artifactId>
-		<version>${project.version}</version>
-	</dependency>
+    <dependency>
+      <groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
+      <artifactId>soitoolkit-mule-${vp.mule.version}-dependencies</artifactId>
+      <version>${soitoolkit.version}</version>
+      <type>pom</type>
+    </dependency>
   </dependencies>
 
   <profiles>

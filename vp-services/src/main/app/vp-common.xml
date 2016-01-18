@@ -132,9 +132,28 @@
     <custom-transformer name="rivExtractor" class="se.skl.tp.vp.vagvalrouter.RivExtractor" />
     
     <custom-transformer name="fixTransformer" class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
-	
+
+	<!-- #MULE-370, see comment below.	
 	<custom-transformer name="XmlToXSR" class="org.mule.module.xml.transformer.XmlToXMLStreamReader">
    		<spring:property name="reversible" value="true"/>
+	</custom-transformer>
+	-->
+	<!-- #MULE-370
+		Mule-3.7.0: workaround for bugs: MULE-8913, MULE-8508:
+        The transformer XmlToXMLStreamReader_BugfixedForMule370 will
+        be applied (using autodiscovery) for cases where the payload is not an
+        XMLStreamReader - but need to be.
+        
+        NO OTHER XmlToXMLStreamReader transformer may be declared globally.
+        This transformer may also NOT BE REFERENCED BY NAME - or Mule-3.7.0
+        will fail saying it found more than one applicable transformer when
+        trying to autodiscover and apply this transformer (MULE-8913).
+        
+        If an XmlToXMLStreamReader transformer is needed explicitly in a flow,
+        it may be declared inline in the flow without using a name.
+	-->
+	<custom-transformer name="MULE_370_BUG_WORKAROUND_FOR_MULE_BUGS_8913_8508" class="se.skl.tp.vp.mule.bugfix.XmlToXMLStreamReader_BugfixedForMule370">
+		<spring:property name="reversible" value="true"/>
 	</custom-transformer>
 	
 	<custom-transformer name="objToStr" class="org.soitoolkit.commons.mule.core.ObjectToStringTransformer"/>

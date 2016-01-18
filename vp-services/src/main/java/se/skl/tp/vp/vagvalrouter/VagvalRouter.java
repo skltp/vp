@@ -35,6 +35,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -42,6 +43,7 @@ import org.mule.endpoint.URIBuilder;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.outbound.AbstractRecipientList;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
+import org.mule.transformer.types.TypedValue;
 import org.mule.transport.http.HttpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	private AddressingHelper addrHelper;
 
 	private String vpInstanceId;
+	private TypedValue vpInstanceTypedValue;
 	
 	private Boolean propagateCorrelationIdForHttps;
 	
@@ -78,6 +81,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 */
 	public void setVpInstanceId(String vpInstanceId) {
 		this.vpInstanceId = vpInstanceId;
+		vpInstanceTypedValue = new TypedValue(vpInstanceId, DataType.STRING_DATA_TYPE);
 	}
 
 	/**
@@ -270,7 +274,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	private void propagateSoapActionToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
 		String action = message.getProperty("SOAPAction", PropertyScope.INBOUND);
 		if (action != null) {
-			mt.getAddProperties().put("SOAPAction", action);
+			mt.getAddProperties().put("SOAPAction", new TypedValue(action, DataType.STRING_DATA_TYPE));
 		}
 	}
 
@@ -280,8 +284,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	 */
 	private void propagateSenderIdAndVpInstanceIdToProducer(MuleMessage message, MessagePropertiesTransformer mt) {
 		String senderId = message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
-		mt.getAddProperties().put(HttpHeaders.X_VP_SENDER_ID, senderId);
-		mt.getAddProperties().put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
+		mt.getAddProperties().put(HttpHeaders.X_VP_SENDER_ID, new TypedValue(senderId, DataType.STRING_DATA_TYPE));
+		mt.getAddProperties().put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceTypedValue);
 	}
 
 	/*
@@ -301,7 +305,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 
 		//Propagate the http header to producers
-		mt.getAddProperties().put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalServiceconsumerHsaid);
+		mt.getAddProperties().put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, new TypedValue(originalServiceconsumerHsaid, DataType.STRING_DATA_TYPE));
 	}
 
 	/*
@@ -311,10 +315,10 @@ public class VagvalRouter extends AbstractRecipientList {
 		String correlationId = message.getProperty(VPUtil.CORRELATION_ID, PropertyScope.SESSION);
 				
 		if (!isURLHTTPS(url)) {
-			mt.getAddProperties().put(HttpHeaders.X_SKLTP_CORRELATION_ID, correlationId);						
+			mt.getAddProperties().put(HttpHeaders.X_SKLTP_CORRELATION_ID, new TypedValue(correlationId, DataType.STRING_DATA_TYPE));						
 		} else {
 			if (propagateCorrelationIdForHttps) {
-				mt.getAddProperties().put(HttpHeaders.X_SKLTP_CORRELATION_ID, correlationId);										
+				mt.getAddProperties().put(HttpHeaders.X_SKLTP_CORRELATION_ID, new TypedValue(correlationId, DataType.STRING_DATA_TYPE));										
 			}
 		}
 	}

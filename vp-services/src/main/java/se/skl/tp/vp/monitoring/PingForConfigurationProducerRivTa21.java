@@ -22,9 +22,9 @@ package se.skl.tp.vp.monitoring;
 
 import java.util.Date;
 
+import javax.inject.Inject;
 import javax.jws.WebService;
 
-import org.mule.api.annotations.expressions.Lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
@@ -50,7 +50,7 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 	private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("yyyyMMddhhmmss");
 	private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
-	@Lookup("vagvalAgent")
+	@Inject
 	private VagvalAgent vagvalAgent;
 
 	@Override

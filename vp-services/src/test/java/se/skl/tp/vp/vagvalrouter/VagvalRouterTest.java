@@ -21,6 +21,7 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.createAuthorization;
@@ -34,15 +35,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-import org.mule.api.MuleMessage;
 
 import se.skl.tp.hsa.cache.HsaCache;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
 public class VagvalRouterTest {
 
@@ -113,9 +113,10 @@ public class VagvalRouterTest {
 		// This test however works fine on the original VagValAgent since it doesn't require any mocked TAK-info
 
 		// Remove local cached TAK file
-		File localTakCache = folder.newFile(".tk.localCache");
+		File localTakCache = new File(folder.getRoot().getPath() + File.separator + ".tk.localCache");
 		localTakCache.delete();
-
+		assertFalse("precond: local tak-cache file must not exist", localTakCache.exists());
+		
 		// Setup VagvalAgent with no routing or access control added
 		VagvalAgent vagvalAgent = new VagvalAgent();
 		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());

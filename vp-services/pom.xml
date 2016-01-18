@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>se.skltp.vp</groupId>
 		<artifactId>vp-parent</artifactId>
-		<version>2.3.1-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -27,18 +27,18 @@
 			<artifactId>soitoolkit-commons-mule</artifactId>
 			<version>${soitoolkit.version}</version>
 		</dependency>
-
 		<dependency>
-			<groupId>se.skltp.vp</groupId>
-			<artifactId>vp-soitoolkit-mule-dependencies</artifactId>
-			<version>${project.version}</version>
-			<!-- Exclude mule-module-spring-security since we don't use it and it contains dependencies to old versions of spring causing strange problems to occurr -->
-			<exclusions>
-				<exclusion>
-					<groupId>org.mule.modules</groupId>
-					<artifactId>mule-module-spring-security</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>org.soitoolkit.commons.poms</groupId>
+			<artifactId>soitoolkit-test-dependencies</artifactId>
+			<version>${soitoolkit.version}</version>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.soitoolkit.commons.poms.mule-dependencies</groupId>
+			<artifactId>soitoolkit-mule-${vp.mule.version}-dependencies</artifactId>
+			<version>${soitoolkit.version}</version>
+			<type>pom</type>
 		</dependency>
 
 		<!-- TAK vagval schemas -->
@@ -66,7 +66,7 @@
 			<version>2.0-RC1</version>
         </dependency>
 
-						<!-- Ping -->
+		<!-- Ping -->
 		<dependency>
 			<groupId>se.skltp.vp</groupId>
 			<artifactId>itinfra-tp-schemas</artifactId>
@@ -83,24 +83,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Mockito -->
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-			<version>1.8.5</version>
-		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
-			<version>1.8.5</version>
-		</dependency>
-
-		<dependency>
-		  <groupId>org.bouncycastle</groupId>
-		  <artifactId>bcprov-jdk16</artifactId>
-		  <version>1.45</version>
+			<version>1.10.19</version>
 		</dependency>
 
 		<dependency>
@@ -112,7 +99,7 @@
         <dependency>
           <groupId>xmlunit</groupId>
           <artifactId>xmlunit</artifactId>
-          <version>1.4</version>
+          <version>1.5</version>
         </dependency>
 
 	</dependencies>
@@ -137,6 +124,21 @@
 
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
+			</plugin>
+
+			<!-- setup/debug of dependencies: dump all dependencies for inspection into dir target/dependency -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
             <plugin>
@@ -193,7 +195,7 @@
                 -->
                 <classifier>core</classifier>
                 <excludes>
-                  <exclude>log4j.xml</exclude>
+                  <exclude>log4j2.xml</exclude>
                 </excludes>
               </configuration>
               <executions>
@@ -208,6 +210,7 @@
 			<plugin>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>${vp.cxf.version}</version>
 				<executions>
 					<execution>
 						<id>generate-sources</id>
@@ -252,13 +255,13 @@
 			                <goal>copy-resources</goal>
 			            </goals>
 			            <configuration>
+			            	<overwrite>true</overwrite>
 			                <outputDirectory>${project.build.outputDirectory}</outputDirectory>
 			                <resources>
 			                    <resource>
 			                        <directory>src/environment</directory>
 			                        <includes>
-			                            <include>log4j.xml</include>
-			                            <include>log4j.dtd</include>
+			                            <include>log4j2.xml</include>
 			                        </includes>
 			                    </resource>
 			                </resources>
