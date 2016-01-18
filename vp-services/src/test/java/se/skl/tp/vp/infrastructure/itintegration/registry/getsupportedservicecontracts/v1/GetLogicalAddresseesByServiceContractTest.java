@@ -22,6 +22,7 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v1.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
 import java.util.ArrayList;
@@ -58,8 +59,10 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 
 		assertEquals(2, response.getLogicalAddress().size());
-		assertEquals(RECEIVERID_1, response.getLogicalAddress().get(0));
-		assertEquals(RECEIVERID_2, response.getLogicalAddress().get(1));
+		String la1 = response.getLogicalAddress().get(0);
+		String la2 = response.getLogicalAddress().get(1);
+		assertTrue(RECEIVERID_1.equals(la1) && RECEIVERID_2.equals(la2)
+				|| RECEIVERID_1.equals(la2) && RECEIVERID_2.equals(la1));
 	}
 
 	@Test

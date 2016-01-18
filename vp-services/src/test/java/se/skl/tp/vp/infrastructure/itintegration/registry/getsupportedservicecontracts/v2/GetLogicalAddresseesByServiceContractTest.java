@@ -22,11 +22,14 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +38,7 @@ import org.junit.Test;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.FilterType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
+import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.LogicalAddresseeRecordType;
 import se.rivta.infrastructure.itintegration.registry.v2.ServiceContractNamespaceType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
@@ -58,8 +62,11 @@ public class GetLogicalAddresseesByServiceContractTest {
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
 
 		assertEquals(2, response.getLogicalAddressRecord().size());
-		assertEquals(RECEIVERID_1, response.getLogicalAddressRecord().get(0).getLogicalAddress());
-		assertEquals(RECEIVERID_2, response.getLogicalAddressRecord().get(1).getLogicalAddress());
+		
+		String lar1 = response.getLogicalAddressRecord().get(0).getLogicalAddress();
+		String lar2 = response.getLogicalAddressRecord().get(1).getLogicalAddress();
+		assertTrue(RECEIVERID_1.equals(lar1) && RECEIVERID_2.equals(lar2)
+				|| RECEIVERID_1.equals(lar2) && RECEIVERID_2.equals(lar1));		
 	}
 
 	@Test
@@ -103,6 +110,18 @@ public class GetLogicalAddresseesByServiceContractTest {
 
 		assertEquals(2, responseCrmScheduling.getLogicalAddressRecord().size());
 		assertEquals(1, responseEngagementindex.getLogicalAddressRecord().size());
+		
+		// fix order of records for easy comparison in asserts below
+		{
+			Comparator<LogicalAddresseeRecordType> c = new Comparator<LogicalAddresseeRecordType>() {
+				@Override
+				public int compare(LogicalAddresseeRecordType o1,
+						LogicalAddresseeRecordType o2) {
+					return o1.getLogicalAddress().compareTo(o2.getLogicalAddress());
+				}
+			};
+			Collections.sort(responseCrmScheduling.getLogicalAddressRecord(), c);
+		}
 
 		//Receiver RECEIVERID-1 crm:scheduling
 		assertEquals(RECEIVERID_1, responseCrmScheduling.getLogicalAddressRecord().get(0).getLogicalAddress());

@@ -21,11 +21,15 @@
 package se.skl.tp.hsa.cache;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static se.skl.tp.hsa.cache.HsaCache.*;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
+
+import javax.validation.constraints.AssertTrue;
 
 import org.junit.Test;
 
@@ -62,7 +66,10 @@ public class HsaCacheImplTest {
 	
 		assertEquals(Arrays.asList(new String[]{"SE0000000003-1234"}), impl.getChildren("SE0000000004-1234"));
 		assertEquals(Arrays.asList(new String[]{"SE0000000002-1234"}), impl.getChildren("SE0000000003-1234"));
-		assertEquals(Arrays.asList(new String[]{"SE0000000000-1234","SE0000000001-1234"}), impl.getChildren("SE0000000002-1234"));
+		List<String> children = impl.getChildren("SE0000000002-1234");
+		assertTrue(children.size() == 2);
+		assertTrue(children.contains("SE0000000000-1234"));
+		assertTrue(children.contains("SE0000000001-1234"));
 	}
 	
 	@Test
