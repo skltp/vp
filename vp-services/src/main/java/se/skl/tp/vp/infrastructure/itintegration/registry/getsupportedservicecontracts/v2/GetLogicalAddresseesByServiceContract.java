@@ -23,11 +23,11 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.jws.WebService;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.mule.api.annotations.expressions.Lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +36,10 @@ import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyserv
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.LogicalAddresseeRecordType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.FilterInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.FilterInfoType;
 
 /**
  * GetLogicalAddressesByServiceContract by using the local cache instead of
@@ -50,7 +50,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 
 	private static final Logger log = LoggerFactory.getLogger(GetLogicalAddresseesByServiceContract.class);
 
-	@Lookup("vagvalAgent")
+	@Inject
 	private VagvalAgent vagvalAgent;
 
 	public void setVagvalAgent(VagvalAgent vagvalAgent) {

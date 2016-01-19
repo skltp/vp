@@ -23,20 +23,20 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.jws.WebService;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.mule.api.annotations.expressions.Lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
+import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 
 /**
  *
@@ -51,7 +51,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 
 	private static final Logger log = LoggerFactory.getLogger(GetLogicalAddresseesByServiceContract.class);
 
-	@Lookup("vagvalAgent")
+	@Inject
 	private VagvalAgent vagvalAgent;
 
 	public void setVagvalAgent(VagvalAgent vagvalAgent) {
