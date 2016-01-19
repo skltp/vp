@@ -48,7 +48,7 @@ public class PingForConfigurationProducerRivTa21 implements PingForConfiguration
 	
 	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationProducerRivTa21.class);
 	private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("yyyyMMddhhmmss");
-	private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
+	private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override", "vp-build");
 
 	@Inject
 	private VagvalAgent vagvalAgent;
