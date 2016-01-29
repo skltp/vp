@@ -27,16 +27,42 @@
 		<!-- Message logging using the old Mule <logger/> - element -->
 		<AsyncLogger name="org.mule.api.processor.LoggerMessageProcessor" level="INFO"/>
 		<!-- Message logging using the old Mule <log-component/> - element -->
-		<AsyncLogger name="org.mule.component.simple.LogComponent" level="INFO"/>
-		<AsyncLogger name="org.soitoolkit.commons" level="INFO"/>
-		<AsyncLogger name="org.soitoolkit.tool.generator.onewaysav2mule370" level="INFO"/>
+		<AsyncLogger name="org.mule.component.simple.LogComponent" level="ERROR"/>
+		<AsyncLogger name="org.soitoolkit.commons" level="ERROR"/>
+
 		<!-- Message logging using soi-toolkit LogTransformer class -->
+		<!--
+			For logging events to QUEUE using EventLogger (if JMS-logging is enabled):
+
+			Defaults to payload logging = off
+
+			DEBUG puts logevents (with payload) and errorevents on log queue
+			INFO puts logevents (without payload) and errorevents on log queue
+			ERROR will only put errorevents on log queue
+		-->
 		<AsyncLogger name="org.soitoolkit.commons.mule.messageLogger" level="INFO"/>
 
-		<!--		
-		<AsyncLogger name="se.skl.tp.vp.vagvalrouter" level="DEBUG"/>
-		<AsyncLogger name="org.mule.transport.http" level="DEBUG"/>
-		-->
+		<AsyncLogger name="se.skl.tp.vp" level="INFO"/>
+		<AsyncLogger name="se.skl.tp.hsa" level="INFO"/>
+
+		<!-- Monitoring logs to separate log file, additivity makes sure not logged twice -->
+		<AsyncLogger name="se.skl.tp.vp.monitoring" level="DEBUG" additivity="false">
+			<AppenderRef ref="Console"/>
+		</AsyncLogger>
+
+		<!-- Level INFO will give log output for reset cache -->
+		<AsyncLogger name="se.skl.tp.vp.vagvalagent.VagvalAgent" level="INFO"/>
+		<!-- Level INFO will give log output for reset hsa cache -->
+		<AsyncLogger name="se.skl.tp.vp.vagvalagent.ResetHsaCache" level="INFO"/>
+		<!-- Level INFO will give log output during startup of VP, initiating VP caches etc -->
+		<AsyncLogger name="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler" level="INFO"/>
+
+
+		<!-- Level DEBUG: Log http headers transfered during a request/response -->
+		<AsyncLogger name="httpclient.wire.header" level="FATAL"/>
+		<!-- Level DEBUG: Log the http content transfered during a request/response -->
+		<AsyncLogger name="httpclient.wire.content" level="FATAL"/>
+
 		
 		<AsyncRoot level="WARN">
 			<AppenderRef ref="Console"/>
