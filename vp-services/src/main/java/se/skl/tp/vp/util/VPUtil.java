@@ -111,8 +111,12 @@ public final class VPUtil {
 		String remoteAddress = message.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
 		remoteAddress = remoteAddress.trim();
 		
-		final String s = remoteAddress.split(":")[0];
-		return s.substring(1, s.length());
+		String s = remoteAddress.split(":")[0];
+		if(s.startsWith("/"))
+			s = s.substring(1);
+		
+		final String ipAddress = s;
+		return ipAddress;
 	}
 	
 	//
