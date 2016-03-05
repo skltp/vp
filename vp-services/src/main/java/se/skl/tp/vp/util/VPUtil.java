@@ -111,12 +111,14 @@ public final class VPUtil {
 		String remoteAddress = message.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
 		remoteAddress = remoteAddress.trim();
 		
-		String s = remoteAddress.split(":")[0];
-		if(s.startsWith("/"))
-			s = s.substring(1);
+		// Remote address may start with a /
+		if(remoteAddress.startsWith("/"))
+			remoteAddress = remoteAddress.substring(1);		
 		
-		final String ipAddress = s;
-		return ipAddress;
+		// Remove port from remoteAddress
+		final String s = remoteAddress.split(":")[0];
+	
+		return s;
 	}
 	
 	//
