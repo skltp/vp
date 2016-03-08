@@ -41,6 +41,7 @@ public final class VPUtil {
 	private static final Logger log = LoggerFactory.getLogger(VPUtil.class);
 
 	public static final String REMOTE_ADDR = MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
+	public static final String MULE_PROXY_ADDRESS = MuleProperties.MULE_PROXY_ADDRESS;
 	
 	public static final String CONSUMER_CONNECTOR_HTTPS_NAME = "VPConsumerConnector";
 	public static final String CONSUMER_CONNECTOR_HTTPS_KEEPALIVE_NAME = "VPConsumerConnectorKeepAlive";
@@ -108,17 +109,30 @@ public final class VPUtil {
 	}
 	
 	public static String extractIpAddress(final MuleMessage message) {
-		String remoteAddress = message.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		// first check if we have a proxy-address
+		// Ref: MULE-7263
+		String remoteAddress = message.getProperty(VPUtil.MULE_PROXY_ADDRESS, PropertyScope.INBOUND);
+		if (remoteAddress == null) {
+			remoteAddress = message.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		}
+		
+		// format extracted address
+		// MULE_PROXY_ADDRESS for mule-3.7.0 looks like: MULE_PROXY_ADDRESS=/127.0.0.1:59443
+		// and
+		// MULE_REMOTE_CLIENT_ADDRESS for mule-3.7.0 looks like:
+		//   a) if MULE_PROXY_ADDRESS is present: MULE_REMOTE_CLIENT_ADDRESS=10.10.10.10
+		//   b) if MULE_PROXY_ADDRESS is NOT present: MULE_REMOTE_CLIENT_ADDRESS=/127.0.0.1:60563
 		remoteAddress = remoteAddress.trim();
-		
-		// Remote address may start with a /
-		if(remoteAddress.startsWith("/"))
-			remoteAddress = remoteAddress.substring(1);		
-		
-		// Remove port from remoteAddress
-		final String s = remoteAddress.split(":")[0];
-	
-		return s;
+		if (remoteAddress.startsWith("/")) {
+			remoteAddress = remoteAddress.substring(1);
+		}
+		// strip the port part
+		int portSeparator = remoteAddress.indexOf(':');
+		if (portSeparator > -1) {
+			remoteAddress = remoteAddress.substring(0, portSeparator);
+		}
+
+		return remoteAddress;
 	}
 	
 	//

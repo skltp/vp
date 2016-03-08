@@ -112,7 +112,6 @@ public class CallerNotOnWhitelistIntegrationTest extends
 					LOGICAL_ADDRESS, properties);
 			fail("expected exception!");
 		} catch (Exception e) {
-			e.printStackTrace();
 			assertTrue(e
 					.getMessage()
 					.contains(

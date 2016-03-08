@@ -86,6 +86,7 @@
 							<exclude>**/*.dtd</exclude>
 							<exclude>**/*.jks</exclude>
 							<exclude>**/*.pem</exclude>
+							<exclude>**/*.sh</exclude>
 						</excludes>
 						<useDefaultExcludes>true</useDefaultExcludes>
 						<mapping>
