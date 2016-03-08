@@ -47,7 +47,7 @@ import se.skl.tp.vp.vagvalagent.VagvalAgent;
 public class PingForConfigurationProducerRivTa21 implements PingForConfigurationResponderInterface {
 	
 	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationProducerRivTa21.class);
-	private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("yyyyMMddhhmmss");
+	private ThreadSafeSimpleDateFormat dateFormat = new ThreadSafeSimpleDateFormat("yyyyMMddHHmmss");
 	private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override", "vp-build");
 
 	@Inject
