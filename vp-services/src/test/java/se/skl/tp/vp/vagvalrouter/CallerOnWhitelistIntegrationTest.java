@@ -20,125 +20,58 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
-import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
 import se.skl.tp.vp.util.HttpHeaders;
-import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
-import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
-import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
-public class CallerOnWhitelistIntegrationTest extends AbstractTestCase {
+public class CallerOnWhitelistIntegrationTest extends
+		CallerOnWhitelistBaseIntegrationTest {
 
-	private static final int    CLIENT_TIMEOUT_MS = 60000;
-	private static final String PRODUCT_ID = "SW123";
-	private static final String TJANSTE_ADRESS_HTTP = "http://localhost:8080/vp/tjanst1";
-	private static final String LOGICAL_ADDRESS = "vp-test-producer";
-
-    private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config", "vp-config-override");
-
-	private static VpFullServiceTestConsumer_MuleClient testConsumer = null;
-
-	public CallerOnWhitelistIntegrationTest() {
-		super();
-		
-		// Only start up Mule once to make the tests run faster...
-		// Set to false if tests interfere with each other when Mule is started
-		// only once.
-		setDisposeContextPerClass(true);
-		
-		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
-		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS, "https://localhost:19000/vardgivare-b/tjanst1"));
-		svimi.setVagvalInputs(vagvalInputs);
-	}
-
-	private VagvalMockInputRecord createVagvalRecord(String receiverId, String adress) {
-		VagvalMockInputRecord vi_TP = new VagvalMockInputRecord();
-		vi_TP.receiverId = receiverId;
-		vi_TP.senderId = "tp";
-		vi_TP.rivVersion = "RIVTABP20";
-		vi_TP.serviceContractNamespace = "urn:riv:domain:subdomain:GetProductDetailResponder:1";
-		vi_TP.adress = adress;
-		return vi_TP;
-	}
-	
-	@Override
-	protected String getConfigResources() {
-		
-		/*
-		 * NOTE! This test uses a separate vp-common configuration file to
-		 * be able to mock a different vp-config-override.properties. The
-		 * 
-		 */
-		return 
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
-			"test-caller-on-whitelist/test-caller-on-whitelist-vp-common.xml," +
-			"services/VagvalRouter-service.xml," +
-			"vp-teststubs-and-services-config.xml";
-	}
-	
 	@Before
 	public void doSetUp() throws Exception {
 		super.doSetUp();
 
-		if (testConsumer == null) {
-			testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPInsecureConnector", CLIENT_TIMEOUT_MS);
-		}
+		assertIpWhiteListPreCondition();
 	}
-	
-	/**
-	 * Verify that when caller is using http and correct values for http headers 
-	 * x-vp-sender-id and x-vp-instance-id, a check is done against ip whitelist.
-	 * In this case ip whitelist does not contain 127.0.0.1.
-	 */
-	@Test
-	public void testVP011IsThrownWhenCallerIsNotOnWhitelistUsingHeaderX_VP_SENDER_ID() throws Exception {
-		
-		final String X_VP_SENDER_ID = "tp";
-		final String VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
-		
-		/*
-		 * Provide a valid vp instance id and x-vp-sender-id to trigger
-		 * a check on the ip whitelist.
-		 */
- 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(HttpHeaders.X_VP_SENDER_ID, X_VP_SENDER_ID);
-    	properties.put(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
-		
-		try {
-			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_HTTP, LOGICAL_ADDRESS, properties);
-			fail("Expected error here!");
-		} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("VP011 Caller was not on the white list of accepted IP-addresses. IP-address: 127.0.0.1. HTTP header that caused checking: x-vp-sender-id"));
-		}
+
+	protected void assertIpWhiteListPreCondition() {
+		assertEquals("127.0.0.1", IP_WHITE_LIST);
 	}
-	
+
 	@Test
-	public void testVP011IsThrownWhenCallerIsNotOnWhitelistUsingHeader_X_VP_CERT() throws Exception {
-			
-		/*
-		 * Provide a valid cert in http header x-vp-auth-cert to trigger
-		 * a check on the ip whitelist.
-		 */
- 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, "kalle");
-		
-		try {
-			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_HTTP, LOGICAL_ADDRESS, properties);
-			fail("Expected error here!");
-		} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("VP011 Caller was not on the white list of accepted IP-addresses. IP-address: 127.0.0.1. HTTP header that caused checking: x-vp-auth-cert"));
-		}
+	public void testOkCallerOnWhitelistUsingSenderIdAndVpInstanceId()
+			throws Exception {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(HttpHeaders.X_VP_SENDER_ID, "tp");
+		properties.put(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
+
+		Product p = testConsumer.callGetProductDetail(PRODUCT_ID,
+				TJANSTE_ADRESS_HTTP, LOGICAL_ADDRESS, properties);
+
+		assertEquals(PRODUCT_ID, p.getId());
+	}
+
+	@Test
+	public void testOkCallerOnWhitelistUsingReverseProxyTerminatingTls()
+			throws Exception {
+		// add headers set by fronting reverse proxy that terminates TLS
+		Map<String, String> properties = new HashMap<String, String>();
+		properties
+				.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
+		properties.put("X-Forwarded-For", "10.10.10.10");
+
+		Product p = testConsumer.callGetProductDetail(PRODUCT_ID,
+				TJANSTE_ADRESS_HTTP, LOGICAL_ADDRESS, properties);
+
+		assertEquals(PRODUCT_ID, p.getId());
 	}
 }
