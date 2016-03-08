@@ -35,7 +35,8 @@ import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 
-public class CallerOnWhitelistBaseIntegrationTest extends AbstractTestCase {
+public abstract class CallerOnWhitelistBaseIntegrationTest extends
+		AbstractTestCase {
 
 	protected static final int CLIENT_TIMEOUT_MS = 60000;
 	protected static final String PRODUCT_ID = "SW123";
@@ -48,7 +49,7 @@ public class CallerOnWhitelistBaseIntegrationTest extends AbstractTestCase {
 			.getString("VP_INSTANCE_ID");
 	protected static final String IP_WHITE_LIST = rb.getString("IP_WHITE_LIST");
 
-	protected static VpFullServiceTestConsumer_MuleClient testConsumer = null;
+	protected VpFullServiceTestConsumer_MuleClient testConsumer = null;
 	protected static String clientCertificate;
 
 	public CallerOnWhitelistBaseIntegrationTest() {
@@ -57,7 +58,7 @@ public class CallerOnWhitelistBaseIntegrationTest extends AbstractTestCase {
 		// Only start up Mule once to make the tests run faster...
 		// Set to false if tests interfere with each other when Mule is started
 		// only once.
-		setDisposeContextPerClass(true);
+		// setDisposeContextPerClass(true);
 
 		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
@@ -88,10 +89,8 @@ public class CallerOnWhitelistBaseIntegrationTest extends AbstractTestCase {
 	public void doSetUp() throws Exception {
 		super.doSetUp();
 
-		if (testConsumer == null) {
-			testConsumer = new VpFullServiceTestConsumer_MuleClient(
-					muleContext, "VPInsecureConnector", CLIENT_TIMEOUT_MS);
-		}
+		testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext,
+				"VPInsecureConnector", CLIENT_TIMEOUT_MS);
 	}
 
 	@BeforeClass

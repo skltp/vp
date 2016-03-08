@@ -22,11 +22,9 @@ package se.skl.tp.vp.vagvalrouter;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
