@@ -5,15 +5,15 @@
 	<parent>
 		<groupId>se.skltp.vp</groupId>
 		<artifactId>vp-parent</artifactId>
-		<version>2.2.10-SNAPSHOT</version>
+		<version>3.0.0-RC5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>vp-performance-tests</artifactId>
 
 	<properties>
-		<gatling.version>2.1.2</gatling.version>
-		<gatling-plugin.version>2.1.2</gatling-plugin.version>
+		<gatling.version>2.1.7</gatling.version>
+		<gatling-plugin.version>2.1.7</gatling-plugin.version>
 		<baseUrl>http://localhost:9088</baseUrl>
 	</properties>
 

@@ -7,3 +7,4 @@ target
 .idea
 vp-auto-deployer/src/test/resources/test.jar
 .mule/
+.metadata
