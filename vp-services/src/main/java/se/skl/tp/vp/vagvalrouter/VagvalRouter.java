@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
@@ -213,19 +214,23 @@ public class VagvalRouter extends AbstractRecipientList {
 
 		String url = (String) recipient;
 
-		//endpoint_url only set here in session to be able to log in EventLogger
-		message.setProperty(VPUtil.ENDPOINT_URL, url, PropertyScope.SESSION);
-
-		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, muleContext));
-		eb.setResponseTimeout(selectResponseTimeout(message));
-		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-		eb.setEncoding("UTF-8");
-
+		// Set and reove properties on the mule message.
+		
 		VagvalRouterHelper.propagateDefaultProperties(message);
 		VagvalRouterHelper.propagateSenderIdAndVpInstanceIdToProducer(message, url, vpInstanceTypedValue);
 		VagvalRouterHelper.propagateOriginalServiceConsumerHsaIdToProducer(message);
 		VagvalRouterHelper.propagateSoapActionToProducer(message);
 		VagvalRouterHelper.propagateCorrelationIdToProducer(message,url, propagateCorrelationIdForHttps);
+
+		//endpoint_url only set here in session to be able to log in EventLogger
+		message.setProperty(VPUtil.ENDPOINT_URL, url, PropertyScope.SESSION);
+
+		// Create EndpointBuilder
+		
+		EndpointBuilder eb = new EndpointURIEndpointBuilder(new URIBuilder(url, getMuleContext()));
+		eb.setResponseTimeout(selectResponseTimeout(message));
+		eb.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+		eb.setEncoding("UTF-8");
 
 		Connector connector = selectConsumerConnector(url, message);
 		eb.setConnector(connector);
@@ -233,11 +238,15 @@ public class VagvalRouter extends AbstractRecipientList {
 		
 		try {
 			OutboundEndpoint ep = eb.buildOutboundEndpoint();
+			if(null != ep)
+				getMuleContext().getRegistry().applyLifecycle(ep);
 			logger.debug("EndpointBuilder ready!!!");
 			return ep;
 		} catch (InitialisationException e) {
 			throw new VpTechnicalException(e);
 		} catch (EndpointException e) {
+			throw new VpTechnicalException(e);
+		} catch (MuleException e) {
 			throw new VpTechnicalException(e);
 		}
 	}
