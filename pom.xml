@@ -87,6 +87,7 @@
 							<exclude>**/*.jks</exclude>
 							<exclude>**/*.pem</exclude>
 							<exclude>**/*.sh</exclude>
+							<exclude>src/test/java/org/mule/util/**</exclude>
 						</excludes>
 						<useDefaultExcludes>true</useDefaultExcludes>
 						<mapping>
