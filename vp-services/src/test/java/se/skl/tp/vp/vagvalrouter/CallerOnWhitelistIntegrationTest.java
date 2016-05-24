@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.skl.tp.vp.util.HttpHeaders;
+import se.skl.tp.vp.util.VPUtil;
 import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 public class CallerOnWhitelistIntegrationTest extends
@@ -63,9 +64,9 @@ public class CallerOnWhitelistIntegrationTest extends
 			throws Exception {
 		// add headers set by fronting reverse proxy that terminates TLS
 		Map<String, String> properties = new HashMap<String, String>();
-		properties
-				.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
+		properties.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
 		properties.put("X-Forwarded-For", "10.10.10.10");
+		properties.put(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, "127.0.0.1");
 
 		Product p = testConsumer.callGetProductDetail(PRODUCT_ID,
 				TJANSTE_ADRESS_HTTP, LOGICAL_ADDRESS, properties);

@@ -42,7 +42,7 @@ public class CertificateExtractorFactoryTest {
 		Pattern pattern = null;
 
 		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, "127.0.0.1");
-		CertificateExtractor certificateExtractor = factory.creaetCertificateExtractor();
+		CertificateExtractor certificateExtractor = factory.createCertificateExtractor();
 
 		assertTrue(certificateExtractor instanceof CertificateHeaderExtractor);
 	}
@@ -54,7 +54,7 @@ public class CertificateExtractorFactoryTest {
 		Pattern pattern = null;
 
 		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, "127.0.0.1");
-		CertificateExtractor certificateExtractor = factory.creaetCertificateExtractor();
+		CertificateExtractor certificateExtractor = factory.createCertificateExtractor();
 
 		assertTrue(certificateExtractor instanceof CertificateChainExtractor);
 	}
