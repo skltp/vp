@@ -77,12 +77,12 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
     /**
      * Message aware transformer that extracts senderId to session variable
      */
-    @Override
+	@Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
     		
 		String senderId = message.getProperty(HttpHeaders.X_VP_SENDER_ID, PropertyScope.INBOUND, null);
 		String senderVpInstanceId = message.getProperty(HttpHeaders.X_VP_INSTANCE_ID, PropertyScope.INBOUND, null);
-		
+
 		/*
 		 * Extract sender ip adress to session scope to be able to log in EventLogger.
 		 */
@@ -122,7 +122,7 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 			try {
 				log.debug("No, look into the senders certificate instead");
 				CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message, pattern, whiteList);
-				CertificateExtractor certHelper = certificateExtractorFactory.creaetCertificateExtractor();
+				CertificateExtractor certHelper = certificateExtractorFactory.createCertificateExtractor();
 				senderId = certHelper.extractSenderIdFromCertificate();
 				log.debug("Sender id extracted from certificate {}", senderId);
 				

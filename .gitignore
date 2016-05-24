@@ -8,3 +8,5 @@ target
 vp-auto-deployer/src/test/resources/test.jar
 .mule/
 .metadata
+caches
+.recommenders

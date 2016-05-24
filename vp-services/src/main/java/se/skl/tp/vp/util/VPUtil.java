@@ -83,7 +83,8 @@ public final class VPUtil {
 	public static final String VP_X_FORWARDED_PROTO = "httpXForwardedProto";
 	public static final String VP_X_FORWARDED_HOST = "httpXForwardedHost";
 	public static final String VP_X_FORWARDED_PORT = "httpXForwardedPort";
-
+	public static final String X_MULE_REMOTE_CLIENT_ADDRESS = "X_MULE_REMOTE_CLIENT_ADDRESS";
+	
 	/*
 	 * Generic soap fault template, just use String.format(SOAP_FAULT, message);
 	 */
@@ -132,6 +133,31 @@ public final class VPUtil {
 			remoteAddress = remoteAddress.substring(0, portSeparator);
 		}
 
+		return remoteAddress;
+	}
+
+	/**
+	 * Extract the remote client address. Requires patch skltp-patch-mule-transport-http
+	 * @param message
+	 * @return
+	 */
+	public static String extractSocketIpAddress(final MuleMessage message) {
+		String remoteAddress = message.getProperty(X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND);
+		if (remoteAddress == null) {
+			return remoteAddress = extractIpAddress(message);
+		}
+		remoteAddress = remoteAddress.trim();
+		
+		remoteAddress = remoteAddress.trim();
+		if (remoteAddress.startsWith("/")) {
+			remoteAddress = remoteAddress.substring(1);
+		}
+		// strip the port part
+		int portSeparator = remoteAddress.indexOf(':');
+		if (portSeparator > -1) {
+			remoteAddress = remoteAddress.substring(0, portSeparator);
+		}
+		
 		return remoteAddress;
 	}
 	

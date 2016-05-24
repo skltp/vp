@@ -54,7 +54,7 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 		log.debug("Extracting from http header...");
 
 		// Check whitelist
-		String callersIp = VPUtil.extractIpAddress(getMuleMessage());
+		String callersIp = VPUtil.extractSocketIpAddress(getMuleMessage());
 		if(!VPUtil.isCallerOnWhiteList(callersIp, getWhiteList(), HttpHeaders.REVERSE_PROXY_HEADER_NAME)){
 			throw VPUtil.createVP011Exception(callersIp, HttpHeaders.REVERSE_PROXY_HEADER_NAME);
 		}

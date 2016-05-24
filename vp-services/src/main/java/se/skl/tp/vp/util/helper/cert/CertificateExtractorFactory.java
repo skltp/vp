@@ -52,7 +52,7 @@ public class CertificateExtractorFactory extends VPHelperSupport {
 	 * @param reverseProxyMode
 	 * @return
 	 */
-	public CertificateExtractor creaetCertificateExtractor() {
+	public CertificateExtractor createCertificateExtractor() {
 
 		final boolean isReverseProxy = this.isReverseProxy();
 		log.debug("Get extractor for X509Certificate. Reverse proxy mode: {}", isReverseProxy);

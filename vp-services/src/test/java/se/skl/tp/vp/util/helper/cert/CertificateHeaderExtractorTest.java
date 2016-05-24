@@ -58,7 +58,8 @@ public class CertificateHeaderExtractorTest {
 		final String senderId = helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND);
 
 		assertNotNull(senderId);
 		assertEquals("Harmony", senderId);
@@ -69,10 +70,12 @@ public class CertificateHeaderExtractorTest {
 		final MuleMessage msg = mockCertAndRemoteAddress();
 		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern,
 				"192.168.0.109, 127.0.0.1, localhost");
+		Mockito.when(msg.getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND)).thenReturn("/127.0.0.1:12345");
 		helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND);
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND);
 	}
 
@@ -93,7 +96,8 @@ public class CertificateHeaderExtractorTest {
 		}
 
 		Mockito.verify(msg, Mockito.times(0)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND);
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND);
 	}
 
@@ -105,7 +109,8 @@ public class CertificateHeaderExtractorTest {
 		helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND);
 		Mockito.verify(msg, Mockito.times(0)).getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND);
 	}
 
@@ -120,6 +125,7 @@ public class CertificateHeaderExtractorTest {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND)).thenReturn(cert);
 		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND)).thenReturn("/127.0.0.1:12345");
+		Mockito.when(msg.getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND)).thenReturn("/127.0.0.1:12345");
 
 		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "127.0.0.1");
 		try {
@@ -131,7 +137,7 @@ public class CertificateHeaderExtractorTest {
 		}
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
-		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND);
+		Mockito.verify(msg, Mockito.times(1)).getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND);
 	}
 
 	private MuleMessage mockCertAndRemoteAddress() {
@@ -145,6 +151,7 @@ public class CertificateHeaderExtractorTest {
 		final DefaultMuleMessage msg = Mockito.mock(DefaultMuleMessage.class);
 		Mockito.when(msg.getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND)).thenReturn(cert);
 		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND)).thenReturn("/192.168.0.109:12345");
+		Mockito.when(msg.getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND)).thenReturn("/192.168.0.109:12345");
 
 		return msg;
 	}

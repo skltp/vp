@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import se.skl.tp.vp.util.HttpHeaders;
+import se.skl.tp.vp.util.VPUtil;
 
 public class CallerNotOnWhitelistIntegrationTest extends
 		CallerOnWhitelistBaseIntegrationTest {
@@ -83,8 +84,8 @@ public class CallerNotOnWhitelistIntegrationTest extends
 		 * on the ip whitelist.
 		 */
 		Map<String, String> properties = new HashMap<String, String>();
-		properties
-				.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
+		properties.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
+		properties.put(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, "127.0.0.1");
 
 		try {
 			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_HTTP,
@@ -106,6 +107,7 @@ public class CallerNotOnWhitelistIntegrationTest extends
 		properties
 				.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
 		properties.put("X-Forwarded-For", "10.10.10.10");
+		properties.put(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, "127.0.0.1");
 
 		try {
 			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_HTTP,
