@@ -78,7 +78,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	 * @param vpInstanceId
 	 */
 	public void setVpInstanceId(String vpInstanceId) {
-		this.vpInstanceId = vpInstanceId;
+		this.vpInstanceId = VPUtil.trimProperty(vpInstanceId);
 		vpInstanceTypedValue = new TypedValue(vpInstanceId, DataType.STRING_DATA_TYPE);
 	}
 

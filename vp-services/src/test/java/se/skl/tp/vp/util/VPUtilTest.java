@@ -34,6 +34,7 @@ import se.skl.tp.vp.vagvalrouter.ExceptionMessageTransformer;
 public class VPUtilTest {
 	
 	public static final String WHITE_LIST="127.0.0.1,127.0.0.2,127.0.0.3";
+	public static final String WHITE_LIST_WITH_COMMENT="127.0.0.1,127.0.0.2,127.0.0.3 #Inline comment";
 	public static final String REMOTE_ADDRESS = "/127.0.0.1:52440";
 	
 	final static String CORRECT_FORMATED_SOAP_FAULT = 
@@ -63,7 +64,15 @@ public class VPUtilTest {
 		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.1", WHITE_LIST, HttpHeaders.X_VP_SENDER_ID);
 		assertTrue(callerOnWhiteList);
 	}
+
+	@Test
+	public void isCallerOnWhiteListOkWithComment(){
+				
+		boolean callerOnWhiteList = VPUtil.isCallerOnWhiteList("127.0.0.1", WHITE_LIST_WITH_COMMENT, HttpHeaders.X_VP_SENDER_ID);
+		assertTrue(callerOnWhiteList);
+	}
 	
+
 	@Test
 	public void isCallerOnWhiteListOkWhenWhiteListContainsLeadingWiteSpaces(){
 		

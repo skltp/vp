@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
+import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -45,9 +46,8 @@ public abstract class CallerOnWhitelistBaseIntegrationTest extends
 
 	protected static final RecursiveResourceBundle rb = new RecursiveResourceBundle(
 			"vp-config", "vp-config-override");
-	protected static final String VP_INSTANCE_ID = rb
-			.getString("VP_INSTANCE_ID");
-	protected static final String IP_WHITE_LIST = rb.getString("IP_WHITE_LIST");
+	protected static final String VP_INSTANCE_ID = VPUtil.trimProperty(rb.getString("VP_INSTANCE_ID"));
+	protected static final String IP_WHITE_LIST = VPUtil.trimProperty(rb.getString("IP_WHITE_LIST"));
 
 	protected VpFullServiceTestConsumer_MuleClient testConsumer = null;
 	protected static String clientCertificate;
