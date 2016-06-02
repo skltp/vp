@@ -54,7 +54,7 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 	private String senderIpAdressHttpHeader;
 	
 	public void setVpInstanceId(String vpInstanceId) {
-		this.vpInstanceId = vpInstanceId;
+		this.vpInstanceId = VPUtil.trimProperty(vpInstanceId);
 	}
 
 	public void setWhiteList(final String whiteList) {
