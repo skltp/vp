@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>se.skltp.commons</groupId>
 		<artifactId>skltp-commons-mule-parent</artifactId>
-		<version>1.1.0</version>
+		<version>2.0.0</version>
 	</parent>
 
 	<groupId>se.skltp.vp</groupId>
@@ -100,17 +100,6 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>sonar-maven-plugin</artifactId>
 					<version>2.7.1</version>
-				</plugin>
-				<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-release-plugin</artifactId>
-						<version>2.5.1</version>
-						<configuration>
-								<autoVersionSubmodules>true</autoVersionSubmodules>
-								<tagNameFormat>v@{project.version}</tagNameFormat>
-								<pushChanges>false</pushChanges>
-								<localCheckout>true</localCheckout>
-						</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
