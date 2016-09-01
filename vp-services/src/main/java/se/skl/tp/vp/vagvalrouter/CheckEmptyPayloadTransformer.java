@@ -36,6 +36,7 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 	
 	private static final Logger log = LoggerFactory.getLogger(CheckEmptyPayloadTransformer.class);
 	
+	private static final String nullPayload = "{NullPayload}";
     /**
      * Message aware transformer that checks payload
      */
@@ -49,7 +50,9 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 		}
     		
     	try {
-			if (message.getPayloadAsString().length() == 0) {
+    		String strPayload = message.getPayloadAsString();
+    		
+			if (strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
 				String cause = "No content found! Server responded with status code: " + message.getInboundProperty("http.status");
 				message.setPayload(generateSoap11FaultWithCause(cause));    	
