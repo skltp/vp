@@ -259,13 +259,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 
 	private MuleEvent setSoapFaultInResponse(MuleEvent event, String cause, String errorCode){
-		String soapFault = VPUtil.generateSoap11FaultWithCause(cause);
 		MuleMessage message = event.getMessage();
-		message.setPayload(soapFault);
-		message.setExceptionPayload(null);
-		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
-		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-		message.setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
+		VPUtil.setSoapFaultInResponse(message, cause, errorCode);
 		return event;
 	}
 
