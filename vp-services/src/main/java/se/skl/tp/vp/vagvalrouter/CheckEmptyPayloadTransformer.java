@@ -26,10 +26,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
-
-import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
-import static se.skl.tp.vp.util.VPUtil.generateSoap11FaultWithCause;;
+import static se.skl.tp.vp.util.VPUtil.generateSoap11FaultWithCause;
 
 /**
  * CheckEmptyPayloadTransformer responsible to check if return message is "" and if so replace it with a SoapFault
@@ -59,7 +56,6 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
 				String cause = "No content found! Server responded with status code: " + message.getInboundProperty("http.status");
 				message.setPayload(generateSoap11FaultWithCause(cause));    	
-				setSoapFaultInResponse(message, cause, VpSemanticErrorCodeEnum.VP009.toString());
 			}
 		} catch (Exception e) {
 	   		log.error("Error reading message as String after check that the message is a String!.");
