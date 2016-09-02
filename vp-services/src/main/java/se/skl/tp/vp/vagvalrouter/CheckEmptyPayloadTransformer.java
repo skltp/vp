@@ -25,8 +25,17 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
-import static se.skl.tp.vp.util.VPUtil.generateSoap11FaultWithCause;
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
+import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.EventLogger;
+
+import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * CheckEmptyPayloadTransformer responsible to check if return message is "" and if so replace it with a SoapFault
@@ -35,8 +44,36 @@ import static se.skl.tp.vp.util.VPUtil.generateSoap11FaultWithCause;
 public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 	
 	private static final Logger log = LoggerFactory.getLogger(CheckEmptyPayloadTransformer.class);
-	
+	private final EventLogger eventLogger = new EventLogger();	
 	private static final String nullPayload = "{NullPayload}";
+
+	/**
+	 * Enable logging to JMS, it true by default
+	 * 
+	 * @param logEnableToJms
+	 */
+	public void setEnableLogToJms(boolean logEnableToJms) {	
+		this.eventLogger.setEnableLogToJms(logEnableToJms);
+	}
+
+	/**
+	 * Setter for the jaxbToXml property
+	 * 
+	 * @param jaxbToXml
+	 */
+	public void setJaxbObjectToXml(JaxbObjectToXmlTransformer jaxbToXml) {
+		this.eventLogger.setJaxbToXml(jaxbToXml);
+	}
+	
+    /**
+     * Set the queue name for log error messages.
+     * 
+     * @param queueName
+     */
+    public void setLogErrorQueueName(String queueName) {
+        this.eventLogger.setLogErrorQueueName(queueName);
+    }
+    
     /**
      * Message aware transformer that checks payload
      */
@@ -55,12 +92,21 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 			if (strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
 				String cause = "No content found! Server responded with status code: " + message.getInboundProperty("http.status");
-				message.setPayload(generateSoap11FaultWithCause(cause));    	
+				setSoapFaultInResponse(message, cause, VpSemanticErrorCodeEnum.VP009.toString());
+				logException(message, new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));
 			}
 		} catch (Exception e) {
-	   		log.error("Error reading message as String after check that the message is a String!.");
-	   		e.printStackTrace();
+	   		log.error("An error occured in CheckEmptyPayloadTransformer!.", e);
 		}
 		return message;
     }
+    
+	@SuppressWarnings("deprecation")
+	private void logException(MuleMessage message, Throwable t) {
+		Map<String, String> extraInfo = new HashMap<String, String>();
+		extraInfo.put("source", getClass().getName());
+		eventLogger.setMuleContext(message.getMuleContext());	
+		eventLogger.addSessionInfo(message, extraInfo);
+		eventLogger.logErrorEvent(t, message, null, extraInfo);
+	}
 }
