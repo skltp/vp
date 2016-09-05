@@ -86,15 +86,31 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
     		throw new TransformerException(null);
 		}
     		
+		String cause = null;
     	try {
     		String strPayload = message.getPayloadAsString();
-    		
+    		Integer status = message.getOutboundProperty("http.status");
 			if (strPayload.length() == 0 || strPayload.equals(nullPayload)) {
+				
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
-				String cause = "No content found! Server responded with status code: " + message.getInboundProperty("http.status");
+				cause = VpSemanticErrorCodeEnum.VP009 + " No content found! Server responded with status code: " + message.getInboundProperty("http.status");
 				setSoapFaultInResponse(message, cause, VpSemanticErrorCodeEnum.VP009.toString());
 				logException(message, new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));
+				
+			} else if(status == 500 && !strPayload.contains("http://schemas.xmlsoap.org/soap/envelope/")) {
+				
+				// See ExceptionTransformer
+				// We must handle this error here, where payload is not xml. 
+				// Otherwise there will be a cxf error and we will end up in the general exception handling
+				// According to specification VP should always return a VPxxx error when soap fault.
+				// Unclear what should happen if producer returns soap fault.
+				
+				log.debug("Found response message and http.status = 500. Response was : " + left(strPayload, 200) + "...");
+				cause = VpSemanticErrorCodeEnum.VP009 + " Service unavailable! Server responded with status code: " + message.getInboundProperty("http.status");
+				setSoapFaultInResponse(message, cause, VpSemanticErrorCodeEnum.VP009.toString());
+				logException(message, new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));				
 			}
+				
 		} catch (Exception e) {
 	   		log.error("An error occured in CheckEmptyPayloadTransformer!.", e);
 		}
@@ -108,5 +124,13 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 		eventLogger.setMuleContext(message.getMuleContext());	
 		eventLogger.addSessionInfo(message, extraInfo);
 		eventLogger.logErrorEvent(t, message, null, extraInfo);
+	}
+	
+	private String left(String s, int len) {
+		if(s == null)
+			return null;
+		
+		int i =  s.length() > len ? len : s.length();
+		return s.substring(0, i);
 	}
 }

@@ -24,19 +24,23 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transport.NullPayload;
+import org.mule.transport.NullPayloadTestCase;
+
+import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 /**
  * Simple class that returns a zero length response.
  * @author matsekhammar
  *
  */
-public class VpHttpTestProducerTransformer extends AbstractMessageTransformer{    
+public class VpHttpTestProducer500Transformer extends AbstractMessageTransformer{    
     @Override
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
 		
-		message.setProperty("http.status", 404, PropertyScope.OUTBOUND);
-		message.setPayload("");
+		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
+		message.setPayload("Not xml");
 		return message;
 	}
 }
