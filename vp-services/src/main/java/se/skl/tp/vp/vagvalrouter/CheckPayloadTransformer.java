@@ -41,9 +41,9 @@ import java.util.Map;
  * CheckEmptyPayloadTransformer responsible to check if return message is "" and if so replace it with a SoapFault
  * 
  */
-public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
+public class CheckPayloadTransformer extends AbstractMessageTransformer{
 	
-	private static final Logger log = LoggerFactory.getLogger(CheckEmptyPayloadTransformer.class);
+	private static final Logger log = LoggerFactory.getLogger(CheckPayloadTransformer.class);
 	private final EventLogger eventLogger = new EventLogger();	
 	private static final String nullPayload = "{NullPayload}";
 
@@ -86,16 +86,14 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
     		throw new TransformerException(null);
 		}
     		
-		String cause = null;
     	try {
+    		String cause = null;
     		String strPayload = message.getPayloadAsString();
     		Integer status = message.getOutboundProperty("http.status");
 			if (strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
 				cause = VpSemanticErrorCodeEnum.VP009 + " No content found! Server responded with status code: " + message.getInboundProperty("http.status");
-				setSoapFaultInResponse(message, cause, VpSemanticErrorCodeEnum.VP009.toString());
-				logException(message, new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));
 				
 			} else if(status == 500 && !strPayload.contains("http://schemas.xmlsoap.org/soap/envelope/")) {
 				
@@ -107,12 +105,15 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 				
 				log.debug("Found response message and http.status = 500. Response was : " + left(strPayload, 200) + "...");
 				cause = VpSemanticErrorCodeEnum.VP009 + " Service unavailable! Server responded with status code: " + message.getInboundProperty("http.status");
+			}
+			
+			if(cause != null) {
 				setSoapFaultInResponse(message, cause, VpSemanticErrorCodeEnum.VP009.toString());
-				logException(message, new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));				
+				logException(message, new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));								
 			}
 				
 		} catch (Exception e) {
-	   		log.error("An error occured in CheckEmptyPayloadTransformer!.", e);
+	   		log.error("An error occured in CheckPayloadTransformer!.", e);
 		}
 		return message;
     }
@@ -125,7 +126,7 @@ public class CheckEmptyPayloadTransformer extends AbstractMessageTransformer{
 		eventLogger.addSessionInfo(message, extraInfo);
 		eventLogger.logErrorEvent(t, message, null, extraInfo);
 	}
-	
+
 	private String left(String s, int len) {
 		if(s == null)
 			return null;

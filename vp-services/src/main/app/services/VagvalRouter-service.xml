@@ -95,7 +95,7 @@
                 	<processor-chain>
            				<transformer ref="exceptionTransformer" />
 	            		<object-to-string-transformer />
-	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckEmptyPayloadTransformer">
+	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckPayloadTransformer">
 			        		<!-- EventLogger properties -->
 							<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
 			        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
