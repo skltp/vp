@@ -28,9 +28,6 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
-import se.skl.tp.vp.util.VPUtil;
-
 public class ExceptionTransformer extends AbstractMessageTransformer {
 
 	private static Logger logger = LoggerFactory.getLogger(ExceptionTransformer.class);
