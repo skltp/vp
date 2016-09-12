@@ -46,6 +46,8 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 	private static final Logger log = LoggerFactory.getLogger(CheckPayloadTransformer.class);
 	private final EventLogger eventLogger = new EventLogger();	
 	private static final String nullPayload = "{NullPayload}";
+	private static final Integer HTTP_STATUS_500 = 500;
+	private static final String SOAP_XMLNS = "http://schemas.xmlsoap.org/soap/envelope/";
 
 	/**
 	 * Enable logging to JMS, it true by default
@@ -85,17 +87,18 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
     		log.error("Wrong type encountered in transformer! Bailing out...");
     		throw new TransformerException(null);
 		}
-    		
+
+		Integer status = message.getOutboundProperty("http.status");
+
     	try {
     		String cause = null;
     		String strPayload = message.getPayloadAsString();
-    		Integer status = message.getOutboundProperty("http.status");
-			if (strPayload.length() == 0 || strPayload.equals(nullPayload)) {
+			if (strPayload == null || strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
 				cause = VpSemanticErrorCodeEnum.VP009 + " No content found! Server responded with status code: " + message.getInboundProperty("http.status");
 				
-			} else if(status == 500 && !strPayload.contains("http://schemas.xmlsoap.org/soap/envelope/")) {
+			} else if(HTTP_STATUS_500.equals(status) && !strPayload.contains(SOAP_XMLNS)) {
 				
 				// See ExceptionTransformer
 				// We must handle this error here, where payload is not xml. 
