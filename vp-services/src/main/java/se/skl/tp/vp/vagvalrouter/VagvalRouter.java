@@ -70,6 +70,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	
 	private Boolean propagateCorrelationIdForHttps;
 	
+	private int retryRoute;
+	
 	private final EventLogger eventLogger = new EventLogger();
 
 	/**
@@ -95,6 +97,10 @@ public class VagvalRouter extends AbstractRecipientList {
 		this.propagateCorrelationIdForHttps = propagateCorrelationIdForHttps;
 	}
 
+	public void setRetryRouteAfterMs(final int retry) {
+		retryRoute = retry;
+	}
+	
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		setAddressingHelper(new AddressingHelper(vagvalAgent));
 	}
@@ -135,13 +141,16 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	@Override
 	protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
-		ExecutionTimer.start(VPUtil.TIMER_ROUTE);
 		try {
+			ExecutionTimer.start(VPUtil.TIMER_ROUTE);
 			String addr = addrHelper.getAddress(event.getMessage());
 
 			logger.debug("Endpoint address is {}", addr);
 
 			return Collections.singletonList((Object) addr);
+		} catch(Exception e) {
+			logger.error("Error in getRecipients", e);
+			throw e;			
 		} finally {
 			ExecutionTimer.stop(VPUtil.TIMER_ROUTE);
 		}
@@ -169,7 +178,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		try {
 			setDisableMuleCorrelation(true);
 			// Do the actual routing
-			replyEvent = super.route(event);
+			replyEvent = doRoute(event);
 		} catch (RoutingException re) {
 			/*
 			 * RoutingExceotion goes here, e.g when unable to connect to producer
@@ -251,6 +260,28 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 	}
 
+	private MuleEvent doRoute(MuleEvent event) throws RoutingException {
+		MuleEvent replyEvent = null;
+		try {
+			replyEvent = super.route(event);
+		} catch(CouldNotRouteOutboundMessageException ec) {
+			
+			if(retryRoute == 0)
+				throw ec;
+			else {
+				logger.error("We got an error {}", (Integer)event.getMessage().getInboundProperty("http.status"));
+				logger.error("Could not route. Will retry after {} sec ...", retryRoute);
+				try {
+					Thread.sleep(retryRoute);
+				} catch (InterruptedException e) {
+					throw ec;
+				}
+				replyEvent = super.route(event);
+			}
+		}
+		return replyEvent;
+	}
+	
 	protected int selectResponseTimeout(MuleMessage message) {
 		//Feature: Select response timeout provided by invoked service or use global default in responseTimeout
 		int responseTimeoutValue = message.getProperty(VPUtil.FEATURE_RESPONSE_TIMOEUT, PropertyScope.INVOCATION,responseTimeout);
@@ -259,13 +290,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 
 	private MuleEvent setSoapFaultInResponse(MuleEvent event, String cause, String errorCode){
-		String soapFault = VPUtil.generateSoap11FaultWithCause(cause);
-		MuleMessage message = event.getMessage();
-		message.setPayload(soapFault);
-		message.setExceptionPayload(null);
-		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
-		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-		message.setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
+		VPUtil.setSoapFaultInResponse(event.getMessage(), cause, errorCode);
 		return event;
 	}
 

@@ -23,6 +23,7 @@ package se.skl.tp.vp.util;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
@@ -263,4 +264,12 @@ public final class VPUtil {
 				+ callersIp + ". HTTP header that caused checking: " + httpHeaderCausingCheck, VpSemanticErrorCodeEnum.VP011);
 	}
 	
+	public static void setSoapFaultInResponse(MuleMessage message, String cause, String errorCode){
+		String soapFault = VPUtil.generateSoap11FaultWithCause(cause);
+		message.setPayload(soapFault);
+		message.setExceptionPayload(null);
+		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
+		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
+	}
 }
