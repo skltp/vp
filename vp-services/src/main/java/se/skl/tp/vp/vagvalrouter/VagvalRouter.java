@@ -142,7 +142,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	@Override
 	protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
 		try {
-			ExecutionTimer.start(VPUtil.TIMER_ROUTE);
+		ExecutionTimer.start(VPUtil.TIMER_ROUTE);
 			String addr = addrHelper.getAddress(event.getMessage());
 
 			logger.debug("Endpoint address is {}", addr);

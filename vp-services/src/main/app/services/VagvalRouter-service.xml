@@ -67,6 +67,9 @@
             <spring:property name="vagvalAgent" ref="vagvalAgent" />
 
 			<!-- Default value for response timeout is set in VagvalRouter -->
+            <spring:property name="retryRouteAfterMs" value="${RETRY_ROUTE_AFTER_MS}" />
+
+			<!-- Default value for response timeout is set in VagvalRouter -->
             <spring:property name="responseTimeout" value="${SERVICE_TIMEOUT_MS}" />
             
             <!-- Value for HTTP header x-vp-instance-id -->
