@@ -70,6 +70,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	
 	private Boolean propagateCorrelationIdForHttps;
 	
+	private int retryRoute;
+	
 	private final EventLogger eventLogger = new EventLogger();
 
 	/**
@@ -95,6 +97,10 @@ public class VagvalRouter extends AbstractRecipientList {
 		this.propagateCorrelationIdForHttps = propagateCorrelationIdForHttps;
 	}
 
+	public void setRetryRouteAfterMs(final int retry) {
+		retryRoute = retry;
+	}
+	
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
 		setAddressingHelper(new AddressingHelper(vagvalAgent));
 	}
@@ -169,7 +175,7 @@ public class VagvalRouter extends AbstractRecipientList {
 		try {
 			setDisableMuleCorrelation(true);
 			// Do the actual routing
-			replyEvent = super.route(event);
+			replyEvent = doRoute(event);
 		} catch (RoutingException re) {
 			/*
 			 * RoutingExceotion goes here, e.g when unable to connect to producer
@@ -251,6 +257,27 @@ public class VagvalRouter extends AbstractRecipientList {
 		}
 	}
 
+	private MuleEvent doRoute(MuleEvent event) throws RoutingException {
+		MuleEvent replyEvent = null;
+		try {
+			replyEvent = super.route(event);
+		} catch(CouldNotRouteOutboundMessageException ec) {
+			
+			if(retryRoute == 0)
+				throw ec;
+			else {
+				logger.error("Could not route. Will retry after {} sec ...", retryRoute);
+				try {
+					Thread.sleep(retryRoute);
+				} catch (InterruptedException e) {
+					throw ec;
+				}
+				replyEvent = super.route(event);
+			}
+		}
+		return replyEvent;
+	}
+	
 	protected int selectResponseTimeout(MuleMessage message) {
 		//Feature: Select response timeout provided by invoked service or use global default in responseTimeout
 		int responseTimeoutValue = message.getProperty(VPUtil.FEATURE_RESPONSE_TIMOEUT, PropertyScope.INVOCATION,responseTimeout);
