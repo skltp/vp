@@ -186,7 +186,7 @@ public class VagvalRouter extends AbstractRecipientList {
 			String addr = addrHelper.getAddress(event.getMessage());
 			String cause = VpSemanticErrorCodeEnum.VP009 + " Error connecting to service producer at adress " + addr;
 			setSoapFaultInResponse(event, cause, VpSemanticErrorCodeEnum.VP009.toString());
-			logException(event.getMessage(), re);
+			logException(event.getMessage(), new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));
 			return event;
 
 		} catch (RuntimeException re) {
