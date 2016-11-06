@@ -67,6 +67,9 @@
             <spring:property name="vagvalAgent" ref="vagvalAgent" />
 
 			<!-- Default value for response timeout is set in VagvalRouter -->
+            <spring:property name="retryRouteAfterMs" value="${RETRY_ROUTE_AFTER_MS}" />
+
+			<!-- Default value for response timeout is set in VagvalRouter -->
             <spring:property name="responseTimeout" value="${SERVICE_TIMEOUT_MS}" />
             
             <!-- Value for HTTP header x-vp-instance-id -->
@@ -95,7 +98,12 @@
                 	<processor-chain>
            				<transformer ref="exceptionTransformer" />
 	            		<object-to-string-transformer />
-	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckEmptyPayloadTransformer"/>
+	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckPayloadTransformer">
+			        		<!-- EventLogger properties -->
+							<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+			        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+							<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+	            		</custom-transformer>
 	            		<transformer ref="logRespOut" />
                 	</processor-chain>
             	</otherwise>

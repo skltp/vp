@@ -64,6 +64,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER     = "unknown-logical-address ";
 	private static final String LOGICAL_ADDRESS_NO_CONNECTION = "vp-test-producer-no-connection";
 	private static final String LOGICAL_ADDRESS_ZERO_LENGTH = "zeroLength";
+	private static final String LOGICAL_ADDRESS_500 = "response500";
 
     private static final RecursiveResourceBundle rb = new RecursiveResourceBundle("vp-config","vp-config-override");
 
@@ -108,6 +109,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_HTTP,               "http://localhost:19001/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_NO_CONNECTION, "https://www.google.com:81"));
         vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_ZERO_LENGTH,    "http://localhost:8081/zeroLength"));
+        vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_500, "http://localhost:8081/response500"));
 		svimi.setVagvalInputs(vagvalInputs);
 	}
 	
@@ -222,7 +224,22 @@ public class VpFullServiceTest extends AbstractTestCase {
     	}
 	}
 	
-
+	/**
+	 * Verify that we handle a response from service producer with http.status=500 and a payload
+	 * (which is typically non-xml).
+	 * @throws Exception
+	 */
+	@Test
+	public void test500ResponseMessage() throws Exception {
+		
+    	try {
+    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_500);
+    		fail("Expected error here!");
+    	} catch (Exception ex) {
+			assertTrue(ex.getMessage().contains("Service unavailable!"));
+    	}
+	}
+	
 	/**
 	 * Verify that VP send info log events to JMS queue by default
 	 * @throws Exception

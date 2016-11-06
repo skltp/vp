@@ -59,10 +59,10 @@ public class ExceptionTransformer extends AbstractMessageTransformer {
 			logger.debug("No error, return origin message");
 			return msg;
 		}
+				
+		msg.setExceptionPayload(null);
+		msg.setProperty("http.status", 500, PropertyScope.OUTBOUND);
 		
-		 msg.setExceptionPayload(null);
-		 msg.setProperty("http.status", 500, PropertyScope.OUTBOUND);
-		
-        return msg;
+		return msg;
  	}
 }

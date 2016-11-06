@@ -23,6 +23,7 @@ package se.skl.tp.vp.util;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
@@ -175,6 +176,30 @@ public final class VPUtil {
 	}
 	
 	/**
+	 * Remove possible inline comment.
+	 * 
+	 * @param whiteList
+	 * @return
+	 */
+	public static String removeInlineComment(String text) {
+		
+		if(text != null && text.contains("#"))
+			return text.split("#")[0].trim();
+		else
+			return text;
+	}
+
+	/**
+	 * Removes trailing spaces and comments
+	 * @param text
+	 * @return
+	 */
+	public static String trimProperty(String text) {
+		
+			return text == null ? null : removeInlineComment(text).trim();
+	}
+
+	/**
 	 * Check if the calling ip address is on accepted list of ip addresses or subdomains. False
 	 * is always returned in case no whitelist exist or ip address is empty.
 	 * 
@@ -193,11 +218,15 @@ public final class VPUtil {
 			return false;
 		}
 		
+		// Remove possible inline comment
+		whiteList = VPUtil.trimProperty(whiteList);
+		
 		//When no whitelist exist we can not validate incoming ip address
 		if (VPUtil.isWhitespace(whiteList)) {
 			log.warn("A check against the ip address whitelist was requested, but the whitelist is configured empty. Update VP configuration property IP_WHITE_LIST");
 			return false;
 		}
+		
 		
 		for (String ipAddress : whiteList.split(",")) {
 			if(callerIp.startsWith(ipAddress.trim())){
@@ -235,4 +264,12 @@ public final class VPUtil {
 				+ callersIp + ". HTTP header that caused checking: " + httpHeaderCausingCheck, VpSemanticErrorCodeEnum.VP011);
 	}
 	
+	public static void setSoapFaultInResponse(MuleMessage message, String cause, String errorCode){
+		String soapFault = VPUtil.generateSoap11FaultWithCause(cause);
+		message.setPayload(soapFault);
+		message.setExceptionPayload(null);
+		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
+		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
+	}
 }

@@ -9,12 +9,12 @@
 	<parent>
 		<groupId>se.skltp.commons</groupId>
 		<artifactId>skltp-commons-mule-parent</artifactId>
-		<version>1.1.0</version>
+		<version>2.0.1</version>
 	</parent>
 
 	<groupId>se.skltp.vp</groupId>
 	<artifactId>vp-parent</artifactId>
-	<version>3.0.3-SNAPSHOT</version>
+	<version>3.1.1</version>
 	<packaging>pom</packaging>
 	<name>vp-parent</name>
 
@@ -23,13 +23,14 @@
 		<vp.cxf.version>2.7.15</vp.cxf.version>
 		<sonar.host.url>http://localhost:9000</sonar.host.url>
 		<sonar.jdbc.url>jdbc:jtds:sqlserver://localhost;databaseName=sonar;SelectMethod=Cursor</sonar.jdbc.url>
-	</properties>
-
+		<!-- Turn off strict checking of javadoc tags for Java 8 -->
+        <additionalparam>-Xdoclint:none</additionalparam>
+    </properties>
 	<scm>
 		<url>http://github.com/skltp/vp</url>
 		<connection>scm:git:git://github.com/skltp/vp.git</connection>
 		<developerConnection>scm:git:git://github.com/skltp/vp.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v3.1.1</tag>
 	</scm>
 
 	<repositories>
@@ -100,17 +101,6 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>sonar-maven-plugin</artifactId>
 					<version>2.7.1</version>
-				</plugin>
-				<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-release-plugin</artifactId>
-						<version>2.5.1</version>
-						<configuration>
-								<autoVersionSubmodules>true</autoVersionSubmodules>
-								<tagNameFormat>v@{project.version}</tagNameFormat>
-								<pushChanges>false</pushChanges>
-								<localCheckout>true</localCheckout>
-						</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>

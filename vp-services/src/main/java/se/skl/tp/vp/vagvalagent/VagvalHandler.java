@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.datatype.DatatypeConstants;
-
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
