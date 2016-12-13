@@ -17,10 +17,6 @@
     <packaging>mule</packaging>
 	<name>vp-services</name>
 
-	<properties>
-		<tak.version>1.5.0</tak.version>
-    </properties>
-
 	<dependencies>
 		<dependency>
 		  <groupId>org.soitoolkit.commons.components</groupId>

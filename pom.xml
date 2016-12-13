@@ -25,6 +25,7 @@
 		<sonar.jdbc.url>jdbc:jtds:sqlserver://localhost;databaseName=sonar;SelectMethod=Cursor</sonar.jdbc.url>
 		<!-- Turn off strict checking of javadoc tags for Java 8 -->
         <additionalparam>-Xdoclint:none</additionalparam>
+		<tak.version>1.5.0</tak.version>
     </properties>
 	<scm>
 		<url>http://github.com/skltp/vp</url>
