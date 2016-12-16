@@ -48,9 +48,11 @@ public class AddressingHelper {
 	private static final Logger log = LoggerFactory.getLogger(AddressingHelper.class);
 
 	private VisaVagvalsInterface agent;
+	private String vpInstanceId;
 
-	public AddressingHelper(final VisaVagvalsInterface agent) {
+	public AddressingHelper(final VisaVagvalsInterface agent, String vpInstanceId) {
 		this.agent = agent;
+		this.vpInstanceId = vpInstanceId;
 	}
 
 	public String getAvailableRivProfile(MuleMessage muleMessage) {
@@ -216,7 +218,7 @@ public class AddressingHelper {
 				whitespaceDetectedHintString = ". Whitespace detected in incoming request!";
 			}
 			String errorMessage = VpSemanticErrorCodeEnum.VP004 + " No Logical Adress found for serviceNamespace:" + request.serviceContractNamespace
-					+ ", receiverId:" + request.receiverId + whitespaceDetectedHintString;
+					+ ", receiverId:" + request.receiverId + ", From:" + vpInstanceId + whitespaceDetectedHintString;
 			log.info(errorMessage);
 			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP004);
 		}

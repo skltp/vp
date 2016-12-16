@@ -42,6 +42,8 @@ import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
+import com.mchange.util.AssertException;
+
 import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
@@ -473,26 +475,29 @@ public class VpFullServiceTest extends AbstractTestCase {
 	@Test
 	public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceBefore() throws Exception {
 		
+		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
 		Map<String, String> properties = new HashMap<String, String>();
     	
     	try {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ". Whitespace detected in incoming request!"));
-    	}
+    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ", From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));    	}
 	}
 
 	@Test
 	public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceAfter() throws Exception {
-		
-		Map<String, String> properties = new HashMap<String, String>();
+
+		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
+
+ 		Map<String, String> properties = new HashMap<String, String>();
     	
     	try {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ". Whitespace detected in incoming request!"));
+    		String msg = ex.getMessage();
+    		assertTrue(msg.contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ", From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));
     	}
 	}
 

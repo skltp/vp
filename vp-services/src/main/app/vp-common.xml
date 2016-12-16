@@ -171,9 +171,9 @@
 	</custom-transformer>
 	
 	<custom-transformer name="rivTransformer" class="se.skl.tp.vp.vagvalrouter.RivTransformer" >
-        <spring:property
-            name="vagvalAgent"
-            ref="vagvalAgent" />
+        <!-- Value for HTTP header x-vp-instance-id -->
+        <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
+        <spring:property name="vagvalAgent" ref="vagvalAgent" />
    </custom-transformer>
 	
 	<custom-transformer name="exceptionTransformer" class="se.skl.tp.vp.vagvalrouter.ExceptionTransformer"/>

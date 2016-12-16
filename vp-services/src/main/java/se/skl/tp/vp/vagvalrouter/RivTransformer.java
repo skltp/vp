@@ -32,10 +32,12 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.TypedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,13 +69,19 @@ public class RivTransformer extends AbstractMessageTransformer {
 
     private static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
+	private String vpInstanceId;
+
 	public RivTransformer() {
 		super();
 	}
 
+	public void setVpInstanceId(String vpInstanceId) {
+		this.vpInstanceId = VPUtil.trimProperty(vpInstanceId);
+	}
+
 	public void setVagvalAgent(final VisaVagvalsInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
-		addrHelper = new AddressingHelper(vagvalAgent);
+		addrHelper = new AddressingHelper(vagvalAgent, vpInstanceId);
 	}
 
 	@Override
