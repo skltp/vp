@@ -142,7 +142,7 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
 		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
 		message.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, nvl(t.getMessage()), PropertyScope.SESSION);
 		message.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, nvl(t.toString()), PropertyScope.SESSION);
-		String errorCode = "";
+		String errorCode = "VP009";
 		if (t instanceof VpSemanticException) {
 			errorCode = ((VpSemanticException) t).getErrorCode().toString();	
 		}
