@@ -39,11 +39,12 @@
 	
 	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
 	
-	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
+	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent" init-method="doRemoveTakCache">
 		<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_TESTSTUB_URL}" />
 		<spring:property name="addressDelimiter" value="#" />
 		<spring:property name="hsaCache" ref="hsaCache"/>
-		<spring:property name="localTakCache" value="${user.home}${file.separator}.tk.localCache.test"/>
+		<spring:property name="localTakCache" value="target/.tk.localCache.test"/>
+		<spring:property name="removeTakCacheAllowed" value="true"/>
 	</spring:bean>
 
     <flow name="tk-teststub-flow" >

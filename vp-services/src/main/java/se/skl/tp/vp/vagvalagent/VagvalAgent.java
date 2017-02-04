@@ -94,6 +94,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	private static final JaxbUtil JAXB = new JaxbUtil(PersistentCache.class);
 
 	private String localTakCache;
+	private Boolean removeLocalCacheAllowed;
 
 	private TakCache takCache;
 	private boolean takCacheIsInitialized = false;
@@ -108,7 +109,6 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	private Object lockTakFetch = new Object();
 
 	public VagvalAgent() {
-
 	}
 
 	public void setEndpointAddress(String endpointAddressTjanstekatalog) {
@@ -126,6 +126,21 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	public void setLocalTakCache(String localTakCache) {
 		this.localTakCache = localTakCache;
 	}
+
+	/* For unit tests only */
+	public void setRemoveTakCacheAllowed(Boolean remove) {
+		this.removeLocalCacheAllowed = remove;
+	}
+	
+	/* For unit tests only */
+	public void doRemoveTakCache() {
+		if(this.removeLocalCacheAllowed != null && this.removeLocalCacheAllowed) {
+			File file = new File(this.localTakCache);
+			if(file.exists())
+				file.delete();	
+		}
+	}
+	
 
 	/**
 	 * Initialize VagvalAgent resources.
@@ -148,6 +163,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		}
 		return processingLog;
 	}
+	
 	
 	/**
 	 * Thread-safe initialization, allow only one thread to do initialization.
@@ -188,7 +204,12 @@ public class VagvalAgent implements VisaVagvalsInterface {
 				// both TAK calls to fetch data must succeed to have a consistent state
 				List<VirtualiseringsInfoType> v = getVirtualiseringar();
 				List<AnropsBehorighetsInfoType> p = getBehorigheter();
-				if (v != null && p != null) {
+				
+				if(v == null || v.size() == 0) {
+					logger.warn("Failed to refresh TAK data. No VirtualiseringsInfo found!");					
+				} else if(p == null || p.size() == 0) {
+					logger.warn("Failed to refresh TAK data. No AnropsBehorighetsInfo found!");					
+				} else {
 					// do thread-safe update of cache
 					updateTakCache(v, p);
 					isRefreshSuccessful = true;
@@ -476,6 +497,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * Read data without blocking for performance reasons.
 	 */
 	public int threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations() {
+		System.out.println(">>>>>>>>>>>>" + (takCache != null ? takCache.vagvalHandler.getVirtualiseringsInfo().size() : 0));
 		return takCache != null ? takCache.vagvalHandler.getVirtualiseringsInfo().size() : 0;		
 	}
 
@@ -483,6 +505,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * Read data without blocking for performance reasons.
 	 */
 	public int threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter() {
+		System.out.println(">>>>>>>>>>>>" + (takCache != null ? takCache.behorighetHandler.getAnropsBehorighetsInfoList().size() : 0));
 		return takCache != null ? takCache.behorighetHandler.getAnropsBehorighetsInfoList().size() : 0;		
 	}	
 

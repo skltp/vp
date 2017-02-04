@@ -176,6 +176,8 @@ public class VagvalRouterTest {
 
 		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
+		
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("","",""));
 		try {
 			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
@@ -189,6 +191,7 @@ public class VagvalRouterTest {
 
 		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1", "unknown",
 				"VardgivareB"));
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("","",""));
 		try {
 			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");

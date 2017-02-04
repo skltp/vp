@@ -108,6 +108,7 @@
 			<spring:property name="addressDelimiter" value="#"/>
 			<spring:property name="hsaCache" ref="hsaCache"/>
 			<spring:property name="localTakCache" value="${LOCAL_TAK_CACHE}"/>
+			<spring:property name="removeTakCacheAllowed" value="false"/>
 		</spring:bean>
 		
 		<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
