@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.util.WhiteListHandler;
 import se.skl.tp.vp.util.helper.cert.CertificateExtractor;
 import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
 
@@ -44,8 +45,8 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 	private static final Logger log = LoggerFactory.getLogger(CheckSenderIdTransformer.class);
 	
 	private String senderIdPropertyName;
-
-	private String whiteList;
+	
+	private WhiteListHandler whiteListHandler;
 	
 	private Pattern pattern;
 	
@@ -57,8 +58,8 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 		this.vpInstanceId = VPUtil.trimProperty(vpInstanceId);
 	}
 
-	public void setWhiteList(final String whiteList) {
-		this.whiteList = whiteList;
+	public void setWhiteListHandler(final WhiteListHandler whiteListHandler) {
+		this.whiteListHandler = whiteListHandler;
 	}
 
 	public void setSenderIpAdressHttpHeader(String senderIpAdressHttpHeader) {
@@ -98,7 +99,7 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 			 * x-vp-sender-id exist as inbound property and x-vp-instance-id macthes this VP instance, a mandatory check against the whitelist of
 			 * ip addresses is needed. VPUtil.checkCallerOnWhiteList throws VpSemanticException in case ip address is not in whitelist.
 			 */
-			if(!VPUtil.isCallerOnWhiteList(senderIpAdress, whiteList, HttpHeaders.X_VP_SENDER_ID)){
+			if(!whiteListHandler.isCallerOnWhiteList(senderIpAdress, HttpHeaders.X_VP_SENDER_ID)){
 				throw VPUtil.createVP011Exception(senderIpAdress, HttpHeaders.X_VP_SENDER_ID);
 			}
 			
@@ -121,7 +122,7 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 			 */
 			try {
 				log.debug("No, look into the senders certificate instead");
-				CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message, pattern, whiteList);
+				CertificateExtractorFactory certificateExtractorFactory = new CertificateExtractorFactory(message, pattern, whiteListHandler);
 				CertificateExtractor certHelper = certificateExtractorFactory.createCertificateExtractor();
 				senderId = certHelper.extractSenderIdFromCertificate();
 				log.debug("Sender id extracted from certificate {}", senderId);

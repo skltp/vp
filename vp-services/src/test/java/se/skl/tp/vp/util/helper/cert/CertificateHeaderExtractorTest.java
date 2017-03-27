@@ -39,10 +39,12 @@ import org.mule.api.transport.PropertyScope;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.util.WhiteListHandler;
 
 public class CertificateHeaderExtractorTest {
 
 	private Pattern pattern = Pattern.compile("OU" + VPUtil.CERT_SENDERID_PATTERN);
+	private WhiteListHandler whiteListHandler = new WhiteListHandler();
 
 	/**
 	 * Test that we can extract a certificate when it comes in the http header.
@@ -54,7 +56,8 @@ public class CertificateHeaderExtractorTest {
 	public void testExtractX509CertificateCertificateFromHeader() throws Exception {
 		final MuleMessage msg = mockCertAndRemoteAddress();
 
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "192.168.0.109");
+		whiteListHandler.setWhiteList("192.168.0.109");
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, whiteListHandler);
 		final String senderId = helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
@@ -68,8 +71,9 @@ public class CertificateHeaderExtractorTest {
 	@Test
 	public void testExtractX509CertificateCertificateFromHeaderAndInWhiteList() throws Exception {
 		final MuleMessage msg = mockCertAndRemoteAddress();
+		whiteListHandler.setWhiteList("192.168.0.109, 127.0.0.1, localhost");
 		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern,
-				"192.168.0.109, 127.0.0.1, localhost");
+				whiteListHandler);
 		Mockito.when(msg.getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND)).thenReturn("/127.0.0.1:12345");
 		helper.extractSenderIdFromCertificate();
 
@@ -84,8 +88,9 @@ public class CertificateHeaderExtractorTest {
 
 		final MuleMessage msg = mockCertAndRemoteAddress();
 
+		whiteListHandler.setWhiteList("192.168.0.108, 127.0.0.1, localhost");
 		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern,
-				"192.168.0.108, 127.0.0.1, localhost");
+				whiteListHandler);
 		try {
 			helper.extractSenderIdFromCertificate();
 
@@ -105,7 +110,8 @@ public class CertificateHeaderExtractorTest {
 	public void testExtractX509CertificateCertificateWithSingleWhiteListEntry() throws Exception {
 		final MuleMessage msg = mockCertAndRemoteAddress();
 
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "192.168.0.109");
+		whiteListHandler.setWhiteList("192.168.0.109");
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, whiteListHandler);
 		helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(1)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
@@ -127,7 +133,8 @@ public class CertificateHeaderExtractorTest {
 		Mockito.when(msg.getProperty(VPUtil.REMOTE_ADDR, PropertyScope.INBOUND)).thenReturn("/127.0.0.1:12345");
 		Mockito.when(msg.getProperty(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, PropertyScope.INBOUND)).thenReturn("/127.0.0.1:12345");
 
-		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, "127.0.0.1");
+		whiteListHandler.setWhiteList("127.0.0.1");
+		final CertificateHeaderExtractor helper = new CertificateHeaderExtractor(msg, pattern, whiteListHandler);
 		try {
 			helper.extractSenderIdFromCertificate();
 
