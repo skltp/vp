@@ -27,14 +27,19 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.ws.BindingProvider;
 
+import org.python.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbUtil;
@@ -70,6 +75,10 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	private static final Logger logger = LoggerFactory.getLogger(VagvalAgent.class);
 	public static final boolean FORCE_RESET = true;
 	public static final boolean DONT_FORCE_RESET = false;
+
+	private static InetAddress HOST = null;
+	private static String HOST_NAME = "UNKNOWN";
+	private static Calendar calendar = Calendar.getInstance();
 
 	/**
 	 * Persistent cache. 
@@ -152,6 +161,14 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	 * @return a processing log containing status for loading TAK resources
 	 */
 	public VagvalAgentProcessingLog init(boolean forceReset) {
+		
+		try {
+			HOST       = InetAddress.getLocalHost();
+			HOST_NAME  = HOST.getCanonicalHostName();
+		} catch (UnknownHostException e) {
+
+		}
+		
 		VagvalAgentProcessingLog processingLog = new VagvalAgentProcessingLog();
 		if (!forceReset) {
 			init(processingLog);
@@ -193,11 +210,15 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	private boolean refresh(boolean isInit, VagvalAgentProcessingLog processingLog) {
 		
 		boolean isRefreshSuccessful = false;
+		// Use local df since not thread safe.
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		// only let one thread at a time attempt to fetch and persist TAK data
 		synchronized (lockTakFetch) {
 
 			logger.info("Initialize VagvalAgent TAK resources...");
+			processingLog.addLog("Host: " + HOST_NAME);
+			processingLog.addLog("Time: " + df.format(calendar.getTime()));
 			processingLog.addLog("Initialize VagvalAgent TAK resources...");
 
 			try {
@@ -270,6 +291,9 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	        SokVagvalsServiceSoap11LitDocService service = new SokVagvalsServiceSoap11LitDocService(
 	                ClientUtil.createEndpointUrlFromServiceAddress(endpointAddressTjanstekatalog));
 	        port = service.getSokVagvalsSoap11LitDocPort();
+
+	        BindingProvider prov = (BindingProvider)port;
+	        prov.getRequestContext().put("HTTP_USER_AGENT", Collections.singletonList("user_agent"));
 	    }
 		return port;
 	}
