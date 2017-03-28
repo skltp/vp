@@ -366,7 +366,6 @@ public class VpFullServiceTest extends AbstractTestCase {
 			fail("An timeout should have occurred");
 		} catch (Throwable e) {
 			ts = System.currentTimeMillis() - ts;
-			System.out.println(">>>>>>>>>>>>>>>>>>" + e.getMessage());
 			assertTrue("Expected time to be between short_timeout_ms (" + short_timeout_ms + ") and normal_timeout_ms (" + normal_timeout_ms + ") but was " + ts + " ms.", short_timeout_ms < ts && ts < normal_timeout_ms);
 			assertTrue(e.getMessage().contains("VP009 Error connecting to service producer at address https://www.google.com:81"));
 		}
