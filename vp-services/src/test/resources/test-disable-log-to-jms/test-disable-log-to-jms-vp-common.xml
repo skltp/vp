@@ -42,6 +42,7 @@
 				<spring:value>classpath:vp-security-override.properties</spring:value>
 				
 				<spring:value>classpath:vp-config.properties</spring:value>
+				<spring:value>classpath:vp-messages.properties</spring:value>
 				<spring:value>classpath:test-disable-log-to-jms/test-disable-log-to-jms-vp-config-override.properties</spring:value>
 			</spring:list>
 		</spring:property>

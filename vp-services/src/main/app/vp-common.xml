@@ -46,6 +46,7 @@
 				<spring:value>classpath:vp-security-override.properties</spring:value>
 				
 				<spring:value>classpath:vp-config.properties</spring:value>
+				<spring:value>classpath:vp-messages.properties</spring:value>
 				<spring:value>classpath:vp-config-override.properties</spring:value>
 
 				<spring:value>classpath:vp-build.properties</spring:value>
@@ -109,6 +110,7 @@
 			<spring:property name="hsaCache" ref="hsaCache"/>
 			<spring:property name="localTakCache" value="${LOCAL_TAK_CACHE}"/>
 			<spring:property name="removeTakCacheAllowed" value="false"/>
+			<spring:property name="messageProperties" ref="messageProperties"/>
 		</spring:bean>
 		
 		<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">

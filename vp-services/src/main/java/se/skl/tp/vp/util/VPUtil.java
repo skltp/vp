@@ -237,8 +237,11 @@ public final class VPUtil {
 	}
 	
 	public static VpSemanticException createVP011Exception(String callersIp, String httpHeaderCausingCheck){
-		return new VpSemanticException(VpSemanticErrorCodeEnum.VP011 + " Caller was not on the white list of accepted IP-addresses. IP-address: " 
-				+ callersIp + ". HTTP header that caused checking: " + httpHeaderCausingCheck, VpSemanticErrorCodeEnum.VP011);
+		return new VpSemanticException(
+				MessageProperties.getInstance().get(VpSemanticErrorCodeEnum.VP011,
+				"IP-address: " + callersIp 
+				+ ". HTTP header that caused checking: " + httpHeaderCausingCheck), 
+				VpSemanticErrorCodeEnum.VP011);
 	}
 	
 	public static void setSoapFaultInResponse(MuleMessage message, String cause, String errorCode){

@@ -82,6 +82,8 @@
 			<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
         	<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 			<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+
+            <spring:property name="messageProperties" ref="messageProperties" />
 						
         </custom-processor>
                 
@@ -99,6 +101,8 @@
            				<transformer ref="exceptionTransformer" />
 	            		<object-to-string-transformer />
 	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckPayloadTransformer">
+            				<spring:property name="messageProperties" ref="messageProperties" />
+	            		
 			        		<!-- EventLogger properties -->
 							<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
 			        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>

@@ -45,6 +45,7 @@
 		<spring:property name="hsaCache" ref="hsaCache"/>
 		<spring:property name="localTakCache" value="target/.tk.localCache.test"/>
 		<spring:property name="removeTakCacheAllowed" value="true"/>
+        <spring:property name="messageProperties" ref="messageProperties" />
 	</spring:bean>
 
     <flow name="tk-teststub-flow" >

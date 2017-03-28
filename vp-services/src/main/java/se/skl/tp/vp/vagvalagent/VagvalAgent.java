@@ -59,6 +59,7 @@ import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.ClientUtil;
+import se.skl.tp.vp.util.MessageProperties;
 
 /**
  * Provides routing information.
@@ -112,6 +113,8 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	private String endpointAddressTjanstekatalog;
 	private String addressDelimiter;
+	
+	private MessageProperties messageProperties;
 
 	private SokVagvalsInfoInterface port = null;
 	
@@ -134,6 +137,10 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 	public void setLocalTakCache(String localTakCache) {
 		this.localTakCache = localTakCache;
+	}
+	
+	public void setMessageProperties(MessageProperties messageProperties) {
+		this.messageProperties = messageProperties;
 	}
 
 	/* For unit tests only */
@@ -481,7 +488,7 @@ public class VagvalAgent implements VisaVagvalsInterface {
 		
 
 		if (!takCacheIsInitialized) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP008 + " No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call";
+			String errorMessage = messageProperties.get(VpSemanticErrorCodeEnum.VP008, null);
 			logger.error(errorMessage);
 			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP008);
 		}
@@ -552,9 +559,15 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	}
 
 	private void throwNotAuthorizedException(VisaVagvalRequest request) {
-		String errorMessage = VpSemanticErrorCodeEnum.VP007 + " Authorization missing for serviceNamespace: " + request.getTjanstegranssnitt()
-				+ ", receiverId: " + request.getReceiverId() + ", senderId: " + request.getSenderId();
+		String errorMessage = messageProperties.get(VpSemanticErrorCodeEnum.VP007,getRequestSummary(request));
 		logger.info(errorMessage);
 		throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP007);
+	}
+	
+	private String getRequestSummary(VisaVagvalRequest request) {
+		return 
+			"serviceNamespace: " + request.getTjanstegranssnitt()
+			+ ", receiverId: " + request.getReceiverId() 
+			+ ", senderId: " + request.getSenderId();
 	}
 }

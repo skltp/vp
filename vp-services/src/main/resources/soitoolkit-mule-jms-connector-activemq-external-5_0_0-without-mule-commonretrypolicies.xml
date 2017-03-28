@@ -35,7 +35,7 @@
 	SOITOOLKIT_MULE_AMQ_REDELIVERY_DELAY=60000
 	SOITOOLKIT_MULE_AMQ_NO_OF_CONSUMERS=2
 	-->
-
+<!-- vm://localhost?broker.persistent=false&broker.useJmx=false -->
 	<spring:bean name="soitoolkit-jms-connection-factory"
 		class="org.apache.activemq.ActiveMQConnectionFactory">
         <spring:property name="brokerURL" value="${SOITOOLKIT_MULE_AMQ_BROKER_URL}" />
