@@ -32,12 +32,15 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.python.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;
@@ -59,6 +62,7 @@ import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.ClientUtil;
+import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.MessageProperties;
 
 /**
@@ -299,8 +303,15 @@ public class VagvalAgent implements VisaVagvalsInterface {
 	                ClientUtil.createEndpointUrlFromServiceAddress(endpointAddressTjanstekatalog));
 	        port = service.getSokVagvalsSoap11LitDocPort();
 
-	        BindingProvider prov = (BindingProvider)port;
-	        prov.getRequestContext().put("HTTP_USER_AGENT", Collections.singletonList("user_agent"));
+	        /*
+	         *  Set request headers
+	         *  Note that this can not be configured in Mule since
+	         *  call is made directly bypassing mule functionality.
+	         */
+	        Map<String, Object> req_ctx = ((BindingProvider)port).getRequestContext();
+	        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+	        headers.put("User-Agent", Collections.singletonList(HttpHeaders.VP_HEADER_USER_AGENT));
+	        req_ctx.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
 	    }
 		return port;
 	}
