@@ -397,7 +397,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		
 		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
-		assertEquals("SKLTP VP/2.0", VpTestProducerLogger.getLatestUserAgent());
+		assertEquals(HttpHeaders.VP_HEADER_USER_AGENT, VpTestProducerLogger.getLatestUserAgent());
 	}
 	
 	@Test
