@@ -26,7 +26,6 @@ import java.util.List;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transport.PropertyScope;
-import org.mule.transport.http.CookieHelper;
 import org.mule.transport.http.HttpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +63,6 @@ public class VagvalRouterHelper {
 				VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES", 
 				HttpConstants.HEADER_CONTENT_TYPE,
 				"http.disable.status.code.exception.check" }));
-		
-		Object cookieObj = message.getInboundProperty("Set-Cookie");
 		
 		for(String key : BLOCKED_REQ_HEADERS) {
 			message.removeProperty(key, scope);
