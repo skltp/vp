@@ -108,6 +108,7 @@
 			<spring:property name="addressDelimiter" value="#"/>
 			<spring:property name="hsaCache" ref="hsaCache"/>
 			<spring:property name="localTakCache" value="${LOCAL_TAK_CACHE}"/>
+			<spring:property name="removeTakCacheAllowed" value="false"/>
 		</spring:bean>
 		
 		<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
@@ -171,9 +172,9 @@
 	</custom-transformer>
 	
 	<custom-transformer name="rivTransformer" class="se.skl.tp.vp.vagvalrouter.RivTransformer" >
-        <spring:property
-            name="vagvalAgent"
-            ref="vagvalAgent" />
+        <!-- Value for HTTP header x-vp-instance-id -->
+        <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
+        <spring:property name="vagvalAgent" ref="vagvalAgent" />
    </custom-transformer>
 	
 	<custom-transformer name="exceptionTransformer" class="se.skl.tp.vp.vagvalrouter.ExceptionTransformer"/>

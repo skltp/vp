@@ -63,6 +63,9 @@
         <cxf:proxy-client payload="envelope" />
 
         <custom-processor class="se.skl.tp.vp.vagvalrouter.VagvalRouter" >
+           
+            <!-- Value for HTTP header x-vp-instance-id -->
+            <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
 
             <spring:property name="vagvalAgent" ref="vagvalAgent" />
 
@@ -71,9 +74,6 @@
 
 			<!-- Default value for response timeout is set in VagvalRouter -->
             <spring:property name="responseTimeout" value="${SERVICE_TIMEOUT_MS}" />
-            
-            <!-- Value for HTTP header x-vp-instance-id -->
-            <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
 			
 			<!-- Proprty if to propagate korrelation id to producer or not for HTTPS trafic -->
 			<spring:property name="propagateCorrelationIdForHttps" value="${VAGVALROUTER_PROPAGATE_CORRELATION_ID_FOR_HTTPS}"/>

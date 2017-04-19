@@ -102,7 +102,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 	
 	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
-		setAddressingHelper(new AddressingHelper(vagvalAgent));
+		setAddressingHelper(new AddressingHelper(vagvalAgent, vpInstanceId));
 	}
 	
 	public void setDisableMuleCorrelation(boolean disabled) {

@@ -77,7 +77,7 @@ public class VagvalRouterTest {
 		vagvalInput.rivVersion = "urn:riv:v1";
 		vagvalInput.serviceContractNamespace = "{urn:riv13606:v1}RIV";
 
-		helper = new AddressingHelper(vagvalAgent);
+		helper = new AddressingHelper(vagvalAgent, "VP_INSTANCE_ID");
 	}
 
 	@Test
@@ -121,7 +121,7 @@ public class VagvalRouterTest {
 		VagvalAgent vagvalAgent = new VagvalAgent();
 		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
 
-		AddressingHelper myHelper = new AddressingHelper(vagvalAgent);
+		AddressingHelper myHelper = new AddressingHelper(vagvalAgent, "VP_INSTANCE_ID");
 
 		// Perform the test and ensure that we get a "VP008 no contact..." error message
 		try {
@@ -176,6 +176,8 @@ public class VagvalRouterTest {
 
 		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
 				"{urn:riv13606:v1}RIV", "VardgivareB"));
+		
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("","",""));
 		try {
 			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");
@@ -189,6 +191,7 @@ public class VagvalRouterTest {
 
 		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1", "unknown",
 				"VardgivareB"));
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization("","",""));
 		try {
 			helper.getAddressFromAgent(vagvalInput);
 			fail("Exception expected");

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class PingForConfigurationProducerRivTa21NoTAKIntegrationTest extends Abs
 
 	@Override
 	protected String getConfigResources() {
+		
 		return "soitoolkit-mule-jms-connector-activemq-embedded.xml,"
 				+ "vp-common.xml,"
 				+ "services/PingForConfiguration-rivtabp21-service.xml,"

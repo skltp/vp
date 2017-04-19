@@ -14,7 +14,7 @@
 
 	<groupId>se.skltp.vp</groupId>
 	<artifactId>vp-parent</artifactId>
-	<version>3.1.1</version>
+	<version>3.1.2</version>
 	<packaging>pom</packaging>
 	<name>vp-parent</name>
 
@@ -25,12 +25,13 @@
 		<sonar.jdbc.url>jdbc:jtds:sqlserver://localhost;databaseName=sonar;SelectMethod=Cursor</sonar.jdbc.url>
 		<!-- Turn off strict checking of javadoc tags for Java 8 -->
         <additionalparam>-Xdoclint:none</additionalparam>
+		<tak.version>1.5.0</tak.version>
     </properties>
 	<scm>
 		<url>http://github.com/skltp/vp</url>
 		<connection>scm:git:git://github.com/skltp/vp.git</connection>
 		<developerConnection>scm:git:git://github.com/skltp/vp.git</developerConnection>
-		<tag>v3.1.1</tag>
+		<tag>v3.1.2</tag>
 	</scm>
 
 	<repositories>

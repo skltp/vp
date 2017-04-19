@@ -24,14 +24,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transport.NullPayload;
-import org.mule.transport.NullPayloadTestCase;
-
-import se.skltp.domain.subdomain.getproducdetail.v1.Product;
 
 /**
- * Simple class that returns a zero length response.
- * @author matsekhammar
+ * Simple class that returns a non xml response.
  *
  */
 public class VpHttpTestProducer500Transformer extends AbstractMessageTransformer{    
