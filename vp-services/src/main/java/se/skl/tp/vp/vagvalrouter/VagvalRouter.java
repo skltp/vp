@@ -21,9 +21,7 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -49,7 +47,9 @@ import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
-import se.skl.tp.vp.util.EventLogger;
+import se.skl.tp.vp.logging.EventLoggerFactory;
+import se.skl.tp.vp.logging.SessionInfo;
+import se.skl.tp.vp.logging.EventLogger;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.MessageProperties;
@@ -72,7 +72,7 @@ public class VagvalRouter extends AbstractRecipientList {
 	
 	private int retryRoute;
 	
-	private final EventLogger eventLogger = new EventLogger();
+	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
 
 	private MessageProperties messageProperties;
 
@@ -297,10 +297,10 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 
 	private void logException(MuleMessage message, Throwable t) {
-		Map<String, String> extraInfo = new HashMap<String, String>();
-		extraInfo.put("source", getClass().getName());
-		eventLogger.setMuleContext(getMuleContext());
-		eventLogger.addSessionInfo(message, extraInfo);
+		SessionInfo extraInfo = new SessionInfo();
+		extraInfo.addSource(getClass().getName());
+		extraInfo.addSessionInfo(message);
+		eventLogger.setContext(getMuleContext());
 		eventLogger.logErrorEvent(t, message, null, extraInfo);
 	}
 

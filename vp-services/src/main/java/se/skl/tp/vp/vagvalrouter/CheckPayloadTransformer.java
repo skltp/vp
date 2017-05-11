@@ -20,6 +20,10 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
+import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
+
+import java.net.URI;
+
 import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -28,16 +32,13 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
+
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.EventLogger;
+import se.skl.tp.vp.logging.EventLogger;
+import se.skl.tp.vp.logging.EventLoggerFactory;
+import se.skl.tp.vp.logging.SessionInfo;
 import se.skl.tp.vp.util.MessageProperties;
-
-import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -48,7 +49,7 @@ import java.util.Map;
 public class CheckPayloadTransformer extends AbstractMessageTransformer{
 	
 	private static final Logger log = LoggerFactory.getLogger(CheckPayloadTransformer.class);
-	private final EventLogger eventLogger = new EventLogger();	
+	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
 	private static final String nullPayload = "{NullPayload}";
 	private static final Integer HTTP_STATUS_500 = 500;
 	private static final String SOAP_XMLNS = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -129,12 +130,11 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		return message;
     }
     
-	@SuppressWarnings("deprecation")
 	private void logException(MuleMessage message, Throwable t) {
-		Map<String, String> extraInfo = new HashMap<String, String>();
-		extraInfo.put("source", getClass().getName());
-		eventLogger.setMuleContext(message.getMuleContext());	
-		eventLogger.addSessionInfo(message, extraInfo);
+		SessionInfo extraInfo = new SessionInfo();
+		extraInfo.addSessionInfo(message);
+		extraInfo.addSource(getClass().getName());
+		eventLogger.setContext(super.muleContext);	
 		eventLogger.logErrorEvent(t, message, null, extraInfo);
 	}
 

@@ -35,7 +35,7 @@ import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.MdcLogTrace;
+import se.skl.tp.vp.logging.MdcLogTrace;
 import se.skl.tp.vp.util.MessageProperties;
 
 public class VagvalHandler {

@@ -33,20 +33,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 
-import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.EventLogger;
+import se.skl.tp.vp.logging.EventLogger;
+import se.skl.tp.vp.logging.EventLoggerFactory;
+import se.skl.tp.vp.logging.SessionInfo;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
 
 /**
  * Transformer that is responsible for logging exceptions using EventLogger.
  */
-public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
+public class ExceptionLoggerTransformer extends AbstractMessageTransformer {
 	
 	private static final Logger log = LoggerFactory.getLogger(ExceptionLoggerTransformer.class);
 	
-	private final EventLogger eventLogger = new EventLogger();
+	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
 
 	@Override
 	public Object transformMessage(MuleMessage message, String outputEncoding)
@@ -54,7 +55,7 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
 		
 		log.debug("Entering ExceptionLoggerTransformer to log exception...");
 		
-		eventLogger.setMuleContext(message.getMuleContext());	
+		eventLogger.setContext(super.muleContext);	
 		
 		Throwable ex = message.getExceptionPayload().getException();
 		
@@ -119,21 +120,17 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer{
 	 */
 	protected void logException(Throwable t, MuleMessage message) {
 		
-		Map<String, String> extraInfo = new HashMap<String, String>();
-		extraInfo.put("source", getClass().getName());
+		SessionInfo extraInfo = new SessionInfo();
+		extraInfo.addSource(getClass().getName());
+		extraInfo.addSessionInfo(message);
 		
 		MuleException muleException = ExceptionHelper.getRootMuleException(t);
 		if (muleException != null) {
 			addErrorMessageProperties(muleException, message);
-
-    		eventLogger.addSessionInfo(message, extraInfo);
     		eventLogger.logErrorEvent(muleException, message, null, extraInfo); 
     		
-    		//logger.error(muleException.getDetailedMessage());
 		} else {
 			addErrorMessageProperties(t, message);
-
-    		eventLogger.addSessionInfo(message, extraInfo);
 			eventLogger.logErrorEvent(t, "", null, extraInfo);
 		}
 	}
