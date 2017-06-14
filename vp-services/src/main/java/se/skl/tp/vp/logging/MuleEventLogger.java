@@ -207,6 +207,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		String contractId            = ""; 
 		String businessCorrelationId = "";
 		String propertyBusinessContextId = null;
+		String payloadAsString = null;
 
 		if (message != null) {
 
@@ -217,6 +218,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 					Object value = message.getProperty(object.toString(), PropertyScope.OUTBOUND);
 					log.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
 				}
+				payloadAsString = payloadToStringTransformer.getPayloadAsString(payload);
 			}
 			
 			messageId             = message.getUniqueId();
@@ -227,8 +229,6 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		}
 
 		String componentId = getServerId();
-
-		String payloadAsString = payloadToStringTransformer.getPayloadAsString(payload);
 		
 
 	    // -------------------------

@@ -21,7 +21,6 @@
 package se.skl.tp.vp.logging;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -205,7 +204,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 			if ("xresp-out".equals(logType)) {
 				ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
 				final String infoMsg = String.format("%s, %s: { %s }", 
-						message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, ""),
+						message.getProperty(VPUtil.SKLTP_CORRELATION_ID, PropertyScope.SESSION, ""),
 						message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION, ""),
 						ExecutionTimer.format());
 				log.info(infoMsg);

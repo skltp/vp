@@ -51,7 +51,7 @@ public class UseOrCreateCorrelationIdTransformer extends AbstractMessageTransfor
 			log.debug("Correlation id not found in http header create a new one!");			
 			correlationId = UUID.getUUID();
 		}	
-		message.setProperty(VPUtil.CORRELATION_ID, correlationId, PropertyScope.SESSION);
+		message.setProperty(VPUtil.SKLTP_CORRELATION_ID, correlationId, PropertyScope.SESSION);
           
         return message;
     }

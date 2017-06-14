@@ -23,7 +23,6 @@ package se.skl.tp.vp.util;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
@@ -39,6 +38,7 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
  */
 public final class VPUtil {
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(VPUtil.class);
 
 	public static final String REMOTE_ADDR = MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
@@ -56,7 +56,7 @@ public final class VPUtil {
 	public static final String SESSION_ERROR_CODE = "errorCode";
 	
 	//Session scoped variables used in internal flows, not to mix with http headers prefixed x-something used for external http headers
-	public static final String CORRELATION_ID = "soitoolkit_correlationId";
+	public static final String SKLTP_CORRELATION_ID = "skltp_correlationId";
 	public static final String ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid";
 	public static final String RECEIVER_ID = "receiverid";
 	public static final String SENDER_ID = "senderid";

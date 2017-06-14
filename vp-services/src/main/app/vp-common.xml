@@ -149,7 +149,15 @@
 		<default-dispatcher-threading-profile poolExhaustedAction="ABORT" maxThreadsActive="${TP_DISPATCH_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_DISPATCH_MAX_THREADS_IDLE}" threadTTL="${TP_DISPATCH_MAX_THREADS_TTL}"/>
 		<default-receiver-threading-profile poolExhaustedAction="ABORT" maxThreadsActive="${TP_RECEIVE_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_RECEIVE_MAX_THREADS_IDLE}" threadTTL="${TP_RECEIVE_MAX_THREADS_TTL}"/>
 	</configuration>
-    
+
+<!-- doc:name="Check SenderId exist in incoming http request, put in session variable" -->
+   	<custom-transformer name="checkSenderIdTransformer" class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" >
+   		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+           <spring:property name="whiteListHandler" ref="whiteListHandler" />
+           <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
+           <spring:property name="senderIpAdressHttpHeader" value="${VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER}"/>
+   	</custom-transformer>
+    	    
     <custom-transformer name="wsdlQueryResponse" class="se.skl.tp.vp.util.wsdl.WsdlQueryReferencedUrlsResponseTransformer">
     	<spring:property name="httpHeaderNameForwardedProto" value="${VP_HTTP_HEADER_NAME_FORWARDED_PROTO}"/>
     	<spring:property name="httpHeaderNameForwardedHost" value="${VP_HTTP_HEADER_NAME_FORWARDED_HOST}"/>
