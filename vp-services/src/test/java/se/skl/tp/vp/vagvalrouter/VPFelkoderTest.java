@@ -75,17 +75,6 @@ public class VPFelkoderTest extends AbstractTestCase {
     }
 
 
-    @Test
-    public void testVP001ThrownWhenRIVversionNoMatchesPattern() throws Exception {
-        try {
-            testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_MED_FEL_CONFIGURERAD_RIV_VERSION, LOGICAL_ADDRESS);
-            fail("Expected error here!");
-        } catch (Throwable ex) {
-            assertTrue(ex.getMessage().contains("VP001 RIV-version RIVTABP256 matchar inte godkänd namnstandard"));
-        }
-    }
-
-
 
         @Test
     public void testVP003ThrownWhenNoLocalAddress() throws Exception {

@@ -45,8 +45,6 @@ import se.skl.tp.vp.vagvalrouter.VagvalInput;
  * Helper class for working with addressing
  */
 public class AddressingHelper {
-	private static final String RIVTA_VERSION_PATTERN = "^rivtabp\\d{2}$";
-
 	private static final Logger log = LoggerFactory.getLogger(AddressingHelper.class);
 
 	private VisaVagvalsInterface agent;
@@ -136,12 +134,6 @@ public class AddressingHelper {
 		}
 		if (request.rivVersion == null) {
 			String errorMessage = VpSemanticErrorCodeEnum.VP001 + " No RIV version configured";
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP001);
-		}
-
-		if(!request.rivVersion.toLowerCase().matches(RIVTA_VERSION_PATTERN)){
-				String errorMessage = VpSemanticErrorCodeEnum.VP001 + " RIV-version " + request.rivVersion +" matchar inte godkänd namnstandard";
 			log.error(errorMessage);
 			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP001);
 		}
