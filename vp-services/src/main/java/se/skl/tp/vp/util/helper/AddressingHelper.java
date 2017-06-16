@@ -45,6 +45,8 @@ import se.skl.tp.vp.vagvalrouter.VagvalInput;
  * Helper class for working with addressing
  */
 public class AddressingHelper {
+	private static final String RIVTA_VERSION_PATTERN = "^rivtabp\\d{2}$";
+
 	private static final Logger log = LoggerFactory.getLogger(AddressingHelper.class);
 
 	private VisaVagvalsInterface agent;
@@ -137,6 +139,13 @@ public class AddressingHelper {
 			log.error(errorMessage);
 			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP001);
 		}
+
+		if(!request.rivVersion.toLowerCase().matches(RIVTA_VERSION_PATTERN)){
+				String errorMessage = VpSemanticErrorCodeEnum.VP001 + " RIV-version " + request.rivVersion +" matchar inte godkänd namnstandard";
+			log.error(errorMessage);
+			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP001);
+		}
+
 		if (request.senderId == null) {
 			String errorMessage = VpSemanticErrorCodeEnum.VP002 + " No sender ID (from_address) found in certificate";
 			log.error(errorMessage);
@@ -212,6 +221,12 @@ public class AddressingHelper {
 		}
 
 		if (virtualiseringar.size() == 0) {
+			if (request.receiverId == null) {
+				String errorMessage = VpSemanticErrorCodeEnum.VP003 + " No receiver ID (to_address) found in message";
+				log.error(errorMessage);
+				throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP003);
+			}
+
 			// Check if whitespace in incoming receiverid and give a hint in the error message if found.
 			String whitespaceDetectedHintString = "";
 			if (request.receiverId.contains(" ")) {
