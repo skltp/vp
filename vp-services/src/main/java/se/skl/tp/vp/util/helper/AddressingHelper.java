@@ -197,11 +197,8 @@ public class AddressingHelper {
 		}
 
 		if (virtualiseringar.size() == 0) {
-			if (request.receiverId == null) {
-				String errorMessage = VpSemanticErrorCodeEnum.VP003 + " No receiver ID (to_address) found in message";
-				log.error(errorMessage);
-				throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP003);
-			}
+
+			raiseError(request.receiverId == null, VpSemanticErrorCodeEnum.VP003);
 
 			// Check if whitespace in incoming receiverid and give a hint in the error message if found.
 			String whitespaceDetectedHintString = "";
