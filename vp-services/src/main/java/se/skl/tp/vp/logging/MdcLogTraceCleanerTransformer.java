@@ -18,35 +18,24 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.exceptions;
+package se.skl.tp.vp.logging;
 
-public enum VpSemanticErrorCodeEnum {
-	UNSET("UNSET"), 
-	VP001("VP001"), 
-	VP002("VP002"), 
-	VP003("VP003"), 
-	VP004("VP004"), 
-	VP005("VP005"), 
-	VP006("VP006"), 
-	VP007("VP007"), 
-	VP008("VP008"), 
-	VP009("VP009"), 
-	VP010("VP010"), 
-	VP011("VP011"), 
-	VP012("VP012");
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageTransformer;
 
-	private String code;
-	public String getCode() {
-		return code;
+/**
+ * Clear the MDC.
+ * 
+ * @author hakan
+ */
+public class MdcLogTraceCleanerTransformer extends AbstractMessageTransformer {
+
+	@Override
+	public Object transformMessage(MuleMessage message, String outputEncoding)
+			throws TransformerException {
+		MdcLogTrace.clear();
+		return message;
 	}
-	
-	public VpSemanticErrorCodeEnum getCodeEnum(String code) {
-		return VpSemanticErrorCodeEnum.valueOf(code);
-	}
-	
-	VpSemanticErrorCodeEnum(String code) {
-		this.code = code;
-	}
-	
-	
+
 }

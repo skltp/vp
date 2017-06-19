@@ -39,10 +39,12 @@ import org.mule.api.transport.PropertyScope;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.util.WhiteListHandler;
 
 public class CertificateChainExtractorTest {
 
 	private Pattern pattern = Pattern.compile("OU" + VPUtil.CERT_SENDERID_PATTERN);
+	private WhiteListHandler whiteListHandler = new WhiteListHandler();
 
 	/**
 	 * Test that we can extract a certificate that is in the mule message.
@@ -53,7 +55,8 @@ public class CertificateChainExtractorTest {
 
 		final MuleMessage msg = mockCert();
 
-		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, pattern, "127.0.0.1");
+		whiteListHandler.setWhiteList("127.0.0.1");
+		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, pattern, whiteListHandler);
 		final String senderId = helper.extractSenderIdFromCertificate();
 
 		Mockito.verify(msg, Mockito.times(0)).getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND);
@@ -69,7 +72,8 @@ public class CertificateChainExtractorTest {
 
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 
-		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, null, "127.0.0.1");
+		whiteListHandler.setWhiteList("127.0.0.1");
+		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, null, whiteListHandler);
 		try {
 			helper.extractSenderIdFromCertificate();
 
@@ -95,7 +99,8 @@ public class CertificateChainExtractorTest {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 		Mockito.when(msg.getProperty(VPUtil.PEER_CERTIFICATES, PropertyScope.OUTBOUND)).thenReturn(certs);
 
-		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, null, "127.0.0.1");
+		whiteListHandler.setWhiteList("127.0.0.1");
+		final CertificateChainExtractor helper = new CertificateChainExtractor(msg, null, whiteListHandler);
 
 		try {
 			helper.extractSenderIdFromCertificate();

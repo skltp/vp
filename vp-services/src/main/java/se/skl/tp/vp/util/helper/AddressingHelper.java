@@ -37,6 +37,7 @@ import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalrouter.VagvalInput;
@@ -67,19 +68,11 @@ public class AddressingHelper {
 			rivProfiles.add(virt.getRivProfil());
 		}
 
-		if (rivProfiles.size() == 0) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP005 + " No ruting with matching Riv-version found for serviceContractNamespace :"
-					+ input.serviceContractNamespace + ", receiverId:" + input.receiverId + "RivVersion" + input.rivVersion;
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP005);
-		}
+		// No routing with matching Riv-version found for
+		raiseError(rivProfiles.size() == 0, VpSemanticErrorCodeEnum.VP005, input);
 
-		if (rivProfiles.size() > 1) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP006 + " More than one route with matching Riv-version found for serviceContractNamespace:"
-					+ input.serviceContractNamespace + ", receiverId:" + input.receiverId;
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP006);
-		}
+		// More than one route with matching Riv-version found for
+		raiseError(rivProfiles.size() > 1, VpSemanticErrorCodeEnum.VP006, input);
 
 		return rivProfiles.iterator().next();
 	}
@@ -132,22 +125,15 @@ public class AddressingHelper {
 					"Calling vagvalAgent with serviceNamespace:" + request.serviceContractNamespace + ", receiverId:"
 							+ request.receiverId + ", senderId: " + request.senderId);
 		}
-		if (request.rivVersion == null) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP001 + " No RIV version configured";
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP001);
-		}
-
-		if (request.senderId == null) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP002 + " No sender ID (from_address) found in certificate";
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP002);
-		}
-		if (request.receiverId == null) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP003 + " No receiver ID (to_address) found in message";
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP003);
-		}
+		
+		// No RIV version configured
+		raiseError(request.rivVersion == null, VpSemanticErrorCodeEnum.VP001);
+		
+		// No sender ID (from_address) found in certificate
+		raiseError(request.senderId == null, VpSemanticErrorCodeEnum.VP002);
+		
+		// No receiver ID (to_address) found in message
+		raiseError(request.receiverId == null, VpSemanticErrorCodeEnum.VP003);
 	}
 
 	private VisaVagvalRequest createVisaVagvalRequest(final VagvalInput input) {
@@ -176,25 +162,23 @@ public class AddressingHelper {
 			}
 		}
 
+		// No Logical Adress with matching Riv-version found for ...
 		if (noOfMatchingAdresses == 0) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP005 + " No Logical Adress with matching Riv-version found for serviceNamespace :"
-					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion;
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP005);
+			String errorMessage = request.getSummary();
+			raiseError(VpSemanticErrorCodeEnum.VP005, errorMessage);
 		}
 
+		// More than one Logical Adress with matching Riv-version found for ...
 		if (noOfMatchingAdresses > 1) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP006 + " More than one Logical Adress with matching Riv-version found for serviceNamespace:"
-					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId;
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP006);
+			String errorMessage = "More than one Logical Adress with matching Riv-version found for "
+					+ request.getSummary();
+			raiseError(VpSemanticErrorCodeEnum.VP006, errorMessage);
 		}
 
+		// Physical Adress field is empty in Service Producer for
 		if (adress == null || adress.trim().length() == 0) {
-			String errorMessage = VpSemanticErrorCodeEnum.VP010 + " Physical Adress field is empty in Service Producer for serviceNamespace :"
-					+ request.serviceContractNamespace + ", receiverId:" + request.receiverId + "RivVersion" + request.rivVersion;
-			log.error(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP010);
+			String errorMessage = request.getSummary();
+			raiseError(VpSemanticErrorCodeEnum.VP010, errorMessage);
 		}
 
 		return adress;
@@ -224,12 +208,27 @@ public class AddressingHelper {
 			if (request.receiverId.contains(" ")) {
 				whitespaceDetectedHintString = ". Whitespace detected in incoming request!";
 			}
-			String errorMessage = VpSemanticErrorCodeEnum.VP004 + " No Logical Adress found for serviceNamespace:" + request.serviceContractNamespace
-					+ ", receiverId:" + request.receiverId + ", From:" + vpInstanceId + whitespaceDetectedHintString;
-			log.info(errorMessage);
-			throw new VpSemanticException(errorMessage, VpSemanticErrorCodeEnum.VP004);
+			// No Logical Address found for serviceNamespace
+			String errorMessage = request.getSummary() + ", From:" + vpInstanceId + whitespaceDetectedHintString;
+			raiseError(VpSemanticErrorCodeEnum.VP004, errorMessage);
 		}
 
 		return virtualiseringar;
+	}
+	
+	private void raiseError(boolean test, VpSemanticErrorCodeEnum codeenum, VagvalInput request) {
+		if(test)
+			raiseError(codeenum, request == null ? "" : request.getSummary());
+	}
+	
+	private void raiseError(boolean test, VpSemanticErrorCodeEnum codeenum) {
+		if(test)
+			raiseError(codeenum, null);
+	}
+	
+	private void raiseError(VpSemanticErrorCodeEnum codeEnum, String suffix) {
+		String errmsg = MessageProperties.getInstance().get(codeEnum, suffix);
+		log.error(errmsg);
+		throw new VpSemanticException(errmsg, codeEnum);		
 	}
 }

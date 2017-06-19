@@ -33,6 +33,7 @@ import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.util.WhiteListHandler;
 
 /**
  * Extractor used when extracting certificate from header
@@ -44,8 +45,8 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 	private static Logger log = LoggerFactory.getLogger(CertificateHeaderExtractor.class);
 
-	public CertificateHeaderExtractor(MuleMessage muleMessage, Pattern pattern, String whiteList) {
-		super(muleMessage, pattern, whiteList);
+	public CertificateHeaderExtractor(MuleMessage muleMessage, Pattern pattern, WhiteListHandler whiteListHandler) {
+		super(muleMessage, pattern, whiteListHandler);
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class CertificateHeaderExtractor extends CertificateExtractorBase impleme
 
 		// Check whitelist
 		String callersIp = VPUtil.extractSocketIpAddress(getMuleMessage());
-		if(!VPUtil.isCallerOnWhiteList(callersIp, getWhiteList(), HttpHeaders.REVERSE_PROXY_HEADER_NAME)){
+		if(!isCallerOnWhiteList(callersIp, HttpHeaders.REVERSE_PROXY_HEADER_NAME)){
 			throw VPUtil.createVP011Exception(callersIp, HttpHeaders.REVERSE_PROXY_HEADER_NAME);
 		}
 

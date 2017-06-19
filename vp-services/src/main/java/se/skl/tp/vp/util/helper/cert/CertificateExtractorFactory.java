@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vp.util.HttpHeaders;
+import se.skl.tp.vp.util.WhiteListHandler;
 import se.skl.tp.vp.util.helper.VPHelperSupport;
 
 /**
@@ -38,12 +39,12 @@ public class CertificateExtractorFactory extends VPHelperSupport {
 	private static Logger log = LoggerFactory.getLogger(CertificateExtractorFactory.class);
 	
 	private Pattern pattern;
-	private String whiteList;
+	private WhiteListHandler whiteListHandler;
 
-	public CertificateExtractorFactory(MuleMessage muleMessage, Pattern pattern, String whiteList) {
+	public CertificateExtractorFactory(MuleMessage muleMessage, Pattern pattern, WhiteListHandler whiteListHandler) {
 		super(muleMessage);
 		this.pattern = pattern;
-		this.whiteList = whiteList;
+		this.whiteListHandler = whiteListHandler;
 	}
 
 	/**
@@ -58,9 +59,9 @@ public class CertificateExtractorFactory extends VPHelperSupport {
 		log.debug("Get extractor for X509Certificate. Reverse proxy mode: {}", isReverseProxy);
 
 		if (isReverseProxy) {
-			return new CertificateHeaderExtractor(getMuleMessage(), getPattern(), getWhiteList());
+			return new CertificateHeaderExtractor(getMuleMessage(), getPattern(), getWhiteListHandler());
 		} else {
-			return new CertificateChainExtractor(getMuleMessage(), getPattern(), getWhiteList());
+			return new CertificateChainExtractor(getMuleMessage(), getPattern(), getWhiteListHandler());
 		}
 	}
 
@@ -72,8 +73,8 @@ public class CertificateExtractorFactory extends VPHelperSupport {
 		return this.pattern;
 	}
 	
-	public String getWhiteList() {
-		return this.whiteList;
+	public WhiteListHandler getWhiteListHandler() {
+		return this.whiteListHandler;
 	}
 
 }

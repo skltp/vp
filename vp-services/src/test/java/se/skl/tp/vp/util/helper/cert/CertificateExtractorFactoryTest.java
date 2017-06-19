@@ -31,8 +31,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vp.util.HttpHeaders;
+import se.skl.tp.vp.util.WhiteListHandler;
 
 public class CertificateExtractorFactoryTest {
+	
+	private WhiteListHandler whiteListHandler = new WhiteListHandler();
 
 	@Test
 	public void extractFromHeaderWhenReveresedProxyHeaderExist() throws Exception {
@@ -41,7 +44,8 @@ public class CertificateExtractorFactoryTest {
 		Mockito.when(msg.getProperty(HttpHeaders.REVERSE_PROXY_HEADER_NAME, PropertyScope.INBOUND)).thenReturn("ANY VALUE");
 		Pattern pattern = null;
 
-		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, "127.0.0.1");
+		whiteListHandler.setWhiteList("127.0.0.1");
+		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, whiteListHandler);
 		CertificateExtractor certificateExtractor = factory.createCertificateExtractor();
 
 		assertTrue(certificateExtractor instanceof CertificateHeaderExtractor);
@@ -53,7 +57,8 @@ public class CertificateExtractorFactoryTest {
 		final DefaultMuleMessage msg = Mockito.mock(DefaultMuleMessage.class);
 		Pattern pattern = null;
 
-		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, "127.0.0.1");
+		whiteListHandler.setWhiteList("127.0.0.1");
+		CertificateExtractorFactory factory = new CertificateExtractorFactory(msg, pattern, whiteListHandler);
 		CertificateExtractor certificateExtractor = factory.createCertificateExtractor();
 
 		assertTrue(certificateExtractor instanceof CertificateChainExtractor);

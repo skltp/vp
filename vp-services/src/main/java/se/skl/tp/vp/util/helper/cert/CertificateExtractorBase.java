@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.WhiteListHandler;
 import se.skl.tp.vp.util.helper.VPHelperSupport;
 
 /**
@@ -41,12 +42,19 @@ public class CertificateExtractorBase extends VPHelperSupport {
 	private static Logger log = LoggerFactory.getLogger(CertificateExtractorBase.class);
 	
 	private Pattern pattern;
-	private String whiteList;
+	private WhiteListHandler whiteListHandler;
+
+	public CertificateExtractorBase(MuleMessage muleMessage, Pattern pattern, WhiteListHandler whiteListHandler) {
+		super(muleMessage);
+		this.pattern = pattern;
+		this.whiteListHandler = whiteListHandler;
+	}
 
 	public CertificateExtractorBase(MuleMessage muleMessage, Pattern pattern, String whiteList) {
 		super(muleMessage);
 		this.pattern = pattern;
-		this.whiteList = whiteList;
+		this.whiteListHandler = new WhiteListHandler();
+		this.whiteListHandler.setWhiteList(whiteList);
 	}
 
 	String extractSenderIdFromCertificate(final X509Certificate certificate) {
@@ -69,8 +77,8 @@ public class CertificateExtractorBase extends VPHelperSupport {
 		return this.pattern;
 	}
 	
-	public String getWhiteList() {
-		return this.whiteList;
+	public boolean isCallerOnWhiteList(String callerIp, String httpHeader) {
+		return this.whiteListHandler.isCallerOnWhiteList(callerIp, httpHeader);
 	}
 
 	private String convertFromHexToString(final String hexString) {

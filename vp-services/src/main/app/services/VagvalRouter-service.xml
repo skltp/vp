@@ -33,19 +33,14 @@
 		http://www.mulesoft.org/schema/mule/cxf 	http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd" >
 
-    <flow name="vagval-dynamic-routing-flow" >
+    <flow name="vagval-dynamic-routing-flow" processingStrategy="synchronous">
     
-    	<custom-transformer class="se.skl.tp.vp.util.MdcLogTraceCleanerTransformer" doc:name="Clear the MDC that collects and carries tracing info for logging"/>
+    	<custom-transformer class="se.skl.tp.vp.logging.MdcLogTraceCleanerTransformer" doc:name="Clear the MDC that collects and carries tracing info for logging"/>
     	<set-variable variableName="httpXForwardedProto" value="#[message.inboundProperties['${VP_HTTP_HEADER_NAME_FORWARDED_PROTO}']]" doc:name="Store HTTP header under well known name for logging"/>
     	<set-variable variableName="httpXForwardedHost" value="#[message.inboundProperties['${VP_HTTP_HEADER_NAME_FORWARDED_HOST}']]" doc:name="Store HTTP header under well known name for logging"/>
     	<set-variable variableName="httpXForwardedPort" value="#[message.inboundProperties['${VP_HTTP_HEADER_NAME_FORWARDED_PORT}']]" doc:name="Store HTTP header under well known name for logging"/>
     	
-    	<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable">
-    		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-            <spring:property name="whiteList" value="${IP_WHITE_LIST}" />
-            <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
-            <spring:property name="senderIpAdressHttpHeader" value="${VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER}"/>
-    	</custom-transformer>
+    	<transformer ref="checkSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable" />
     
     	<!-- Save the http header x-rivta-original-serviceconsumer-hsaid in session-property originalServiceconsumerHsaid -->
     	<set-session-variable variableName="originalServiceconsumerHsaid" value="#[message.inboundProperties.get('x-rivta-original-serviceconsumer-hsaid')]" 
@@ -82,6 +77,8 @@
 			<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
         	<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 			<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+
+            <spring:property name="messageProperties" ref="messageProperties" />
 						
         </custom-processor>
                 
@@ -97,13 +94,19 @@
             	<otherwise>
                 	<processor-chain>
            				<transformer ref="exceptionTransformer" />
-	            		<object-to-string-transformer />
-	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckPayloadTransformer">
-			        		<!-- EventLogger properties -->
-							<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
-			        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
-							<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
-	            		</custom-transformer>
+           				<choice doc:name="Choice">
+						    <when expression="#[message.inboundProperties['http.status']] != 200 || payload == empty]">
+			            		<object-to-string-transformer />
+			            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckPayloadTransformer">
+		            				<spring:property name="messageProperties" ref="messageProperties" />
+			            		
+					        		<!-- EventLogger properties -->
+									<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
+					        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
+									<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+			            		</custom-transformer>
+						    </when>
+						</choice>
 	            		<transformer ref="logRespOut" />
                 	</processor-chain>
             	</otherwise>

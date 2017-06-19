@@ -46,6 +46,7 @@
 	<Loggers>
 		<AsyncLogger name="org.mockftpserver" level="ERROR"/>
 		<AsyncLogger name="org.apache.sshd" level="ERROR"/>
+		<AsyncLogger name="org.apache.commons.httpclient" level="ERROR"/>
 		<AsyncLogger name="org.apache.activemq.transport.failover.FailoverTransport" level="DEBUG"/>
 		<AsyncLogger name="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" level="TRACE"/>
 		<AsyncLogger name="org.springframework.core.io.support.PropertiesLoaderSupport" level="INFO"/>

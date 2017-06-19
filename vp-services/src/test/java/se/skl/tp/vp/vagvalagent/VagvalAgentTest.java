@@ -25,7 +25,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -490,12 +489,14 @@ public class VagvalAgentTest {
 
         List<String> log = processingLog.getLog();
         assertThat(log.get(0), CoreMatchers.containsString("init: not initialized, will do init ..."));
-        assertThat(log.get(1), CoreMatchers.containsString("Initialize VagvalAgent TAK resources.."));
-        assertThat(log.get(2), CoreMatchers.containsString("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy..."));
-        assertThat(log.get(3), CoreMatchers.containsString("Succesfully saved virtualizations and permissions to local TAK copy:"));
-        assertThat(log.get(4), CoreMatchers.containsString("Init VagvalAgent loaded number of permissions: 1"));
-        assertThat(log.get(5), CoreMatchers.containsString("Init VagvalAgent loaded number of virtualizations: 1"));
-        assertThat(log.get(6), CoreMatchers.containsString("init done, was successful: true"));
+        assertThat(log.get(1), CoreMatchers.containsString("Host:"));
+        assertThat(log.get(2), CoreMatchers.containsString("Time:"));
+        assertThat(log.get(3), CoreMatchers.containsString("Initialize VagvalAgent TAK resources.."));
+        assertThat(log.get(4), CoreMatchers.containsString("Succeeded to get virtualizations and/or permissions from TAK, save to local TAK copy..."));
+        assertThat(log.get(5), CoreMatchers.containsString("Succesfully saved virtualizations and permissions to local TAK copy:"));
+        assertThat(log.get(6), CoreMatchers.containsString("Init VagvalAgent loaded number of permissions: 1"));
+        assertThat(log.get(7), CoreMatchers.containsString("Init VagvalAgent loaded number of virtualizations: 1"));
+        assertThat(log.get(8), CoreMatchers.containsString("init done, was successful: true"));
     }
 
     @Test
@@ -515,12 +516,14 @@ public class VagvalAgentTest {
 
         List<String> log = processingLog.getLog();
         assertThat(log.get(0), CoreMatchers.containsString("init: not initialized, will do init ..."));
-        assertThat(log.get(1), CoreMatchers.containsString("Initialize VagvalAgent TAK resources.."));
-        assertThat(log.get(2), CoreMatchers.containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
-        assertThat(log.get(3), CoreMatchers.containsString("Succesfully restored virtualizations and permissions from local TAK copy:"));
-        assertThat(log.get(4), CoreMatchers.containsString("Init VagvalAgent loaded number of permissions: 1"));
-        assertThat(log.get(5), CoreMatchers.containsString("Init VagvalAgent loaded number of virtualizations: 1"));
-        assertThat(log.get(6), CoreMatchers.containsString("init done, was successful: true"));
+        assertThat(log.get(1), CoreMatchers.containsString("Host:"));
+        assertThat(log.get(2), CoreMatchers.containsString("Time:"));
+        assertThat(log.get(3), CoreMatchers.containsString("Initialize VagvalAgent TAK resources.."));
+        assertThat(log.get(4), CoreMatchers.containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
+        assertThat(log.get(5), CoreMatchers.containsString("Succesfully restored virtualizations and permissions from local TAK copy:"));
+        assertThat(log.get(6), CoreMatchers.containsString("Init VagvalAgent loaded number of permissions: 1"));
+        assertThat(log.get(7), CoreMatchers.containsString("Init VagvalAgent loaded number of virtualizations: 1"));
+        assertThat(log.get(8), CoreMatchers.containsString("init done, was successful: true"));
     }
 
     @Test
@@ -540,10 +543,12 @@ public class VagvalAgentTest {
 
         List<String> log = processingLog.getLog();
         assertThat(log.get(0), CoreMatchers.containsString("init: not initialized, will do init ..."));
-        assertThat(log.get(1), CoreMatchers.containsString("Initialize VagvalAgent TAK resources.."));
-        assertThat(log.get(2), CoreMatchers.containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
-        assertThat(log.get(3), CoreMatchers.containsString("Failed to restore virtualizations and permissions from local TAK copy:"));
-        assertThat(log.get(4), CoreMatchers.containsString("Reason for failure: javax.xml.bind.UnmarshalException"));
+        assertThat(log.get(1), CoreMatchers.containsString("Host:"));
+        assertThat(log.get(2), CoreMatchers.containsString("Time:"));
+        assertThat(log.get(3), CoreMatchers.containsString("Initialize VagvalAgent TAK resources.."));
+        assertThat(log.get(4), CoreMatchers.containsString("Failed to get virtualizations and/or permissions from TAK, see logfiles for details. Restore from local TAK copy..."));
+        assertThat(log.get(5), CoreMatchers.containsString("Failed to restore virtualizations and permissions from local TAK copy:"));
+        assertThat(log.get(6), CoreMatchers.containsString("Reason for failure: javax.xml.bind.UnmarshalException"));
     }
 
     @Test

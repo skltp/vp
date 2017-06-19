@@ -21,9 +21,7 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
@@ -49,9 +47,12 @@ import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
-import se.skl.tp.vp.util.EventLogger;
+import se.skl.tp.vp.logging.EventLoggerFactory;
+import se.skl.tp.vp.logging.SessionInfo;
+import se.skl.tp.vp.logging.EventLogger;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.HttpHeaders;
+import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
@@ -64,7 +65,6 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private AddressingHelper addrHelper;
 
-	@SuppressWarnings("unused")
 	private String vpInstanceId;
 	private TypedValue vpInstanceTypedValue;
 	
@@ -72,7 +72,9 @@ public class VagvalRouter extends AbstractRecipientList {
 	
 	private int retryRoute;
 	
-	private final EventLogger eventLogger = new EventLogger();
+	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
+
+	private MessageProperties messageProperties;
 
 	/**
 	 * Set value to be used in HTTP header x-vp-instance-id.
@@ -110,6 +112,10 @@ public class VagvalRouter extends AbstractRecipientList {
 		 {
 			 setEnableCorrelation(CorrelationMode.NEVER);
 		 }
+	}
+
+	public void setMessageProperties(MessageProperties messageProperties) {
+		this.messageProperties = messageProperties;
 	}
 
 	/**
@@ -184,7 +190,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 			//TODO: Is it possible to get failing endpoint any other way, e.g from exception?
 			String addr = addrHelper.getAddress(event.getMessage());
-			String cause = VpSemanticErrorCodeEnum.VP009 + " Error connecting to service producer at adress " + addr;
+			String cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr);
 			setSoapFaultInResponse(event, cause, VpSemanticErrorCodeEnum.VP009.toString());
 			logException(event.getMessage(), new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));
 			return event;
@@ -291,10 +297,10 @@ public class VagvalRouter extends AbstractRecipientList {
 	}
 
 	private void logException(MuleMessage message, Throwable t) {
-		Map<String, String> extraInfo = new HashMap<String, String>();
-		extraInfo.put("source", getClass().getName());
-		eventLogger.setMuleContext(getMuleContext());
-		eventLogger.addSessionInfo(message, extraInfo);
+		SessionInfo extraInfo = new SessionInfo();
+		extraInfo.addSource(getClass().getName());
+		extraInfo.addSessionInfo(message);
+		eventLogger.setContext(getMuleContext());
 		eventLogger.logErrorEvent(t, message, null, extraInfo);
 	}
 

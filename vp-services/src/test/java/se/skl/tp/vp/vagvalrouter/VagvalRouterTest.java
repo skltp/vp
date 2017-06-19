@@ -38,6 +38,7 @@ import org.mockito.Mockito;
 
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 import se.skl.tp.vp.vagvalagent.VagvalAgentMock;
@@ -66,6 +67,7 @@ public class VagvalRouterTest {
 
 		vagvalRouter = new VagvalRouter();
 		vagvalRouter.setVagvalAgent(vagvalAgent);
+		vagvalRouter.setMessageProperties(MessageProperties.getInstance());
 
 		HsaCache hsaCacheMock = Mockito.mock(HsaCache.class);
 		Mockito.when(hsaCacheMock.getParent("VardgivareB")).thenReturn(HsaCache.DEFAUL_ROOTNODE);
@@ -118,8 +120,9 @@ public class VagvalRouterTest {
 		assertFalse("precond: local tak-cache file must not exist", localTakCache.exists());
 		
 		// Setup VagvalAgent with no routing or access control added
-		VagvalAgent vagvalAgent = new VagvalAgent();
+		VagvalAgentMock vagvalAgent = new VagvalAgentMock();
 		vagvalAgent.setLocalTakCache(localTakCache.getAbsolutePath());
+
 
 		AddressingHelper myHelper = new AddressingHelper(vagvalAgent, "VP_INSTANCE_ID");
 
@@ -128,7 +131,7 @@ public class VagvalRouterTest {
 			myHelper.getAddressFromAgent(vagvalInput);
 			fail("VP008 Exception expected");
 		} catch (VpSemanticException e) {
-			assertTrue(e.getMessage().equals("VP008 No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call"));
+			assertTrue(e.getMessage().equals("VP008 No contact with TAK at startup, and no local cache to fallback on, not possible to route call"));
 		}
 
 	}

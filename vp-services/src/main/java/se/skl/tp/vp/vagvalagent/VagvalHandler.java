@@ -35,7 +35,8 @@ import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.MdcLogTrace;
+import se.skl.tp.vp.logging.MdcLogTrace;
+import se.skl.tp.vp.util.MessageProperties;
 
 public class VagvalHandler {
 
@@ -169,7 +170,8 @@ public class VagvalHandler {
 		try {
 			return hsaCache.getParent(receiverId);
 		} catch (HsaCacheInitializationException e) {
-			throw new VpSemanticException(VpSemanticErrorCodeEnum.VP011 + " Internal HSA cache is not available!", VpSemanticErrorCodeEnum.VP011, e);
+			String errmsg = MessageProperties.getInstance().get(VpSemanticErrorCodeEnum.VP012, "Internal HSA cache is not available!");
+			throw new VpSemanticException(VpSemanticErrorCodeEnum.VP012 + " " + errmsg, VpSemanticErrorCodeEnum.VP012, e);
 		}
 	}
 

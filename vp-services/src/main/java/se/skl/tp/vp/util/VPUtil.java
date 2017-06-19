@@ -23,7 +23,6 @@ package se.skl.tp.vp.util;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
@@ -39,6 +38,7 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
  */
 public final class VPUtil {
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(VPUtil.class);
 
 	public static final String REMOTE_ADDR = MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
@@ -56,7 +56,7 @@ public final class VPUtil {
 	public static final String SESSION_ERROR_CODE = "errorCode";
 	
 	//Session scoped variables used in internal flows, not to mix with http headers prefixed x-something used for external http headers
-	public static final String CORRELATION_ID = "soitoolkit_correlationId";
+	public static final String SKLTP_CORRELATION_ID = "skltp_correlationId";
 	public static final String ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid";
 	public static final String RECEIVER_ID = "receiverid";
 	public static final String SENDER_ID = "senderid";
@@ -207,36 +207,13 @@ public final class VPUtil {
 	 * @param whiteList The comma separated list of ip addresses or subdomains 
 	 * @param httpHeader The http header causing the check in the white list
 	 * @return true if caller is on whitelist
+	 * @deprecated for test only. Use {@link WhiteListHandler} instead
 	 */
 	public static boolean isCallerOnWhiteList(String callerIp, String whiteList, String httpHeader) {
 		
-		log.debug("Check if caller {} is in white list berfore using HTTP header {}...", callerIp, httpHeader);
-
-		//When no ip address exist we can not validate against whitelist
-		if (VPUtil.isWhitespace(callerIp)) {
-			log.warn("A potential empty ip address from the caller, ip adress is: {}. HTTP header that caused checking: {} ", callerIp, httpHeader);
-			return false;
-		}
-		
-		// Remove possible inline comment
-		whiteList = VPUtil.trimProperty(whiteList);
-		
-		//When no whitelist exist we can not validate incoming ip address
-		if (VPUtil.isWhitespace(whiteList)) {
-			log.warn("A check against the ip address whitelist was requested, but the whitelist is configured empty. Update VP configuration property IP_WHITE_LIST");
-			return false;
-		}
-		
-		
-		for (String ipAddress : whiteList.split(",")) {
-			if(callerIp.startsWith(ipAddress.trim())){
-				log.debug("Caller matches ip address/subdomain in white list");
-				return true;
-			}
-		}
-
-		log.warn("Caller was not on the white list of accepted IP-addresses. IP-address: {}, accepted IP-addresses in IP_WHITE_LIST: {}", callerIp, whiteList);
-		return false;
+		WhiteListHandler w = new WhiteListHandler();
+		w.setWhiteList(whiteList);
+		return w.isCallerOnWhiteList(callerIp, httpHeader);
 	}
 	
 	/**
@@ -260,8 +237,11 @@ public final class VPUtil {
 	}
 	
 	public static VpSemanticException createVP011Exception(String callersIp, String httpHeaderCausingCheck){
-		return new VpSemanticException(VpSemanticErrorCodeEnum.VP011 + " Caller was not on the white list of accepted IP-addresses. IP-address: " 
-				+ callersIp + ". HTTP header that caused checking: " + httpHeaderCausingCheck, VpSemanticErrorCodeEnum.VP011);
+		return new VpSemanticException(
+				MessageProperties.getInstance().get(VpSemanticErrorCodeEnum.VP011,
+				"IP-address: " + callersIp 
+				+ ". HTTP header that caused checking: " + httpHeaderCausingCheck), 
+				VpSemanticErrorCodeEnum.VP011);
 	}
 	
 	public static void setSoapFaultInResponse(MuleMessage message, String cause, String errorCode){

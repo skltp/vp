@@ -34,8 +34,11 @@ import org.mockito.Mockito;
 import org.mule.api.MuleMessage;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.util.WhiteListHandler;
 
 public class CertificateExtractorBaseTest {
+
+	private WhiteListHandler whiteListHandler = new WhiteListHandler();
 
 	@Test
 	public void testExtractSenderFromCertificate() throws Exception {
@@ -49,7 +52,8 @@ public class CertificateExtractorBaseTest {
 
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 
-		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, pattern, "127.0.0.1");
+		whiteListHandler.setWhiteList("127.0.0.1");
+		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, pattern, whiteListHandler);
 		final String sender = helper.extractSenderIdFromCertificate(cert);
 
 		assertNotNull(sender);
@@ -86,7 +90,7 @@ public class CertificateExtractorBaseTest {
 	@Test
 	public void testExtractSenderWithNullCert() throws Exception {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, null, null);
+		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, null, "");
 
 		try {
 			helper.extractSenderIdFromCertificate(null);
@@ -101,7 +105,7 @@ public class CertificateExtractorBaseTest {
 	@Test
 	public void testExtractSenderWithNullPattern() throws Exception {
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
-		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, null, null);
+		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, null, "");
 
 		try {
 			helper.extractSenderIdFromCertificate(Mockito.mock(X509Certificate.class));
@@ -123,7 +127,7 @@ public class CertificateExtractorBaseTest {
 
 		final MuleMessage msg = Mockito.mock(MuleMessage.class);
 
-		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, pattern, null);
+		final CertificateExtractorBase helper = new CertificateExtractorBase(msg, pattern, "");
 
 		try {
 			helper.extractSenderIdFromCertificate(cert);
