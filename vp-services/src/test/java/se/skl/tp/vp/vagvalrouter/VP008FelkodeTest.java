@@ -22,10 +22,16 @@ package se.skl.tp.vp.vagvalrouter;
 
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
+
+import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 /**
  * Tjanstekatalogen stub är tom
@@ -35,8 +41,20 @@ public class VP008FelkodeTest  extends AbstractTestCase {
     private static final int    CLIENT_TIMEOUT_MS = 600000000;
     private static final String PRODUCT_ID = "SW123";
 
-    private static final String TJANSTE_ADRESS =                                      "https://localhost:20000/vp/tjanst1";
-    private static final String LOGICAL_ADDRESS =                                    "vp-test-producer";
+    private static final String TJANSTE_ADRESS =     "https://localhost:20000/vp/tjanst1";
+    private static final String LOGICAL_ADDRESS =    "vp-test-producer";
+
+    @BeforeClass
+    public static void setupTjanstekatalogen() throws Exception {
+        // override value in property file before injecting into spring context
+        System.setProperty("TP_SOKVAGVALSINFO_URL", "http://localhost:20001/unknown");
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() {
+        // restore
+        System.clearProperty("TP_SOKVAGVALSINFO_URL");
+    }
 
     @Override
     protected String getConfigResources() {
@@ -51,14 +69,14 @@ public class VP008FelkodeTest  extends AbstractTestCase {
     public void doSetUp() throws Exception {
         testConsumer = new VpFullServiceTestConsumer_MuleClient(muleContext, "VPConsumerConnector", CLIENT_TIMEOUT_MS);
     }
+    
     @Test
     public void testVP008() throws Exception {
         try {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS);
             fail("Expected error here!");
         } catch (Throwable ex) {
-            assertTrue(ex.getMessage().contains("VP008 No contact with Tjanstekatalogen at startup, and no local cache to fallback on, not possible to route call"));
+            assertTrue(ex.getMessage(), ex.getMessage().contains("VP008 No contact with TAK at startup, and no local cache to fallback on, not possible to route call"));
         }
     }
-
 }

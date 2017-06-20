@@ -39,8 +39,11 @@
 	
 	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
 	
+	<!-- TP_SOKVAGVALSINFO_URL is normally equals to
+	     TP_SOKVAGVALSINFO_TESTSTUB_URL, configured in property file.
+	 -->
 	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent" init-method="doRemoveTakCache">
-		<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_TESTSTUB_URL}" />
+		<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_URL}" />
 		<spring:property name="addressDelimiter" value="#" />
 		<spring:property name="hsaCache" ref="hsaCache"/>
 		<spring:property name="localTakCache" value="target/test-classes/.tk.localCache.test"/>

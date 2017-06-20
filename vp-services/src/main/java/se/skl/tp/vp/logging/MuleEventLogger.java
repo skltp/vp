@@ -79,6 +79,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 	private String serverId = null; // Can't read this one at class initialization because it is not set at that time. Can also be different for different loggers in the same JVM (e.g. multiple wars in one servlet container with shared classes?))
 	private MuleContext muleContext;
 
+	@SuppressWarnings("unused")
 	private static boolean s_enableLogToJms = true;
 
 	
@@ -110,7 +111,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		
 		//Only log payload when DEBUG is defined in log4j.xml
 		if(messageLogger.isDebugEnabled()){
-			LogEvent logEvent = createLogEntry(LogLevelType.DEBUG, message, logMessage, businessContextId, extraInfo, message.getPayload(), null);
+			LogEvent logEvent = createLogEntry(LogLevelType.DEBUG, message, logMessage, businessContextId, extraInfo, message.getPayloadForLogging(), null);
 			dispatchDebugEvent(logEvent);
 			logDebugEvent(logEvent);
 		}else if (messageLogger.isInfoEnabled()) {
@@ -207,18 +208,16 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		String contractId            = ""; 
 		String businessCorrelationId = "";
 		String propertyBusinessContextId = null;
-		String payloadAsString = null;
 
 		if (message != null) {
 
-			if (log.isDebugEnabled()) {
+			if (logLevel == LogLevelType.DEBUG) {
 				@SuppressWarnings("rawtypes")
 				Set names = message.getPropertyNames(PropertyScope.OUTBOUND);
 				for (Object object : names) {
 					Object value = message.getProperty(object.toString(), PropertyScope.OUTBOUND);
 					log.debug(object + " = " + value + " (" + object.getClass().getName() + ")");
 				}
-				payloadAsString = payloadToStringTransformer.getPayloadAsString(payload);
 			}
 			
 			messageId             = message.getUniqueId();
@@ -229,6 +228,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		}
 
 		String componentId = getServerId();
+		String payloadAsString = payloadToStringTransformer.getPayloadAsString(payload);
 		
 
 	    // -------------------------

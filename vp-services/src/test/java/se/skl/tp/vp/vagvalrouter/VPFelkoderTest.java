@@ -96,12 +96,12 @@ public class VPFelkoderTest extends AbstractTestCase {
 
 
         @Test
-    public void testVP003ThrownWhenNoLocalAddress() throws Exception {
+    public void testVP003ThrownWhenLogicalAddressIsMissing() throws Exception {
         try {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, "");
             fail("Expected error here!");
         } catch (Throwable ex) {
-           assertTrue(ex.getMessage().contains("VP003 No receiver ID (to_address) found in message"));
+           assertTrue(ex.getMessage().contains("VP003 No receiverId (logical address) found in message header"));
         }
     }
 
@@ -112,10 +112,10 @@ public class VPFelkoderTest extends AbstractTestCase {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND);
             fail("Expected error here!");
         } catch (Exception ex) {
-            assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
+        	assertTrue(ex.getMessage().contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));        	
         }
     }
-
+    
     @Test
     public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceBefore() throws Exception {
         final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
@@ -125,7 +125,8 @@ public class VPFelkoderTest extends AbstractTestCase {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE, properties);
             fail("Expected error here!");
         } catch (Exception ex) {
-            assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ", From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));    	}
+    		assertTrue(ex.getMessage().contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ", RivVersion:RIVTABP20, From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));    	
+    	}    	
     }
 
     @Test
@@ -139,8 +140,8 @@ public class VPFelkoderTest extends AbstractTestCase {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER, properties);
             fail("Expected error here!");
         } catch (Exception ex) {
-            String msg = ex.getMessage();
-            assertTrue(msg.contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ", From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));
+    		String msg = ex.getMessage();
+    		assertTrue(msg.contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ", RivVersion:RIVTABP20, From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));
         }
     }
 
@@ -151,20 +152,20 @@ public class VPFelkoderTest extends AbstractTestCase {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_MED_OBEFINLIG_RIV_VERSION, LOGICAL_ADDRESS);
             fail("Expected error here!");
         } catch (Throwable ex) {
-            assertTrue(ex.getMessage().contains("VP005 No Logical Adress with matching Riv-version found for serviceNamespace"));
+            assertTrue(ex.getMessage().contains("VP005 No receiverId (logical address) with matching Riv-version found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:vp-test-producer, RivVersion:RIVTABP25"));
         }
     }
-
+    
     @Test
     public void testVP006IsThrownWhenAreMoreThanOneLogicalAdress() throws Exception {
         try {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_DUBLICATE, LOGICAL_ADDRESS_DUBLICATE);
             fail("Expected error here!");
         } catch (Throwable ex) {
-            assertTrue(ex.getMessage().contains("VP006 More than one Logical Adress with matching Riv-version found"));
+            assertTrue(ex.getMessage().contains("VP006 More than one receiverId (logical address) with matching Riv-version found"));
         }
     }
-
+    
     @Test
     public void testVP007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
 
@@ -201,7 +202,7 @@ public class VPFelkoderTest extends AbstractTestCase {
             // packages - like a "stealth" mode firewall port.
             // Not an easy (or even possible?) thing to do in Java.
             //assertTrue("Expected time to be longer than long_timeout_ms (" + long_timeout_ms + ") but was " + ts + " ms.", ts > long_timeout_ms);
-            assertTrue(ex.getMessage().contains("VP009 Error connecting to service producer at adress https://www.google.com:81"));
+            assertTrue(ex.getMessage().contains("VP009 Error connecting to service producer at address https://www.google.com:81"));
         }
     }
 
@@ -215,10 +216,9 @@ public class VPFelkoderTest extends AbstractTestCase {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_MED_EMPTY_PHYSIKAL);
             fail("Expected error here!");
         } catch (Throwable ex) {
-            assertTrue(ex.getMessage().contains("VP010 Physical Adress field is empty in Service Producer for serviceNamespace"));
+            assertTrue(ex.getMessage().contains("VP010 Physical Address field is empty in Service Producer for serviceNamespace"));
         }
     }
-
 
     private static VagvalMockInputRecord createVagvalRecord(String receiverId, String adress) {
         VagvalMockInputRecord vagvalInput = new VagvalMockInputRecord();
