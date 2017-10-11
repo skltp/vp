@@ -272,7 +272,7 @@ public class VagvalRouter extends AbstractRecipientList {
 			if(retryRoute == 0)
 				throw ec;
 			else {
-				logger.error("Could not route. Will retry after {} sec ...", retryRoute);
+				logger.error("Could not route. Will retry after {} millisec ...", retryRoute);
 				try {
 					Thread.sleep(retryRoute);
 				} catch (InterruptedException e) {
