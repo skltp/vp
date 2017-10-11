@@ -170,8 +170,7 @@ public class AddressingHelper {
 
 		// More than one Logical Adress with matching Riv-version found for ...
 		if (noOfMatchingAdresses > 1) {
-			String errorMessage = "More than one Logical Adress with matching Riv-version found for "
-					+ request.getSummary();
+			String errorMessage = request.getSummary();
 			raiseError(VpSemanticErrorCodeEnum.VP006, errorMessage);
 		}
 
