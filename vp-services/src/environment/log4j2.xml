@@ -38,6 +38,13 @@
 			</Policies>
 			<DefaultRolloverStrategy fileIndex="min" max="5"/>
 		</RollingRandomAccessFile>
+
+		<Socket name="socket" host="localhost" port="9500" additivity="false">
+			<PatternLayout>
+				<Pattern>%d %-5p [%t] %-30c - %m%n</Pattern>
+			</PatternLayout>
+		</Socket>
+		
 	</Appenders>
 
 	<!-- Log levels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL}

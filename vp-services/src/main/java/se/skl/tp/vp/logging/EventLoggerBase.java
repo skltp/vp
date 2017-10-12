@@ -22,6 +22,8 @@ package se.skl.tp.vp.logging;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +44,11 @@ import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType.BusinessCont
  * @author Magnus Larsson
  *
  */
-public class EventLoggerBase {
+public abstract class EventLoggerBase {
 
 	// EventLogger specific logger of message execution in VP
 	protected static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
+	protected static final Logger socketLogger = LoggerFactory.getLogger("se.skltp.mule.logging.socketLogger");
 	
 	private static final String MSG_ID = "soi-toolkit.log";
 	private static final String LOG_EVENT_INFO = "logEvent-info";
@@ -74,8 +77,44 @@ public class EventLoggerBase {
 		}
 	}
 
+	private Boolean useSocketLogger = false;
+	public void setUseSocketLogger(Boolean useSocketLogger) {
+		this.useSocketLogger = useSocketLogger == null ? false : useSocketLogger;
+	}
+	
+	private List<String> categoriesList;
+	public void setSocketLoggerCategories(String categories) {
+		if(categories == null)
+			categoriesList = new ArrayList<String>();
+		else {
+			String [] s = categories.split(",");
+			this.categoriesList = Arrays.asList(s);
+		}
+	}
+	
+	protected boolean socketLogging(LogEvent logEvent) {
+		
+		if(!useSocketLogger)
+			return false;
+		
+		if(!socketLogger.isDebugEnabled())
+			return false;
+		
+		String logMsgType = logEvent.getLogEntry().getMessageInfo().getMessage();
+		
+		if(!categoriesList.contains(logMsgType))
+			return false;
+		
+		return true;
+	}
+
+	protected void logSocketEvent(LogEvent logEvent) {
+		String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent,true);
+		socketLogger.debug(logMsg);	
+	}
+	
 	protected void logDebugEvent(LogEvent logEvent) {
-		String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent);
+		String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent, true);
 		messageLogger.debug(logMsg);	
 	}
 	
@@ -88,7 +127,12 @@ public class EventLoggerBase {
 		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
 		messageLogger.error(logMsg);
 	}
+	
 	protected String formatLogMessage(String logEventName, LogEvent logEvent) {
+		return formatLogMessage(logEventName, logEvent, false);
+	}
+
+	protected String formatLogMessage(String logEventName, LogEvent logEvent, boolean logPayLoad) {
 		LogMessageType      messageInfo  = logEvent.getLogEntry().getMessageInfo();
 		LogMetadataInfoType metadataInfo = logEvent.getLogEntry().getMetadataInfo();
 		LogRuntimeInfoType  runtimeInfo  = logEvent.getLogEntry().getRuntimeInfo();

@@ -48,6 +48,13 @@ public interface EventLogger <T> {
 	void setLogInfoQueueName(String logInfoQueueName);
 
 	/**
+	 * For socket logging
+	 * @param useSocketLogger
+	 */
+	public void setUseSocketLogger(Boolean useSocketLogger);
+	public void setSocketLoggerCategories(String categories);
+
+	/**
 	 * Set context
 	 * @param context
 	 */

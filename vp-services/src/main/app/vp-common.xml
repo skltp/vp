@@ -222,6 +222,8 @@
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+        <spring:property name="SocketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
     </custom-transformer>
     
     <custom-transformer name="logReqOut" class="se.skl.tp.vp.logging.LogTransformer">
@@ -230,6 +232,8 @@
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+        <spring:property name="SocketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
     </custom-transformer>
 
     <custom-transformer name="logRespIn" class="se.skl.tp.vp.logging.LogTransformer">
@@ -238,6 +242,8 @@
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+        <spring:property name="SocketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
     </custom-transformer>
 
     <custom-transformer name="logRespOut" class="se.skl.tp.vp.logging.LogTransformer">
@@ -246,6 +252,8 @@
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+        <spring:property name="SocketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
     </custom-transformer>
     
     <message-properties-transformer name="filterResponseHeaders" scope="outbound">
