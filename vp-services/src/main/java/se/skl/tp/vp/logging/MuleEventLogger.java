@@ -90,7 +90,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 			dispatchInfoEvent(logEvent);
 			logInfoEvent(logEvent);
 		}
-		if(socketLogging(logEvent) && logEvent != null) {
+		if(socketLogging(logEvent, extraInfo) && logEvent != null) {
 			handler.setPayload(logEvent, message.getPayloadForLogging());
 			logSocketEvent(logEvent);
 		}

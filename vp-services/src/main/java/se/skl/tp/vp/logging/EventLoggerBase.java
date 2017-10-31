@@ -35,7 +35,7 @@ import org.soitoolkit.commons.logentry.schema.v1.LogMessageType;
 import org.soitoolkit.commons.logentry.schema.v1.LogMetadataInfoType;
 import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType;
 import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType.BusinessContextId;
-
+import se.skl.tp.vp.util.VPUtil;
 
 
 /**
@@ -91,8 +91,18 @@ public abstract class EventLoggerBase {
 			this.categoriesList = Arrays.asList(s);
 		}
 	}
+
+	private List<String> serviceContractList;
+	public void setSocketLoggerServiceContracts(String serviceContracts) {
+		if(serviceContracts == null)
+			serviceContractList = new ArrayList<String>();
+		else {
+			String [] s = serviceContracts.split(",");
+			this.serviceContractList = Arrays.asList(s);
+		}
+	}
 	
-	protected boolean socketLogging(LogEvent logEvent) {
+	protected boolean socketLogging(LogEvent logEvent, SessionInfo extraInfo) {
 		
 		if(!useSocketLogger)
 			return false;
@@ -101,10 +111,15 @@ public abstract class EventLoggerBase {
 			return false;
 		
 		String logMsgType = logEvent.getLogEntry().getMessageInfo().getMessage();
-		
-		if(!categoriesList.contains(logMsgType))
+
+		if(categoriesList != null && !categoriesList.contains(logMsgType))
 			return false;
-		
+
+		String serviceContract = extraInfo.get(VPUtil.SERVICECONTRACT_NAMESPACE);
+
+		if(serviceContractList != null && !serviceContractList.contains(serviceContract))
+			return false;
+
 		return true;
 	}
 

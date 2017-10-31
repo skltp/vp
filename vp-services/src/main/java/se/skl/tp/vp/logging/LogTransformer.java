@@ -66,6 +66,10 @@ public class LogTransformer extends AbstractMessageTransformer {
 	public void setSocketLoggerCategories(String categories) {
 		this.eventLogger.setSocketLoggerCategories(categories);
 	}
+
+	public void setSocketLoggerServiceContracts(String serviceContracts) {
+		this.eventLogger.setSocketLoggerServiceContracts(serviceContracts);
+	}
 	
 	/**
 	 * Enable logging to JMS, it true by default
