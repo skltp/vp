@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- status="TRACE" to debug logging config, default: WARN -->
-<Configuration status="WARN">
+<Configuration status="WARN" packages="se.skl.tp.vp.logging.plugins">
 	<Properties>
 		<Property name="log.dir">${sys:mule.home}/logs</Property>
+		<Property name="socketappender.host">localhost</Property>
+		<Property name="socketappender.port">5000</Property>
 	</Properties>
 
 	<Appenders>
@@ -39,7 +41,7 @@
 			<DefaultRolloverStrategy fileIndex="min" max="5"/>
 		</RollingRandomAccessFile>
 
-		<Socket name="socket" host="localhost" port="9500">
+		<Socket name="socket" host="${vp:socketappender.host}" port="${vp:socketappender.port}">
 			<PatternLayout>
 				<Pattern>%d %-5p [%t] %-30c - %m%n</Pattern>
 			</PatternLayout>
@@ -78,10 +80,11 @@
 			ERROR will only put errorevents on log queue
 		-->
 		<AsyncLogger name="org.soitoolkit.commons.mule.messageLogger" level="INFO"/>
-		<AsyncLogger name="se.skltp.mule.logging.socketLogger" level="INFO" additivity="false">
+		<AsyncLogger name="se.skltp.mule.logging.socketLogger" level="DEBUG" additivity="false">
 			<AppenderRef ref="socket"></AppenderRef>
 		</AsyncLogger>
 
+		<AsyncLogger name="se.skl.tp.vp.logging" level="INFO"/>
 		<AsyncLogger name="se.skl.tp.vp" level="ERROR"/>
 		<AsyncLogger name="se.skl.tp.hsa" level="ERROR"/>
 
