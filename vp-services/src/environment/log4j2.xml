@@ -42,9 +42,6 @@
 		</RollingRandomAccessFile>
 
 		<Socket name="socket" host="${vp:socketappender.host}" port="${vp:socketappender.port}">
-			<PatternLayout>
-				<Pattern>%d %-5p [%t] %-30c - %m%n</Pattern>
-			</PatternLayout>
 		</Socket>
 		
 	</Appenders>
