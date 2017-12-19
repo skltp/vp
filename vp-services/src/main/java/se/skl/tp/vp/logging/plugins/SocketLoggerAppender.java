@@ -20,7 +20,10 @@
  */
 package se.skl.tp.vp.logging.plugins;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -28,7 +31,6 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -84,7 +86,7 @@ public class SocketLoggerAppender extends AbstractAppender {
         String hostname = StringUtils.isNotEmpty(host) ? host : getHostFromProps();
         String portnum = StringUtils.isNotEmpty(port) ? port : getPortFromProps();
 
-        if( StringUtils.isNotEmpty(hostname) && StringUtils.isNotEmpty(portnum) && StringUtils.isNumeric(port)) {
+        if( StringUtils.isNotEmpty(hostname) && StringUtils.isNotEmpty(portnum) && StringUtils.isNumericSpace(portnum)) {
             socketAppender = SocketAppender.createAppender(hostname, portnum, protocolStr, sslConfig, delayMillis, immediateFail, name, immediateFlush, ignore, layout, filter, advertise, config);
         } else{
             LOGGER.warn(LOOKUP, "No host/port defined, socketlogging will be turned off. Host:'{}' Port: {}", hostname, portnum );
@@ -93,13 +95,11 @@ public class SocketLoggerAppender extends AbstractAppender {
     }
 
     private static String getPortFromProps() {
-        String port = StrSubstitutor.replace(props.getProperty("socketappender.port"), System.getProperties());
-        return StringUtils.isNumeric(port) ? port : "";
+        return props.getProperty("socketappender.port");
     }
 
     private static String getHostFromProps() {
-        String port = props.getProperty("socketappender.host");
-        return StrSubstitutor.replace(port, System.getProperties());
+        return  props.getProperty("socketappender.host");
     }
 
     private static boolean loadPropertiesFromResource(String configResource) {
