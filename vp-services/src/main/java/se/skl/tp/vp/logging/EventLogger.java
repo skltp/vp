@@ -29,7 +29,7 @@ public interface EventLogger <T> {
 	/**
 	 * Enable logging to JMS, it true by default
 	 * 
-	 * @param logEnableToJms
+	 * @param enableLogToJms
 	 */
 	void setEnableLogToJms(boolean enableLogToJms);
 
@@ -46,6 +46,14 @@ public interface EventLogger <T> {
 	 * @param logInfoQueueName
 	 */
 	void setLogInfoQueueName(String logInfoQueueName);
+
+	/**
+	 * For socket logging
+	 * @param useSocketLogger
+	 */
+	public void setUseSocketLogger(Boolean useSocketLogger);
+	public void setSocketLoggerCategories(String categories);
+	public void setSocketLoggerServiceContracts(String serviceContracts);
 
 	/**
 	 * Set context

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- status="TRACE" to debug logging config, default: WARN -->
-<Configuration status="WARN">
+<Configuration status="WARN" packages="se.skl.tp.vp.logging.plugins">
 	<Properties>
 		<Property name="log.dir">${sys:mule.home}/logs</Property>
 	</Properties>
@@ -9,6 +9,11 @@
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d %-5p [%t] %-30c - %m%n"/>
 		</Console>
+
+		<!--<SocketLoggerAppender name="SocketLoggerAppender" configResource="vp-socketappender-test.properties"></SocketLoggerAppender>-->
+		<SocketLoggerAppender name="SocketLoggerAppender" host="localhost" port="${sys:SocketLoggerAppenderTest.port}"></SocketLoggerAppender>
+
+
 	</Appenders>
 
 	<!-- Log levels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL}
@@ -30,6 +35,9 @@
 		<!-- Message logging using the old Mule <log-component/> - element -->
 		<AsyncLogger name="org.mule.component.simple.LogComponent" level="ERROR"/>
 		<AsyncLogger name="org.soitoolkit.commons" level="ERROR"/>
+		<AsyncLogger name="se.skltp.mule.logging.socketLogger" level="DEBUG" additivity="false">
+			<AppenderRef ref="SocketLoggerAppender"></AppenderRef>
+		</AsyncLogger>
 
 		<!-- Message logging using soi-toolkit LogTransformer class -->
 		<!--

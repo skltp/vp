@@ -21,7 +21,10 @@
 package se.skl.tp.vp.logging;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
+import static se.skl.tp.vp.logging.LogMessageEnum.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -35,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
-
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.VPUtil;
 
@@ -54,6 +56,20 @@ public class LogTransformer extends AbstractMessageTransformer {
 	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
 
 	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
+	
+	// Socket logging
+	
+	public void setUseSocketLogger(Boolean useSocketLogger) {
+		this.eventLogger.setUseSocketLogger(useSocketLogger);
+	}
+	
+	public void setSocketLoggerCategories(String categories) {
+		this.eventLogger.setSocketLoggerCategories(categories);
+	}
+
+	public void setSocketLoggerServiceContracts(String serviceContracts) {
+		this.eventLogger.setSocketLoggerServiceContracts(serviceContracts);
+	}
 	
 	/**
 	 * Enable logging to JMS, it true by default
@@ -201,7 +217,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 		} finally {
 			ExecutionTimer.stop(logName);
 			// close total timer.
-			if ("xresp-out".equals(logType)) {
+			if (TYPE_XRESP_OUT.getName().equals(logType)) {
 				ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
 				final String infoMsg = String.format("%s, %s: { %s }", 
 						message.getProperty(VPUtil.SKLTP_CORRELATION_ID, PropertyScope.SESSION, ""),

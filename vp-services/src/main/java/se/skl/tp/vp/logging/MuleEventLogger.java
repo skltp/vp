@@ -20,41 +20,19 @@
  */
 package se.skl.tp.vp.logging;
 
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_BUSINESS_CONTEXT_ID;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CONTRACT_ID;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_INTEGRATION_SCENARIO;
-
-import java.net.URI;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import org.mule.RequestContext;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleConfiguration;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.jms.JmsConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.soitoolkit.commons.logentry.schema.v1.LogEntryType;
-import org.soitoolkit.commons.logentry.schema.v1.LogEntryType.ExtraInfo;
 import org.soitoolkit.commons.logentry.schema.v1.LogEvent;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
-import org.soitoolkit.commons.logentry.schema.v1.LogMessageExceptionType;
-import org.soitoolkit.commons.logentry.schema.v1.LogMessageType;
-import org.soitoolkit.commons.logentry.schema.v1.LogMetadataInfoType;
-import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType;
-import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType.BusinessContextId;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.util.MuleUtil;
-import org.soitoolkit.commons.mule.util.XmlUtil;
-
 import se.skl.tp.vp.util.PayloadToStringTransformer;
 
 
@@ -65,24 +43,14 @@ import se.skl.tp.vp.util.PayloadToStringTransformer;
  * @author Magnus Larsson
  *
  */
-@SuppressWarnings("deprecation")
 public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleMessage> {
-
-	private static final String UNKNOWN_MULE_CONFIGURATION = "UNKNOWN.MULE_CONFIGURATION";
-
-	private static final String UNKNOWN_MULE_CONTEXT = "UNKNOWN.MULE_CONTEXT";
 
 	// Logger for normal logging of code execution	
 	private static final Logger log = LoggerFactory.getLogger(EventLogger.class);
 
 
-	private String serverId = null; // Can't read this one at class initialization because it is not set at that time. Can also be different for different loggers in the same JVM (e.g. multiple wars in one servlet container with shared classes?))
 	private MuleContext muleContext;
 
-	@SuppressWarnings("unused")
-	private static boolean s_enableLogToJms = true;
-
-	
 	@Override
 	public <F> void setContext(F muleContext) {
 		log.debug("setMuleContext { muleContext: {} }", muleContext);
@@ -109,16 +77,25 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		Map<String, String> businessContextId,
 		SessionInfo extraInfo) {
 		
+		LogEntryHandler handler = LogEntryHandler.getInstance(muleContext, messageLogger.getName(), payloadToStringTransformer);
+		
+		LogEvent logEvent = null;
 		//Only log payload when DEBUG is defined in log4j.xml
 		if(messageLogger.isDebugEnabled()){
-			LogEvent logEvent = createLogEntry(LogLevelType.DEBUG, message, logMessage, businessContextId, extraInfo, message.getPayloadForLogging(), null);
+			logEvent = handler.createLogEntry(LogLevelType.DEBUG, message, logMessage, businessContextId, extraInfo, null, null);
+			handler.setPayload(logEvent, message.getPayloadForLogging());
 			dispatchDebugEvent(logEvent);
 			logDebugEvent(logEvent);
 		}else if (messageLogger.isInfoEnabled()) {
-			LogEvent logEvent = createLogEntry(LogLevelType.INFO, message, logMessage, businessContextId, extraInfo, null, null);
+			logEvent = handler.createLogEntry(LogLevelType.INFO, message, logMessage, businessContextId, extraInfo, null, null);
 			dispatchInfoEvent(logEvent);
 			logInfoEvent(logEvent);
 		}
+		if(logEvent != null && socketLogging(logEvent, extraInfo)) {
+			handler.setPayload(logEvent, message.getPayloadForLogging());
+			logSocketEvent(logEvent);
+		}
+
 	}
 
 	//
@@ -132,7 +109,9 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		Map<String, String> businessContextId,
 		SessionInfo extraInfo) {
 
-		LogEvent logEvent = createLogEntry(LogLevelType.ERROR, message, error.toString(), businessContextId, extraInfo, message.getPayload(), error);
+		LogEntryHandler handler = LogEntryHandler.getInstance(muleContext, messageLogger.getName(), payloadToStringTransformer);
+
+		LogEvent logEvent = handler.createLogEntry(LogLevelType.ERROR, message, error.toString(), businessContextId, extraInfo, message.getPayload(), error);
 		dispatchErrorEvent(logEvent);
 		logErrorEvent(logEvent);
 	}
@@ -147,7 +126,9 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		Map<String, String> businessContextId,
 		SessionInfo extraInfo) {
 
-		LogEvent logEvent = createLogEntry(LogLevelType.ERROR, null, error.toString(), businessContextId, extraInfo, payload, error);
+		LogEntryHandler handler = LogEntryHandler.getInstance(muleContext, messageLogger.getName(), payloadToStringTransformer);
+
+		LogEvent logEvent = handler.createLogEntry(LogLevelType.ERROR, null, error.toString(), businessContextId, extraInfo, payload, error);
 		dispatchErrorEvent(logEvent);
 		logErrorEvent(logEvent);
 	}
@@ -164,6 +145,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		return getSession(jmsConn);
 	}
 
+	/*
 	private String getServerId() {
 
 		if (serverId != null) return serverId;
@@ -176,7 +158,8 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		
 		return serverId = mConf.getId();
 	}
-
+*/
+	/*
 	private LogEvent createLogEntry(
 		LogLevelType logLevel,
 		MuleMessage message, 
@@ -333,5 +316,5 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		// We are actually done :-)
 		return logEvent;
 	}
-	
+	*/
 }

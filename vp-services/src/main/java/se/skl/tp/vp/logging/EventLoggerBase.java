@@ -22,7 +22,10 @@ package se.skl.tp.vp.logging;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -33,20 +36,21 @@ import org.soitoolkit.commons.logentry.schema.v1.LogMessageType;
 import org.soitoolkit.commons.logentry.schema.v1.LogMetadataInfoType;
 import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType;
 import org.soitoolkit.commons.logentry.schema.v1.LogRuntimeInfoType.BusinessContextId;
-
+import se.skl.tp.vp.util.VPUtil;
 
 
 /**
- * Log events in a standardized way
- * 
- * @author Magnus Larsson
+ * Base class for event logging
  *
  */
-public class EventLoggerBase {
+public abstract class EventLoggerBase {
 
 	// EventLogger specific logger of message execution in VP
 	protected static final Logger messageLogger = LoggerFactory.getLogger("org.soitoolkit.commons.mule.messageLogger");
-	
+	protected static final Logger socketLogger = LoggerFactory.getLogger("se.skltp.mule.logging.socketLogger");
+
+	private static final Logger logger = LoggerFactory.getLogger(EventLoggerBase.class);
+			
 	private static final String MSG_ID = "soi-toolkit.log";
 	private static final String LOG_EVENT_INFO = "logEvent-info";
 	private static final String LOG_EVENT_ERROR = "logEvent-error";
@@ -74,8 +78,63 @@ public class EventLoggerBase {
 		}
 	}
 
+	private Boolean useSocketLogger = false;
+	public void setUseSocketLogger(Boolean useSocketLogger) {
+		this.useSocketLogger = useSocketLogger == null ? false : useSocketLogger;
+	}
+	
+	private List<String> categoriesList;
+	public void setSocketLoggerCategories(String categories) {
+		if(categories == null || categories.isEmpty()) {
+			categoriesList = new ArrayList<String>();
+		} else {
+			String [] s = categories.split(",");
+			this.categoriesList = Arrays.asList(s);
+		}
+	}
+
+	private List<String> serviceContractList;
+	public void setSocketLoggerServiceContracts(String serviceContracts) {
+		if(serviceContracts == null || serviceContracts.isEmpty()) {
+			serviceContractList = new ArrayList<String>();
+		} else {
+			String [] s = serviceContracts.split(",");
+			this.serviceContractList = Arrays.asList(s);
+		}
+	}
+	
+	protected boolean socketLogging(LogEvent logEvent, SessionInfo extraInfo) {
+
+		if(!useSocketLogger) {
+			return false;
+		}
+		
+		if(!socketLogger.isDebugEnabled()) {
+			return false;
+		}
+		
+		String logMsgType = logEvent.getLogEntry().getMessageInfo().getMessage();
+
+		if(categoriesList != null && !categoriesList.isEmpty() && !categoriesList.contains(logMsgType)) {
+			return false;
+		}
+
+		String serviceContract = extraInfo.get(VPUtil.SERVICECONTRACT_NAMESPACE);
+
+		if(serviceContractList != null && !serviceContractList.isEmpty() && !serviceContractList.contains(serviceContract)) {
+			return false;
+		}
+		return true;
+	}
+
+	protected void logSocketEvent(LogEvent logEvent) {
+		logger.info("Socket logging for messageid {}", logEvent.getLogEntry().getRuntimeInfo().getMessageId());
+		String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent,true);
+		socketLogger.debug(logMsg);	
+	}
+	
 	protected void logDebugEvent(LogEvent logEvent) {
-		String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent);
+		String logMsg = formatLogMessage(LOG_EVENT_DEBUG, logEvent, true);
 		messageLogger.debug(logMsg);	
 	}
 	
@@ -88,7 +147,12 @@ public class EventLoggerBase {
 		String logMsg = formatLogMessage(LOG_EVENT_ERROR, logEvent);
 		messageLogger.error(logMsg);
 	}
+	
 	protected String formatLogMessage(String logEventName, LogEvent logEvent) {
+		return formatLogMessage(logEventName, logEvent, false);
+	}
+
+	protected String formatLogMessage(String logEventName, LogEvent logEvent, boolean logPayLoad) {
 		LogMessageType      messageInfo  = logEvent.getLogEntry().getMessageInfo();
 		LogMetadataInfoType metadataInfo = logEvent.getLogEntry().getMetadataInfo();
 		LogRuntimeInfoType  runtimeInfo  = logEvent.getLogEntry().getRuntimeInfo();
