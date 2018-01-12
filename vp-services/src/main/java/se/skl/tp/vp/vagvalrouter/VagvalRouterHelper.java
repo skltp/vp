@@ -68,7 +68,7 @@ public class VagvalRouterHelper {
 			message.removeProperty(key, scope);
 		}
 		
-		message.setOutboundProperty(HttpConstants.HEADER_USER_AGENT, "SKLTP VP/2.0");
+		message.setOutboundProperty(HttpConstants.HEADER_USER_AGENT, HttpHeaders.VP_HEADER_USER_AGENT);
 		message.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml; charset=UTF-8");
 
 	}

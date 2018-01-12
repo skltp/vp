@@ -22,6 +22,7 @@ package se.skl.tp.vp.vagvalagent;
 
 import java.util.List;
 
+import se.skl.tp.vp.util.MessageProperties;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 
@@ -33,6 +34,7 @@ public class VagvalAgentMock extends VagvalAgent {
 	public VagvalAgentMock (List<VirtualiseringsInfoType> virtualiseringsInfo, List<AnropsBehorighetsInfoType> anropsBehorighetsInfo) {
 		this.virtualiseringsInfo = virtualiseringsInfo;
 		this.anropsBehorighetsInfo = anropsBehorighetsInfo;
+	    this.setMessageProperties(MessageProperties.getInstance());
 	}
 
 	public VagvalAgentMock (List<AnropsBehorighetsInfoType> anropsBehorighetsInfo) {

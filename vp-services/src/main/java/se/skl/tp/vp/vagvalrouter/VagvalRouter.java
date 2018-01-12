@@ -52,6 +52,7 @@ import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.util.EventLogger;
 import se.skl.tp.vp.util.ExecutionTimer;
 import se.skl.tp.vp.util.HttpHeaders;
+import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
@@ -64,7 +65,6 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private AddressingHelper addrHelper;
 
-	@SuppressWarnings("unused")
 	private String vpInstanceId;
 	private TypedValue vpInstanceTypedValue;
 	
@@ -73,6 +73,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	private int retryRoute;
 	
 	private final EventLogger eventLogger = new EventLogger();
+
+	private MessageProperties messageProperties;
 
 	/**
 	 * Set value to be used in HTTP header x-vp-instance-id.
@@ -110,6 +112,10 @@ public class VagvalRouter extends AbstractRecipientList {
 		 {
 			 setEnableCorrelation(CorrelationMode.NEVER);
 		 }
+	}
+
+	public void setMessageProperties(MessageProperties messageProperties) {
+		this.messageProperties = messageProperties;
 	}
 
 	/**
@@ -184,7 +190,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 			//TODO: Is it possible to get failing endpoint any other way, e.g from exception?
 			String addr = addrHelper.getAddress(event.getMessage());
-			String cause = VpSemanticErrorCodeEnum.VP009 + " Error connecting to service producer at adress " + addr;
+			String cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr);
 			setSoapFaultInResponse(event, cause, VpSemanticErrorCodeEnum.VP009.toString());
 			logException(event.getMessage(), new VpSemanticException(cause, VpSemanticErrorCodeEnum.VP009));
 			return event;

@@ -46,6 +46,7 @@
 				<spring:value>classpath:vp-security-override.properties</spring:value>
 				
 				<spring:value>classpath:vp-config.properties</spring:value>
+				<spring:value>classpath:vp-messages.properties</spring:value>
 				<spring:value>classpath:vp-config-override.properties</spring:value>
 
 				<spring:value>classpath:vp-build.properties</spring:value>
@@ -109,6 +110,7 @@
 			<spring:property name="hsaCache" ref="hsaCache"/>
 			<spring:property name="localTakCache" value="${LOCAL_TAK_CACHE}"/>
 			<spring:property name="removeTakCacheAllowed" value="false"/>
+			<spring:property name="messageProperties" ref="messageProperties"/>
 		</spring:bean>
 		
 		<spring:bean name="muleStartupNotification" class="se.skl.tp.vp.vagvalagent.MuleStartupNotificationHandler">
@@ -117,6 +119,30 @@
 			<spring:property name="hsaFiles" value="${HSA_FILES}"/>
 		</spring:bean>
 		
+		<spring:bean name="whiteListHandler" class="se.skl.tp.vp.util.WhiteListHandler">
+            <spring:property name="whiteList" value="${IP_WHITE_LIST}" />
+		</spring:bean>
+		
+		<spring:bean name="messageProperties" class="se.skl.tp.vp.util.MessageProperties">
+			<spring:property name="propertyMap">
+				<spring:map>
+					<spring:entry key="VP001" value="${VP001}" />
+					<spring:entry key="VP002" value="${VP002}" />
+					<spring:entry key="VP003" value="${VP003}" />
+					<spring:entry key="VP004" value="${VP004}" />
+					<spring:entry key="VP005" value="${VP005}" />
+					<spring:entry key="VP006" value="${VP006}" />
+					<spring:entry key="VP007" value="${VP007}" />
+					<spring:entry key="VP008" value="${VP008}" />
+					<spring:entry key="VP009" value="${VP009}" />
+					<spring:entry key="VP010" value="${VP010}" />
+					<spring:entry key="VP011" value="${VP011}" />
+					<spring:entry key="VP012" value="${VP012}" />
+				</spring:map>
+			</spring:property>		
+		</spring:bean>
+
+				
     </spring:beans>
     
     <configuration>

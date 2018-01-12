@@ -42,7 +42,7 @@
     	
     	<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" doc:name="Check SenderId exist in incoming http request, put in session variable">
     		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
-            <spring:property name="whiteList" value="${IP_WHITE_LIST}" />
+            <spring:property name="whiteListHandler" ref="whiteListHandler" />
             <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
             <spring:property name="senderIpAdressHttpHeader" value="${VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER}"/>
     	</custom-transformer>
@@ -82,6 +82,8 @@
 			<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
         	<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 			<spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+
+            <spring:property name="messageProperties" ref="messageProperties" />
 						
         </custom-processor>
                 
@@ -99,6 +101,8 @@
            				<transformer ref="exceptionTransformer" />
 	            		<object-to-string-transformer />
 	            		<custom-transformer class="se.skl.tp.vp.vagvalrouter.CheckPayloadTransformer">
+            				<spring:property name="messageProperties" ref="messageProperties" />
+	            		
 			        		<!-- EventLogger properties -->
 							<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
 			        		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>

@@ -32,5 +32,8 @@ public class VagvalInput {
 		return "VagvalInput: " + senderId + " " + receiverId + " " + rivVersion + " "
 				+ serviceContractNamespace;
 	}
+	public String getSummary() {
+		return "serviceNamespace:" + serviceContractNamespace + ", receiverId:" + receiverId + ", RivVersion:" + rivVersion;		
+	}
 
 }

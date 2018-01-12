@@ -34,7 +34,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.soitoolkit.commons.mule.test.AbstractJmsTestUtil;
@@ -42,10 +41,7 @@ import org.soitoolkit.commons.mule.test.ActiveMqJmsTestUtil;
 import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
 import org.soitoolkit.commons.mule.util.RecursiveResourceBundle;
 
-import com.mchange.util.AssertException;
-
 import se.skl.tp.vp.util.HttpHeaders;
-import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
 import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
@@ -238,7 +234,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_500);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("Service unavailable!"));
+			assertTrue(ex.getMessage().contains("Invalid content found!"));
     	}
 	}
 	
@@ -371,7 +367,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		} catch (Throwable e) {
 			ts = System.currentTimeMillis() - ts;
 			assertTrue("Expected time to be between short_timeout_ms (" + short_timeout_ms + ") and normal_timeout_ms (" + normal_timeout_ms + ") but was " + ts + " ms.", short_timeout_ms < ts && ts < normal_timeout_ms);
-			assertTrue(e.getMessage().contains("VP009 Error connecting to service producer at adress https://www.google.com:81"));
+			assertTrue(e.getMessage().contains("VP009 Error connecting to service producer at address https://www.google.com:81"));
 		}
 	}
 
@@ -389,7 +385,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 			// packages - like a "stealth" mode firewall port.
 			// Not an easy (or even possible?) thing to do in Java.
 			//assertTrue("Expected time to be longer than long_timeout_ms (" + long_timeout_ms + ") but was " + ts + " ms.", ts > long_timeout_ms);
-			assertTrue(ex.getMessage().contains("VP009 Error connecting to service producer at adress https://www.google.com:81"));
+			assertTrue(ex.getMessage().contains("VP009 Error connecting to service producer at address https://www.google.com:81"));
 		}
 	}
 	
@@ -401,7 +397,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		
 		assertEquals("tp", VpTestProducerLogger.getLatestRivtaOriginalSenderId());
-		assertEquals("SKLTP VP/2.0", VpTestProducerLogger.getLatestUserAgent());
+		assertEquals(HttpHeaders.VP_HEADER_USER_AGENT, VpTestProducerLogger.getLatestUserAgent());
 	}
 	
 	@Test
@@ -468,7 +464,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
+    		assertTrue(ex.getMessage().contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
     	}
 	}
 
@@ -482,7 +478,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE, properties);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ", From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));    	}
+    		assertTrue(ex.getMessage().contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ", RivVersion:RIVTABP20, From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));    	}
 	}
 
 	@Test
@@ -497,7 +493,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		fail("Expected error here!");
     	} catch (Exception ex) {
     		String msg = ex.getMessage();
-    		assertTrue(msg.contains("VP004 No Logical Adress found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ", From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));
+    		assertTrue(msg.contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ", RivVersion:RIVTABP20, From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));
     	}
 	}
 

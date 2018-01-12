@@ -10,3 +10,5 @@ vp-auto-deployer/src/test/resources/test.jar
 .metadata
 caches
 .recommenders
+/build.bat
+/release.properties

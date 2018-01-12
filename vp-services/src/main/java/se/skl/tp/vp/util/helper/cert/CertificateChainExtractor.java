@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
+import se.skl.tp.vp.util.WhiteListHandler;
 
 /**
  * Extractor used when extracting certificate from the certificate chain.
@@ -41,8 +42,8 @@ public class CertificateChainExtractor extends CertificateExtractorBase implemen
 
 	private static Logger log = LoggerFactory.getLogger(CertificateChainExtractor.class);
 
-	public CertificateChainExtractor(MuleMessage muleMessage, Pattern pattern, String whiteList) {
-		super(muleMessage, pattern, whiteList);
+	public CertificateChainExtractor(MuleMessage muleMessage, Pattern pattern, WhiteListHandler whiteListHandler) {
+		super(muleMessage, pattern, whiteListHandler);
 	}
 
 	@Override
