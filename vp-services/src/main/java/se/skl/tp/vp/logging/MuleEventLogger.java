@@ -34,6 +34,7 @@ import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.util.MuleUtil;
 import se.skl.tp.vp.util.PayloadToStringTransformer;
+import se.skl.tp.vp.util.VPUtil;
 
 
 
@@ -205,7 +206,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 			
 			messageId             = message.getUniqueId();
 			contractId            = message.getProperty(SOITOOLKIT_CONTRACT_ID, PropertyScope.SESSION, "");
-			businessCorrelationId = message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, "");
+			businessCorrelationId = message.getProperty(VPUtil.SKLTP_CORRELATION_ID, PropertyScope.SESSION, "");
 			integrationScenarioId = message.getProperty(SOITOOLKIT_INTEGRATION_SCENARIO, PropertyScope.SESSION, "");
 			propertyBusinessContextId = message.getProperty(SOITOOLKIT_BUSINESS_CONTEXT_ID, null);
 		}

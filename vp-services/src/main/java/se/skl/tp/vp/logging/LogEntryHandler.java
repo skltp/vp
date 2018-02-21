@@ -53,6 +53,7 @@ import org.soitoolkit.commons.mule.util.MuleUtil;
 import org.soitoolkit.commons.mule.util.XmlUtil;
 
 import se.skl.tp.vp.util.PayloadToStringTransformer;
+import se.skl.tp.vp.util.VPUtil;
 
 @SuppressWarnings("deprecation")
 public class LogEntryHandler {
@@ -160,7 +161,7 @@ public class LogEntryHandler {
 				
 				messageId             = message.getUniqueId();
 				contractId            = message.getProperty(SOITOOLKIT_CONTRACT_ID, PropertyScope.SESSION, "");
-				businessCorrelationId = message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, "");
+				businessCorrelationId = message.getProperty(VPUtil.SKLTP_CORRELATION_ID, PropertyScope.SESSION, "");
 				integrationScenarioId = message.getProperty(SOITOOLKIT_INTEGRATION_SCENARIO, PropertyScope.SESSION, "");
 				propertyBusinessContextId = message.getProperty(SOITOOLKIT_BUSINESS_CONTEXT_ID, null);
 			}
