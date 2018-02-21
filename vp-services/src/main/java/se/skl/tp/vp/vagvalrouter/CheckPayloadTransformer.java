@@ -28,6 +28,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ import se.skl.tp.vp.logging.EventLogger;
 import se.skl.tp.vp.logging.EventLoggerFactory;
 import se.skl.tp.vp.logging.SessionInfo;
 import se.skl.tp.vp.util.MessageProperties;
+import se.skl.tp.vp.util.VPUtil;
 
 
 /**
@@ -99,6 +101,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		}
 
 		Integer status = message.getOutboundProperty("http.status");
+		String addr = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION, "<UNKNOWN>");
 
     	try {
     		String cause = null;
@@ -106,8 +109,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 			if (strPayload == null || strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, getAddress() + ". No content found!");
-				
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr + ". No content found! Server responded with status code: " + message.getInboundProperty("http.status"));
 			} else if(HTTP_STATUS_500.equals(status) && !strPayload.contains(SOAP_XMLNS)) {
 
 				
@@ -116,7 +118,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 				// Otherwise there will be a cxf error and we will end up in the general exception handling
 				
 				log.debug("Found response message and http.status = 500. Response was : " + left(strPayload, 200) + "...");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , getAddress() + ". Invalid content found!");
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , addr + ". Invalid content found! Server responded with status code: " + message.getInboundProperty("http.status"));
 			}
 			
 			if(cause != null) {
@@ -145,16 +147,5 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		int i =  s.length() > len ? len : s.length();
 		return s.substring(0, i);
 	}
-	
-	private String getAddress() {
-		
-		String           endpoint    = "";
-        MuleEventContext event       = RequestContext.getEventContext();
-        if (event != null) {
-		    URI endpointURI = event.getEndpointURI();
-			endpoint                = (endpointURI == null)? "" : endpointURI.toString();
-        }
-        
-        return endpoint;
-	}
+
 }
