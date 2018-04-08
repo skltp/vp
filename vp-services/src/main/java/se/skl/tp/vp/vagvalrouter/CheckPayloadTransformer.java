@@ -21,6 +21,7 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
+import static se.skl.tp.vp.util.VPUtil.getStatusMessage;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -29,8 +30,6 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
-import org.springframework.http.HttpStatus;
-
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.logging.EventLogger;
@@ -108,7 +107,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 			if (strPayload == null || strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr + ". Server responded with status code: " + getErrorMessage(status_in));
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr + ". Server responded with status code: " + getStatusMessage(status_in, "NULL"));
 			} else if(HTTP_STATUS_500.equals(status) && !strPayload.contains(SOAP_XMLNS)) {
 
 				
@@ -117,7 +116,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 				// Otherwise there will be a cxf error and we will end up in the general exception handling
 				
 				log.debug("Found response message and http.status = 500. Response was : " + left(strPayload, 200) + "...");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , addr + ". Server responded with status code: " + getErrorMessage(status_in));
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , addr + ". Server responded with status code: " + getStatusMessage(status_in, "NULL"));
 			}
 			
 			if(cause != null) {
@@ -147,19 +146,4 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		return s.substring(0, i);
 	}
 
-	private String getErrorMessage(String code) {
-		
-		if(code == null || code.length() == 0)
-			return "NO REASON RETURNED";
-		
-		try {
-			Integer intCode = Integer.valueOf(code);
-			String reason = HttpStatus.valueOf(intCode).getReasonPhrase();
-			return code + " " + reason;
-		} catch(Exception e) {
-			return code;
-		}
-
-
-	}
 }
