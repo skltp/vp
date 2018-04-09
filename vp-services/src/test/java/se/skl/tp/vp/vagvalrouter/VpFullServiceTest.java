@@ -215,7 +215,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_ZERO_LENGTH);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("No content found!"));
+			assertTrue(ex.getMessage().contains("Server responded with"));
     	}
 	}
 	
@@ -231,7 +231,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_500);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("Invalid content found!"));
+			assertTrue(ex.getMessage().contains("Server responded with"));
     	}
 	}
 	

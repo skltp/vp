@@ -21,11 +21,8 @@
 package se.skl.tp.vp.vagvalrouter;
 
 import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
+import static se.skl.tp.vp.util.VPUtil.getStatusMessage;
 
-import java.net.URI;
-
-import org.mule.RequestContext;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -33,7 +30,6 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
-
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.logging.EventLogger;
@@ -47,7 +43,6 @@ import se.skl.tp.vp.util.VPUtil;
  * CheckEmptyPayloadTransformer responsible to check if return message is "" and if so replace it with a SoapFault
  * 
  */
-@SuppressWarnings("deprecation")
 public class CheckPayloadTransformer extends AbstractMessageTransformer{
 	
 	private static final Logger log = LoggerFactory.getLogger(CheckPayloadTransformer.class);
@@ -101,6 +96,9 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		}
 
 		Integer status = message.getOutboundProperty("http.status");
+		
+		String status_in = (String)message.getInboundProperty("http.status");
+		
 		String addr = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION, "<UNKNOWN>");
 
     	try {
@@ -109,7 +107,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 			if (strPayload == null || strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr + ". No content found! Server responded with status code: " + message.getInboundProperty("http.status"));
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr + ". Server responded with status code: " + getStatusMessage(status_in, "NULL"));
 			} else if(HTTP_STATUS_500.equals(status) && !strPayload.contains(SOAP_XMLNS)) {
 
 				
@@ -118,7 +116,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 				// Otherwise there will be a cxf error and we will end up in the general exception handling
 				
 				log.debug("Found response message and http.status = 500. Response was : " + left(strPayload, 200) + "...");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , addr + ". Invalid content found! Server responded with status code: " + message.getInboundProperty("http.status"));
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , addr + ". Server responded with status code: " + getStatusMessage(status_in, "NULL"));
 			}
 			
 			if(cause != null) {
