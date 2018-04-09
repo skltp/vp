@@ -28,6 +28,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
@@ -54,6 +55,7 @@ public final class VPUtil {
 	public static final String SESSION_ERROR_DESCRIPTION = "sessionErrorDescription";
 	public static final String SESSION_ERROR_TECHNICAL_DESCRIPTION = "sessionErrorTechnicalDescription";
 	public static final String SESSION_ERROR_CODE = "errorCode";
+	public static final String SESSION_HTML_STATUS = "statusCode";
 	
 	//Session scoped variables used in internal flows, not to mix with http headers prefixed x-something used for external http headers
 	public static final String SKLTP_CORRELATION_ID = "skltp_correlationId";
@@ -167,6 +169,13 @@ public final class VPUtil {
 		return (s == null) ? "" : s;
 	}
 
+	public static String nvl(Object o) {
+		if(o == null)
+			return null;
+		else
+			return o.toString();			
+	}
+	
 	public static boolean isWhitespace(final String s) {
 		if (s == null) {
 			return true;
@@ -251,5 +260,21 @@ public final class VPUtil {
 		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
 		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
 		message.setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_HTML_STATUS, getStatusMessage(VPUtil.nvl(message.getInboundProperty("http.status")), null), PropertyScope.SESSION);
+	}
+	
+	public static String getStatusMessage(String code, String defaultReason) {
+		
+		if(code == null || code.length() == 0)
+			return defaultReason;
+		
+		try {
+			Integer intCode = Integer.valueOf(code);
+			String reason = HttpStatus.valueOf(intCode).getReasonPhrase();
+			return code + " " + reason;
+		} catch(Exception e) {
+			return code;
+		}
+
 	}
 }

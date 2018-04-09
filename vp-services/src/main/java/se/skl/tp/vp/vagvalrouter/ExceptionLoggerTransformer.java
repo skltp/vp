@@ -137,8 +137,9 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer {
 
 	private void addErrorMessageProperties(Throwable t, MuleMessage message) {
 		message.setProperty(VPUtil.SESSION_ERROR, Boolean.TRUE, PropertyScope.SESSION);
-		message.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, nvl(t.getMessage()), PropertyScope.SESSION);
-		message.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, nvl(t.toString()), PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_ERROR_DESCRIPTION, VPUtil.nvl(t.getMessage()), PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, VPUtil.nvl(t.toString()), PropertyScope.SESSION);
+		message.setProperty(VPUtil.SESSION_HTML_STATUS, VPUtil.nvl(message.getInboundProperty("http.status")), PropertyScope.SESSION);
 		String errorCode = "VP009";
 		if (t instanceof VpSemanticException) {
 			errorCode = ((VpSemanticException) t).getErrorCode().toString();	
@@ -148,8 +149,5 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer {
 		}
 		message.setProperty(VPUtil.SESSION_ERROR_CODE, errorCode, PropertyScope.SESSION);
 	}
-    	
-	static String nvl(String s) {
-		return (s == null) ? "" : s;
-	}
+
 }

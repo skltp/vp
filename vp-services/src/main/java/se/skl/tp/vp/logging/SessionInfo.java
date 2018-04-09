@@ -80,10 +80,18 @@ public class SessionInfo extends HashMap<String, String> {
 					VPUtil.nvl((String) message.getProperty(VPUtil.SESSION_ERROR_TECHNICAL_DESCRIPTION, PropertyScope.SESSION)));
 			this.put(VPUtil.SESSION_ERROR_CODE,
 					VPUtil.nvl((String) message.getProperty(VPUtil.SESSION_ERROR_CODE, PropertyScope.SESSION)));
+			this.putIfNotEmpty(VPUtil.SESSION_HTML_STATUS,
+					VPUtil.nvl(message.getProperty(VPUtil.SESSION_HTML_STATUS, PropertyScope.SESSION)));
 		}
 	}
 	
 	public void addSource(String className) {
 		this.put("source", className);
 	}
+	
+	private void putIfNotEmpty(String key, String value) {
+		if(value != null && value.length() > 0)
+			this.put(key, value);
+	}
+				
 }
