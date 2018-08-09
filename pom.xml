@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>se.skltp.commons</groupId>
 		<artifactId>skltp-commons-mule-parent</artifactId>
-		<version>2.0.1</version>
+		<version>2.0.3-RC1</version>
 	</parent>
 
 	<groupId>se.skltp.vp</groupId>
@@ -27,21 +27,15 @@
         <additionalparam>-Xdoclint:none</additionalparam>
 		<tak.version>1.5.0</tak.version>
     </properties>
+
 	<scm>
 		<url>http://github.com/skltp/vp</url>
-		<connection>scm:git:git://github.com/skltp/vp.git</connection>
-		<developerConnection>scm:git:git://github.com/skltp/vp.git</developerConnection>
+		<connection>scm:git:https://github.com:443/skltp/vp.git</connection>
+		<developerConnection>scm:git:https://github.com:443/skltp/vp.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>basefarm-nexus</id>
-			<name>SKLTP-Snapshots</name>
-			<url>http://ine-dib-nexus1.in1.sth.basefarm.net:8081/repository/SKLTP-Snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-	
+
 	<repositories>
 		<!-- Sonatype staging repo added to be able to build VP using artifacts
 			not yet pushed to central maven. In this specific case its about
@@ -130,7 +124,7 @@
 		<profile>
 			<id>license</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
 				<plugins>
