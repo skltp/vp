@@ -232,7 +232,6 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<attach>false</attach>
 							<descriptors>
 								<descriptor>assemblies/vp-virtuell-tjanst-teststub-assembly-descriptor.xml</descriptor>
 							</descriptors>
