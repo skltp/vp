@@ -14,7 +14,7 @@
 
 	<groupId>se.skltp.vp</groupId>
 	<artifactId>vp-parent</artifactId>
-	<version>3.2.0-RC7-SNAPSHOT</version>
+	<version>3.2.0-RC7</version>
 	<packaging>pom</packaging>
 	<name>vp-parent</name>
 
@@ -33,7 +33,7 @@
 		<url>http://github.com/skltp/vp</url>
 		<connection>scm:git:https://github.com:443/skltp/vp.git</connection>
 		<developerConnection>scm:git:https://github.com:443/skltp/vp.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v3.2.0-RC7</tag>
 	</scm>
 
 
