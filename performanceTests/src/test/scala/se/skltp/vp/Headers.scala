@@ -38,6 +38,12 @@ object Headers {
       "SOAPAction" -> "urn:riv:test:PingResponder:1:ping",
       "Keep-Alive" -> "115")
 
+	val pingForConfigurationHttps_header = Map(
+		"Accept-Encoding" -> "gzip,deflate",
+		"Content-Type" -> "text/xml;charset=UTF-8",
+		"SOAPAction" -> "urn:riv:itintegration:monitoring:PingForConfigurationResponder:1:PingForConfiguration",
+		"Keep-Alive" -> "115")
+
 	val getSubjectOfCareSchedule_header = Map(
 	  "Accept-Encoding" -> "gzip,deflate",
 	  "Content-Type" -> "text/xml;charset=UTF-8",

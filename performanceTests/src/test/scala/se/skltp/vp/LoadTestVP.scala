@@ -30,7 +30,7 @@ class LoadTestVP extends Simulation {
     setUp(
 		Scenarios.scn_SendMedicalCertificateAnswerHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
 		Scenarios.scn_GetSubjectOfCareScheduleHttps_2.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
-		Scenarios.scn_PingOk.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
+		Scenarios.scn_PingOkHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
 		Scenarios.scn_GetSubjectOfCareScheduleHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
 	)
 }

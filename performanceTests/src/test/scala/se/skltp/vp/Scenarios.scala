@@ -68,7 +68,7 @@ object Scenarios {
      */	
 	
 	// Ping OK
-    val scn_PingOk = scenario("Ping OK https scenario")
+    val scn_PingOkHttps = scenario("Ping OK https scenario")
       .during(Conf.testTimeSecs) {     
         exec(
           http("Ping OK")
@@ -82,7 +82,22 @@ object Scenarios {
         .pause(minWaitMs, maxWaitMs)
     }
 
-    val scn_PingVP004 = scenario("Error: VP004 Ping scenario")
+	// Ping OK
+	val scn_PingForConfigurationHttpsOk = scenario("PingForConfiguration OK https scenario")
+		.during(Conf.testTimeSecs) {
+			exec(
+				http("Ping OK")
+					.post("/vp/itintegration/monitoring/PingForConfiguration/1/rivtabp21")
+					.headers(Headers.pingForConfigurationHttps_header)
+					.body(RawFileBody("data/PingForConfiguration_OK.xml")).asXML
+					.check(status.is(200))
+					.check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
+					.check(xpath("//pr:PingForConfigurationResponse", List("pr" -> "urn:riv:itintegration:monitoring:PingForConfigurationResponder:1")).count.is(1))
+			)
+				.pause(minWaitMs, maxWaitMs)
+		}
+
+	val scn_PingVP004 = scenario("Error: VP004 Ping scenario")
       .during(Conf.testTimeSecs) {
         exec(
           http("Ping VP004")
@@ -92,7 +107,7 @@ object Scenarios {
             .check(status.is(500))
             .check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
             .check(xpath("//faultstring", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
-            .check(xpath("//faultstring/text()", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).is("VP004 No Logical Adress found for serviceNamespace:urn:riv:itinfra:tp:PingResponder:1, receiverId:ping-vp004"))
+            .check(xpath("//faultstring/text()[contains(.,'VP004')]", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
           )
         .pause(minWaitMs*2, maxWaitMs*2)
       }
@@ -108,7 +123,7 @@ object Scenarios {
   		  .check(status.is(500))
           .check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
           .check(xpath("//faultstring", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
-          .check(xpath("//faultstring/text()", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).is("VP007 Authorization missing for serviceNamespace: urn:riv:insuranceprocess:healthreporting:SendMedicalCertificateAnswerResponder:1, receiverId: CONSUMER_NOT_AUTHORIZED, senderId: SE5565594230-B9P"))
+          .check(xpath("//faultstring/text()[contains(.,'VP007')]", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
         )
       .pause(minWaitMs*2, maxWaitMs*2)
     }
@@ -123,7 +138,7 @@ object Scenarios {
   		  .check(status.is(500))
           .check(xpath("soap:Envelope", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
           .check(xpath("//faultstring", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
-          .check(xpath("//faultstring/text()", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).is("VP009 Error connecting to service producer at adress http://ine-tit-app01:8999/non-existing-service"))
+          .check(xpath("//faultstring/text()[contains(.,'VP009')]", List("soap" -> "http://schemas.xmlsoap.org/soap/envelope/")).exists)
         )
       .pause(minWaitMs*2, maxWaitMs*2)
     }
