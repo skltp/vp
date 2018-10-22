@@ -54,12 +54,9 @@ public class VpFullServiceTest extends AbstractTestCase {
 	private static final String PRODUCT_ID = "SW123";
 	private static final String TJANSTE_ADRESS = "https://localhost:20000/vp/tjanst1";
 	private static final String TJANSTE_ADRESS_SHORT_TIMEOUT  = "https://localhost:20000/vp/tjanst1-short-timeout";
-	private static final String TJANSTE_ADRESS_LONG_TIMEOUT   = "https://localhost:20000/vp/tjanst1-long-timeout";
 	private static final String LOGICAL_ADDRESS               = "vp-test-producer";
 	private static final String LOGICAL_ADDRESS_HTTP               = "vp-test-producer_http";
 	private static final String LOGICAL_ADDRESS_NOT_FOUND     = "unknown-logical-address";
-	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE     = " unknown-logical-address";
-	private static final String LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER     = "unknown-logical-address ";
 	private static final String LOGICAL_ADDRESS_NO_CONNECTION = "vp-test-producer-no-connection";
 	private static final String LOGICAL_ADDRESS_ZERO_LENGTH = "zeroLength";
 	private static final String LOGICAL_ADDRESS_500 = "response500";
@@ -218,7 +215,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_ZERO_LENGTH);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("No content found!"));
+			assertTrue(ex.getMessage().contains("Server responded with"));
     	}
 	}
 	
@@ -234,7 +231,7 @@ public class VpFullServiceTest extends AbstractTestCase {
     		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_500);
     		fail("Expected error here!");
     	} catch (Exception ex) {
-			assertTrue(ex.getMessage().contains("Invalid content found!"));
+			assertTrue(ex.getMessage().contains("Server responded with"));
     	}
 	}
 	
@@ -371,24 +368,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		}
 	}
 
-	@Test
-	public void testVP009IsThrownWhenLongConnectionTimeout() throws Exception {
-		
-		long ts = System.currentTimeMillis();
-		try {
-			testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS_LONG_TIMEOUT, LOGICAL_ADDRESS_NO_CONNECTION);
-			fail("An timeout should have occurred");
-		} catch (Throwable ex) {
-			ts = System.currentTimeMillis() - ts;
-			// NOTE: this test is really tricky to make predictable - requires trying to
-			// connect to a port that typically doesn't respond at all, rather just drops
-			// packages - like a "stealth" mode firewall port.
-			// Not an easy (or even possible?) thing to do in Java.
-			//assertTrue("Expected time to be longer than long_timeout_ms (" + long_timeout_ms + ") but was " + ts + " ms.", ts > long_timeout_ms);
-			assertTrue(ex.getMessage().contains("VP009 Error connecting to service producer at address https://www.google.com:81"));
-		}
-	}
-	
+
 	@Test
 	public void testMandatoryPropertiesArePropagatedToExternalProducer() throws Exception {
 		
@@ -431,71 +411,9 @@ public class VpFullServiceTest extends AbstractTestCase {
 		assertEquals(THIS_VP_INSTANCE_ID, VpTestProducerLogger.getLatestVpInstanceId());
 	}
 	
-	@Test
-	public void testVP007IsThrownWhenNotAuthorizedConsumerIsProvided() throws Exception {
-	
-		final String NOT_AUHTORIZED_CONSUMER_HSAID = "UNKNOWN_CONSUMER";
-		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
-		
-		/*
-		 * Provide a valid vp instance id to trigger check if provided http header x-vp-sender-id
-		 * is a authorized consumer, otherwise sender id is extracted from certificate.
-		 */
- 		Map<String, String> properties = new HashMap<String, String>();
-    	properties.put(HttpHeaders.X_VP_SENDER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
-    	properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 
-    	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP007 Authorization missing for serviceNamespace: urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId: vp-test-producer, senderId: " + NOT_AUHTORIZED_CONSUMER_HSAID));
-    	}
-	}
-	
 	//TODO: Lägg till test för VP001, VP002, VP003, VP005 och VP006
-	
-	@Test
-	public void testVP004IsThrownWhenNoLogicalAddressIsFound() throws Exception {
-		
-		Map<String, String> properties = new HashMap<String, String>();
-    	
-    	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND));
-    	}
-	}
 
-	@Test
-	public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceBefore() throws Exception {
-		
-		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
-		Map<String, String> properties = new HashMap<String, String>();
-    	
-    	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		assertTrue(ex.getMessage().contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE + ", RivVersion:RIVTABP20, From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));    	}
-	}
-
-	@Test
-	public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceAfter() throws Exception {
-
-		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
-
- 		Map<String, String> properties = new HashMap<String, String>();
-    	
-    	try {
-    		testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER, properties);
-    		fail("Expected error here!");
-    	} catch (Exception ex) {
-    		String msg = ex.getMessage();
-    		assertTrue(msg.contains("VP004 No receiverId (logical address) found for serviceNamespace:urn:riv:domain:subdomain:GetProductDetailResponder:1, receiverId:" + LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER + ", RivVersion:RIVTABP20, From:" + THIS_VP_INSTANCE_ID + ". Whitespace detected in incoming request!"));
-    	}
-	}
 
 	@Test
 	public void testWhenProducerReturnsFaultItsPropagatedCorrectToConsumer() throws Exception {

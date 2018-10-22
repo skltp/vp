@@ -18,14 +18,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.util;
+package se.skl.tp.vp.logging;
 
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
-import static org.soitoolkit.commons.mule.core.PropertyNames.SOITOOLKIT_CORRELATION_ID;
+import static se.skl.tp.vp.logging.LogMessageEnum.*;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.mule.api.MuleContext;
@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
+import se.skl.tp.vp.util.ExecutionTimer;
+import se.skl.tp.vp.util.VPUtil;
 
 /**
  * Transformer used to log messages passing a specific endpoint using the
@@ -53,7 +55,21 @@ public class LogTransformer extends AbstractMessageTransformer {
 
 	private static final Logger log = LoggerFactory.getLogger(LogTransformer.class);
 
-	private final EventLogger eventLogger = new EventLogger();
+	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
+	
+	// Socket logging
+	
+	public void setUseSocketLogger(Boolean useSocketLogger) {
+		this.eventLogger.setUseSocketLogger(useSocketLogger);
+	}
+	
+	public void setSocketLoggerCategories(String categories) {
+		this.eventLogger.setSocketLoggerCategories(categories);
+	}
+
+	public void setSocketLoggerServiceContracts(String serviceContracts) {
+		this.eventLogger.setSocketLoggerServiceContracts(serviceContracts);
+	}
 	
 	/**
 	 * Enable logging to JMS, it true by default
@@ -87,7 +103,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 	public void setMuleContext(MuleContext muleContext) {
 		log.debug("setMuleContext { muleContext: {} }", muleContext);
 		super.setMuleContext(muleContext);
-		this.eventLogger.setMuleContext(muleContext);
+		this.eventLogger.setContext(muleContext);
 	}
 
 	/*
@@ -118,9 +134,9 @@ public class LogTransformer extends AbstractMessageTransformer {
 	 * <spring:entry key="id1" value="123"/> <spring:entry key="id2"
 	 * value="456"/> </spring:map> </spring:property> </custom-transformer>
 	 */
-	private Map<String, String> extraInfo;
+	private SessionInfo extraInfo;
 
-	public void setExtraInfo(Map<String, String> extraInfo) {
+	public void setExtraInfo(SessionInfo extraInfo) {
 		this.extraInfo = extraInfo;
 	}
 
@@ -165,20 +181,15 @@ public class LogTransformer extends AbstractMessageTransformer {
 			}
 
 			// FIXME: Added from ST v0.4.1
-			Map<String, String> evaluatedExtraInfo = evaluateMapInfo(extraInfo, message);
-
+			SessionInfo evaluatedExtraInfo = evaluateMapInfo(extraInfo, message);
+			evaluatedExtraInfo.addSource(getClass().getName());
 			
-			if (evaluatedExtraInfo == null) {
-				evaluatedExtraInfo = new HashMap<String, String>();
-			}
-			
-			evaluatedExtraInfo.put("source", getClass().getName());
 			// producer elapsed time
 			ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_ENDPOINT);
 			if (timer != null) {
 				evaluatedExtraInfo.put("time.producer", String.valueOf(timer.getElapsed()));
 			}
-			eventLogger.addSessionInfo(message, evaluatedExtraInfo);
+			evaluatedExtraInfo.addSessionInfo(message);
 
 			switch (logLevel) {
 			case INFO:
@@ -206,10 +217,10 @@ public class LogTransformer extends AbstractMessageTransformer {
 		} finally {
 			ExecutionTimer.stop(logName);
 			// close total timer.
-			if ("xresp-out".equals(logType)) {
+			if (TYPE_XRESP_OUT.getName().equals(logType)) {
 				ExecutionTimer.stop(VPUtil.TIMER_TOTAL);
 				final String infoMsg = String.format("%s, %s: { %s }", 
-						message.getProperty(SOITOOLKIT_CORRELATION_ID, PropertyScope.SESSION, ""),
+						message.getProperty(VPUtil.SKLTP_CORRELATION_ID, PropertyScope.SESSION, ""),
 						message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION, ""),
 						ExecutionTimer.format());
 				log.info(infoMsg);
@@ -218,12 +229,12 @@ public class LogTransformer extends AbstractMessageTransformer {
 	}
 
 	// FIXME: Added from ST v0.4.1
-	private Map<String, String> evaluateMapInfo(Map<String, String> map, MuleMessage message) {
+	private SessionInfo evaluateMapInfo(SessionInfo map, MuleMessage message) {
 
 		if (map == null)
-			return null;
+			return new SessionInfo();
 
-		Map<String, String> evaluatedMap = new HashMap<String, String>();
+		SessionInfo evaluatedMap = new SessionInfo();
 		for (Entry<String, String> entry : map.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -240,6 +251,7 @@ public class LogTransformer extends AbstractMessageTransformer {
 		try {
 			if (muleContext.getExpressionManager().isValidExpression(value.toString())) {
 				String before = value;
+				@SuppressWarnings("deprecation")
 				Object eval = muleContext.getExpressionManager().evaluate(value.toString(), message);
 
 				if (eval == null) {

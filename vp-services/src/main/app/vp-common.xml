@@ -149,7 +149,15 @@
 		<default-dispatcher-threading-profile poolExhaustedAction="ABORT" maxThreadsActive="${TP_DISPATCH_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_DISPATCH_MAX_THREADS_IDLE}" threadTTL="${TP_DISPATCH_MAX_THREADS_TTL}"/>
 		<default-receiver-threading-profile poolExhaustedAction="ABORT" maxThreadsActive="${TP_RECEIVE_MAX_THREADS_ACTIVE}" maxThreadsIdle="${TP_RECEIVE_MAX_THREADS_IDLE}" threadTTL="${TP_RECEIVE_MAX_THREADS_TTL}"/>
 	</configuration>
-    
+
+<!-- doc:name="Check SenderId exist in incoming http request, put in session variable" -->
+   	<custom-transformer name="checkSenderIdTransformer" class="se.skl.tp.vp.vagvalrouter.CheckSenderIdTransformer" >
+   		<spring:property name="senderIdPropertyName" value="${VAGVALROUTER_SENDERID}" />
+           <spring:property name="whiteListHandler" ref="whiteListHandler" />
+           <spring:property name="vpInstanceId" value="${VP_INSTANCE_ID}" />
+           <spring:property name="senderIpAdressHttpHeader" value="${VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER}"/>
+   	</custom-transformer>
+    	    
     <custom-transformer name="wsdlQueryResponse" class="se.skl.tp.vp.util.wsdl.WsdlQueryReferencedUrlsResponseTransformer">
     	<spring:property name="httpHeaderNameForwardedProto" value="${VP_HTTP_HEADER_NAME_FORWARDED_PROTO}"/>
     	<spring:property name="httpHeaderNameForwardedHost" value="${VP_HTTP_HEADER_NAME_FORWARDED_HOST}"/>
@@ -208,36 +216,48 @@
 	
 	<custom-transformer name="mimeToStr" class="org.soitoolkit.commons.mule.mime.MimeToStringTransformer" />
 
-    <custom-transformer name="logReqIn" class="se.skl.tp.vp.util.LogTransformer">
+    <custom-transformer name="logReqIn" class="se.skl.tp.vp.logging.LogTransformer">
 		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
 		<spring:property name="logType"  value="xreq-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+        <spring:property name="socketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
+		<spring:property name="socketLoggerServiceContracts" value="${SOCKET_LOGGER_SERVICE_CONTRACTS}" />
     </custom-transformer>
     
-    <custom-transformer name="logReqOut" class="se.skl.tp.vp.util.LogTransformer">
+    <custom-transformer name="logReqOut" class="se.skl.tp.vp.logging.LogTransformer">
 		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
 		<spring:property name="logType"  value="xreq-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+		<spring:property name="socketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
+		<spring:property name="socketLoggerServiceContracts" value="${SOCKET_LOGGER_SERVICE_CONTRACTS}" />
     </custom-transformer>
 
-    <custom-transformer name="logRespIn" class="se.skl.tp.vp.util.LogTransformer">
+    <custom-transformer name="logRespIn" class="se.skl.tp.vp.logging.LogTransformer">
 		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
 		<spring:property name="logType"  value="xresp-in"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+		<spring:property name="socketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
+		<spring:property name="socketLoggerServiceContracts" value="${SOCKET_LOGGER_SERVICE_CONTRACTS}" />
     </custom-transformer>
 
-    <custom-transformer name="logRespOut" class="se.skl.tp.vp.util.LogTransformer">
+    <custom-transformer name="logRespOut" class="se.skl.tp.vp.logging.LogTransformer">
 		<spring:property name="enableLogToJms"  value="${ENABLE_LOG_TO_JMS}"/>
 		<spring:property name="logType"  value="xresp-out"/>
 		<spring:property name="jaxbObjectToXml"  ref="objToXml"/>
 		<spring:property name="logInfoQueueName" value="${SOITOOLKIT_LOG_INFO_QUEUE}" />
         <spring:property name="logErrorQueueName" value="${SOITOOLKIT_LOG_ERROR_QUEUE}" />
+        <spring:property name="useSocketLogger" value="${USE_SOCKET_LOGGER}" />
+		<spring:property name="socketLoggerCategories" value="${SOCKET_LOGGER_CATEGORIES}" />
+		<spring:property name="socketLoggerServiceContracts" value="${SOCKET_LOGGER_SERVICE_CONTRACTS}" />
     </custom-transformer>
     
     <message-properties-transformer name="filterResponseHeaders" scope="outbound">

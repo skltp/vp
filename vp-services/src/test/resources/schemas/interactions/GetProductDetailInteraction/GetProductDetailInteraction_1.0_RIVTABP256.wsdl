@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+ * Copyright 2009 Sjukvardsradgivningen
+ *
+ *   This library is free software; you can redistribute it and/or modify
+ *   it under the terms of version 2.1 of the GNU Lesser General Public
+
+ *   License as published by the Free Software Foundation.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ *   GNU Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the
+ *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+
+ *   Boston, MA 02111-1307  USA
+ -->
+
+<wsdl:definitions name="GetProductDetailInteraction"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:wsa="http://www.w3.org/2005/08/addressing"
+                  xmlns:tjsr="urn:riv:domain:subdomain:GetProductDetailResponder:1"
+                  targetNamespace="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp256"
+                  xmlns:tns="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp256">
+
+    <wsdl:types>
+        <xsd:schema targetNamespace='urn:riv:domain:subdomain:GetProductDetail'>
+            <xsd:import schemaLocation="GetProductDetailResponder_1.0.xsd" namespace="urn:riv:domain:subdomain:GetProductDetailResponder:1"/>
+            <xsd:import schemaLocation="../../core_components/ws-addressing-1.0.xsd" namespace="http://www.w3.org/2005/08/addressing"/>
+        </xsd:schema>
+
+    </wsdl:types>
+
+    <wsdl:message name="GetProductDetailRequest">
+        <wsdl:part name="LogicalAddress" element="wsa:To" />
+        <wsdl:part name="parameters" element="tjsr:getProductDetailElem" />
+    </wsdl:message>
+
+    <wsdl:message name="GetProductDetailResponse">
+        <wsdl:part name="parameters" element="tjsr:getProductDetailResponse" />
+    </wsdl:message>
+
+    <wsdl:portType name="GetProductDetailResponderInterface">
+        <wsdl:operation name="GetProductDetail">
+            <wsdl:input message="tns:GetProductDetailRequest"/>
+            <wsdl:output message="tns:GetProductDetailResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="GetProductDetailResponderBinding" type="tns:GetProductDetailResponderInterface">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+
+        <wsdl:operation name="GetProductDetail">
+            <soap:operation soapAction="urn:riv:domain:subdomain:GetProductDetailResponder:GetProductDetail" style="document" />
+            <wsdl:input>
+                <soap:header use="literal" message="tns:GetProductDetailRequest" part="LogicalAddress" />
+                <soap:body use="literal" parts="parameters"  />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+
+    </wsdl:binding>
+
+    <wsdl:service name='GetProductDetailResponderService'>
+        <wsdl:port name='GetProductDetailResponderPort' binding='tns:GetProductDetailResponderBinding'>
+            <soap:address location='https://localhost:23000/nationell/GetProductDetail' />
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

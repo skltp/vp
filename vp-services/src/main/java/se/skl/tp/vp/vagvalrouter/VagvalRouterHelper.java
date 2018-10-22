@@ -119,7 +119,7 @@ public class VagvalRouterHelper {
 	 * Propagate x-skltp-correlation-id as an outbound http property if HTTP trafic or HTTPS trafic and if property set for this!
 	 */
 	public static void propagateCorrelationIdToProducer(MuleMessage message, String url, Boolean propagateCorrelationIdForHttps) {
-		String correlationId = message.getProperty(VPUtil.CORRELATION_ID, PropertyScope.SESSION);
+		String correlationId = message.getProperty(VPUtil.SKLTP_CORRELATION_ID, PropertyScope.SESSION);
 				
 		if (!isURLHTTPS(url)) {
 			message.setOutboundProperty(HttpHeaders.X_SKLTP_CORRELATION_ID, correlationId, DataType.STRING_DATA_TYPE);						

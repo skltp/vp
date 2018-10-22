@@ -18,24 +18,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.vp.util;
+package se.skl.tp.vp.logging;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageTransformer;
 
-/**
- * Clear the MDC.
- * 
- * @author hakan
- */
-public class MdcLogTraceCleanerTransformer extends AbstractMessageTransformer {
+public class EventLoggerFactory {
 
-	@Override
-	public Object transformMessage(MuleMessage message, String outputEncoding)
-			throws TransformerException {
-		MdcLogTrace.clear();
-		return message;
+	public static EventLogger<MuleMessage> createInstance() {
+		return new MuleEventLogger();
 	}
-
 }

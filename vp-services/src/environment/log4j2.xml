@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- status="TRACE" to debug logging config, default: WARN -->
-<Configuration status="WARN">
+<Configuration status="WARN" packages="se.skl.tp.vp.logging.plugins">
 	<Properties>
 		<Property name="log.dir">${sys:mule.home}/logs</Property>
 	</Properties>
@@ -38,6 +38,9 @@
 			</Policies>
 			<DefaultRolloverStrategy fileIndex="min" max="5"/>
 		</RollingRandomAccessFile>
+
+		<SocketLoggerAppender name="SocketLoggerAppender" configFile="${sys:mule.home}/conf/vp-socketappender.properties"></SocketLoggerAppender>
+
 	</Appenders>
 
 	<!-- Log levels: {OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL}
@@ -71,7 +74,11 @@
 			ERROR will only put errorevents on log queue
 		-->
 		<AsyncLogger name="org.soitoolkit.commons.mule.messageLogger" level="INFO"/>
+		<AsyncLogger name="se.skltp.mule.logging.socketLogger" level="DEBUG" additivity="false">
+			<AppenderRef ref="SocketLoggerAppender"></AppenderRef>
+		</AsyncLogger>
 
+		<AsyncLogger name="se.skl.tp.vp.logging" level="INFO"/>
 		<AsyncLogger name="se.skl.tp.vp" level="ERROR"/>
 		<AsyncLogger name="se.skl.tp.hsa" level="ERROR"/>
 

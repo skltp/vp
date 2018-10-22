@@ -510,8 +510,11 @@ public class VagvalAgent implements VisaVagvalsInterface {
 
 		// Determine if delimiter is set and present in request logical address.
 		// Delimiter is used in deprecated default routing (VG#VE).
-		boolean useDeprecatedDefaultRouting = addressDelimiter != null && addressDelimiter.length() > 0
-				&& request.getReceiverId().contains(addressDelimiter);
+		boolean useDeprecatedDefaultRouting = false;
+		if(request.getReceiverId() != null && addressDelimiter != null && addressDelimiter.length() > 0){
+			useDeprecatedDefaultRouting = request.getReceiverId().contains(addressDelimiter);
+		}
+
 		List<String> receiverAddresses = extractReceiverAdresses(request, useDeprecatedDefaultRouting);
 
 		// Get possible routes (vagval)

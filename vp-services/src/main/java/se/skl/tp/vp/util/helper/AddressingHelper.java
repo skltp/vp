@@ -196,6 +196,9 @@ public class AddressingHelper {
 		}
 
 		if (virtualiseringar.size() == 0) {
+
+			raiseError(request.receiverId == null, VpSemanticErrorCodeEnum.VP003);
+
 			// Check if whitespace in incoming receiverid and give a hint in the error message if found.
 			String whitespaceDetectedHintString = "";
 			if (request.receiverId.contains(" ")) {

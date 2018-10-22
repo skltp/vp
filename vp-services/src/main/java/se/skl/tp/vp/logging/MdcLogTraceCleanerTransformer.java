@@ -18,19 +18,24 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skltp.vp
+package se.skl.tp.vp.logging;
 
-import io.gatling.core.Predef._
-import io.gatling.http.Predef._
-import io.gatling.jdbc.Predef._
-import scala.concurrent.duration._
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageTransformer;
 
-class LoadTestVP extends Simulation {
+/**
+ * Clear the MDC.
+ * 
+ * @author hakan
+ */
+public class MdcLogTraceCleanerTransformer extends AbstractMessageTransformer {
 
-    setUp(
-		Scenarios.scn_SendMedicalCertificateAnswerHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
-		Scenarios.scn_GetSubjectOfCareScheduleHttps_2.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
-		Scenarios.scn_PingOkHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
-		Scenarios.scn_GetSubjectOfCareScheduleHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
-	)
+	@Override
+	public Object transformMessage(MuleMessage message, String outputEncoding)
+			throws TransformerException {
+		MdcLogTrace.clear();
+		return message;
+	}
+
 }

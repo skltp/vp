@@ -149,5 +149,97 @@
         <flow-ref name="vagval-dynamic-routing-flow" />
     </flow>
 
+	<flow name="vp-virtuell-tjanst-teststub-utan-RIV-version">
+		<composite-source>
+			<https:inbound-endpoint
+					address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst2"
+					connector-ref="VPProducerConnector"
+					exchange-pattern="request-response"
+					responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+				<properties>
+					<spring:entry key="featureUseKeepAlive" value="true"/>
+					<spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+				</properties>
+			</https:inbound-endpoint>
+			<http:inbound-endpoint
+					address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/tjanst2"
+					exchange-pattern="request-response"
+					responseTransformer-refs="filterResponseHeaders">
+				<properties>
+					<spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+				</properties>
+			</http:inbound-endpoint>
+		</composite-source>
+
+		<cxf:proxy-service
+				namespace="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp256"
+				payload="envelope"
+				service="GetProductDetailResponderService"
+				wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP256.wsdl" />
+
+		<flow-ref name="vagval-dynamic-routing-flow" />
+	</flow>
+
+	<flow name="vp-virtuell-tjanst-teststub-med-obefintlig-RIV-version">
+		<composite-source>
+			<https:inbound-endpoint
+					address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst3"
+					connector-ref="VPProducerConnector"
+					exchange-pattern="request-response"
+					responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+				<properties>
+					<spring:entry key="featureUseKeepAlive" value="true"/>
+					<spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+				</properties>
+			</https:inbound-endpoint>
+			<http:inbound-endpoint
+					address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/tjanst3"
+					exchange-pattern="request-response"
+					responseTransformer-refs="filterResponseHeaders">
+				<properties>
+					<spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+				</properties>
+			</http:inbound-endpoint>
+		</composite-source>
+
+		<cxf:proxy-service
+				namespace="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp25"
+				payload="envelope"
+				service="GetProductDetailResponderService"
+				wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP25.wsdl" />
+
+		<flow-ref name="vagval-dynamic-routing-flow" />
+	</flow>
+
+	<flow name="vp-virtuell-tjanst-teststub-dublicate">
+		<composite-source>
+			<https:inbound-endpoint
+					address="https://${TP_HOST}:${TP_PORT}/${TP_BASE_URI}/tjanst4"
+					connector-ref="VPProducerConnector"
+					exchange-pattern="request-response"
+					responseTransformer-refs="featureKeepAliveResponse filterResponseHeaders">
+				<properties>
+					<spring:entry key="featureUseKeepAlive" value="true"/>
+					<spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+				</properties>
+			</https:inbound-endpoint>
+			<http:inbound-endpoint
+					address="http://${TP_HOST}:${TP_PORT_HTTP}/${TP_BASE_URI}/tjanst4"
+					exchange-pattern="request-response"
+					responseTransformer-refs="filterResponseHeaders">
+				<properties>
+					<spring:entry key="featureResponseTimeout" value="${TEST_LONG_TIMEOUT_MS}"/>
+				</properties>
+			</http:inbound-endpoint>
+		</composite-source>
+
+		<cxf:proxy-service
+				namespace="urn:riv:domain:subdomain:GetProductDetail:1:rivtabp20"
+				payload="envelope"
+				service="GetProductDetailResponderService"
+				wsdlLocation="classpath:/schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl" />
+
+		<flow-ref name="vagval-dynamic-routing-flow" />
+	</flow>
 
 </mule>

@@ -34,7 +34,7 @@ public class VpHttpTestProducer500Transformer extends AbstractMessageTransformer
 	public Object transformMessage(MuleMessage message, String outputEncoding)
 			throws TransformerException {
 		
-		message.setProperty("http.status", 500, PropertyScope.OUTBOUND);
+		message.setProperty("http.status", 503, PropertyScope.OUTBOUND);
 		message.setPayload("Not xml");
 		return message;
 	}

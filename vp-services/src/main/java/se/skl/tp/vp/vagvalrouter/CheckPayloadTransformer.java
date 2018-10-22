@@ -20,35 +20,33 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEventContext;
+import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
+import static se.skl.tp.vp.util.VPUtil.getStatusMessage;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
-import se.skl.tp.vp.util.EventLogger;
+import se.skl.tp.vp.logging.EventLogger;
+import se.skl.tp.vp.logging.EventLoggerFactory;
+import se.skl.tp.vp.logging.SessionInfo;
 import se.skl.tp.vp.util.MessageProperties;
-
-import static se.skl.tp.vp.util.VPUtil.setSoapFaultInResponse;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import se.skl.tp.vp.util.VPUtil;
 
 
 /**
  * CheckEmptyPayloadTransformer responsible to check if return message is "" and if so replace it with a SoapFault
  * 
  */
-@SuppressWarnings("deprecation")
 public class CheckPayloadTransformer extends AbstractMessageTransformer{
 	
 	private static final Logger log = LoggerFactory.getLogger(CheckPayloadTransformer.class);
-	private final EventLogger eventLogger = new EventLogger();	
+	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
 	private static final String nullPayload = "{NullPayload}";
 	private static final Integer HTTP_STATUS_500 = 500;
 	private static final String SOAP_XMLNS = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -98,6 +96,10 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		}
 
 		Integer status = message.getOutboundProperty("http.status");
+		
+		String status_in = (String)message.getInboundProperty("http.status");
+		
+		String addr = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION, "<UNKNOWN>");
 
     	try {
     		String cause = null;
@@ -105,8 +107,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 			if (strPayload == null || strPayload.length() == 0 || strPayload.equals(nullPayload)) {
 				
 				log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, getAddress() + ". No content found!");
-				
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009, addr + ". Server responded with status code: " + getStatusMessage(status_in, "NULL"));
 			} else if(HTTP_STATUS_500.equals(status) && !strPayload.contains(SOAP_XMLNS)) {
 
 				
@@ -115,7 +116,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 				// Otherwise there will be a cxf error and we will end up in the general exception handling
 				
 				log.debug("Found response message and http.status = 500. Response was : " + left(strPayload, 200) + "...");
-				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , getAddress() + ". Invalid content found!");
+				cause = messageProperties.get(VpSemanticErrorCodeEnum.VP009 , addr + ". Server responded with status code: " + getStatusMessage(status_in, "NULL"));
 			}
 			
 			if(cause != null) {
@@ -129,12 +130,11 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		return message;
     }
     
-	@SuppressWarnings("deprecation")
 	private void logException(MuleMessage message, Throwable t) {
-		Map<String, String> extraInfo = new HashMap<String, String>();
-		extraInfo.put("source", getClass().getName());
-		eventLogger.setMuleContext(message.getMuleContext());	
-		eventLogger.addSessionInfo(message, extraInfo);
+		SessionInfo extraInfo = new SessionInfo();
+		extraInfo.addSessionInfo(message);
+		extraInfo.addSource(getClass().getName());
+		eventLogger.setContext(super.muleContext);	
 		eventLogger.logErrorEvent(t, message, null, extraInfo);
 	}
 
@@ -145,16 +145,5 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 		int i =  s.length() > len ? len : s.length();
 		return s.substring(0, i);
 	}
-	
-	private String getAddress() {
-		
-		String           endpoint    = "";
-        MuleEventContext event       = RequestContext.getEventContext();
-        if (event != null) {
-		    URI endpointURI = event.getEndpointURI();
-			endpoint                = (endpointURI == null)? "" : endpointURI.toString();
-        }
-        
-        return endpoint;
-	}
+
 }

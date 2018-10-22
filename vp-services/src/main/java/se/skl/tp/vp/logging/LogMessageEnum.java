@@ -18,19 +18,25 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skltp.vp
+package se.skl.tp.vp.logging;
 
-import io.gatling.core.Predef._
-import io.gatling.http.Predef._
-import io.gatling.jdbc.Predef._
-import scala.concurrent.duration._
+public enum LogMessageEnum {
+	TYPE_XREQ_IN("xreq-in"),
+	TYPE_XREQ_OUT("xreq-out"),
+	TYPE_XRESP_IN("xresp-in"),
+	TYPE_XRESP_OUT("xresp-out");
+	
+	private String name;
+	
+	private LogMessageEnum(String name) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return name;
+	}
 
-class LoadTestVP extends Simulation {
-
-    setUp(
-		Scenarios.scn_SendMedicalCertificateAnswerHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
-		Scenarios.scn_GetSubjectOfCareScheduleHttps_2.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
-		Scenarios.scn_PingOkHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf),
-		Scenarios.scn_GetSubjectOfCareScheduleHttps.inject(rampUsers(Conf.noOfUsers) over (Scenarios.rampUpTimeSecs seconds)).protocols(Conf.httpConf)
-	)
+	public boolean equals(String name) {
+		return this.name().equals(name);
+	}
 }
