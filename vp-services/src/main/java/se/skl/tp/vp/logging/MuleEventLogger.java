@@ -84,7 +84,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 		//Only log payload when DEBUG is defined in log4j.xml
 		if(messageLogger.isDebugEnabled()){
 			logEvent = handler.createLogEntry(LogLevelType.DEBUG, message, logMessage, businessContextId, extraInfo, null, null);
-			handler.setPayload(logEvent, message.getPayloadForLogging());
+			handler.setPayload(logEvent, message.getPayload());
 			dispatchDebugEvent(logEvent);
 			logDebugEvent(logEvent);
 		}else if (messageLogger.isInfoEnabled()) {
@@ -93,7 +93,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 			logInfoEvent(logEvent);
 		}
 		if(logEvent != null && socketLogging(logEvent, extraInfo)) {
-			handler.setPayload(logEvent, message.getPayloadForLogging());
+			handler.setPayload(logEvent, message.getPayload());
 			logSocketEvent(logEvent);
 		}
 
