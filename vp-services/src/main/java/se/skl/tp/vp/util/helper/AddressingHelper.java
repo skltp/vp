@@ -74,7 +74,7 @@ public class AddressingHelper {
 		}
 
 
-		final Set<String> rivProfiles = routingInfos.stream().map(x->x.getRivProfile()).collect(Collectors.toSet());
+		final Set<String> rivProfiles = routingInfos.stream().map(RoutingInfo::getRivProfile).collect(Collectors.toSet());
 		raiseError(rivProfiles.size() == 0, VpSemanticErrorCodeEnum.VP005, input);
 		raiseError(rivProfiles.size() > 1, VpSemanticErrorCodeEnum.VP006, input);
 
@@ -115,10 +115,10 @@ public class AddressingHelper {
 	private VagvalInput createRequestToServiceDirectory(MuleMessage muleMessage) {
 
 		VagvalInput vagvalInput = new VagvalInput();
-		vagvalInput.senderId = (String) muleMessage.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
-		vagvalInput.receiverId = (String) muleMessage.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
-		vagvalInput.rivVersion = (String) muleMessage.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
-		vagvalInput.serviceContractNamespace = (String) muleMessage.getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION);
+		vagvalInput.senderId = muleMessage.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION);
+		vagvalInput.receiverId = muleMessage.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION);
+		vagvalInput.rivVersion = muleMessage.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
+		vagvalInput.serviceContractNamespace = muleMessage.getProperty(VPUtil.SERVICECONTRACT_NAMESPACE, PropertyScope.SESSION);
 
 		return vagvalInput;
 	}

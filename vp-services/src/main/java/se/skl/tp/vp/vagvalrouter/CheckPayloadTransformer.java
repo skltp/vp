@@ -97,7 +97,7 @@ public class CheckPayloadTransformer extends AbstractMessageTransformer{
 
 		Integer status = message.getOutboundProperty("http.status");
 		
-		String status_in = (String)message.getInboundProperty("http.status");
+		String status_in = message.getInboundProperty("http.status");
 		
 		String addr = message.getProperty(VPUtil.ENDPOINT_URL, PropertyScope.SESSION, "<UNKNOWN>");
 

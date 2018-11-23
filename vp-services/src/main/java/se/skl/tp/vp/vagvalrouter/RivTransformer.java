@@ -123,8 +123,8 @@ public class RivTransformer extends AbstractMessageTransformer {
 	Object doTransform(final MuleMessage msg, final String fromNs, final String toNs, final String fromElem,
 			final String toElem) {
 
-		LOG.info("Transforming {} -> {}. Payload is of type {}", new Object[] { fromNs, toNs,
-				msg.getPayload().getClass().getName() });
+		LOG.info("Transforming {} -> {}. Payload is of type {}", fromNs, toNs,
+				msg.getPayload().getClass().getName());
 
 		try {
 			ReversibleXMLStreamReader reader = (ReversibleXMLStreamReader) msg.getPayload();
@@ -226,7 +226,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 		boolean writeElementNS = false;
 		if (uri != null) {
 			String boundPrefix = writer.getPrefix(uri);
-			if (boundPrefix == null || !prefix.equals(boundPrefix)) {
+			if (!prefix.equals(boundPrefix)) {
 				writeElementNS = true;
 			}
 		}

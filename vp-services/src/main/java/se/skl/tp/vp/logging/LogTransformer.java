@@ -23,8 +23,6 @@ package se.skl.tp.vp.logging;
 import static org.soitoolkit.commons.logentry.schema.v1.LogLevelType.INFO;
 import static se.skl.tp.vp.logging.LogMessageEnum.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 

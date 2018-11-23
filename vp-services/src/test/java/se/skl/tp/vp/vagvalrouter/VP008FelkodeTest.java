@@ -58,12 +58,12 @@ public class VP008FelkodeTest  extends AbstractTestCase {
     }
 
     @Override
-    protected String getConfigResources() {
+    protected String[] getConfigFiles() {
         return
-                "soitoolkit-mule-jms-connector-activemq-embedded.xml," +
-                        "vp-common.xml," +
-                        "services/VagvalRouter-service.xml," +
-                        "vp-teststubs-and-services-config.xml";
+            new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+                "vp-common.xml",
+                "services/VagvalRouter-service.xml",
+                "vp-teststubs-and-services-config.xml"};
     }
 
     @Override

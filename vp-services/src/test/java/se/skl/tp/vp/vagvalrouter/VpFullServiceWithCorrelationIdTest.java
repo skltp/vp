@@ -62,19 +62,19 @@ public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
 	}
 	
 	@Override
-	protected String getConfigResources() {
+	protected String[] getConfigFiles() {
 	   	// Set send correlation_id to true
     	System.setProperty("VAGVALROUTER_PROPAGATE_CORRELATION_ID_FOR_HTTPS", "true");
-		return 
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
-			"vp-common.xml," +
-			"services/VagvalRouter-service.xml," +
-			"vp-teststubs-and-services-config.xml";
+		return
+				new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+						"vp-common.xml",
+						"services/VagvalRouter-service.xml",
+						"vp-teststubs-and-services-config.xml"};
 	}
 	
 	@BeforeClass
 	public static void setupTjanstekatalogen() throws Exception {
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS, "https://localhost:19000/vardgivare-b/tjanst1"));
 		svimi.setVagvalInputs(vagvalInputs);
 	}
@@ -95,7 +95,7 @@ public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
 	@Test
 	public void testCorrelationIdCreatedIfNotProvided() throws Exception {
 		
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
     	
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());
@@ -108,7 +108,7 @@ public class VpFullServiceWithCorrelationIdTest extends AbstractTestCase {
 		
 		final String providedCorrelationId = "1234567890";
 		
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
     	properties.put(HttpHeaders.X_SKLTP_CORRELATION_ID, providedCorrelationId);
 
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);

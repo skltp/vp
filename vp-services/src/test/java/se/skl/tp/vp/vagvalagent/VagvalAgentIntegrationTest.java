@@ -60,16 +60,15 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 
 
 	@Override
-	protected String getConfigResources() {
-		return
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," +
-			"vp-common.xml," +
-			"services/VagvalRouter-service.xml," +
-			"vp-teststubs-and-services-config.xml";
+	protected String[] getConfigFiles() {
+		return new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+			"vp-common.xml",
+			"services/VagvalRouter-service.xml",
+			"vp-teststubs-and-services-config.xml"};
 	}
 
 	private void setupTjanstekatalogen() throws Exception {
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp20", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		vagvalInputs.add(createVagvalRecordValidBefore(vardgivareC, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
@@ -108,10 +107,9 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 
 		String tjansteKontrakt = "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1";
 		String senderId = "XXX";
-		String receiverId = vardgivareB;
 
 		try {
-			vagvalAgent.visaVagval(createVisaVagvalRequest(senderId, receiverId, tjansteKontrakt));
+			vagvalAgent.visaVagval(createVisaVagvalRequest(senderId, vardgivareB, tjansteKontrakt));
 			fail("Exception expected");
 		} catch (VpSemanticException e) {
 			assertEquals("VP007 Authorization missing for serviceNamespace: urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1, receiverId: SE0000000003-1234, senderId: XXX", e.getMessage());

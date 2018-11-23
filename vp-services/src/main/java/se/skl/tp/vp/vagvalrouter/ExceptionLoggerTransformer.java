@@ -104,7 +104,7 @@ public class ExceptionLoggerTransformer extends AbstractMessageTransformer {
 	}
 
 	private void startTimer() {
-		Map<String, String> extraInfo = new HashMap<String, String>();
+		Map<String, String> extraInfo = new HashMap<>();
 		extraInfo.put("source", getClass().getName());
 		ExecutionTimer timer = ExecutionTimer.get(VPUtil.TIMER_ENDPOINT);
 		if (timer != null) {

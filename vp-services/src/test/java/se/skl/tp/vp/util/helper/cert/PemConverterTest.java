@@ -84,8 +84,7 @@ public class PemConverterTest {
 	private String readPemCertificateFile(String pemFile) throws IOException {
 		URL filePath = CertificateHeaderExtractorTest.class.getClassLoader().getResource(pemFile);
 		File file = FileUtils.toFile(filePath);
-		String pemCertContent = FileUtils.readFileToString(file);
-		return pemCertContent;
+		return FileUtils.readFileToString(file);
 	}
 
 }

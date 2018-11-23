@@ -2,14 +2,11 @@ package se.skl.tp.vp.vagvalagent;
 
 import java.util.ArrayList;
 import java.util.List;
-import se.skl.tp.behorighet.BehorighetHandlerImpl;
 import se.skl.tp.hsa.cache.HsaCache;
-import se.skl.tp.vagval.VagvalHandlerImpl;
 import se.skl.tp.vp.util.MessageProperties;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skltp.takcache.TakCacheImpl;
-import se.skltp.takcache.TakCache;
 import se.skltp.takcache.services.TakService;
 
 public class VagvalAgentMock extends VagvalAgent {

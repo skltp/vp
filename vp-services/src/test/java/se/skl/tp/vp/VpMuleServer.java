@@ -66,7 +66,7 @@ public class VpMuleServer {
 		// to the virtual service is made
 		// Note certificate serial number is used as sender
 		
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		
 		//Test producers for urn:riv:domain:subdomain:GetProductDetailResponder:1
 		vagvalInputs.add(createVagvalRecord("vp-test-producer", "RIVTABP20", "tp", "urn:riv:domain:subdomain:GetProductDetailResponder:1","https://localhost:19000/vardgivare-b/tjanst1"));

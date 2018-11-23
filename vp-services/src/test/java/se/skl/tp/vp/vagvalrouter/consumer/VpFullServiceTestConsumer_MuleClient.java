@@ -77,7 +77,7 @@ public class VpFullServiceTestConsumer_MuleClient {
 	
 	private RestClient restClient = null;
 
-	private static final Map<String, String> namespaceMap = new HashMap<String, String>();
+	private static final Map<String, String> namespaceMap = new HashMap<>();
 	
 	static {
 		namespaceMap.put("soap",    "http://schemas.xmlsoap.org/soap/envelope/");

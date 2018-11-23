@@ -66,9 +66,9 @@ public class ResetVagvalCache implements Callable {
 
   private String getResultAsString(TakCacheLog takCacheLog) {
 
-    StringBuffer resultAsString = new StringBuffer();
+    StringBuilder resultAsString = new StringBuilder();
     for (String processingLog : takCacheLog.getLog()) {
-      resultAsString.append("<br>" + processingLog);
+      resultAsString.append("<br>").append(processingLog);
     }
 
     return resultAsString.toString();

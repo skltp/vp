@@ -110,14 +110,8 @@ public class GetLogicalAddresseesByServiceContractTest {
 		
 		// fix order of records for easy comparison in asserts below
 		{
-			Comparator<LogicalAddresseeRecordType> c = new Comparator<LogicalAddresseeRecordType>() {
-				@Override
-				public int compare(LogicalAddresseeRecordType o1,
-						LogicalAddresseeRecordType o2) {
-					return o1.getLogicalAddress().compareTo(o2.getLogicalAddress());
-				}
-			};
-			Collections.sort(responseCrmScheduling.getLogicalAddressRecord(), c);
+			Comparator<LogicalAddresseeRecordType> c = (o1, o2) -> o1.getLogicalAddress().compareTo(o2.getLogicalAddress());
+			responseCrmScheduling.getLogicalAddressRecord().sort(c);
 		}
 
 		//Receiver RECEIVERID-1 crm:scheduling

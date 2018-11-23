@@ -34,7 +34,7 @@ public class ExecutionTimerTest {
 		ExecutionTimer.start("single");
 		Thread.sleep(500);
 		ExecutionTimer.stop("single");
-		assertTrue(ExecutionTimer.getAll().size() == 1);
+		assertEquals(1, ExecutionTimer.getAll().size());
 		assertTrue(ExecutionTimer.getAll().get("single").getElapsed() >= 500);
 	}
 	

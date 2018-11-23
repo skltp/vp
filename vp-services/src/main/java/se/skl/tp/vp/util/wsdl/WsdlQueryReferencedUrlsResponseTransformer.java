@@ -191,7 +191,7 @@ public class WsdlQueryReferencedUrlsResponseTransformer extends
 		// http://whileonefork.blogspot.se/2011/01/how-to-use-dom4j-xpath-with-xml.html
 
 		// xpath namespaces
-		Map<String, String> namespaceUris = new HashMap<String, String>();
+		Map<String, String> namespaceUris = new HashMap<>();
 		namespaceUris.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
 		namespaceUris.put("xsd", "http://www.w3.org/2001/XMLSchema");
 		namespaceUris.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");

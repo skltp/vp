@@ -49,7 +49,7 @@ public class CallerOnWhitelistIntegrationTest extends
 	@Test
 	public void testOkCallerOnWhitelistUsingSenderIdAndVpInstanceId()
 			throws Exception {
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put(HttpHeaders.X_VP_SENDER_ID, "tp");
 		properties.put(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
 
@@ -63,7 +63,7 @@ public class CallerOnWhitelistIntegrationTest extends
 	public void testOkCallerOnWhitelistUsingReverseProxyTerminatingTls()
 			throws Exception {
 		// add headers set by fronting reverse proxy that terminates TLS
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
 		properties.put("X-Forwarded-For", "10.10.10.10");
 		properties.put(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, "127.0.0.1");

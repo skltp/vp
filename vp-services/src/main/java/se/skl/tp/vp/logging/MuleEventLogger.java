@@ -34,8 +34,6 @@ import org.soitoolkit.commons.logentry.schema.v1.LogLevelType;
 import org.soitoolkit.commons.mule.jaxb.JaxbObjectToXmlTransformer;
 import org.soitoolkit.commons.mule.util.MuleUtil;
 import se.skl.tp.vp.util.PayloadToStringTransformer;
-import se.skl.tp.vp.util.VPUtil;
-
 
 
 /**
@@ -136,8 +134,7 @@ public class MuleEventLogger extends JMSEventLogger implements EventLogger<MuleM
 
 	private Session getSession(JmsConnector jmsConn) throws JMSException {
 		Connection c = jmsConn.getConnection();
-		Session s = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		return s;
+		return c.createSession(false, Session.AUTO_ACKNOWLEDGE);
 	}
 
 	@Override

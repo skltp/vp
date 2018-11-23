@@ -42,7 +42,7 @@ import se.skltp.domain.subdomain.getproducdetail.v1.rivtabp20.GetProductDetailRe
 		wsdlLocation = "schemas/interactions/GetProductDetailInteraction/GetProductDetailInteraction_1.0_RIVTABP20.wsdl")
 public class VpFullServiceTestProducer implements GetProductDetailResponderInterface {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Map<String, Product> productMap = new HashMap<String, Product>();
+    private Map<String, Product> productMap = new HashMap<>();
 
     public VpFullServiceTestProducer() {
         // Load some products

@@ -53,20 +53,20 @@ public class MonitorPingIntegrationTest extends AbstractTestCase{
 	
 	@BeforeClass
 	public static void setupTjanstekatalogen() throws Exception {
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord("LOGICAL_ADDRESS_1","https://localhost:19000/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord("LOGICAL_ADDRESS_2", "https://www.google.com:81"));
 		svimi.setVagvalInputs(vagvalInputs);
 	}
 
 	@Override
-	protected String getConfigResources() {
-		return "soitoolkit-mule-jms-connector-activemq-embedded.xml,"
-				+ "vp-common.xml,"
-				+ "services/PingService-service.xml,"
-				+ "services/VagvalRouter-service.xml,"
-				+ "services/PingForConfiguration-rivtabp21-service.xml,"
-				+ "vp-teststubs-and-services-config.xml";
+	protected String[] getConfigFiles() {
+		return new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+				"vp-common.xml",
+				"services/PingService-service.xml",
+				"services/VagvalRouter-service.xml",
+				"services/PingForConfiguration-rivtabp21-service.xml",
+				"vp-teststubs-and-services-config.xml"};
 	}
 	
 	

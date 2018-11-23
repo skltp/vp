@@ -30,8 +30,8 @@ import org.junit.Test;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 public class PingForConfigurationProducerRivTa21Test {
-	private static final Integer ONE = new Integer(1);
-	private static final Integer ZERO = new Integer(0);
+	private static final Integer ONE = 1;
+	private static final Integer ZERO = 0;
 
 	@Test
 	public void resourcesNeededForVpAvailable() {

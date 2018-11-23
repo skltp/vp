@@ -31,7 +31,7 @@ public class SessionInfo extends HashMap<String, String> {
 	private static final long serialVersionUID = -2500406010556069761L;
 
 	public void addSessionInfo(MuleMessage message) {
-		this.put(VPUtil.SENDER_ID, (String) message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
+		this.put(VPUtil.SENDER_ID, message.getProperty(VPUtil.SENDER_ID, PropertyScope.SESSION));
 		this.put(VPUtil.RECEIVER_ID, (String) message.getProperty(VPUtil.RECEIVER_ID, PropertyScope.SESSION));
 		this.put(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, (String) message.getProperty(VPUtil.ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyScope.SESSION));
 		this.put(VPUtil.RIV_VERSION, (String) message.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION));

@@ -36,7 +36,7 @@ public class ExecutionTimer {
 	//
 	private static final Logger logger = LoggerFactory.getLogger(ExecutionTimer.class);
 	
-	private static ThreadLocal<Map<String, ExecutionTimer>> local = new ThreadLocal<Map<String, ExecutionTimer>>();
+	private static ThreadLocal<Map<String, ExecutionTimer>> local = new ThreadLocal<>();
 	private String name;
 	private long start;
 	private long end;
@@ -46,7 +46,7 @@ public class ExecutionTimer {
 	 */
 	public static void init() {
 		logger.debug("init");
-		local.set(new HashMap<String, ExecutionTimer>());
+		local.set(new HashMap<>());
 	}
 	
 	/**
@@ -100,7 +100,7 @@ public class ExecutionTimer {
 	 * Returns a formatted string with timers.
 	 */
 	public static String format() {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		buf.append("timers { ");
 		int len = buf.length();
 		Map<String, ExecutionTimer> map = getAll();

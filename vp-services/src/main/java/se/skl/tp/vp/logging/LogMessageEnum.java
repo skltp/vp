@@ -28,7 +28,7 @@ public enum LogMessageEnum {
 	
 	private String name;
 	
-	private LogMessageEnum(String name) {
+	LogMessageEnum(String name) {
 		this.name = name;
 	}
 	

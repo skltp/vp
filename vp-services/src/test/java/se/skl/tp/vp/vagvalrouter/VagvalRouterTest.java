@@ -119,8 +119,8 @@ public class VagvalRouterTest {
       myHelper.getAddressFromAgent(vagvalInput);
       fail("VP008 Exception expected");
     } catch (VpSemanticException e) {
-      assertTrue(e.getMessage().equals(
-          "VP008 No contact with TAK at startup, and no local cache to fallback on, not possible to route call"));
+      assertEquals("VP008 No contact with TAK at startup, and no local cache to fallback on, not possible to route call",
+          e.getMessage());
     }
 
   }

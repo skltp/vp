@@ -63,7 +63,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		}
 
 		System.out.println("Vagval agent inside"+vagvalAgent);
-		Set<String> uniqueLogicalAddresses = new HashSet<String>();
+		Set<String> uniqueLogicalAddresses = new HashSet<>();
 		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
 			if (validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
 				uniqueLogicalAddresses.add(authInfo.getReceiverId());
@@ -76,8 +76,8 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		if (log.isInfoEnabled()) {
 			String consumerHsaId = request.getServiceConsumerHsaId();
 			String namespace = request.getServiceContractNameSpace().getServiceContractNamespace();
-			log.info("getLogicalAddresseesByServiceContract.v1 found {} logical addresses for consumerHsaId: {}, namespace: {}", new Object[] {
-					uniqueLogicalAddresses.size(), consumerHsaId, namespace });
+			log.info("getLogicalAddresseesByServiceContract.v1 found {} logical addresses for consumerHsaId: {}, namespace: {}",
+					uniqueLogicalAddresses.size(), consumerHsaId, namespace);
 		}
 
 		return response;

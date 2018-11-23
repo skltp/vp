@@ -20,6 +20,7 @@
  */
 package se.skl.tp.vp.util.helper;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
@@ -95,7 +96,7 @@ public class PayloadHelperTest extends AbstractMuleContextTestCase {
 
 		PayloadHelper helper = new PayloadHelper(testMsg);
 		PayloadInfo result = helper.extractInfoFromPayload();
-		assertTrue(result.receiverId == null);	
+    assertNull(result.receiverId);
 	}
 
 	/**

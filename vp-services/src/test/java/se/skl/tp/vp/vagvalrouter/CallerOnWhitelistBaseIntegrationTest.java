@@ -61,7 +61,7 @@ public abstract class CallerOnWhitelistBaseIntegrationTest extends
 		// setDisposeContextPerClass(true);
 
 		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,
 				"https://localhost:19000/vardgivare-b/tjanst1"));
 		svimi.setVagvalInputs(vagvalInputs);
@@ -79,10 +79,11 @@ public abstract class CallerOnWhitelistBaseIntegrationTest extends
 	}
 
 	@Override
-	protected String getConfigResources() {
-		return "soitoolkit-mule-jms-connector-activemq-embedded.xml,"
-				+ "vp-common.xml," + "services/VagvalRouter-service.xml,"
-				+ "vp-teststubs-and-services-config.xml";
+	protected String[] getConfigFiles() {
+		return new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+				"vp-common.xml",
+				"services/VagvalRouter-service.xml",
+				"vp-teststubs-and-services-config.xml"};
 	}
 
 	@Before

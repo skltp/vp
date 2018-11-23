@@ -66,7 +66,7 @@ public class PayloadToStringTransformer {
 
 		String content;
 		if (payload instanceof Object[]) {
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			int i = 0;
 			for (Object object : (Object[]) payload) {
 				if (i > 0) {

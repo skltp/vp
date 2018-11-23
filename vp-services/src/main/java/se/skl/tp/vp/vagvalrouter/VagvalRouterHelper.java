@@ -55,14 +55,13 @@ public class VagvalRouterHelper {
 		/**
 		 * Headers to be blocked when invoking producer.
 		 */
-		final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(new String[] {
-				VPUtil.RIV_VERSION, 
-				VPUtil.WSDL_NAMESPACE, 
-				HttpHeaders.REVERSE_PROXY_HEADER_NAME, 
+		final List<String> BLOCKED_REQ_HEADERS = Collections.unmodifiableList(Arrays.asList(VPUtil.RIV_VERSION,
+				VPUtil.WSDL_NAMESPACE,
+				HttpHeaders.REVERSE_PROXY_HEADER_NAME,
 				VPUtil.SERVICECONTRACT_NAMESPACE,
-				VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES", 
+				VPUtil.PEER_CERTIFICATES, "LOCAL_CERTIFICATES",
 				HttpConstants.HEADER_CONTENT_TYPE,
-				"http.disable.status.code.exception.check" }));
+				"http.disable.status.code.exception.check"));
 		
 		for(String key : BLOCKED_REQ_HEADERS) {
 			message.removeProperty(key, scope);

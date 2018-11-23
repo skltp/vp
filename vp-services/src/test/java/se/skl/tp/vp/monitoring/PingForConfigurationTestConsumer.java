@@ -32,7 +32,7 @@ public class PingForConfigurationTestConsumer {
 
 	private static final Logger log = LoggerFactory.getLogger(PingForConfigurationTestConsumer.class);
 
-	PingForConfigurationResponderInterface _service = null;
+	PingForConfigurationResponderInterface _service;
 
 	public PingForConfigurationTestConsumer(String serviceAddress) {
 		JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();

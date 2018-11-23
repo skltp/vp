@@ -30,7 +30,7 @@ public class VagvalAgentProcessingLog {
     List<String> logBuffer = null;    
 
     public VagvalAgentProcessingLog() {
-        logBuffer = new ArrayList<String>();
+        logBuffer = new ArrayList<>();
     }
 
     public void addLog(String log) {

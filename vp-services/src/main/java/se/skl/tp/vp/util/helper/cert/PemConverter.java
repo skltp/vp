@@ -78,8 +78,7 @@ public class PemConverter {
 
 	private static Certificate generateCertificate(InputStream is) throws CertificateException {
 		CertificateFactory factory = CertificateFactory.getInstance("X.509");
-		Certificate certificate = factory.generateCertificate(is);
-		return certificate;
+		return factory.generateCertificate(is);
 	}
 
 	private static BufferedInputStream extractCerticate(String pemCertString) {
@@ -87,16 +86,14 @@ public class PemConverter {
 		int beginHeader = pemCertString.indexOf(BEGIN_HEADER) + BEGIN_HEADER.length();
 		int endHeader = pemCertString.indexOf(END_HEADER);
 
-		StringBuffer formattedCert = new StringBuffer();
-		formattedCert.append(BEGIN_HEADER);
-		formattedCert.append("\n");
-		formattedCert.append(pemCertString.substring(beginHeader, endHeader).replaceAll("\\s+", ""));
-		formattedCert.append("\n");
-		formattedCert.append(END_HEADER);
+		String formattedCert = BEGIN_HEADER
+				+ "\n"
+				+ pemCertString.substring(beginHeader, endHeader).replaceAll("\\s+", "")
+				+ "\n"
+				+ END_HEADER;
+		pemCertString = formattedCert;
 
-		pemCertString = formattedCert.toString();
-
-		InputStream is = new ByteArrayInputStream(((String) pemCertString).getBytes());
+		InputStream is = new ByteArrayInputStream(pemCertString.getBytes());
 		BufferedInputStream bis = new BufferedInputStream(is);
 		return bis;
 	}

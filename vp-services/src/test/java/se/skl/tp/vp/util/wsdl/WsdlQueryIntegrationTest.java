@@ -49,12 +49,12 @@ public class WsdlQueryIntegrationTest extends AbstractTestCase {
 	}
 	
 	@Override
-	protected String getConfigResources() {
-		return 
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
-			"vp-common.xml," +
-			"services/VagvalRouter-service.xml," +
-			"teststub-services/vp-virtuell-tjanst-teststub-service.xml";
+	protected String[] getConfigFiles() {
+		return
+				new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+						"vp-common.xml",
+						"services/VagvalRouter-service.xml",
+						"teststub-services/vp-virtuell-tjanst-teststub-service.xml"};
 	}
 		
 	@Before
@@ -80,7 +80,7 @@ public class WsdlQueryIntegrationTest extends AbstractTestCase {
 
 	@Test
 	public void testWsdlLookupWithLoadBalancerForwardedInfo() throws Exception {
-		Map<String, String> httpHeaders = new HashMap<String, String>();
+		Map<String, String> httpHeaders = new HashMap<>();
 		httpHeaders.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_PROTO"), "http");
 		httpHeaders.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_HOST"), "vp-loadbalancer-dns-name");
 		httpHeaders.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_PORT"), "443");
@@ -102,8 +102,7 @@ public class WsdlQueryIntegrationTest extends AbstractTestCase {
 		}
 		int retStatus = httpClient.executeMethod(get);
 		assertEquals(HttpStatus.SC_OK, retStatus);
-		String response = new String(get.getResponseBody(), "UTF-8");
-		return response;
+		return new String(get.getResponseBody(), "UTF-8");
 	}
 	
 }

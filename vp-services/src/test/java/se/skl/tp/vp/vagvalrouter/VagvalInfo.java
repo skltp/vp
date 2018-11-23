@@ -47,7 +47,7 @@ public class VagvalInfo {
 		}
 	}
 
-	private static List<Info> infos = new ArrayList<Info>();
+	private static List<Info> infos = new ArrayList<>();
 
 	public List<Info> getInfos() {
 		log.debug("Get vagval-info, return {} records", infos.size());
@@ -61,7 +61,7 @@ public class VagvalInfo {
 
 	public void reset() {
 		log.debug("Reset vagval-info");
-		infos = new ArrayList<Info>();		
+		infos = new ArrayList<>();
 	}
 	
 }

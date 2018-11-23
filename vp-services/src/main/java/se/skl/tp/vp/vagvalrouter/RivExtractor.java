@@ -56,7 +56,7 @@ public class RivExtractor extends AbstractMessageTransformer {
 		/*
 		 * cxf_service is set by cxf:proxy_service on inbound.
 		 */
-		QName qname = (QName) msg.getProperty(VPUtil.CXF_SERVICE_NAMESPACE, PropertyScope.INVOCATION);
+		QName qname = msg.getProperty(VPUtil.CXF_SERVICE_NAMESPACE, PropertyScope.INVOCATION);
 		final String tns = VPUtil.extractNamespaceFromService(qname);
 
 		if (tns != null) {

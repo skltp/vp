@@ -35,7 +35,6 @@ import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaTjanstekontraktResponseType;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
-import se.skl.tp.vp.vagvalrouter.VagvalInput;
 
 /**
  * Denna klass används för att kunna simulera en tjänstekatalog med valfritt

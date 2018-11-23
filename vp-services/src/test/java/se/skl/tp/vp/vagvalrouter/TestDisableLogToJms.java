@@ -63,7 +63,7 @@ public class TestDisableLogToJms extends AbstractTestCase {
 		setDisposeContextPerClass(true);
 		
 		SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,               "https://localhost:19000/vardgivare-b/tjanst1"));
 		svimi.setVagvalInputs(vagvalInputs);
 	}
@@ -79,18 +79,18 @@ public class TestDisableLogToJms extends AbstractTestCase {
 	}
 	
 	@Override
-	protected String getConfigResources() {
+	protected String[] getConfigFiles() {
 		
 		/*
 		 * NOTE! This test uses a separate vp-common configuration file to
 		 * be able to mock a different vp-config-override.properties. The
 		 * 
 		 */
-		return 
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
-			"test-disable-log-to-jms/test-disable-log-to-jms-vp-common.xml," +
-			"services/VagvalRouter-service.xml," +
-			"vp-teststubs-and-services-config.xml";
+		return
+				new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+						"test-disable-log-to-jms/test-disable-log-to-jms-vp-common.xml",
+						"services/VagvalRouter-service.xml",
+						"vp-teststubs-and-services-config.xml"};
 	}
 	
 	@Before

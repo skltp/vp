@@ -154,7 +154,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 			logger.debug("Endpoint address is {}", addr);
 
-			return Collections.singletonList((Object) addr);
+			return Collections.singletonList(addr);
 		} finally {
 			ExecutionTimer.stop(VPUtil.TIMER_ROUTE);
 		}

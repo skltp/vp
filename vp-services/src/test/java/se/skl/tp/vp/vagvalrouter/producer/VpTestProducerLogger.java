@@ -48,7 +48,7 @@ public class VpTestProducerLogger extends AbstractMessageTransformer {
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		
 		@SuppressWarnings("unchecked")
-		Map<String, Object> httpHeaders = (Map<String, Object>)message.getInboundProperty("http.headers");
+		Map<String, Object> httpHeaders = message.getInboundProperty("http.headers");
 		
 		//Sender and original sender
 		String rivtaOriginalSenderId = (String)httpHeaders.get(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID);

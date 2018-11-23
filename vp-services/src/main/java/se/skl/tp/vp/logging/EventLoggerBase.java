@@ -86,7 +86,7 @@ public abstract class EventLoggerBase {
 	private List<String> categoriesList;
 	public void setSocketLoggerCategories(String categories) {
 		if(categories == null || categories.isEmpty()) {
-			categoriesList = new ArrayList<String>();
+			categoriesList = new ArrayList<>();
 		} else {
 			String [] s = categories.split(",");
 			this.categoriesList = Arrays.asList(s);
@@ -96,7 +96,7 @@ public abstract class EventLoggerBase {
 	private List<String> serviceContractList;
 	public void setSocketLoggerServiceContracts(String serviceContracts) {
 		if(serviceContracts == null || serviceContracts.isEmpty()) {
-			serviceContractList = new ArrayList<String>();
+			serviceContractList = new ArrayList<>();
 		} else {
 			String [] s = serviceContracts.split(",");
 			this.serviceContractList = Arrays.asList(s);
@@ -121,10 +121,7 @@ public abstract class EventLoggerBase {
 
 		String serviceContract = extraInfo.get(VPUtil.SERVICECONTRACT_NAMESPACE);
 
-		if(serviceContractList != null && !serviceContractList.isEmpty() && !serviceContractList.contains(serviceContract)) {
-			return false;
-		}
-		return true;
+		return serviceContractList == null || serviceContractList.isEmpty() || serviceContractList.contains(serviceContract);
 	}
 
 	protected void logSocketEvent(LogEvent logEvent) {

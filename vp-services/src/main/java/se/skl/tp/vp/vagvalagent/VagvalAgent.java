@@ -87,7 +87,7 @@ public class VagvalAgent implements VagvalAgentInterface {
       if(takCacheLog==null){
         resetVagvalCache();
       }
-      return (takCache == null) ? Collections.<AnropsBehorighetsInfoType>emptyList() : takCache.getAnropsBehorighetsInfos();
+      return (takCache == null) ? Collections.emptyList() : takCache.getAnropsBehorighetsInfos();
   }
 
   private boolean isTakCacheInitialized(){

@@ -43,9 +43,7 @@ import se.skl.tp.vp.util.helper.cert.CertificateExtractorFactory;
 public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 	
 	private static final Logger log = LoggerFactory.getLogger(CheckSenderIdTransformer.class);
-	
-	private String senderIdPropertyName;
-	
+
 	private WhiteListHandler whiteListHandler;
 	
 	private Pattern pattern;
@@ -67,8 +65,8 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
 	}
 
 	public void setSenderIdPropertyName(String senderIdPropertyName) {
-		this.senderIdPropertyName = senderIdPropertyName;
-		pattern = Pattern.compile(this.senderIdPropertyName + "=([^,]+)");
+		String senderIdPropertyName1 = senderIdPropertyName;
+		pattern = Pattern.compile(senderIdPropertyName1 + "=([^,]+)");
 		if (logger.isInfoEnabled()) {
 			logger.info("senderIdPropertyName set to: " + senderIdPropertyName);
 		}
@@ -145,7 +143,7 @@ public class CheckSenderIdTransformer extends AbstractMessageTransformer{
      * adress.
      */
 	private String extractSenderIpAdress(MuleMessage message) {
-		String senderIpAdress = (String)message.getInboundProperty(senderIpAdressHttpHeader);
+		String senderIpAdress = message.getInboundProperty(senderIpAdressHttpHeader);
 		if(senderIpAdress == null){
 			senderIpAdress = VPUtil.extractIpAddress(message);
 		}
