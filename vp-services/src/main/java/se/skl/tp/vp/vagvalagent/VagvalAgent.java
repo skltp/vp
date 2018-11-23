@@ -24,8 +24,8 @@ public class VagvalAgent implements VagvalAgentInterface {
   private static final Logger LOGGER = LoggerFactory.getLogger(VagvalAgent.class);
 
   private MessageProperties messageProperties;
-  private se.skl.tp.behorighet.BehorighetHandler behorighetHandler;
-  private se.skl.tp.vagval.VagvalHandler vagvalHandler;
+  private BehorighetHandler behorighetHandler;
+  private VagvalHandler vagvalHandler;
   private TakCache takCache;
   private TakCacheLog takCacheLog = null;
 
@@ -111,17 +111,6 @@ public class VagvalAgent implements VagvalAgentInterface {
     this.messageProperties = messageProperties;
   }
 
-  public void setBehorighetHandler(BehorighetHandler behorighetHandler) {
-    this.behorighetHandler = behorighetHandler;
-  }
-
-  public void setVagvalHandler(VagvalHandler vagvalHandler) {
-    this.vagvalHandler = vagvalHandler;
-  }
-
-  public void setTakCache(TakCache takCache) {
-    this.takCache = takCache;
-  }
 
 
 }

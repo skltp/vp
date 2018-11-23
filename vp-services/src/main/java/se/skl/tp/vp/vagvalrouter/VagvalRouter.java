@@ -76,8 +76,6 @@ public class VagvalRouter extends AbstractRecipientList {
 
 	private MessageProperties messageProperties;
 
-	private VagvalAgentInterface vagvalAgent2;
-
 	/**
 	 * Set value to be used in HTTP header x-vp-instance-id.
 	 *

@@ -51,9 +51,8 @@ import se.skl.tp.vp.util.helper.AddressingHelper;
  */
 public class RivTransformer extends AbstractMessageTransformer {
 
-	private static Logger log = LoggerFactory.getLogger(RivTransformer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RivTransformer.class);
 
-	private VagvalAgentInterface vagvalAgent;
 	private AddressingHelper addrHelper;
 
 	static final String RIV20 = "RIVTABP20";
@@ -65,7 +64,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 	static final String RIV21_NS = "urn:riv:itintegration:registry:1";
 	static final String RIV21_ELEM = "LogicalAddress";
 
-    private static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+  private static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
 	private String vpInstanceId;
 
@@ -78,19 +77,18 @@ public class RivTransformer extends AbstractMessageTransformer {
 	}
 
 	public void setVagvalAgent(final VagvalAgentInterface vagvalAgent) {
-		this.vagvalAgent = vagvalAgent;
 		addrHelper = new AddressingHelper(vagvalAgent, vpInstanceId);
 	}
 
 	@Override
 	public Object transformMessage(MuleMessage msg, String encoding) throws TransformerException {
 
-		log.debug("Riv transformer executing");
+		LOG.debug("Riv transformer executing");
 
 		/*
 		 * Check if virtualized service is a 2.0 service
 		 */
-		String rivVersion = (String) msg.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
+		String rivVersion = msg.getProperty(VPUtil.RIV_VERSION, PropertyScope.SESSION);
 
 		/*
 		 * Get the available RIV version from the service directory, and if the
@@ -107,7 +105,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 			msg.setInvocationProperty(VPUtil.VP_SEMANTIC_EXCEPTION, e);
 			return msg;
 		}
-		log.debug("RivProfile set to session scope: " + rivProfile);
+		LOG.debug("RivProfile set to session scope: " + rivProfile);
 
 		if (rivVersion.equalsIgnoreCase(RIV20) && rivProfile.equalsIgnoreCase(RIV21)) {
 			this.doTransform(msg, RIV20_NS, RIV21_NS, RIV20_ELEM, RIV21_ELEM);
@@ -125,7 +123,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 	Object doTransform(final MuleMessage msg, final String fromNs, final String toNs, final String fromElem,
 			final String toElem) {
 
-		log.info("Transforming {} -> {}. Payload is of type {}", new Object[] { fromNs, toNs,
+		LOG.info("Transforming {} -> {}. Payload is of type {}", new Object[] { fromNs, toNs,
 				msg.getPayload().getClass().getName() });
 
 		try {
@@ -138,7 +136,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 			return msg;
 		} catch (final Exception e) {
-			log.error("RIV transformation failed", e);
+			LOG.error("RIV transformation failed", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -149,7 +147,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 			final String toAddressingNs, final String fromAddressingElement,
 			final String toAddressingElement) throws XMLStreamException {
 
-		log.debug("RivTransformer transformXML");
+		LOG.debug("RivTransformer transformXML");
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream(2048);
 		XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(os, "UTF-8");
@@ -203,8 +201,8 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 		String uri = reader.getNamespaceURI();
 		if (fromAddressingNs.equals(uri)) {
-			if (log.isDebugEnabled()) {
-				log.debug("RivTransformer { fromNS: {}, toNS: {} }", new Object[] { fromAddressingNs, toAddressingNs });
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("RivTransformer { fromNS: {}, toNS: {} }", new Object[] { fromAddressingNs, toAddressingNs });
 			}
 			uri = toAddressingNs;
 		}
@@ -213,8 +211,8 @@ public class RivTransformer extends AbstractMessageTransformer {
 		// make sure we only transforms element names within the right namespace
 		if (fromAddressingElement.equals(local) && toAddressingNs.equals(uri)) {
 			local = toAddressingElement;
-			if (log.isDebugEnabled()) {
-				log.debug("RivTransformer { fromName: {}, toName: {}, uri: {} }", new Object[] { fromAddressingElement, toAddressingElement, uri });
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("RivTransformer { fromName: {}, toName: {}, uri: {} }", new Object[] { fromAddressingElement, toAddressingElement, uri });
 			}
 		}
 
