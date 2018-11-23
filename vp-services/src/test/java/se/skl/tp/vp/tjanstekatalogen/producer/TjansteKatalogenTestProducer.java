@@ -23,6 +23,8 @@ package se.skl.tp.vp.tjanstekatalogen.producer;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.AN_HOUR_AGO;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.IN_TEN_YEARS;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.getRelativeDate;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaAnropsBehorigheterResponseType;
@@ -71,13 +73,15 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 		try {
 			int id = 1;
 
-			for (VagvalInput input : vagvalInputs.getVagvalInputs()) {
+			for (VagvalMockInputRecord input : vagvalInputs.getVagvalInputs()) {
 				AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
 				aboId.setValue(String.valueOf(id++));
 				AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
 				abo.setAnropsBehorighetsInfoId(aboId);
-				abo.setFromTidpunkt(getRelativeDate(AN_HOUR_AGO));
-				abo.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
+				XMLGregorianCalendar fromDate = input.getFromDate();
+				XMLGregorianCalendar toDate = input.getToDate();
+				abo.setFromTidpunkt(fromDate==null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
+				abo.setTomTidpunkt(toDate==null ? getRelativeDate(IN_TEN_YEARS) : toDate);
 				abo.setReceiverId(input.receiverId);
 				abo.setSenderId(input.senderId);
 				abo.setTjansteKontrakt(input.serviceContractNamespace);
@@ -106,8 +110,10 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 			for (VagvalMockInputRecord input : vagvalInputs.getVagvalInputs()) {
 				VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
 				vi.setAdress(input.adress);
-				vi.setFromTidpunkt(getRelativeDate(AN_HOUR_AGO));
-				vi.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
+				XMLGregorianCalendar fromDate = input.getFromDate();
+				XMLGregorianCalendar toDate = input.getToDate();
+				vi.setFromTidpunkt(fromDate==null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
+				vi.setTomTidpunkt(toDate==null ? getRelativeDate(IN_TEN_YEARS) : toDate);
 				vi.setReceiverId(input.receiverId);
 				vi.setRivProfil(input.rivVersion);
 				VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();

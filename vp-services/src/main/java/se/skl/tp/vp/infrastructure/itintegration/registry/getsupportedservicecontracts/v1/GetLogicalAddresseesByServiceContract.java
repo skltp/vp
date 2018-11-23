@@ -22,15 +22,12 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.jws.WebService;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
@@ -65,6 +62,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 			return new GetLogicalAddresseesByServiceContractResponseType();
 		}
 
+		System.out.println("Vagval agent inside"+vagvalAgent);
 		Set<String> uniqueLogicalAddresses = new HashSet<String>();
 		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
 			if (validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
@@ -90,7 +88,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 				&& request.getServiceContractNameSpace().getServiceContractNamespace() != null;
 	}
 
-	private boolean matchesRequested(AnropsBehorighetsInfoType authInfo,
+	private boolean  matchesRequested(AnropsBehorighetsInfoType authInfo,
 			GetLogicalAddresseesByServiceContractType request) {
 		String namespace = request.getServiceContractNameSpace()
 				.getServiceContractNamespace();

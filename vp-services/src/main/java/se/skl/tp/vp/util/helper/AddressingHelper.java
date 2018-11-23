@@ -20,10 +20,10 @@
  */
 package se.skl.tp.vp.util.helper;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import java.util.stream.Collectors;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.mule.api.MuleMessage;
@@ -31,16 +31,15 @@ import org.mule.api.transport.PropertyScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.skl.tp.vp.vagvalagent.VagvalAgentInterface;
 import se.skltp.tak.vagval.wsdl.v2.VisaVagvalRequest;
-import se.skltp.tak.vagval.wsdl.v2.VisaVagvalResponse;
-import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.XmlGregorianCalendarUtil;
 import se.skl.tp.vp.vagvalrouter.VagvalInput;
+import se.skltp.takcache.RoutingInfo;
 
 /**
  * Helper class for working with addressing
@@ -48,30 +47,35 @@ import se.skl.tp.vp.vagvalrouter.VagvalInput;
 public class AddressingHelper {
 	private static final Logger log = LoggerFactory.getLogger(AddressingHelper.class);
 
-	private VisaVagvalsInterface agent;
+	private VagvalAgentInterface agent;
 	private String vpInstanceId;
 
-	public AddressingHelper(final VisaVagvalsInterface agent, String vpInstanceId) {
-		this.agent = agent;
+	public AddressingHelper(final VagvalAgentInterface vagvalAgent, String vpInstanceId	) {
+		this.agent = vagvalAgent;
 		this.vpInstanceId = vpInstanceId;
 	}
 
 	public String getAvailableRivProfile(MuleMessage muleMessage) {
 
 		final VagvalInput input = this.createRequestToServiceDirectory(muleMessage);
-		final VisaVagvalResponse response = agent.visaVagval(this.createVisaVagvalRequest(input));
 
-		final List<VirtualiseringsInfoType> virts = this.getAllVirtualizedServices(response, input);
+		final List<RoutingInfo> routingInfos = agent.visaVagval(this.createVisaVagvalRequest(input));
+		if (routingInfos.isEmpty()) {
+			raiseError(input.receiverId == null, VpSemanticErrorCodeEnum.VP003);
 
-		final Set<String> rivProfiles = new HashSet<String>();
-		for (final VirtualiseringsInfoType virt : virts) {
-			rivProfiles.add(virt.getRivProfil());
+			// Check if whitespace in incoming receiverid and give a hint in the error message if found.
+			String whitespaceDetectedHintString = "";
+			if (input.receiverId.contains(" ")) {
+				whitespaceDetectedHintString = ". Whitespace detected in incoming request!";
+			}
+			// No Logical Address found for serviceNamespace
+			String errorMessage = input.getSummary() + ", From:" + vpInstanceId + whitespaceDetectedHintString;
+			raiseError(VpSemanticErrorCodeEnum.VP004, errorMessage);
 		}
 
-		// No routing with matching Riv-version found for
-		raiseError(rivProfiles.size() == 0, VpSemanticErrorCodeEnum.VP005, input);
 
-		// More than one route with matching Riv-version found for
+		final Set<String> rivProfiles = routingInfos.stream().map(x->x.getRivProfile()).collect(Collectors.toSet());
+		raiseError(rivProfiles.size() == 0, VpSemanticErrorCodeEnum.VP005, input);
 		raiseError(rivProfiles.size() > 1, VpSemanticErrorCodeEnum.VP006, input);
 
 		return rivProfiles.iterator().next();
@@ -86,26 +90,26 @@ public class AddressingHelper {
 	}
 
 	public String getAddressFromAgent(final VagvalInput input) {
-		/*
-		 * Validate the parameters
-		 */
-		this.validateRequest(input);
 
-		/*
-		 * Create a real request from the parameters
-		 */
+		this.validateRequest(input);
 		final VisaVagvalRequest request = this.createVisaVagvalRequest(input);
 
-		/*
-		 * Get virtualized services
-		 */
-		final List<VirtualiseringsInfoType> services = this.getAllVirtualizedServices(this.agent.visaVagval(request),
-				input);
 
-		/*
-		 * Grab the address
-		 */
-		return this.getAddressToVirtualService(services, input);
+		final List<RoutingInfo> routingInfos = agent.visaVagval(request);
+		if (routingInfos.isEmpty()) {
+
+			raiseError(input.receiverId == null, VpSemanticErrorCodeEnum.VP003);
+
+			String whitespaceDetectedHintString = "";
+			if (input.receiverId.contains(" ")) {
+				whitespaceDetectedHintString = ". Whitespace detected in incoming request!";
+			}
+			String errorMessage = input.getSummary() + ", From:" + vpInstanceId + whitespaceDetectedHintString;
+			raiseError(VpSemanticErrorCodeEnum.VP004, errorMessage);
+		}
+
+
+		return this.getAddressToVirtualService(routingInfos, input);
 	}
 
 	private VagvalInput createRequestToServiceDirectory(MuleMessage muleMessage) {
@@ -152,12 +156,12 @@ public class AddressingHelper {
 		return vvR;
 	}
 
-	private String getAddressToVirtualService(final List<VirtualiseringsInfoType> services, final VagvalInput request) {
+	private String getAddressToVirtualService(final List<RoutingInfo> services, final VagvalInput request) {
 		String adress = null;
 		int noOfMatchingAdresses = 0;
-		for (VirtualiseringsInfoType vvInfo : services) {
-			if (vvInfo.getRivProfil().equals(request.rivVersion)) {
-				adress = vvInfo.getAdress();
+		for (RoutingInfo vvInfo : services) {
+			if (vvInfo.getRivProfile().equals(request.rivVersion)) {
+				adress = vvInfo.getAddress();
 				noOfMatchingAdresses++;
 			}
 		}
@@ -183,35 +187,7 @@ public class AddressingHelper {
 		return adress;
 	}
 
-	private List<VirtualiseringsInfoType> getAllVirtualizedServices(final VisaVagvalResponse response,
-			final VagvalInput request) {
-		List<VirtualiseringsInfoType> virtualiseringar = response.getVirtualiseringsInfo();
-		if (log.isDebugEnabled()) {
-			log.debug("VagvalAgent response count: " + virtualiseringar.size());
-			for (VirtualiseringsInfoType vvInfo : virtualiseringar) {
-				log.debug(
-						"VagvalAgent response item RivProfil: " + vvInfo.getRivProfil() + ", Address: "
-								+ vvInfo.getAdress());
-			}
-		}
 
-		if (virtualiseringar.size() == 0) {
-
-			raiseError(request.receiverId == null, VpSemanticErrorCodeEnum.VP003);
-
-			// Check if whitespace in incoming receiverid and give a hint in the error message if found.
-			String whitespaceDetectedHintString = "";
-			if (request.receiverId.contains(" ")) {
-				whitespaceDetectedHintString = ". Whitespace detected in incoming request!";
-			}
-			// No Logical Address found for serviceNamespace
-			String errorMessage = request.getSummary() + ", From:" + vpInstanceId + whitespaceDetectedHintString;
-			raiseError(VpSemanticErrorCodeEnum.VP004, errorMessage);
-		}
-
-		return virtualiseringar;
-	}
-	
 	private void raiseError(boolean test, VpSemanticErrorCodeEnum codeenum, VagvalInput request) {
 		if(test)
 			raiseError(codeenum, request == null ? "" : request.getSummary());

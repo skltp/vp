@@ -55,7 +55,7 @@ import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
-import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skl.tp.vp.vagvalagent.VagvalAgentInterface;
 
 public class VagvalRouter extends AbstractRecipientList {
 
@@ -75,6 +75,8 @@ public class VagvalRouter extends AbstractRecipientList {
 	private final EventLogger<MuleMessage> eventLogger = EventLoggerFactory.createInstance();
 
 	private MessageProperties messageProperties;
+
+	private VagvalAgentInterface vagvalAgent2;
 
 	/**
 	 * Set value to be used in HTTP header x-vp-instance-id.
@@ -102,8 +104,9 @@ public class VagvalRouter extends AbstractRecipientList {
 	public void setRetryRouteAfterMs(final int retry) {
 		retryRoute = retry;
 	}
-	
-	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
+
+
+	public void setVagvalAgent(VagvalAgentInterface vagvalAgent) {
 		setAddressingHelper(new AddressingHelper(vagvalAgent, vpInstanceId));
 	}
 	

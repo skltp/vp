@@ -20,11 +20,30 @@
  */
 package se.skl.tp.vp.vagvalagent;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import se.skl.tp.vp.vagvalrouter.VagvalInput;
 
 public class VagvalMockInputRecord extends VagvalInput {
 
 	public String adress;
+	private XMLGregorianCalendar fromDate;
+	private XMLGregorianCalendar toDate;
+
+	public XMLGregorianCalendar getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(XMLGregorianCalendar fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public XMLGregorianCalendar getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(XMLGregorianCalendar toDate) {
+		this.toDate = toDate;
+	}
 
 	@Override
 	public String toString() {

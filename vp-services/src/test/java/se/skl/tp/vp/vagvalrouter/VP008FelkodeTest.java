@@ -20,18 +20,14 @@
  */
 package se.skl.tp.vp.vagvalrouter;
 
-import org.junit.Test;
-import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
-
-import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
-import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
-
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.Test;
+import org.soitoolkit.commons.mule.test.junit4.AbstractTestCase;
+import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
 
 /**
  * Tjanstekatalogen stub är tom
@@ -43,6 +39,11 @@ public class VP008FelkodeTest  extends AbstractTestCase {
 
     private static final String TJANSTE_ADRESS =     "https://localhost:20000/vp/tjanst1";
     private static final String LOGICAL_ADDRESS =    "vp-test-producer";
+
+    public VP008FelkodeTest() {
+        super();
+        setDisposeContextPerClass(true);
+    }
 
     @BeforeClass
     public static void setupTjanstekatalogen() throws Exception {

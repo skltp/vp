@@ -32,16 +32,14 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.transformer.types.TypedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skl.tp.vp.vagvalagent.VagvalAgentInterface;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
@@ -55,7 +53,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 
 	private static Logger log = LoggerFactory.getLogger(RivTransformer.class);
 
-	private VisaVagvalsInterface vagvalAgent;
+	private VagvalAgentInterface vagvalAgent;
 	private AddressingHelper addrHelper;
 
 	static final String RIV20 = "RIVTABP20";
@@ -79,7 +77,7 @@ public class RivTransformer extends AbstractMessageTransformer {
 		this.vpInstanceId = VPUtil.trimProperty(vpInstanceId);
 	}
 
-	public void setVagvalAgent(final VisaVagvalsInterface vagvalAgent) {
+	public void setVagvalAgent(final VagvalAgentInterface vagvalAgent) {
 		this.vagvalAgent = vagvalAgent;
 		addrHelper = new AddressingHelper(vagvalAgent, vpInstanceId);
 	}

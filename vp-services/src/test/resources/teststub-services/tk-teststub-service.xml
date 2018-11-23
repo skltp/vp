@@ -22,50 +22,37 @@
 
 -->
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-    xmlns="http://www.mulesoft.org/schema/mule/core"
-    xsi:schemaLocation="
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+  xmlns="http://www.mulesoft.org/schema/mule/core"
+  xsi:schemaLocation="
 		http://www.springframework.org/schema/beans    http://www.springframework.org/schema/beans/spring-beans-current.xsd
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd" >
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
-    <description>
-		Test konfiguration för att simulera Tjänstekatalogen
-    </description>
-    
-    <spring:bean name="vagvalInputs"
-		class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput" />
-	
-	<spring:bean name="hsaCache" class="se.skl.tp.hsa.cache.HsaCacheImpl"/>
-	
-	<!-- TP_SOKVAGVALSINFO_URL is normally equals to
-	     TP_SOKVAGVALSINFO_TESTSTUB_URL, configured in property file.
-	 -->
-	<spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent" init-method="doRemoveTakCache">
-		<spring:property name="endpointAddress" value="${TP_SOKVAGVALSINFO_URL}" />
-		<spring:property name="addressDelimiter" value="#" />
-		<spring:property name="hsaCache" ref="hsaCache"/>
-		<spring:property name="localTakCache" value="target/test-classes/.tk.localCache.test"/>
-		<spring:property name="removeTakCacheAllowed" value="true"/>
-        <spring:property name="messageProperties" ref="messageProperties" />
-	</spring:bean>
+  <description>
+    Test konfiguration för att simulera Tjänstekatalogen
+  </description>
 
-    <flow name="tk-teststub-flow" >
+  <spring:bean name="vagvalInputs"
+    class="se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput"/>
 
-        <inbound-endpoint address="${TP_SOKVAGVALSINFO_TESTSTUB_URL}"/>
-        
-        <cxf:jaxws-service
-            namespace="urn:skltp:tak:vagvalsinfo:v2"            
-            serviceClass="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer"
-            wsdlLocation="classpath:/VAGVAL_2_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-2.0.wsdl" />
-        
-        <component>
-            <singleton-object class="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer" >
-            	<property key="vagvalInputs" value-ref="vagvalInputs" />
-            </singleton-object>
-        </component>
-       
-    </flow>
+
+  <flow name="tk-teststub-flow">
+
+    <inbound-endpoint address="${TP_SOKVAGVALSINFO_TESTSTUB_URL}"/>
+
+    <cxf:jaxws-service
+      namespace="urn:skltp:tak:vagvalsinfo:v2"
+      serviceClass="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer"
+      wsdlLocation="classpath:/VAGVAL_2_0/interactions/vagvalsInfo/wrapped-vagvalsinfo-sokvagvalsinfo-2.0.wsdl"/>
+
+    <component>
+      <singleton-object class="se.skl.tp.vp.tjanstekatalogen.producer.TjansteKatalogenTestProducer">
+        <property key="vagvalInputs" value-ref="vagvalInputs"/>
+      </singleton-object>
+    </component>
+
+  </flow>
 
 </mule>

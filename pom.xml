@@ -59,7 +59,6 @@
 		<module>vp-ping</module>
 		<module>vp-services</module>
 		<module>vp-teststub</module>
-		<module>vp-hsa-cache</module>
 	</modules>
 
 	<build>

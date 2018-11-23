@@ -25,16 +25,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v2.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.Test;
-
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.FilterType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractType;
@@ -161,13 +158,15 @@ public class GetLogicalAddresseesByServiceContractTest {
 
 	private VagvalAgent createVagvalAgentContainingServiceContractNamespaces() {
 
-		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
+		VagvalAgentMock vagvalAgentMock = new VagvalAgentMock(null, "#");
+		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = vagvalAgentMock.getMockAnropsBehorighetsInfo();
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1",createFilter("crm:scheduling", "Booking", "Invitation")));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1",createFilter("crm:scheduling", "Invitation")));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:itintegration.engagementindex:FindContentResponder:1",createFilter("itintegration:engagementindex", "Update")));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfigurationResponder:1"));
 
-		return new VagvalAgentMock(anropsBehorighetsInfo);
+		vagvalAgentMock.setUseVagvalCache(false);
+		return vagvalAgentMock;
 	}
 
 	private AnropsBehorighetsInfoType validAuthorization(String receiverId, String senderId, String tjansteKontrakt, FilterInfoType... filter) {
