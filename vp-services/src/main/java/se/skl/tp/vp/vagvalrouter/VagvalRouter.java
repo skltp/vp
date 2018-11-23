@@ -277,6 +277,7 @@ public class VagvalRouter extends AbstractRecipientList {
 				try {
 					Thread.sleep(retryRoute);
 				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 					throw ec;
 				}
 				replyEvent = super.route(event);

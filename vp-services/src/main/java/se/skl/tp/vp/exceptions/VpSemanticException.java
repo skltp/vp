@@ -24,16 +24,10 @@ public class VpSemanticException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	private VpSemanticErrorCodeEnum errorCode;
+	private final VpSemanticErrorCodeEnum errorCode;
 
 	public VpSemanticException(String message, VpSemanticErrorCodeEnum errorCode) {
 		super(message);
-		this.errorCode = errorCode;
-	}
-
-	public VpSemanticException(String message,
-			VpSemanticErrorCodeEnum errorCode, Throwable cause) {
-		super(message, cause);
 		this.errorCode = errorCode;
 	}
 

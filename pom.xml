@@ -2,150 +2,261 @@
 <!-- DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT
 	YOU ARE DOING! [soi-toolkit.gen.version=0.3.1] [soi-toolkit.gen.type=integrationComponent]
 	[soi-toolkit.gen.createDate=2011-06-30T14:55:14.006+02:00] [soi-toolkit.gen.artifactId=vp] -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>se.skltp.commons</groupId>
-		<artifactId>skltp-commons-mule-parent</artifactId>
-		<version>2.0.3</version>
-	</parent>
+  <parent>
+    <groupId>se.skltp.commons</groupId>
+    <artifactId>skltp-commons-mule-parent</artifactId>
+    <version>2.0.3</version>
+  </parent>
 
-	<groupId>se.skltp.vp</groupId>
-	<artifactId>vp-parent</artifactId>
-	<version>3.2.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>vp-parent</name>
+  <groupId>se.skltp.vp</groupId>
+  <artifactId>vp-parent</artifactId>
+  <version>3.2.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>vp-parent</name>
 
-	<properties>
-		<vp.mule.version>3.7.0</vp.mule.version>
-		<vp.cxf.version>2.7.15</vp.cxf.version>
-		<sonar.host.url>http://localhost:9000</sonar.host.url>
-		<sonar.jdbc.url>jdbc:jtds:sqlserver://localhost;databaseName=sonar;SelectMethod=Cursor</sonar.jdbc.url>
-		<!-- Turn off strict checking of javadoc tags for Java 8 -->
-        <additionalparam>-Xdoclint:none</additionalparam>
-		<tak.version>1.5.0</tak.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+  <properties>
+    <vp.mule.version>3.7.0</vp.mule.version>
+    <vp.cxf.version>2.7.15</vp.cxf.version>
+    <sonar.host.url>http://localhost:9000</sonar.host.url>
+    <sonar.jdbc.url>jdbc:jtds:sqlserver://localhost;databaseName=sonar;SelectMethod=Cursor</sonar.jdbc.url>
+    <!-- Turn off strict checking of javadoc tags for Java 8 -->
+    <additionalparam>-Xdoclint:none</additionalparam>
+    <tak.version>1.5.0</tak.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-	<scm>
-		<url>http://github.com/skltp/vp</url>
-		<connection>scm:git:https://github.com:443/skltp/vp.git</connection>
-		<developerConnection>scm:git:https://github.com:443/skltp/vp.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+    <surefire.plugin.version>2.20.1</surefire.plugin.version>
+    <failsafe.plugin.version>2.22.0</failsafe.plugin.version>
 
 
-	<repositories>
-		<!-- Sonatype staging repo added to be able to build VP using artifacts
-			not yet pushed to central maven. In this specific case its about
-			new version of itintegration registry constracts.
+    <!-- ************************-->
+    <!-- Sonar/Reporting settings -->
+    <!-- ************************-->
+    <jacoco.plugin.version>0.8.2</jacoco.plugin.version>
+    <sonar.plugin.version>3.5.0.1254</sonar.plugin.version>
 
-			<groupId>se.rivta.infrastructure.itintegration</groupId>
+    <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+    <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
+    <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
+    <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
+
+    <sonar.language>java</sonar.language>
+    <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
+    <sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
+  </properties>
+
+  <scm>
+    <url>http://github.com/skltp/vp</url>
+    <connection>scm:git:https://github.com:443/skltp/vp.git</connection>
+    <developerConnection>scm:git:https://github.com:443/skltp/vp.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+
+  <repositories>
+    <!-- Sonatype staging repo added to be able to build VP using artifacts
+      not yet pushed to central maven. In this specific case its about
+      new version of itintegration registry constracts.
+
+      <groupId>se.rivta.infrastructure.itintegration</groupId>
             <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
             <version>2.0-RC2</version>
          -->
-	    <repository>
-	      <id>sonatype-nexus-staging-repository</id>
-	      <url>https://oss.sonatype.org/content/repositories/staging/</url>
-	      <snapshots>
-	        <enabled>false</enabled>
-	      </snapshots>
-	    </repository>
-  	</repositories>
+    <repository>
+      <id>sonatype-nexus-staging-repository</id>
+      <url>https://oss.sonatype.org/content/repositories/staging/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
-	<modules>
-		<module>vp-ping</module>
-		<module>vp-services</module>
-		<module>vp-teststub</module>
-	</modules>
+  <modules>
+    <module>vp-ping</module>
+    <module>vp-services</module>
+    <module>vp-teststub</module>
+  </modules>
 
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>com.mycila.maven-license-plugin</groupId>
-					<artifactId>maven-license-plugin</artifactId>
-					<version>1.10.b1</version>
-					<configuration>
-						<properties>
-							<year>2013</year>
-							<copyright>Center for eHalsa i samverkan (CeHis).
-							&lt;http://cehis.se/&gt;</copyright>
-							<product>SKLTP</product>
-						</properties>
-						<strictCheck>true</strictCheck>
-						<basedir>${basedir}</basedir>
-						<header>https://raw.githubusercontent.com/skltp/license/develop/header.txt</header>
-						<encoding>UTF-8</encoding>
-						<includes>
-							<include>src/main/**</include>
-							<include>src/test/**</include>
-						</includes>
-						<excludes>
-							<exclude>**/*.xsd</exclude>
-							<exclude>**/*.wsdl</exclude>
-							<exclude>**/*.xml</exclude>
-							<exclude>**/*.dtd</exclude>
-							<exclude>**/*.jks</exclude>
-							<exclude>**/*.pem</exclude>
-							<exclude>**/*.sh</exclude>
-							<exclude>src/test/java/org/mule/util/**</exclude>
-						</excludes>
-						<useDefaultExcludes>true</useDefaultExcludes>
-						<mapping>
-							<tag>DYNASCRIPT_STYLE</tag>
-						</mapping>
-						<useDefaultMapping>true</useDefaultMapping>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>sonar-maven-plugin</artifactId>
-					<version>2.7.1</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-		<plugins>
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.sonar</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>2.7.1</version>
-			</plugin>
-		</plugins>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <version>1.10.b1</version>
+          <configuration>
+            <properties>
+              <year>2013</year>
+              <copyright>Center for eHalsa i samverkan (CeHis).
+                &lt;http://cehis.se/&gt;
+              </copyright>
+              <product>SKLTP</product>
+            </properties>
+            <strictCheck>true</strictCheck>
+            <basedir>${basedir}</basedir>
+            <header>https://raw.githubusercontent.com/skltp/license/develop/header.txt</header>
+            <encoding>UTF-8</encoding>
+            <includes>
+              <include>src/main/**</include>
+              <include>src/test/**</include>
+            </includes>
+            <excludes>
+              <exclude>**/*.xsd</exclude>
+              <exclude>**/*.wsdl</exclude>
+              <exclude>**/*.xml</exclude>
+              <exclude>**/*.dtd</exclude>
+              <exclude>**/*.jks</exclude>
+              <exclude>**/*.pem</exclude>
+              <exclude>**/*.sh</exclude>
+              <exclude>src/test/java/org/mule/util/**</exclude>
+            </excludes>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <mapping>
+              <tag>DYNASCRIPT_STYLE</tag>
+            </mapping>
+            <useDefaultMapping>true</useDefaultMapping>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${surefire.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${failsafe.plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>${sonar.plugin.version}</version>
+      </plugin>
+    </plugins>
 
-	</build>
-	<profiles>
-		<profile>
-			<id>license</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.mycila.maven-license-plugin</groupId>
-						<artifactId>maven-license-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>check</id>
-								<phase>compile</phase>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
+  </build>
+  <profiles>
+    <profile>
+      <id>license</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila.maven-license-plugin</groupId>
+            <artifactId>maven-license-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>check</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>test-coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>${surefireArgLine}</argLine>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>integration-test</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <argLine>${failsafeArgLine}</argLine>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>pre-unit-test</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+                <configuration>
+                  <destFile>${sonar.jacoco.reportPath}</destFile>
+                  <propertyName>surefireArgLine</propertyName>
+                </configuration>
+              </execution>
+              <execution>
+                <id>post-unit-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <configuration>
+                  <dataFile>${jacoco.reportPath}</dataFile>
+                  <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>pre-integration-test</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+                <configuration>
+                  <destFile>${sonar.jacoco.itReportPath}</destFile>
+                  <propertyName>failsafeArgLine</propertyName>
+                </configuration>
+              </execution>
+              <execution>
+                <id>post-integration-test</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <configuration>
+                  <dataFile>${jacoco.reportPath}</dataFile>
+                  <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 
 </project>

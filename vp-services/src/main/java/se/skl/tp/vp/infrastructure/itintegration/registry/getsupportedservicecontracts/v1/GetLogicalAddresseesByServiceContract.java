@@ -62,7 +62,6 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 			return new GetLogicalAddresseesByServiceContractResponseType();
 		}
 
-		System.out.println("Vagval agent inside"+vagvalAgent);
 		Set<String> uniqueLogicalAddresses = new HashSet<>();
 		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
 			if (validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {

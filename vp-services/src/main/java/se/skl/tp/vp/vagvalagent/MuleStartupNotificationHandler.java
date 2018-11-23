@@ -53,7 +53,7 @@ public class MuleStartupNotificationHandler implements
     if (notification.getType().equalsIgnoreCase(MuleContextNotification.TYPE_INFO)
         && notification.getAction() == MuleContextNotification.CONTEXT_STARTED) {
 
-      logger.info("Initiates hsaCache with files: " + Arrays.toString(hsaFiles));
+      logger.info("Initiates hsaCache with files: {}", Arrays.toString(hsaFiles));
       hsaCache.init(hsaFiles);
 
       logger.info("Initiates vagvalAgent ");

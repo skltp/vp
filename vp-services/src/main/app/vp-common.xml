@@ -192,8 +192,6 @@
 
   <custom-transformer name="rivExtractor" class="se.skl.tp.vp.vagvalrouter.RivExtractor"/>
 
-  <custom-transformer name="fixTransformer"
-    class="se.skl.tp.vp.util.ObjectArrayToXMLStreamReaderTransformer"/>
 
   <!-- #MULE-370, see comment below.
   <custom-transformer name="XmlToXSR" class="org.mule.module.xml.transformer.XmlToXMLStreamReader">

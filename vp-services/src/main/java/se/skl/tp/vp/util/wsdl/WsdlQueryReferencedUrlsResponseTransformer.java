@@ -230,7 +230,7 @@ public class WsdlQueryReferencedUrlsResponseTransformer extends
 			String replacementUrl = replaceBaseUrlParts(originalUrl,
 					baseUrlParts);
 			attribute.setText(replacementUrl);
-			log.debug("replaced original url: {} with url: {}");
+			log.debug("replaced original url: {} with url: {}", originalUrl, replacementUrl);
 		}
 	}
 

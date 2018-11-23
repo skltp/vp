@@ -51,7 +51,6 @@ public class GetLogicalAddresseesByServiceContractTest {
 	public void usingServiceContractWhenSearchingAmongServiceContracts() {
 		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
 		VagvalAgent vagvalAgent = createVagvalAgentContainingServiceContractNamespaces();
-		System.out.println("vagval agent:"+vagvalAgent);
 		service.setVagvalAgent(vagvalAgent);
 
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1", CONSUMER_HSAID_1);

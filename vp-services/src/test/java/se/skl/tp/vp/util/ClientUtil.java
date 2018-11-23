@@ -20,20 +20,35 @@
  */
 package se.skl.tp.vp.util;
 
-import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-public class StringBufferOutputStream extends OutputStream {
+public class ClientUtil {
 
-    private StringBuffer stringBuffer;
+	private ClientUtil() {
+		// Static utility
+	}
 
-    public StringBufferOutputStream(StringBuffer stringBuffer) {
-        this.stringBuffer = stringBuffer;
-    }
+	/**
+     * 
+     * @param adressOfWsdl, e.g. http://localhost:8080/tppoc-vagvalsinfo-module-web-g/services/SokVagvalsInfoService?wsdl
+     * @return
+     */
+	public static URL createEndpointUrlFromWsdl(String adressOfWsdl) {
+		try {
+			return new URL(adressOfWsdl);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}	
 
-    public void write(int character) {
-        stringBuffer.append((char)character);
-    }
+	/**
+	 * 
+	 * @param serviceAddress, e.g. http://localhost:8080/tppoc-vagvalsinfo-module-web-g/services/SokVagvalsInfoService
+	 * @return
+	 */
+	public static URL createEndpointUrlFromServiceAddress(String serviceAddress) {
+		return createEndpointUrlFromWsdl(serviceAddress + "?wsdl");
+	}	
+
 }
-
-
-
