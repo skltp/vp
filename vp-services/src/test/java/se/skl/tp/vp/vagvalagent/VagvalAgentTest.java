@@ -21,6 +21,7 @@
 package se.skl.tp.vp.vagvalagent;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -72,6 +73,7 @@ public class VagvalAgentTest {
 	private static final String HEALTHCAREUNIT_A = "SE0000000001-1234";
 	private static final String HEALTHCAREPROVIDER_A = "SE0000000002-1234";
 	private static final String HEALTHCAREPROVIDER_B = "SE0000000005-1234";
+	private static final String DEFAULTPROVIDER = "*";
 	private static final String UNKNOWN_HEALTHCAREPROVIDER = "UNKNOWN";
 	private static final String SE = "SE";
 
@@ -248,6 +250,26 @@ public class VagvalAgentTest {
 		assertEquals(1, response.size());
 		assertEquals("https://providerA", response.get(0).getAddress());
 		assertEquals(RIVTABP21, response.get(0).getRivProfile());
+	}
+
+	@Test
+	public void newDefaultRoutingGiveDefaultRouteWhenNoSpecificRouteFound() throws Exception {
+
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://defaultProvider", RIVTABP21, CRM_SCHEDULING, DEFAULTPROVIDER));
+		vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://providerA", RIVTABP21, CRM_SCHEDULING, HEALTHCAREPROVIDER_A));
+		vagvalAgent.getMockAnropsBehorighetsInfo().add(createAuthorization(NATIONAL_CONSUMER, CRM_SCHEDULING, DEFAULTPROVIDER));
+
+		// No specific route found so we get the default route ("https://defaultProvider")
+		VisaVagvalRequest request = createVisaVagvalRequest(HEALTHCAREPROVIDER_B, NATIONAL_CONSUMER, CRM_SCHEDULING);
+		List<RoutingInfo> response = vagvalAgent.visaVagval(request);
+		assertFalse(response.isEmpty());
+		assertEquals("https://defaultProvider", response.get(0).getAddress());
+
+		// A specific route is found so we get that back ("https://providerA")
+		request = createVisaVagvalRequest(HEALTHCAREPROVIDER_A, NATIONAL_CONSUMER, CRM_SCHEDULING);
+		response = vagvalAgent.visaVagval(request);
+		assertFalse(response.isEmpty());
+		assertEquals("https://providerA", response.get(0).getAddress());
 	}
 
 	@Test
@@ -505,4 +527,16 @@ public class VagvalAgentTest {
         when(mockedTakService.getVirtualiseringar()).thenReturn(null);
         return mockedTakService;
     }
+
+
+	private VisaVagvalRequest createVisaVagvalRequest(String receiver, String sender, String granssnitt) throws Exception {
+		VisaVagvalRequest request;
+		request = new VisaVagvalRequest();
+		request.setReceiverId(receiver );
+		request.setSenderId(sender);
+		request.setTidpunkt(createTimestamp());
+		request.setTjanstegranssnitt(granssnitt);
+		return request;
+	}
+
 }

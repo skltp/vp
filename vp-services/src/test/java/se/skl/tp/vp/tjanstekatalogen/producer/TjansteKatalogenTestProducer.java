@@ -72,19 +72,22 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 		try {
 			int id = 1;
 
+
 			for (VagvalMockInputRecord input : vagvalInputs.getVagvalInputs()) {
-				AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
-				aboId.setValue(String.valueOf(id++));
-				AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
-				abo.setAnropsBehorighetsInfoId(aboId);
-				XMLGregorianCalendar fromDate = input.getFromDate();
-				XMLGregorianCalendar toDate = input.getToDate();
-				abo.setFromTidpunkt(fromDate==null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
-				abo.setTomTidpunkt(toDate==null ? getRelativeDate(IN_TEN_YEARS) : toDate);
-				abo.setReceiverId(input.receiverId);
-				abo.setSenderId(input.senderId);
-				abo.setTjansteKontrakt(input.serviceContractNamespace);
-				sampleResponse.getAnropsBehorighetsInfo().add(abo);
+				if(input.addBehorighet) {
+					AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
+					aboId.setValue(String.valueOf(id++));
+					AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
+					abo.setAnropsBehorighetsInfoId(aboId);
+					XMLGregorianCalendar fromDate = input.getFromDate();
+					XMLGregorianCalendar toDate = input.getToDate();
+					abo.setFromTidpunkt(fromDate == null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
+					abo.setTomTidpunkt(toDate == null ? getRelativeDate(IN_TEN_YEARS) : toDate);
+					abo.setReceiverId(input.receiverId);
+					abo.setSenderId(input.senderId);
+					abo.setTjansteKontrakt(input.serviceContractNamespace);
+					sampleResponse.getAnropsBehorighetsInfo().add(abo);
+				}
 			}
 
 		} catch (Exception e) {
@@ -107,20 +110,21 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 			int id = 1;
 
 			for (VagvalMockInputRecord input : vagvalInputs.getVagvalInputs()) {
-				VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
-				vi.setAdress(input.adress);
-				XMLGregorianCalendar fromDate = input.getFromDate();
-				XMLGregorianCalendar toDate = input.getToDate();
-				vi.setFromTidpunkt(fromDate==null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
-				vi.setTomTidpunkt(toDate==null ? getRelativeDate(IN_TEN_YEARS) : toDate);
-				vi.setReceiverId(input.receiverId);
-				vi.setRivProfil(input.rivVersion);
-				VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
-				viId.setValue(String.valueOf(id++));
-				vi.setVirtualiseringsInfoId(viId);
-				vi.setTjansteKontrakt(input.serviceContractNamespace);
-				sampleResponse.getVirtualiseringsInfo().add(vi);
-
+				if(input.addVagval) {
+					VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
+					vi.setAdress(input.adress);
+					XMLGregorianCalendar fromDate = input.getFromDate();
+					XMLGregorianCalendar toDate = input.getToDate();
+					vi.setFromTidpunkt(fromDate == null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
+					vi.setTomTidpunkt(toDate == null ? getRelativeDate(IN_TEN_YEARS) : toDate);
+					vi.setReceiverId(input.receiverId);
+					vi.setRivProfil(input.rivVersion);
+					VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
+					viId.setValue(String.valueOf(id++));
+					vi.setVirtualiseringsInfoId(viId);
+					vi.setTjansteKontrakt(input.serviceContractNamespace);
+					sampleResponse.getVirtualiseringsInfo().add(vi);
+				}
 			}
 
 		} catch (Exception e) {
