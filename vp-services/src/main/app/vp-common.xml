@@ -116,11 +116,10 @@
       <spring:constructor-arg index="0" ref="takService"/>
     </spring:bean>
 
-
     <spring:bean name="vagvalAgent" class="se.skl.tp.vp.vagvalagent.VagvalAgent">
       <spring:constructor-arg index="0" ref="hsaCache"/>
       <spring:constructor-arg index="1" ref="takCache"/>
-      <spring:constructor-arg index="2" value="#"/>
+      <spring:constructor-arg index="2" value="${DEPRECATED_DEAFAULT_ROUTING_DELIMITER}"/>
 
       <spring:property name="messageProperties" ref="messageProperties"/>
     </spring:bean>

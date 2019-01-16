@@ -50,12 +50,12 @@
     <dependency>
       <groupId>se.skltp.takdatahandler</groupId>
       <artifactId>behorighethandler</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${takdatahandler.version}</version>
     </dependency>
     <dependency>
       <groupId>se.skltp.takdatahandler</groupId>
       <artifactId>vagvalhandler</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${takdatahandler.version}</version>
     </dependency>
 
     <!-- itintegration monitoring schemas för PingForConfiguration -->
