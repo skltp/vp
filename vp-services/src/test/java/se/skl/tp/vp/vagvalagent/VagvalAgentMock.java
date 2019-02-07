@@ -2,6 +2,8 @@ package se.skl.tp.vp.vagvalagent;
 
 import java.util.ArrayList;
 import java.util.List;
+import se.skl.tp.DefaultRoutingConfiguration;
+import se.skl.tp.DefaultRoutingConfigurationImpl;
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vp.util.MessageProperties;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
@@ -26,7 +28,9 @@ public class VagvalAgentMock extends VagvalAgent {
     takCache = new TakCacheImpl(takService);
     takCache.setUseVagvalCache(true);
     takCache.setUseBehorighetCache(true);
-    this.init(hsaCache, takCache, delimiter);
+    DefaultRoutingConfiguration defaultRoutingConfiguration = new DefaultRoutingConfigurationImpl();
+    defaultRoutingConfiguration.setDelimiter(delimiter);
+    this.init(hsaCache, takCache, defaultRoutingConfiguration);
   }
 
   public VagvalAgentMock(HsaCache hsaCache, String delimiter) {
@@ -40,7 +44,9 @@ public class VagvalAgentMock extends VagvalAgent {
     takCache = new TakCacheImpl(takServiceMock);
     takCache.setUseVagvalCache(true);
     takCache.setUseBehorighetCache(true);
-    this.init(hsaCache, takCache, delimiter);
+    DefaultRoutingConfiguration defaultRoutingConfiguration = new DefaultRoutingConfigurationImpl();
+    defaultRoutingConfiguration.setDelimiter(delimiter);
+    this.init(hsaCache, takCache, defaultRoutingConfiguration);
   }
 
   public List<VirtualiseringsInfoType> getMockVirtualiseringsInfo() {

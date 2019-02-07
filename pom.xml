@@ -28,7 +28,7 @@
     <!-- Turn off strict checking of javadoc tags for Java 8 -->
     <additionalparam>-Xdoclint:none</additionalparam>
     <tak.version>1.5.0</tak.version>
-    <takdatahandler.version>1.0.0-RC1</takdatahandler.version>
+    <takdatahandler.version>1.0.0-RC2</takdatahandler.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <surefire.plugin.version>2.20.1</surefire.plugin.version>

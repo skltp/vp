@@ -47,6 +47,7 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 	private static final String vardenhetA = "SE0000000001-1234";
 
 	private static final String konsumentA = "konsumentA";
+	private static final String konsumentB = "konsumentB";
 
 	static SokVagvalsInfoMockInput svimi = new SokVagvalsInfoMockInput();
 
@@ -71,6 +72,8 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp20", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
+		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp21", konsumentA, "urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1"));
+		vagvalInputs.add(createVagvalRecord(vardgivareB, "rivtabp20", konsumentB, "urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1"));
 		vagvalInputs.add(createVagvalRecordValidBefore(vardgivareC, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		vagvalInputs.add(createVagvalRecordValidLater(vardgivareC, "rivtabp21", konsumentA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		svimi.setVagvalInputs(vagvalInputs);
@@ -95,11 +98,46 @@ public class VagvalAgentIntegrationTest extends AbstractTestCase {
 	}
 
 	@Test
-	public void testGiltigaVagvalDelimiter() throws Exception {
+	public void testGiltigaVagvalByOldDefaultRouting() throws Exception {
 
 		List<RoutingInfo> routingInfos = vagvalAgent.visaVagval(createVisaVagvalRequest(konsumentA, vardgivareB + "#"
-				+ vardenhetA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
+				+ vardenhetA, "urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1"));
 		assertEquals(2, routingInfos.size());
+	}
+
+	@Test
+	public void testVagvalOldDefaultRoutingMultipleDelimitersNotAllowed() throws Exception {
+		try{
+			List<RoutingInfo> routingInfos = vagvalAgent.visaVagval(createVisaVagvalRequest(konsumentA, vardgivareC + "#" + vardgivareB + "#"
+					+ vardenhetA, "urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1"));
+			fail("Exception expected");
+		} catch (VpSemanticException e) {
+			assertEquals("VP007 Authorization missing for serviceNamespace: urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1, receiverId: SE0000000055-1234#SE0000000003-1234#SE0000000001-1234, senderId: konsumentA", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testVagvalOldDefaultRoutingNotAllowedSender() throws Exception {
+
+		try{
+			List<RoutingInfo> routingInfos = vagvalAgent.visaVagval(createVisaVagvalRequest(konsumentB, vardgivareB + "#"
+					+ vardenhetA, "urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1"));
+			fail("Exception expected");
+		} catch (VpSemanticException e) {
+			assertEquals("VP007 Authorization missing for serviceNamespace: urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1, receiverId: SE0000000003-1234#SE0000000001-1234, senderId: konsumentB", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testVagvalOldDefaultRoutingNotAllowedContract() throws Exception {
+
+		try{
+		List<RoutingInfo> routingInfos = vagvalAgent.visaVagval(createVisaVagvalRequest(konsumentA, vardgivareB + "#"
+				+ vardenhetA, "urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
+			fail("Exception expected");
+		} catch (VpSemanticException e) {
+			assertEquals("VP007 Authorization missing for serviceNamespace: urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1, receiverId: SE0000000003-1234#SE0000000001-1234, senderId: konsumentA", e.getMessage());
+		}
 	}
 
 	@Test

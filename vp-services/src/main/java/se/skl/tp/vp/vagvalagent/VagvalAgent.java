@@ -1,9 +1,11 @@
 package se.skl.tp.vp.vagvalagent;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.skl.tp.DefaultRoutingConfiguration;
 import se.skl.tp.behorighet.BehorighetHandler;
 import se.skl.tp.behorighet.BehorighetHandlerImpl;
 import se.skl.tp.hsa.cache.HsaCache;
@@ -24,21 +26,22 @@ public class VagvalAgent implements VagvalAgentInterface {
   private static final Logger LOGGER = LoggerFactory.getLogger(VagvalAgent.class);
 
   private MessageProperties messageProperties;
-  private BehorighetHandler behorighetHandler;
+  private BehorighetHandlerImpl behorighetHandler;
   private VagvalHandler vagvalHandler;
   private TakCache takCache;
   private TakCacheLog takCacheLog = null;
+  DefaultRoutingConfiguration defaultRoutingConfiguration;
 
   public VagvalAgent(){
   }
 
-  public VagvalAgent(HsaCache hsaCache, TakCache takCache, String delimiter) {
-    init(hsaCache,takCache, delimiter);
+  public VagvalAgent(HsaCache hsaCache, TakCache takCache, DefaultRoutingConfiguration defaultRoutingConfiguration) {
+    init(hsaCache,takCache, defaultRoutingConfiguration);
   }
 
-  protected void init(HsaCache hsaCache, TakCache takCache, String delimiter){
-    behorighetHandler = new BehorighetHandlerImpl(hsaCache, takCache, delimiter);
-    vagvalHandler = new VagvalHandlerImpl(hsaCache, takCache, delimiter);
+  protected void init(HsaCache hsaCache, TakCache takCache, DefaultRoutingConfiguration defaultRoutingConfiguration){
+    behorighetHandler = new BehorighetHandlerImpl(hsaCache, takCache, defaultRoutingConfiguration);
+    vagvalHandler = new VagvalHandlerImpl(hsaCache, takCache, defaultRoutingConfiguration);
     this.takCache = takCache;
   }
 
@@ -110,7 +113,5 @@ public class VagvalAgent implements VagvalAgentInterface {
   public void setMessageProperties(MessageProperties messageProperties) {
     this.messageProperties = messageProperties;
   }
-
-
 
 }
