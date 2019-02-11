@@ -20,7 +20,9 @@
  *   Boston, MA 02111-1307  USA
  -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>itinfra-tp-ping-test-producer</artifactId>
@@ -35,7 +37,7 @@
   </parent>
 
   <properties>
-    <schema.path>${basedir}/src/test/resources/schemas/business</schema.path>
+    <schema.path>${basedir}/src/main/resources/schemas/business</schema.path>
   </properties>
 
   <dependencies>
@@ -99,7 +101,6 @@
                 </goals>
                 <configuration>
                   <mainClass>se.riv.itinfra.tp.ping.PingProducer</mainClass>
-                  <classpathScope>test</classpathScope>
                   <arguments>
                     <argument>https://localhost:10000/test/Ping_Service</argument>
                   </arguments>
