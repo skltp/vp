@@ -60,17 +60,17 @@ public class VpFullServiceWithCorrelationIdNotPropagatedTest extends AbstractTes
 	}
 	
 	@Override
-	protected String getConfigResources() {
-		return 
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
-			"vp-common.xml," +
-			"services/VagvalRouter-service.xml," +
-			"vp-teststubs-and-services-config.xml";
+	protected String[] getConfigFiles() {
+		return
+				new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+						"vp-common.xml",
+						"services/VagvalRouter-service.xml",
+						"vp-teststubs-and-services-config.xml"};
 	}
 	
 	@BeforeClass
 	public static void setupTjanstekatalogen() throws Exception {
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS, "https://localhost:19000/vardgivare-b/tjanst1"));
 		svimi.setVagvalInputs(vagvalInputs);
 	}
@@ -85,7 +85,7 @@ public class VpFullServiceWithCorrelationIdNotPropagatedTest extends AbstractTes
 	@Test
 	public void testCorrelationIdNotSetNotPropagated() throws Exception {
 		
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
     	
     	Product p = testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		assertEquals(PRODUCT_ID, p.getId());

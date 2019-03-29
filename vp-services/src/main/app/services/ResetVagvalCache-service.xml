@@ -32,9 +32,7 @@
     <spring:bean
         id="resetVagvalCacheComponent"
         class="se.skl.tp.vp.vagvalagent.ResetVagvalCache" >
-        <spring:property
-            name="vagvalAgent"
-            ref="vagvalAgent" />
+        <spring:property name="vagvalAgent" ref="vagvalAgent" />
     </spring:bean>
 
     <flow name="resetVagvalCache-flow" >

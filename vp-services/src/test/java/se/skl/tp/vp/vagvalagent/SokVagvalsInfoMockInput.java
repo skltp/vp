@@ -39,7 +39,7 @@ public class SokVagvalsInfoMockInput {
 	public List<VagvalMockInputRecord> getVagvalInputs() {
 		log.debug("Get mock-vagval-info, return {} records", ((_vagvalInputs == null) ? "NULL" : _vagvalInputs.size()));
 		if(_vagvalInputs == null){
-			_vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+			_vagvalInputs = new ArrayList<>();
 		}
 		return _vagvalInputs;
 	}

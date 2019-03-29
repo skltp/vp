@@ -24,7 +24,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,18 +50,18 @@ public class PingForConfigurationProducerRivTa21NoTAKIntegrationTest extends Abs
 	
 	@BeforeClass
 	public static void setupNoInformationInTjanstekatalogen() throws Exception {
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		svimi.setVagvalInputs(vagvalInputs);
 	}
 
 	@Override
-	protected String getConfigResources() {
+	protected String[] getConfigFiles() {
 		
-		return "soitoolkit-mule-jms-connector-activemq-embedded.xml,"
-				+ "vp-common.xml,"
-				+ "services/PingForConfiguration-rivtabp21-service.xml,"
-				+ "services/VagvalRouter-service.xml,"
-				+ "vp-teststubs-and-services-config.xml";
+		return new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+				"vp-common.xml",
+				"services/PingForConfiguration-rivtabp21-service.xml",
+				"services/VagvalRouter-service.xml",
+				"vp-teststubs-and-services-config.xml"};
 	}
 		
 	@Test

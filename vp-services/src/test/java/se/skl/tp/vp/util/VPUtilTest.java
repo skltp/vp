@@ -29,8 +29,6 @@ import static org.mockito.Mockito.*;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 
-import se.skl.tp.vp.vagvalrouter.ExceptionMessageTransformer;
-
 public class VPUtilTest {
 	
 	public static final String WHITE_LIST="127.0.0.1,127.0.0.2,127.0.0.3";

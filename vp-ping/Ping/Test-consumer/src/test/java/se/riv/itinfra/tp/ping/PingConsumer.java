@@ -20,7 +20,7 @@
  */
 package se.riv.itinfra.tp.ping;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
 import java.util.Random;
@@ -138,17 +138,17 @@ public final class PingConsumer {
 
 	private static TLSClientParameters setUpTlsClientParams() throws Exception {
 
+
 		KeyStore trustStore = KeyStore.getInstance("JKS");
-		String trustStoreLoc = "src/main/resources/test-certs/truststore.jks";
+		InputStream trustStoreStream = PingConsumer.class.getClassLoader().getResourceAsStream("test-certs/truststore.jks");
 		String trustPassword = "password";
-		trustStore.load(new FileInputStream(trustStoreLoc),
+		trustStore.load(trustStoreStream,
 				trustPassword.toCharArray());
 
 		String keyPassword = "password";
 		KeyStore keyStore = KeyStore.getInstance("jks");
-		String keyStoreLoc = "src/main/resources/test-certs/client.jks";
-		keyStore.load(new FileInputStream(keyStoreLoc),
-				keyPassword.toCharArray());
+		InputStream keyStoreStream = PingConsumer.class.getClassLoader().getResourceAsStream("test-certs/client.jks");
+		keyStore.load(keyStoreStream,	keyPassword.toCharArray());
 
 		TrustManagerFactory tmf = TrustManagerFactory
 				.getInstance(TrustManagerFactory.getDefaultAlgorithm());

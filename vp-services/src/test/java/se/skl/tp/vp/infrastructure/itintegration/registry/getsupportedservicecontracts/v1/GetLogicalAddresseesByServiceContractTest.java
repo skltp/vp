@@ -25,13 +25,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedservicecontracts.v1.GetLogicalAddresseesByServiceContract.requestIsValidAccordingToRivSpec;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.Test;
-
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
 import se.rivta.itintegration.registry.v1.ServiceContractNamespaceType;
@@ -53,7 +50,8 @@ public class GetLogicalAddresseesByServiceContractTest {
 	@Test
 	public void usingServiceContractWhenSearchingAmongServiceContracts() {
 		GetLogicalAddresseesByServiceContract service = new GetLogicalAddresseesByServiceContract();
-		service.setVagvalAgent(createVagvalAgentContainingServiceContractNamespaces());
+		VagvalAgent vagvalAgent = createVagvalAgentContainingServiceContractNamespaces();
+		service.setVagvalAgent(vagvalAgent);
 
 		GetLogicalAddresseesByServiceContractType request = createRequest("urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1", CONSUMER_HSAID_1);
 		GetLogicalAddresseesByServiceContractResponseType response = service.getLogicalAddresseesByServiceContract("LOGICALADDRESS", request);
@@ -107,13 +105,14 @@ public class GetLogicalAddresseesByServiceContractTest {
 	}
 
 	private VagvalAgent createVagvalAgentContainingServiceContractNamespaces() {
-
-		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = new ArrayList<AnropsBehorighetsInfoType>();
+		VagvalAgentMock vagvalAgentMock = new VagvalAgentMock(null, "#");
+		List<AnropsBehorighetsInfoType> anropsBehorighetsInfo = vagvalAgentMock.getMockAnropsBehorighetsInfo();
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		anropsBehorighetsInfo.add(validAuthorization(RECEIVERID_2,CONSUMER_HSAID_1,"urn:riv:crm:scheduling:GetSubjectOfCareScheduleResponder:1"));
 		anropsBehorighetsInfo.add(oldAuthorization(RECEIVERID_1,CONSUMER_HSAID_1,"urn:riv:itintegration:monitoring:PingForConfigurationResponder:1"));
 
-		return new VagvalAgentMock(anropsBehorighetsInfo);
+		vagvalAgentMock.setUseVagvalCache(false);
+		return vagvalAgentMock;
 	}
 
 	private AnropsBehorighetsInfoType validAuthorization(String receiverId, String senderId, String tjansteKontrakt) {

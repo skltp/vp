@@ -28,7 +28,7 @@ public enum LogMessageEnum {
 	
 	private String name;
 	
-	private LogMessageEnum(String name) {
+	LogMessageEnum(String name) {
 		this.name = name;
 	}
 	
@@ -36,7 +36,4 @@ public enum LogMessageEnum {
 		return name;
 	}
 
-	public boolean equals(String name) {
-		return this.name().equals(name);
-	}
 }

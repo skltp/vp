@@ -30,8 +30,6 @@ import org.mule.module.client.MuleClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.skl.tp.vp.vagvalrouter.consumer.VpFullServiceTestConsumer_MuleClient;
-
 public class RestClient {
 	private MuleClient muleClient = null;
 	private String muleConnector = null;
@@ -183,13 +181,11 @@ public class RestClient {
 	 */
 	public MuleMessage doHttpSendRequest(String url, String method, String payload, String contentType) {    	
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
     	properties.put("http.method",    method);
     	properties.put("Content-Type",   contentType);
 
-    	MuleMessage response = send(url, payload, properties);
-    	
-    	return response;
+		return send(url, payload, properties);
 	}
 	
 	/**
@@ -204,7 +200,7 @@ public class RestClient {
 	 */
 	public MuleMessage doHttpSendRequest(String url, String method, String payload, String contentType, Map<String, String> inProperties) {    	
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
     	properties.put("http.method",    method);
     	properties.put("Content-Type",   contentType);
 
@@ -229,7 +225,7 @@ public class RestClient {
 	 */
 	public MuleMessage doHttpReceiveRequest(String url, String method, String acceptConentType, String acceptCharSet) {    	
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
     	properties.put("http.method",    method);
     	properties.put("Accept",         acceptConentType);
     	properties.put("Accept-Charset", acceptCharSet);

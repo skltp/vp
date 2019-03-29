@@ -22,15 +22,12 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Inject;
 import javax.jws.WebService;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontract.v2.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.FilterType;
 import se.rivta.infrastructure.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v2.GetLogicalAddresseesByServiceContractResponseType;
@@ -64,7 +61,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 			return new GetLogicalAddresseesByServiceContractResponseType();
 		}
 
-		Map<String, LogicalAddresseeRecordType> uniqueLogicalAddresses = new HashMap<String,LogicalAddresseeRecordType>();
+		Map<String, LogicalAddresseeRecordType> uniqueLogicalAddresses = new HashMap<>();
 		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
 			if (!contains(authInfo, uniqueLogicalAddresses) && validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
 
@@ -84,8 +81,8 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		if (log.isInfoEnabled()) {
 			String consumerHsaId = request.getServiceConsumerHsaId();
 			String namespace = request.getServiceContractNameSpace().getServiceContractNamespace();
-			log.info("getLogicalAddresseesByServiceContract.v2 found {} logical addresses for consumerHsaId: {}, namespace: {}", new Object[] {
-					uniqueLogicalAddresses.size(), consumerHsaId, namespace });
+			log.info("getLogicalAddresseesByServiceContract.v2 found {} logical addresses for consumerHsaId: {}, namespace: {}",
+					uniqueLogicalAddresses.size(), consumerHsaId, namespace);
 		}
 
 		return response;

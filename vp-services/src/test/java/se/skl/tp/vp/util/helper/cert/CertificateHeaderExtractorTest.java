@@ -38,7 +38,6 @@ import org.mule.api.transport.PropertyScope;
 
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.HttpHeaders;
-import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.WhiteListHandler;
 

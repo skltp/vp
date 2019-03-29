@@ -55,7 +55,7 @@ import se.skl.tp.vp.util.HttpHeaders;
 import se.skl.tp.vp.util.MessageProperties;
 import se.skl.tp.vp.util.VPUtil;
 import se.skl.tp.vp.util.helper.AddressingHelper;
-import se.skltp.tak.vagval.wsdl.v2.VisaVagvalsInterface;
+import se.skl.tp.vp.vagvalagent.VagvalAgentInterface;
 
 public class VagvalRouter extends AbstractRecipientList {
 
@@ -102,8 +102,9 @@ public class VagvalRouter extends AbstractRecipientList {
 	public void setRetryRouteAfterMs(final int retry) {
 		retryRoute = retry;
 	}
-	
-	public void setVagvalAgent(VisaVagvalsInterface vagvalAgent) {
+
+
+	public void setVagvalAgent(VagvalAgentInterface vagvalAgent) {
 		setAddressingHelper(new AddressingHelper(vagvalAgent, vpInstanceId));
 	}
 	
@@ -153,7 +154,7 @@ public class VagvalRouter extends AbstractRecipientList {
 
 			logger.debug("Endpoint address is {}", addr);
 
-			return Collections.singletonList((Object) addr);
+			return Collections.singletonList(addr);
 		} finally {
 			ExecutionTimer.stop(VPUtil.TIMER_ROUTE);
 		}
@@ -276,6 +277,7 @@ public class VagvalRouter extends AbstractRecipientList {
 				try {
 					Thread.sleep(retryRoute);
 				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 					throw ec;
 				}
 				replyEvent = super.route(event);

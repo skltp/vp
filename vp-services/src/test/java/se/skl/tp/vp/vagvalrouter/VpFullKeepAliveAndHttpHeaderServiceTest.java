@@ -78,7 +78,7 @@ public class VpFullKeepAliveAndHttpHeaderServiceTest extends AbstractTestCase {
 	
 	@BeforeClass
 	public static void setupTjanstekatalogen() throws Exception {
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord("vp-test-producer", "https://localhost:19000/vardgivare-b/tjanst1"));
 		svimi.setVagvalInputs(vagvalInputs);
 	}

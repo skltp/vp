@@ -18,39 +18,37 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package se.skl.tp.hsa.cache;
+package se.skl.tp.vp.util;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.junit.Test;
+public class ClientUtil {
 
-public class HsaFileValidatorTest {
-
-	@Test
-	public void testName() throws Exception {		
-		URL url = getClass().getClassLoader().getResource("invalidTest.xml");
-		String [] args = new String[]{"-f", url.getFile(), "-w", "2", "-o", "target/output.txt"};
-		
-		HsaFileValidator.main(args);
-		
-		BufferedReader br = new BufferedReader(new FileReader("target/output.txt"));
-		
-		String line1, line2 = "";
-		try {
-			line1 = br.readLine();
-			line2 = br.readLine();
-		} finally {
-			br.close();
-		}
-		
-		System.out.println(line1);
-		System.out.println(line2);
-		
-		assertTrue(line1.startsWith("ERROR HsaObject entry invalid @ LineNo:33, entry: dn=ou="));
-		assertTrue(line2.startsWith("WARNING: No parent for HSA-ID=SE0000000004-1234"));
+	private ClientUtil() {
+		// Static utility
 	}
+
+	/**
+     * 
+     * @param adressOfWsdl, e.g. http://localhost:8080/tppoc-vagvalsinfo-module-web-g/services/SokVagvalsInfoService?wsdl
+     * @return
+     */
+	public static URL createEndpointUrlFromWsdl(String adressOfWsdl) {
+		try {
+			return new URL(adressOfWsdl);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}	
+
+	/**
+	 * 
+	 * @param serviceAddress, e.g. http://localhost:8080/tppoc-vagvalsinfo-module-web-g/services/SokVagvalsInfoService
+	 * @return
+	 */
+	public static URL createEndpointUrlFromServiceAddress(String serviceAddress) {
+		return createEndpointUrlFromWsdl(serviceAddress + "?wsdl");
+	}	
+
 }

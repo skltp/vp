@@ -75,7 +75,7 @@ public class VPFelkoderTest extends AbstractTestCase {
 
     @BeforeClass
     public static void setupTjanstekatalogen() throws Exception {
-        List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+        List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
         vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,                        "https://localhost:19000/vardgivare-b/tjanst1"));
         vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_DUBLICATE,              "https://localhost:19000/vardgivare-b/tjanst4"));
         vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_DUBLICATE,              "https://localhost:19000/vardgivare-b/tjanst4"));
@@ -85,12 +85,12 @@ public class VPFelkoderTest extends AbstractTestCase {
     }
 
     @Override
-    protected String getConfigResources() {
+    protected String[] getConfigFiles() {
         return
-                        "soitoolkit-mule-jms-connector-activemq-embedded.xml," +
-                        "vp-common.xml," +
-                        "services/VagvalRouter-service.xml," +
-                        "vp-teststubs-and-services-config.xml";
+            new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+                "vp-common.xml",
+                "services/VagvalRouter-service.xml",
+                "vp-teststubs-and-services-config.xml"};
     }
 
 
@@ -119,7 +119,7 @@ public class VPFelkoderTest extends AbstractTestCase {
     @Test
     public void testVP004IsThrownWhenNoLogicalAddressIsFoundAndWhitespaceBefore() throws Exception {
         final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
 
         try {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_BEFORE, properties);
@@ -134,7 +134,7 @@ public class VPFelkoderTest extends AbstractTestCase {
 
         final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");
 
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
 
         try {
             testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS_NOT_FOUND_WHITESPACE_AFTER, properties);
@@ -176,7 +176,7 @@ public class VPFelkoderTest extends AbstractTestCase {
 		 * Provide a valid vp instance id to trigger check if provided http header x-vp-sender-id
 		 * is a authorized consumer, otherwise sender id is extracted from certificate.
 		 */
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put(HttpHeaders.X_VP_SENDER_ID, NOT_AUHTORIZED_CONSUMER_HSAID);
         properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 

@@ -23,6 +23,8 @@ package se.skl.tp.vp.tjanstekatalogen.producer;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.AN_HOUR_AGO;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.IN_TEN_YEARS;
 import static se.skl.tp.vp.util.VagvalSchemasTestUtil.getRelativeDate;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoIdType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaAnropsBehorigheterResponseType;
@@ -33,7 +35,6 @@ import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.HamtaAllaTjanstekontraktResponseType;
 import se.skl.tp.vp.vagvalagent.SokVagvalsInfoMockInput;
 import se.skl.tp.vp.vagvalagent.VagvalMockInputRecord;
-import se.skl.tp.vp.vagvalrouter.VagvalInput;
 
 /**
  * Denna klass används för att kunna simulera en tjänstekatalog med valfritt
@@ -71,17 +72,22 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 		try {
 			int id = 1;
 
-			for (VagvalInput input : vagvalInputs.getVagvalInputs()) {
-				AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
-				aboId.setValue(String.valueOf(id++));
-				AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
-				abo.setAnropsBehorighetsInfoId(aboId);
-				abo.setFromTidpunkt(getRelativeDate(AN_HOUR_AGO));
-				abo.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
-				abo.setReceiverId(input.receiverId);
-				abo.setSenderId(input.senderId);
-				abo.setTjansteKontrakt(input.serviceContractNamespace);
-				sampleResponse.getAnropsBehorighetsInfo().add(abo);
+
+			for (VagvalMockInputRecord input : vagvalInputs.getVagvalInputs()) {
+				if(input.addBehorighet) {
+					AnropsBehorighetsInfoIdType aboId = new AnropsBehorighetsInfoIdType();
+					aboId.setValue(String.valueOf(id++));
+					AnropsBehorighetsInfoType abo = new AnropsBehorighetsInfoType();
+					abo.setAnropsBehorighetsInfoId(aboId);
+					XMLGregorianCalendar fromDate = input.getFromDate();
+					XMLGregorianCalendar toDate = input.getToDate();
+					abo.setFromTidpunkt(fromDate == null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
+					abo.setTomTidpunkt(toDate == null ? getRelativeDate(IN_TEN_YEARS) : toDate);
+					abo.setReceiverId(input.receiverId);
+					abo.setSenderId(input.senderId);
+					abo.setTjansteKontrakt(input.serviceContractNamespace);
+					sampleResponse.getAnropsBehorighetsInfo().add(abo);
+				}
 			}
 
 		} catch (Exception e) {
@@ -104,18 +110,21 @@ public class TjansteKatalogenTestProducer implements SokVagvalsInfoInterface {
 			int id = 1;
 
 			for (VagvalMockInputRecord input : vagvalInputs.getVagvalInputs()) {
-				VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
-				vi.setAdress(input.adress);
-				vi.setFromTidpunkt(getRelativeDate(AN_HOUR_AGO));
-				vi.setTomTidpunkt(getRelativeDate(IN_TEN_YEARS));
-				vi.setReceiverId(input.receiverId);
-				vi.setRivProfil(input.rivVersion);
-				VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
-				viId.setValue(String.valueOf(id++));
-				vi.setVirtualiseringsInfoId(viId);
-				vi.setTjansteKontrakt(input.serviceContractNamespace);
-				sampleResponse.getVirtualiseringsInfo().add(vi);
-
+				if(input.addVagval) {
+					VirtualiseringsInfoType vi = new VirtualiseringsInfoType();
+					vi.setAdress(input.adress);
+					XMLGregorianCalendar fromDate = input.getFromDate();
+					XMLGregorianCalendar toDate = input.getToDate();
+					vi.setFromTidpunkt(fromDate == null ? getRelativeDate(AN_HOUR_AGO) : fromDate);
+					vi.setTomTidpunkt(toDate == null ? getRelativeDate(IN_TEN_YEARS) : toDate);
+					vi.setReceiverId(input.receiverId);
+					vi.setRivProfil(input.rivVersion);
+					VirtualiseringsInfoIdType viId = new VirtualiseringsInfoIdType();
+					viId.setValue(String.valueOf(id++));
+					vi.setVirtualiseringsInfoId(viId);
+					vi.setTjansteKontrakt(input.serviceContractNamespace);
+					sampleResponse.getVirtualiseringsInfo().add(vi);
+				}
 			}
 
 		} catch (Exception e) {

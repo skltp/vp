@@ -22,6 +22,7 @@ package se.skl.tp.vp.vagvalrouter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -67,7 +68,6 @@ public class VpFullServiceTest extends AbstractTestCase {
 
 	private int normal_timeout_ms = 0;
 	private int short_timeout_ms = 0;
-	private int long_timeout_ms = 0;
 
 	private static final String LOG_INFO_QUEUE = rb.getString("SOITOOLKIT_LOG_INFO_QUEUE");
 	private static final String LOG_ERROR_QUEUE = rb.getString("SOITOOLKIT_LOG_ERROR_QUEUE");
@@ -85,21 +85,21 @@ public class VpFullServiceTest extends AbstractTestCase {
 		
 		normal_timeout_ms = Integer.parseInt(rb.getString("TEST_NORMAL_TIMEOUT_MS"));
 		short_timeout_ms = Integer.parseInt(rb.getString("TEST_SHORT_TIMEOUT_MS"));
-		long_timeout_ms = Integer.parseInt(rb.getString("TEST_LONG_TIMEOUT_MS"));
+		int long_timeout_ms = Integer.parseInt(rb.getString("TEST_LONG_TIMEOUT_MS"));
 	}
 	
 	@Override
-	protected String getConfigResources() {
-		return 
-			"soitoolkit-mule-jms-connector-activemq-embedded.xml," + 
-			"vp-common.xml," +
-			"services/VagvalRouter-service.xml," +
-			"vp-teststubs-and-services-config.xml";
+	protected String[] getConfigFiles() {
+		return
+				new String[]{"soitoolkit-mule-jms-connector-activemq-embedded.xml",
+						"vp-common.xml",
+						"services/VagvalRouter-service.xml",
+						"vp-teststubs-and-services-config.xml"};
 	}
 	
 	@BeforeClass
 	public static void setupTjanstekatalogen() throws Exception {
-		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<VagvalMockInputRecord>();
+		List<VagvalMockInputRecord> vagvalInputs = new ArrayList<>();
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS,               "https://localhost:19000/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_HTTP,               "http://localhost:19001/vardgivare-b/tjanst1"));
 		vagvalInputs.add(createVagvalRecord(LOGICAL_ADDRESS_NO_CONNECTION, "https://www.google.com:81"));
@@ -167,7 +167,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	@Test
 	public void testLoadBalancerXForwardedInfo() throws Exception {
 		
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_PROTO"), "https");
 		properties.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_HOST"), "skltp-lb.example.org");
 		properties.put(rb.getString("VP_HTTP_HEADER_NAME_FORWARDED_PORT"), "443");
@@ -372,7 +372,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 	@Test
 	public void testMandatoryPropertiesArePropagatedToExternalProducer() throws Exception {
 		
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		
@@ -385,14 +385,14 @@ public class VpFullServiceTest extends AbstractTestCase {
 		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
 		final String CONSUMERS_SENDER_ID_IN_CERT = "tp";
 		
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 		properties.put(HttpHeaders.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
 
     	testConsumer.callGetProductDetail(PRODUCT_ID, TJANSTE_ADRESS, LOGICAL_ADDRESS, properties);
 		
     	//externt https connection it should not propagate
-		assertEquals(null, VpTestProducerLogger.getLatestSenderId());
+		assertNull(VpTestProducerLogger.getLatestSenderId());
 		assertEquals(null, VpTestProducerLogger.getLatestVpInstanceId());
 	}
 	
@@ -401,7 +401,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
 		final String CONSUMERS_SENDER_ID_IN_CERT = "tp";
 		
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 		properties.put(HttpHeaders.X_VP_SENDER_ID, CONSUMERS_SENDER_ID_IN_CERT);
 
@@ -422,7 +422,7 @@ public class VpFullServiceTest extends AbstractTestCase {
 		final String PRODUCT_ID_EXCEPTION = "Exception";
 		final String THIS_VP_INSTANCE_ID = rb.getString("VP_INSTANCE_ID");		
 
- 		Map<String, String> properties = new HashMap<String, String>();
+ 		Map<String, String> properties = new HashMap<>();
     	properties.put(HttpHeaders.X_VP_SENDER_ID, AUHTORIZED_CONSUMER_HSAID);
     	properties.put(HttpHeaders.X_VP_INSTANCE_ID, THIS_VP_INSTANCE_ID);
 

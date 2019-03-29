@@ -32,7 +32,7 @@ import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 
 public class ResetHsaCache implements Callable {
 
-	private Logger log = LoggerFactory.getLogger(ResetHsaCache.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ResetHsaCache.class);
 	private HsaCache hsaCache;
 	private String[] hsaFiles;
 
@@ -53,7 +53,7 @@ public class ResetHsaCache implements Callable {
 
 	private String resetCache(final MuleEventContext eventContext) {
 		try {
-			log.info("Start a reset of HSA cache using files: {} ...", Arrays.toString(hsaFiles));
+			LOG.info("Start a reset of HSA cache using files: {} ...", Arrays.toString(hsaFiles));
 			int oldCacheSize = hsaCache.getHSACacheSize();
 			HsaCache cache = hsaCache.init(hsaFiles);
 			int cacheSize = cache.getHSACacheSize();
@@ -62,17 +62,17 @@ public class ResetHsaCache implements Callable {
 				String message = "Successfully reset HSA cache using files: " + Arrays.toString(hsaFiles) +
 						"\nHSA cache size was: " + oldCacheSize +
 						"\nHSA cache now is: " + cacheSize;
-				log.info(message);
+				LOG.info(message);
 				return message;
 			} else {
 				String message = "Warning: HSA cache reset to" + cacheSize + 
 						". Was " + oldCacheSize + "entries!.\nUsing files: " + 
 						Arrays.toString(hsaFiles);
-				log.warn(message);
+				LOG.warn(message);
 				return message;
 			}
 		} catch (HsaCacheInitializationException e) {
-			log.error("Reset HSA cache failed", e);
+			LOG.error("Reset HSA cache failed", e);
 			return "Reset HSA cache failed using files: " + Arrays.toString(hsaFiles);
 		}
 	}

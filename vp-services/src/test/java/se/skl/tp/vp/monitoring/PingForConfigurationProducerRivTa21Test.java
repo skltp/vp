@@ -25,28 +25,20 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
-import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
-import se.skl.tp.vp.monitoring.PingForConfigurationProducerRivTa21;
 import se.skl.tp.vp.vagvalagent.VagvalAgent;
 
 public class PingForConfigurationProducerRivTa21Test {
-	private static final Integer ONE = new Integer(1);
-	private static final Integer ZERO = new Integer(0);
+	private static final Integer ONE = 1;
+	private static final Integer ZERO = 0;
 
 	@Test
 	public void resourcesNeededForVpAvailable() {
 
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
-		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter()).thenReturn(ONE);
-		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations()).thenReturn(ONE);
+		when(vagvalAgent.getNumberOfBehorigheter()).thenReturn(ONE);
+		when(vagvalAgent.getNumberOfVagval()).thenReturn(ONE);
 
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
@@ -59,8 +51,8 @@ public class PingForConfigurationProducerRivTa21Test {
 	public void virtualiseringsInfoIsMissing() {
 
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
-		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter()).thenReturn(ONE);
-		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations()).thenReturn(ZERO);
+		when(vagvalAgent.getNumberOfBehorigheter()).thenReturn(ONE);
+		when(vagvalAgent.getNumberOfVagval()).thenReturn(ZERO);
 
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);
@@ -73,8 +65,8 @@ public class PingForConfigurationProducerRivTa21Test {
 	public void behorighetsInfoIsMissing() {
 
 		VagvalAgent vagvalAgent = mock(VagvalAgent.class);
-		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfAnropsBehorigheter()).thenReturn(ZERO);
-		when(vagvalAgent.threadUnsafeLoadBalancerHealthCheckGetNumberOfVirtualizations()).thenReturn(ONE);
+		when(vagvalAgent.getNumberOfBehorigheter()).thenReturn(ZERO);
+		when(vagvalAgent.getNumberOfBehorigheter()).thenReturn(ONE);
 
 		PingForConfigurationProducerRivTa21 pingRivTa21 = new PingForConfigurationProducerRivTa21();
 		pingRivTa21.setVagvalAgent(vagvalAgent);

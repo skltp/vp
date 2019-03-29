@@ -71,7 +71,6 @@ public class VpFullServiceTestConsumer_JAX_WS {
 		String serviceAddress = args[1];
 
 		Product p = null;
-		;
 		try {
 			p = callGetProductDetail(productId, serviceAddress);
 			System.out.println("Product Data: " + p.getId() + " - " + p.getDescription() + " - "

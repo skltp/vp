@@ -60,7 +60,7 @@ public class CallerNotOnWhitelistIntegrationTest extends
 		 * Provide a valid vp instance id and x-vp-sender-id to trigger a check
 		 * on the ip whitelist.
 		 */
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put(HttpHeaders.X_VP_SENDER_ID, "tp");
 		properties.put(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
 
@@ -83,7 +83,7 @@ public class CallerNotOnWhitelistIntegrationTest extends
 		 * Provide a valid cert in http header x-vp-auth-cert to trigger a check
 		 * on the ip whitelist.
 		 */
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
 		properties.put(VPUtil.X_MULE_REMOTE_CLIENT_ADDRESS, "127.0.0.1");
 
@@ -103,7 +103,7 @@ public class CallerNotOnWhitelistIntegrationTest extends
 	public void testVP011IsThrownWhenCallerIsNotOnWhitelistUsingReverseProxyTerminatingTls()
 			throws Exception {
 		// add headers set by fronting reverse proxy that terminates TLS
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties
 				.put(HttpHeaders.REVERSE_PROXY_HEADER_NAME, clientCertificate);
 		properties.put("X-Forwarded-For", "10.10.10.10");

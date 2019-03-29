@@ -26,7 +26,7 @@ public abstract class AbstractTestConsumer<ServiceInterface> {
 
 	public static final String SAMPLE_ORIGINAL_CONSUMER_HSAID = "sample-original-consumer-hsaid";
 	
-	protected ServiceInterface _service = null;	
+	protected ServiceInterface _service;
 
     private Class<ServiceInterface> _serviceType;
 

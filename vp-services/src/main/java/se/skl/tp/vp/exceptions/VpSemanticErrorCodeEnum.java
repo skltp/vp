@@ -35,7 +35,7 @@ public enum VpSemanticErrorCodeEnum {
 	VP011("VP011"), 
 	VP012("VP012");
 
-	private String code;
+	private final String code;
 	public String getCode() {
 		return code;
 	}

@@ -1,80 +1,71 @@
-/**
- * Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
- * 							<http://cehis.se/>
- *
- * This file is part of SKLTP.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
 package se.skl.tp.vp.vagvalagent;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import se.skl.tp.DefaultRoutingConfiguration;
+import se.skl.tp.DefaultRoutingConfigurationImpl;
+import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vp.util.MessageProperties;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.AnropsBehorighetsInfoType;
 import se.skltp.tak.vagvalsinfo.wsdl.v2.VirtualiseringsInfoType;
+import se.skltp.takcache.TakCacheImpl;
+import se.skltp.takcache.services.TakService;
 
 public class VagvalAgentMock extends VagvalAgent {
 
-	private List<VirtualiseringsInfoType> virtualiseringsInfo;
-	private List<AnropsBehorighetsInfoType> anropsBehorighetsInfo;
+  private List<VirtualiseringsInfoType> virtualiseringsInfo;
+  private List<AnropsBehorighetsInfoType> anropsBehorighetsInfo;
 
-	public VagvalAgentMock (List<VirtualiseringsInfoType> virtualiseringsInfo, List<AnropsBehorighetsInfoType> anropsBehorighetsInfo) {
-		this.virtualiseringsInfo = virtualiseringsInfo;
-		this.anropsBehorighetsInfo = anropsBehorighetsInfo;
-	    this.setMessageProperties(MessageProperties.getInstance());
-	}
+  private se.skltp.takcache.TakCacheImpl takCache;
 
-	public VagvalAgentMock (List<AnropsBehorighetsInfoType> anropsBehorighetsInfo) {
-		this(null, anropsBehorighetsInfo);
-	}
+  public VagvalAgentMock(){
+    this(null, "");
+  }
 
-	public VagvalAgentMock () {
-		this(null, null);
-	}
+  public VagvalAgentMock(TakService takService, HsaCache hsaCache, String delimiter) {
+    this.setMessageProperties(MessageProperties.getInstance());
 
-	@Override
-	protected List<VirtualiseringsInfoType> getVirtualiseringar() {
-		return virtualiseringsInfo;
-	}
+    takCache = new TakCacheImpl(takService);
+    takCache.setUseVagvalCache(true);
+    takCache.setUseBehorighetCache(true);
+    DefaultRoutingConfiguration defaultRoutingConfiguration = new DefaultRoutingConfigurationImpl();
+    defaultRoutingConfiguration.setDelimiter(delimiter);
+    this.init(hsaCache, takCache, defaultRoutingConfiguration);
+  }
 
-	@Override
-	protected List<AnropsBehorighetsInfoType> getBehorigheter() {
-		return anropsBehorighetsInfo;
-	}
+  public VagvalAgentMock(HsaCache hsaCache, String delimiter) {
+    this.virtualiseringsInfo = new ArrayList<>();
+    this.anropsBehorighetsInfo = new ArrayList<>();
+    this.setMessageProperties(MessageProperties.getInstance());
 
-	@Override
-	public List<AnropsBehorighetsInfoType> getAnropsBehorighetsInfoList() {
-		return anropsBehorighetsInfo;
-	}
+    TakServiceMock takServiceMock = new TakServiceMock();
+    takServiceMock.setAnropsBehorighetsInfo(anropsBehorighetsInfo);
+    takServiceMock.setVirtualiseringsInfo(virtualiseringsInfo);
+    takCache = new TakCacheImpl(takServiceMock);
+    takCache.setUseVagvalCache(true);
+    takCache.setUseBehorighetCache(true);
+    DefaultRoutingConfiguration defaultRoutingConfiguration = new DefaultRoutingConfigurationImpl();
+    defaultRoutingConfiguration.setDelimiter(delimiter);
+    this.init(hsaCache, takCache, defaultRoutingConfiguration);
+  }
 
-	/*
-	 * MOCK SPECIFIC METHODS
-	 */
-	public List<VirtualiseringsInfoType> getMockVirtualiseringsInfo() {
-		return virtualiseringsInfo;
-	}
-	public void setMockVirtualiseringsInfo(List<VirtualiseringsInfoType> virtualiseringsInfo) {
-		this.virtualiseringsInfo = virtualiseringsInfo;
-	}
+  public List<VirtualiseringsInfoType> getMockVirtualiseringsInfo() {
+    return virtualiseringsInfo;
+  }
 
-	public List<AnropsBehorighetsInfoType> getMockAnropsBehorighetsInfo() {
-		return anropsBehorighetsInfo;
-	}
-	public void setMockAnropsBehorighetsInfo(List<AnropsBehorighetsInfoType> anropsBehorighetsInfo) {
-		this.anropsBehorighetsInfo = anropsBehorighetsInfo;
-	}
+  public List<AnropsBehorighetsInfoType> getMockAnropsBehorighetsInfo() {
+    return anropsBehorighetsInfo;
+  }
 
+  public void setLocalCacheFileName(String fileName) {
+    takCache.setLocalTakCacheFileName(fileName);
+  }
+
+  public void setUseVagvalCache(boolean useVagvalCache) {
+    takCache.setUseVagvalCache(useVagvalCache);
+  }
+
+  public void setUseBehorighetCache(boolean useBehorighetCache) {
+    takCache.setUseBehorighetCache(useBehorighetCache);
+  }
 }

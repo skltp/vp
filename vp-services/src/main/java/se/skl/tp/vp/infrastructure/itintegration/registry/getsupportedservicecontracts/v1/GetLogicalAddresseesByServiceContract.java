@@ -22,15 +22,12 @@ package se.skl.tp.vp.infrastructure.itintegration.registry.getsupportedserviceco
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.jws.WebService;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontract.v1.rivtabp21.GetLogicalAddresseesByServiceContractResponderInterface;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractResponseType;
 import se.rivta.itintegration.registry.getlogicaladdresseesbyservicecontractresponder.v1.GetLogicalAddresseesByServiceContractType;
@@ -65,7 +62,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 			return new GetLogicalAddresseesByServiceContractResponseType();
 		}
 
-		Set<String> uniqueLogicalAddresses = new HashSet<String>();
+		Set<String> uniqueLogicalAddresses = new HashSet<>();
 		for (AnropsBehorighetsInfoType authInfo : vagvalAgent.getAnropsBehorighetsInfoList()) {
 			if (validAccordingToTime(authInfo) && matchesRequested(authInfo, request)) {
 				uniqueLogicalAddresses.add(authInfo.getReceiverId());
@@ -78,8 +75,8 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 		if (log.isInfoEnabled()) {
 			String consumerHsaId = request.getServiceConsumerHsaId();
 			String namespace = request.getServiceContractNameSpace().getServiceContractNamespace();
-			log.info("getLogicalAddresseesByServiceContract.v1 found {} logical addresses for consumerHsaId: {}, namespace: {}", new Object[] {
-					uniqueLogicalAddresses.size(), consumerHsaId, namespace });
+			log.info("getLogicalAddresseesByServiceContract.v1 found {} logical addresses for consumerHsaId: {}, namespace: {}",
+					uniqueLogicalAddresses.size(), consumerHsaId, namespace);
 		}
 
 		return response;
@@ -90,7 +87,7 @@ public class GetLogicalAddresseesByServiceContract implements GetLogicalAddresse
 				&& request.getServiceContractNameSpace().getServiceContractNamespace() != null;
 	}
 
-	private boolean matchesRequested(AnropsBehorighetsInfoType authInfo,
+	private boolean  matchesRequested(AnropsBehorighetsInfoType authInfo,
 			GetLogicalAddresseesByServiceContractType request) {
 		String namespace = request.getServiceContractNameSpace()
 				.getServiceContractNamespace();
