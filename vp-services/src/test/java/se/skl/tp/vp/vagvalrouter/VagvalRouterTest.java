@@ -290,5 +290,19 @@ public class VagvalRouterTest {
 
   }
 
+  @Test
+  public void testHappyDaysDelimiterHitBoth() throws Exception {
+
+    vagvalInput.receiverId = "VardgivareB#VardgivareB";
+    vagvalAgent.getMockVirtualiseringsInfo().add(createRouting("https://adress", "urn:riv:v1",
+        "{urn:riv13606:v1}RIV", "VardgivareB"));
+    vagvalAgent.getMockAnropsBehorighetsInfo()
+        .add(createAuthorization("TP-TEST", "{urn:riv13606:v1}RIV",
+            "VardgivareB"));
+    String adress = helper.getAddressFromAgent(vagvalInput);
+    assertEquals("https://adress", adress);
+
+  }
+
 
 }
