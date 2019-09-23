@@ -307,6 +307,8 @@
     <delete-message-property key="X-MULE_CORRELATION_GROUP_SIZE" />
     <delete-message-property key="X-MULE_CORRELATION_ID" />
     <delete-message-property key="X-MULE_CORRELATION_SEQUENCE" />
+    <delete-message-property key="MULE_CORRELATION_GROUP_SIZE" />
+    <delete-message-property key="MULE_CORRELATION_ID" />
     <delete-message-property key="MULE_ENCODING"/>
     <delete-message-property key="http.method"/>
     <delete-message-property key="LOCAL_CERTIFICATES"/>
