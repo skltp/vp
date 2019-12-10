@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:argos="urn:riv:inera.se.apotekensservice:argos:1" xmlns:spdr="urn:riv:se.apotekensservice:lf:AterkallaSamtyckeVardsystemResponder:1" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="urn:riv:inera:se.apotekensservice:lf:AterkallaSamtyckeVardsystem:1:rivtabp20" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="urn:riv:inera:se.apotekensservice:lf:AterkallaSamtyckeVardsystem:1:rivtabp20" name="AterkallaSamtyckeVardsystemInteraction">
+  <xs:annotation>
+    <xs:documentation>
+            Beskrivning: Tjänstekontraktet som avser att konkretisera tillämpningen av RIV.
+            Revisioner: 2011-04-05 Version 1.0
+            Tjänstedomän: se.apotekensservice:lf.
+            Tjänsteinteraktionens namn: AterkallaSamtyckeVardsystem.
+            Tjänsteinteraktionstyp: Fråga-Svar.
+            RIV Tekniska Anvisning: Basic Profile 2.0
+        </xs:documentation>
+  </xs:annotation>
+  <wsdl:types>
+    <xs:schema targetNamespace="urn:riv:inera:se.apotekensservice:lf:AterkallaSamtyckeVardsystem:1:rivtabp20">
+      <xs:import schemaLocation="AterkallaSamtyckeVardsystemResponder_1.0.xsd" namespace="urn:riv:se.apotekensservice:lf:AterkallaSamtyckeVardsystemResponder:1"/>
+      <xs:import schemaLocation="../../core_components/ws-addressing-1.0.xsd" namespace="http://www.w3.org/2005/08/addressing"/>
+      <xs:import schemaLocation="../../core_components/ArgosHeader_1.0.xsd" namespace="urn:riv:inera.se.apotekensservice:argos:1"/>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="AterkallaSamtyckeVardsystemRequest">
+    <wsdl:part element="spdr:AterkallaSamtyckeVardsystem" name="parameters"/>
+    <wsdl:part name="LogicalAddress" element="wsa:To">
+      <wsdl:documentation>Orgnr of Apotekens Service AB</wsdl:documentation>
+    </wsdl:part>
+    <wsdl:part name="ArgosHeader" element="argos:ArgosHeader">
+      <wsdl:documentation>Argos header of Apotekens Service AB. Check documentation regarding mandatory for this specific service interaction</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AterkallaSamtyckeVardsystemResponse">
+    <wsdl:part element="spdr:AterkallaSamtyckeVardsystemResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ApplicationException">
+    <wsdl:part element="spdr:ApplicationException" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="SystemException">
+    <wsdl:part element="spdr:SystemException" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="AterkallaSamtyckeVardsystemResponderInterface">
+    <wsdl:operation name="AterkallaSamtyckeVardsystem">
+      <wsdl:input message="AterkallaSamtyckeVardsystemRequest"/>
+      <wsdl:output message="AterkallaSamtyckeVardsystemResponse"/>
+      <wsdl:fault message="ApplicationException" name="ApplicationException"/>
+      <wsdl:fault message="SystemException" name="SystemException"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AterkallaSamtyckeVardsystemResponderBinding" type="AterkallaSamtyckeVardsystemResponderInterface">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="AterkallaSamtyckeVardsystem">
+      <soap:operation soapAction="urn:riv:se.apotekensservice:lf:AterkallaSamtyckeVardsystemResponder:1:AterkallaSamtyckeVardsystem"/>
+      <wsdl:input>
+        <soap:body use="literal" parts="parameters"/>
+        <soap:header use="literal" message="AterkallaSamtyckeVardsystemRequest" part="LogicalAddress"/>
+        <soap:header use="literal" message="AterkallaSamtyckeVardsystemRequest" part="ArgosHeader"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ApplicationException">
+        <soap:fault name="ApplicationException" use="literal"/>
+      </wsdl:fault>
+      <wsdl:fault name="SystemException">
+        <soap:fault name="SystemException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="AterkallaSamtyckeVardsystemResponderService">
+    <wsdl:port name="AterkallaSamtyckeVardsystemResponderPort" binding="AterkallaSamtyckeVardsystemResponderBinding">
+      <soap:address location="http://temp.uri/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

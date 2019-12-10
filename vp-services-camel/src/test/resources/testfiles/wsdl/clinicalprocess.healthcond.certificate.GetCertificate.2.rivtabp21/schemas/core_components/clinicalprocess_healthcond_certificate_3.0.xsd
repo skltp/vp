@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   xmlns="urn:riv:clinicalprocess:healthcond:certificate:3"
+	   xmlns:types="urn:riv:clinicalprocess:healthcond:certificate:types:3"
+	targetNamespace="urn:riv:clinicalprocess:healthcond:certificate:3"
+	elementFormDefault="qualified" attributeFormDefault="unqualified"
+	version="3.0">
+
+	<xs:import namespace="urn:riv:clinicalprocess:healthcond:certificate:types:3"
+		schemaLocation="clinicalprocess_healthcond_certificate_types_3.0.xsd" />
+
+	<xs:complexType name="Intyg">
+		<xs:annotation>
+			<xs:documentation>Ett intyg.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="intygs-id" type="types:IntygId" />
+			<xs:element name="mottagare" type="types:Part" minOccurs="0"
+				maxOccurs="unbounded" />
+			<xs:element name="typ" type="types:TypAvIntyg" />
+			<xs:element name="version" type="xs:string" />
+			<xs:element name="signeringstidpunkt" type="types:TimeStampType"
+				minOccurs="0" />
+			<xs:element name="skickatTidpunkt" type="types:TimeStampType"
+				minOccurs="0" />
+			<xs:element name="patient" type="Patient" />
+			<xs:element name="skapadAv" type="HosPersonal" />
+			<xs:element name="relation" type="Relation" minOccurs="0"
+				maxOccurs="unbounded" />
+			<xs:element name="status" type="IntygsStatus" minOccurs="0"
+				maxOccurs="unbounded" />
+			<xs:element name="svar" type="Svar" minOccurs="0"
+				maxOccurs="unbounded" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="HosPersonal">
+		<xs:sequence>
+			<xs:element name="personal-id" type="types:HsaId">
+				<xs:annotation>
+					<xs:documentation>HSA-id, o.i.d för HSA-id är 1.2.752.129.2.1.4.1
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fullstandigtNamn" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Förnamn + efternamn sammanslaget.
+						Är tomt om
+						personen har en skyddad identitet.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="forskrivarkod" type="xs:string"
+				minOccurs="0" />
+			<xs:element name="befattning" type="types:Befattning"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="enhet" type="Enhet" />
+			<xs:element name="specialistkompetens" type="types:Specialistkompetens"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Enhet">
+		<xs:sequence>
+			<xs:element name="enhets-id" type="types:HsaId">
+				<xs:annotation>
+					<xs:documentation>HSA-id, o.i.d för HSA-id är 1.2.752.129.2.1.4.1
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="arbetsplatskod" type="types:ArbetsplatsKod">
+				<xs:annotation>
+					<xs:documentation>o.i.d för arbetsplatskod är 1.2.752.29.4.71
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="enhetsnamn" type="xs:string" />
+			<xs:element name="postadress" type="xs:string" />
+			<xs:element name="postnummer" type="xs:string" />
+			<xs:element name="postort" type="xs:string" />
+			<xs:element name="telefonnummer" type="xs:string" />
+			<xs:element name="epost" type="types:nonEmptyString"
+				minOccurs="0" />
+			<xs:element name="vardgivare" type="Vardgivare" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Vardgivare">
+		<xs:sequence>
+			<xs:element name="vardgivare-id" type="types:HsaId">
+				<xs:annotation>
+					<xs:documentation>HSA-id, o.i.d för HSA-id är 1.2.752.129.2.1.4.1
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="vardgivarnamn" type="xs:string" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Patient">
+		<xs:sequence>
+			<xs:element name="person-id" type="types:PersonId" />
+			<xs:element name="fornamn" type="xs:string" />
+			<xs:element name="efternamn" type="xs:string" />
+			<xs:element name="mellannamn" type="xs:string" minOccurs="0" />
+			<xs:element name="postadress" type="xs:string" />
+			<xs:element name="postnummer" type="xs:string" />
+			<xs:element name="postort" type="xs:string" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="MeddelandeReferens">
+		<xs:annotation>
+			<xs:documentation>Referens till ett meddelande</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="meddelande-id" type="xs:string" />
+			<xs:element name="referens-id" type="xs:string" minOccurs="0" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Svar">
+		<xs:annotation>
+			<xs:documentation>Svar på en fråga</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="instans" type="xs:int" minOccurs="0" />
+			<xs:element name="delsvar" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:sequence>
+						<xs:any namespace="##other" processContents="lax"
+							minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+					<xs:attribute name="id" type="DelfrageIdType" use="required" />
+				</xs:complexType>
+			</xs:element>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" type="FrageIdType" use="required" />
+	</xs:complexType>
+
+	<xs:simpleType name="FrageIdType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="DelfrageIdType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+\.[0-9]+" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="ResultType">
+		<xs:annotation>
+			<xs:documentation xml:lang="sv">
+				Datatyp som returneras
+				som ett generellt svar från alla förändrande tjänster, t.ex. skapa,
+				radera, etc.
+				En anropande klient skall alltid kontrollera att
+				resultatkoden inte innehåller fel för att på så sätt veta om anropet
+				lyckades.
+				Alla svarskoder förutom OK och INFO betyder att åtgärden
+				inte genomfördes.
+				Om svarskoden är INFO skall fältet resultText
+				innehålla mer information.
+				Om svarskorden är ERROR skall fältet
+				errorId innehålla en specifik felkod, och fältet resultText
+				innehålla mer information.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="resultCode" type="ResultCodeType" />
+			<xs:element name="resultText" type="xs:string" minOccurs="0" />
+			<xs:element name="errorId" type="ErrorIdType" minOccurs="0" />
+			<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other"
+				processContents="lax" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="ResultCodeType">
+		<xs:annotation>
+			<xs:documentation xml:lang="sv">
+				Enumerationsvärde som
+				anger de svarskoder som finns.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OK">
+				<xs:annotation>
+					<xs:documentation xml:lang="sv">
+						Transaktionen har
+						utförts enligt uppdraget.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="INFO">
+				<xs:annotation>
+					<xs:documentation xml:lang="sv">
+						Transaktionen har
+						utförts enligt begäran, men det finns ett meddelande som
+						konsumenten bör visa upp.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR">
+				<xs:annotation>
+					<xs:documentation xml:lang="sv">
+						Transaktionen har INTE
+						kunnat utföras. Det finns en felkod som klassificerar
+						felet, samt
+						ett meddelande som konsumenten bör visa upp.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ErrorIdType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="VALIDATION_ERROR">
+				<xs:annotation>
+					<xs:documentation xml:lang="sv">
+						En eller flera
+						inparametrar innehåller felaktiga värden. Angiven
+						tjänst utfördes
+						ej, och omsändning av
+						transaktionen är inte tillämpbart.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="APPLICATION_ERROR">
+				<xs:annotation>
+					<xs:documentation xml:lang="sv">
+						Transaktionen har INTE
+						kunnat utföras p.g.a ett logiskt fel. Det finns ett
+						meddelande som
+						konsumenten bör
+						visa upp. Då felet är logisk är omsändning av
+						transaktionen inte
+						tillämpbart.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TECHNICAL_ERROR">
+				<xs:annotation>
+					<xs:documentation xml:lang="sv">
+						Transaktionen har INTE
+						kunnat utföras p.g.a ett tekniskt fel. Det finns ett
+						meddelande som
+						konsumenten bör
+						visa upp. Felet kan vara intermittent, varför
+						omsändning av
+						transaktionen är tillämpbart.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="REVOKED">
+				<xs:annotation>
+					<xs:documentation xml:lang="sv">
+						Den efterfrågade
+						informationen existerar men har rättats/dragits
+						tillbaka och är ej
+						längre giltig eller
+						tillgänglig. Angiven tjänst utfördes ej, och
+						omsändning av transaktionen är
+						inte tillämpbart.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="IntygsStatus">
+		<xs:sequence>
+			<xs:element name="part" type="types:Part" />
+			<xs:element name="status" type="types:Statuskod" />
+			<xs:element name="tidpunkt" type="types:TimeStampType" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- typer som används vid integrerad intygsapplikation -->
+	<xs:complexType name="Handelse">
+		<xs:sequence>
+			<xs:element name="handelsekod" type="types:Handelsekod" />
+			<xs:element name="tidpunkt" type="types:TimeStampMedMillisekunder" />
+			<xs:element name="amne" type="types:Amneskod"  minOccurs="0"/>
+			<xs:element name="sistaDatumForSvar" type="types:DateType"  minOccurs="0"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Arenden"> <!-- Frågor och svar -->
+		<xs:sequence>
+			<xs:element name="totalt" type="xs:int" />
+			<xs:element name="ejBesvarade" type="xs:int" />
+			<xs:element name="besvarade" type="xs:int" />
+			<xs:element name="hanterade" type="xs:int" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<!-- slut typer som används vid integrerad intygsapplikation -->
+
+	<xs:complexType name="Relation">
+		<xs:sequence>
+			<xs:element name="typ" type="types:TypAvRelation" />
+			<xs:element name="intygs-id" type="types:IntygId" />
+			<xs:any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>

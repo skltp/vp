@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. Sveriges Kommuner och Landsting licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ -->		
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:tns='urn:riv:infrastructure:directory:1' targetNamespace='urn:riv:infrastructure:directory:1' elementFormDefault='qualified' attributeFormDefault='unqualified' version='1.0'>
+  <xs:simpleType name="TS">
+    <xs:annotation>
+      <xs:documentation>Regexp declaration for timestamp in the format: YYYYMMDDHHMMSS</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[1-9]{1}[0-9]{3}(0[1-9]{1}|1[0-2]{1})([0-2]{1}[0-9]{1}|3[0-1]{1})([0-1]{1}[0-9]{1}|2[0-3]{1})[0-5]{1}[0-9]{1}[0-5]{1}[0-9]{1}"/> 
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="DNType">
+    <xs:restriction base="xs:token">
+        <xs:maxLength value="350"/>
+        <xs:pattern value="([OUDCNLoudcnl]{1,2}=[0-9\p{L}\p{Zs}\-.]*,?)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:complexType name="AddressType">
+    <xs:sequence>
+      <xs:element name="addressLine" type="xs:string" maxOccurs="unbounded"/>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AgeSpanType">
+    <xs:sequence>
+      <xs:element name="from" type="xs:string" />
+      <xs:element name="to" type="xs:string" />
+      <xs:element name="comment" type="xs:string" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="TelephoneNumberType">
+    <xs:restriction base="xs:string" >
+      <xs:maxLength value="29"/>
+      <xs:pattern value="([+0123456789][0-9]*)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TimeSpanType">
+    <xs:sequence>
+      <xs:element name="fromDay" type="xs:string" />
+      <xs:element name="fromTime" type="xs:time" />
+      <xs:element name="toDay" type="xs:string" />
+      <xs:element name="toTime" type="xs:time" />
+      <xs:element name="comment" type="xs:string" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="DateSpanType">
+    <xs:sequence>
+      <xs:element name="fromDate" type="xs:string" />
+      <xs:element name="toDate" type="xs:string" />
+      <xs:element name="temporaryInformation" type="xs:string" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PersonInformationType">
+    <xs:sequence>
+      <xs:element name="personHsaId" type="xs:string" />
+      <xs:element name="givenName" type="xs:string" />
+      <xs:element name="middleAndSurName" type="xs:string"/>
+      <xs:element name="nickName" type="xs:string" minOccurs="0" />
+      <xs:element name="mail" type="xs:string" minOccurs="0" />
+      <xs:element name="telephoneNumber" type="tns:TelephoneNumberType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="switchboardNumber" type="tns:TelephoneNumberType" minOccurs="0" />
+      <xs:element name="nonPublicTelephoneNumber" type="tns:TelephoneNumberType" minOccurs="0"  maxOccurs="unbounded" />
+      <xs:element name="mobileNumber" type="tns:TelephoneNumberType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="smsTelephoneNumber" type="tns:TelephoneNumberType" minOccurs="0" />
+      <xs:element name="facsimileTelephoneNumber" type="tns:TelephoneNumberType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="telephoneHour" type="tns:TimeSpanType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="postalAddress" type="tns:AddressType" minOccurs="0"/>
+      <xs:element name="labeledUri" type="xs:string" minOccurs="0" />
+      <xs:element name="description" type="xs:string" minOccurs="0" />
+      <xs:element name="languageKnowledgeCode" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="title" type="xs:string" minOccurs="0" />
+      <xs:element name="healthCareProfessionalLicence" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="specialityCode" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="specialityName" type="xs:string"  minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="paTitle" type="tns:PaTitleType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="dn" type="tns:DNType" />
+	  <xs:element name="protectedPerson" type="xs:boolean" minOccurs="0" />	
+      <xs:any namespace='##other' processContents='lax' minOccurs='0' maxOccurs='unbounded' />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="PersonType">
+    <xs:sequence>
+        <xs:element name="personHsaId" type="xs:string" />
+        <xs:element name="givenName" type="xs:string" />
+        <xs:element name="middleAndSurName" type="xs:string"/>
+        <xs:element name="nickname" type="xs:string" minOccurs="0" />
+        <xs:element name="mail" type="xs:string" minOccurs="0" />
+        <xs:element name="telephoneNumber" type="tns:TelephoneNumberType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="switchboardNumber" type="xs:string" minOccurs="0" />
+        <xs:element name="nonPublicTelephoneNumber" type="tns:TelephoneNumberType" minOccurs="0" />
+        <xs:element name="mobileNumber" type="tns:TelephoneNumberType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="smsTelephoneNumber" type="tns:TelephoneNumberType" minOccurs="0" />
+        <xs:element name="telephonehour" type="tns:TimeSpanType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="labeledUri" type="xs:string" minOccurs="0" />
+        <xs:element name="description" type="xs:string" minOccurs="0" />
+        <xs:element name="languageKnowledgeCode" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="title" type="xs:string" minOccurs="0" />
+        <xs:element name="healthCareProfessionalLicence" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="specialityCode" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="specialityName" type="xs:string"  minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="hsaSystemRole" type="tns:HsaSystemRoleType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="dn" type="tns:DNType" />
+        <xs:element name="protectedPerson" type="xs:boolean" minOccurs="0" />	    
+        <xs:any namespace='##other' processContents='lax' minOccurs='0' maxOccurs='unbounded' />
+    </xs:sequence>
+  </xs:complexType>
+	<xs:simpleType name="ResultCodeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OK"/>
+			<xs:enumeration value="ERROR"/>
+			<xs:enumeration value="INFO"/>
+		</xs:restriction>
+	</xs:simpleType> 
+	
+	  <xs:complexType name="CommissionType">
+    <xs:sequence>
+      <xs:element name="commissionName" type="xs:string"/>
+      <xs:element name="commissionHsaId" type="xs:string"/>
+      <xs:element name="commissionPurpose" type="xs:string"/>
+      <xs:element name="commissionRight" type="tns:CommissionRightType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="healthCareUnitHsaId" type="xs:string" minOccurs="0"/>
+      <xs:element name="healthCareUnitName" type="xs:string" minOccurs="0"/>
+      <xs:element name="healthCareUnitStartDate" type="xs:dateTime" minOccurs="0" />
+      <xs:element name="healthCareUnitEndDate" type="xs:dateTime" minOccurs="0" />			
+      <xs:element name="healthCareProviderHsaId" type="xs:string"/>
+      <xs:element name="healthCareProviderName" type="xs:string"/>
+      <xs:element name="healthCareProviderOrgNo" type="xs:string"/>   
+      <xs:element name="healthCareProviderStartDate" type="xs:dateTime" minOccurs="0" />
+      <xs:element name="healthCareProviderEndDate" type="xs:dateTime"  minOccurs="0" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>      
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CommissionRightType">
+    <xs:sequence>
+      <xs:element name="activity" type="xs:string" />
+      <xs:element name="informationClass" type="xs:string" />
+      <xs:element name="scope" type="xs:string" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="NursePrescriptionRightType">
+    <xs:sequence>
+      <xs:element name="healthCareProfessionalLicence" type="xs:string" />
+      <xs:element name="prescriptionRight" type="xs:boolean" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="PaTitleType">
+    <xs:sequence>
+      <xs:element name="paTitleName" type="xs:string" />
+      <xs:element name="paTitleCode" type="xs:string" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>  
+  
+  <xs:complexType name="HsaSystemRoleType">
+    <xs:sequence>
+      <xs:element name="systemId" type="xs:string" />
+      <xs:element name="role" type="xs:string" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="CredentialInformationType">
+    <xs:sequence>
+      <xs:element name="givenName" type="xs:string"/>
+      <xs:element name="middleAndSurName" type="xs:string"/>
+      <xs:element name="personHsaId" type="xs:string"/>
+      <xs:element name="healthCareProfessionalLicence" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="personalPrescriptionCode" type="xs:string" minOccurs="0"/>
+      <xs:element name="groupPrescriptionCode" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="nursePrescriptionRight" type="tns:NursePrescriptionRightType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="hsaSystemRole" type="tns:HsaSystemRoleType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="paTitleCode" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="protectedPerson" type="xs:boolean" minOccurs="0" />
+      <xs:element name="commission" type="tns:CommissionType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+   
+</xs:schema>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistentCache xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+
+  <!--Virtualiseringar för GetCertificateResponder-->
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpProducer</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:19000/vardgivare-b/tjanst2</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpsProducer</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:19001/vardgivare-b/tjanst2</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpsProducerWsdl</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:19001/vardgivare-b/tjanst2/?wsdl</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>NotAuhorizedReceiver</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:19000/vardgivare-b/tjanst2</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>RecevierNoProducerAvailable</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:1974/Im/not/available</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>RecevierUnknownRivVersion</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP22</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:1974/Im/not/available</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>RecevierMultipleVagval</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:1974/Im/not/available</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>RecevierMultipleVagval</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:1974/Im/not/available/either</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>RecevierNoPhysicalAddress</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress></ns2:adress>
+  </virtualiseringsInfo>
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpProducerResetByPeer</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:19007/HttpProducerResetByPeer</ns2:adress>
+  </virtualiseringsInfo>
+
+
+  <!--Virtualiseringar för GetActivitiesResponder-->
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpProducer</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:1900/explicit/GetActivitiesResponder</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>SE0000000003-1234</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:1900/treeclimbing/GetActivitiesResponder</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>ReceiverRiv20</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:19000/GetActivitiesResponder</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>ReceiverRiv21</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:19000/GetActivitiesResponder</ns2:adress>
+  </virtualiseringsInfo>
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>FirstReceiverRiv21</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:1900/default/GetActivitiesResponder</ns2:adress>
+  </virtualiseringsInfo>
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>SecondReceiverRiv21</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:1900/default/GetActivitiesResponder</ns2:adress>
+  </virtualiseringsInfo>
+
+  <!-- Default vagval:
+    contract: GetActivitiesResponder
+    adress:   http://localhost:1900/default/GetActivitiesResponder
+    -->
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>*</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:1900/default/GetActivitiesResponder</ns2:adress>
+  </virtualiseringsInfo>
+
+
+  <!--Virtualiseringar för ProcessNotificationResponder-->
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>5565594230</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:itintegration:engagementindex:ProcessNotificationResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:19000/vardgivare-b/tjanst2</ns2:adress>
+  </virtualiseringsInfo>
+
+  <!--Virtualiseringar för GetSupportedServiceContractsResponder-->
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpProducer</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:infrastructure:itintegration:registry:GetSupportedServiceContractsResponder:2</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:19000/vardgivare-b/tjanst2</ns2:adress>
+  </virtualiseringsInfo>
+
+  <!--Virtualiseringar för CheckBlocksResponder-->
+
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpProducer</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP21</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:ehr:blocking:accesscontrol:CheckBlocksResponder:3</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>http://localhost:19000/vardgivare-b/tjanst2</ns2:adress>
+  </virtualiseringsInfo>
+
+</persistentCache>
+

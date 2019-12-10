@@ -1,14 +1,4 @@
-.classpath
-.project
-.settings
-.studio
-target
+vp-services-camel/target/
+.idea/
+target/
 *.iml
-.idea
-vp-auto-deployer/src/test/resources/test.jar
-.mule/
-.metadata
-caches
-.recommenders
-/build.bat
-/release.properties

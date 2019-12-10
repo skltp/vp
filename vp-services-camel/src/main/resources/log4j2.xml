@@ -1,0 +1,45 @@
+<Configuration status="WARN" monitorInterval="30">
+
+  <Properties>
+    <Property name="LOG_PATTERN">
+      %d %-5p [%t] %-30c - %X{corr.id} %m%n
+    </Property>
+  </Properties>
+
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="${LOG_PATTERN}"/>
+    </Console>
+  </Appenders>
+
+  <Loggers>
+    <AsyncLogger name="se.skl.tp.vp" level="WARN"/>
+
+    <!--Level INFO will log the init/reset och TAK cache-->
+    <AsyncLogger name="se.skltp.takcache" level="INFO"/>
+    <AsyncLogger name="se.skl.tp.vp.vagval.ResetTakCacheProcessor" level="INFO"/>
+
+    <!--Level INFO will log the init/reset of HSA cache-->
+    <AsyncLogger name="se.skl.tp.vp.service.HsaCacheServiceImpl" level="INFO"/>
+
+
+    <!--Level INFO will log startup for spring boot application-->
+    <AsyncLogger name="se.skl.tp.vp.VpServicesApplication" level="INFO"/>
+
+    <!--Apache camel-->
+    <AsyncLogger name="org.apache.camel" level="INFO"/>
+
+    <!-- Message logging -->
+    <AsyncLogger name="se.skl.tp.vp.logging.req.in" level="DEBUG"/>
+    <AsyncLogger name="se.skl.tp.vp.logging.req.out" level="DEBUG"/>
+    <AsyncLogger name="se.skl.tp.vp.logging.resp.in" level="DEBUG"/>
+    <AsyncLogger name="se.skl.tp.vp.logging.resp.out" level="DEBUG"/>
+
+
+    <AsyncRoot level="WARN">
+      <!--<AppenderRef ref="RollingRandomAccessFile"/>-->
+      <AppenderRef ref="Console"/>
+    </AsyncRoot>
+
+  </Loggers>
+</Configuration>

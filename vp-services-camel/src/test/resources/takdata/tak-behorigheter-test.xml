@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistentCache xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+
+  <!--Behorigheter for GetCertificateResponder-->
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>2</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpProducer</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>3</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpsProducer</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>3</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpsProducerWsdl</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>4</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>RecevierNoProducerAvailable</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>RecevierUnknownRivVersion</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpProducerResetByPeer</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <!--Default behorighet for
+   sender:   SenderWithDefaultBehorighet
+   contract: GetCertificateResponder -->
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>*</ns2:receiverId>
+    <ns2:senderId>SenderWithDefaultBehorighet</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+
+  <!--Behorigheter for GetActivitiesResponder-->
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>GetActivitiesReceiverWithNoExplicitVagval</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>SE0000000003-1234</ns2:receiverId>
+    <ns2:senderId>SenderWithDefaultBehorighet</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>ReceiverRiv20</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>ReceiverRiv21</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>FirstReceiverRiv21</ns2:receiverId>
+    <ns2:senderId>SenderWithDefaultBehorighet</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>SecondReceiverRiv21</ns2:receiverId>
+    <ns2:senderId>SenderWithDefaultBehorighet</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <!--Default behorighet for
+      sender:   SenderWithDefaultBehorighet
+      contract: GetActivitiesResponder -->
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>*</ns2:receiverId>
+    <ns2:senderId>SenderWithDefaultBehorighet</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <!--Behorigheter for ProcessNotificationResponder-->
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>75</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>5565594230</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:itintegration:engagementindex:ProcessNotificationResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <!--Behorigheter for GetSupportedServiceContractsResponder-->
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>75</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpProducer</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:infrastructure:itintegration:registry:GetSupportedServiceContractsResponder:2</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+
+  <!--Behorigheter for CheckBlocksResponder-->
+
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>75</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpProducer</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:ehr:blocking:accesscontrol:CheckBlocksResponder:3</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2023-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  urn:riv:ehr:blocking:accesscontrol:CheckBlocksResponder:3
+
+</persistentCache>
