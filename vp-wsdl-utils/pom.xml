@@ -6,12 +6,12 @@
   <parent>
     <artifactId>vp-parent-camel</artifactId>
     <groupId>se.skltp.vp</groupId>
-    <version>4.0.0-RC14</version>
+    <version>4.0.0-RC15-SNAPSHOT</version>
   </parent>
 
   <artifactId>vp-wsdl-utils</artifactId>
   <name>vp-wsdl-utils</name>
-  <version>4.0.0-RC14</version>
+  <version>4.0.0-RC15-SNAPSHOT</version>
   <description>SKLTP VP wsdl utility</description>
 
   <dependencies>
