@@ -54,6 +54,8 @@ public class VPNettyHttpBinding extends DefaultNettyHttpBinding {
   @Override
   public HttpResponse toNettyResponse(Message message, NettyHttpConfiguration configuration) throws Exception {
     HttpResponse response = super.toNettyResponse(message, configuration);
+    String correlationId = message.getExchange().getProperty(VPExchangeProperties.SKLTP_CORRELATION_ID, String.class);
+    response.headers().set(HttpHeaders.X_SKLTP_CORRELATION_ID, correlationId);
     if(log.isDebugEnabled()){
       log.debug("Outgoing response headers:\n{}", response.headers().toString());
     }
