@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. Sveriges Kommuner och Landsting 
+	licenses this file to you under the Apache License, Version 2.0 (the "License"); 
+	you may not use this file except in compliance with the License. You may 
+	obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:riv:clinicalprocess:healthcond:certificate:GetCertificateResponder:2"
+	xmlns:tns="urn:riv:clinicalprocess:healthcond:certificate:GetCertificateResponder:2"
+	xmlns:types="urn:riv:clinicalprocess:healthcond:certificate:types:3"
+	xmlns:core="urn:riv:clinicalprocess:healthcond:certificate:3"
+	elementFormDefault="qualified" attributeFormDefault="unqualified"
+        version="2.1">
+
+	<import namespace="urn:riv:clinicalprocess:healthcond:certificate:3"
+		schemaLocation="../../core_components/clinicalprocess_healthcond_certificate_3.2.xsd" />
+	<import namespace="urn:riv:clinicalprocess:healthcond:certificate:types:3"
+		schemaLocation="../../core_components/clinicalprocess_healthcond_certificate_types_3.2.xsd" />
+
+	<element name="GetCertificate" type="tns:GetCertificateType" />
+	<element name="GetCertificateResponse" type="tns:GetCertificateResponseType" />
+
+	<complexType name="GetCertificateType">
+		<sequence>
+			<element name="intygs-id" type="types:IntygId" />
+			<element name="part" type="types:Part" />
+			<any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	
+	<complexType name="GetCertificateResponseType">
+		<sequence>
+			<element name="intyg" type="core:Intyg" />
+			<any namespace="##other" processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+</schema>

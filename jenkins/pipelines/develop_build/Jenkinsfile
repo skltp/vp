@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    environment{
+        JDK_PATH = tool name: 'Java 8_152'
+        JAVA_HOME = "${JDK_PATH}"
+        MAVEN_IMAGE = 'maven:3.6-jdk-8'
+    }
+
+    stages {
+        stage('Build') {
+            agent {
+                docker {
+                    image "${MAVEN_IMAGE}"
+                    args "-v ${JDK_PATH}:${JDK_PATH}"
+                    reuseNode true
+                }
+            }
+            steps {
+                echo 'Starting Build stage...'
+                configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
+                    sh 'pwd'
+                    echo 'Compiling, testing and building...'
+                    sh 'mvn --global-settings ${MAVEN_SETTINGS} -P test-coverage,leak clean install'
+                }
+            }     
+        }        
+    }
+
+    post {
+        always {
+            echo 'Starting results handling...'
+            junit '**/target/surefire-reports/TEST-*.xml'
+            jacoco()
+            archiveArtifacts '**/target/*.jar'
+        }
+
+        unsuccessful {
+            echo 'Build unsuccessful'
+            emailext attachLog: true, 
+                subject: "Build failed in Jenkins: ${JOB_NAME}#${BUILD_NUMBER}", 
+                body: "See ${BUILD_URL} for details.",
+                to: "${params.EMAIL_RECIPIENTS}"
+        }
+
+        changed {
+            script {
+                if ("${currentBuild.currentResult}" == 'SUCCESS') {
+                    echo "Current build successful, previous build was unsuccessful"
+                    emailext attachLog: true, 
+                        subject: "${JOB_NAME} back to stable", 
+                        body: "See ${BUILD_URL} for details.",
+                        to: "${params.EMAIL_RECIPIENTS}"        
+                }
+            }
+        }
+
+        cleanup {
+            echo 'Cleaning workspace...'
+            cleanWs()
+        }
+    }
+}

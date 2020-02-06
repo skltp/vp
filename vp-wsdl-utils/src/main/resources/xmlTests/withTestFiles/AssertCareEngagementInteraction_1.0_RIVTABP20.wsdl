@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 
+ Licensed to Inera AB under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. inera AB licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ -->		
+<wsdl:definitions name='AssertCareEngagementInteraction' xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:wsa='http://www.w3.org/2005/08/addressing' xmlns:tjsr='urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1' xmlns:tjsi='urn:riv:ehr:accesscontrol:AssertCareEngagementInitiator:1' xmlns:tns='urn:riv:ehr:accesscontrol:AssertCareEngagement:1:rivtabp20' targetNamespace='urn:riv:ehr:accesscontrol:AssertCareEngagement:1:rivtabp20'>
+  <xs:annotation>
+    <xs:documentation>
+			 Tjänsteinteraktionens namn: AssertCareEngagementInteraction
+			 Beskrivning: 
+			   The responder determines whether a care professional has a care relationship with a patient such that access to health records of external healthcare fascilities would be justified
+			 Revisioner: 
+			 Tjänstedomän: ehr:accesscontrol
+			 Tjänsteinteraktionstyp: Fråga-Svar
+			 RIV Teknisk Anvisning: RIVTABP20
+			 Förvaltas av: Inera AB
+			 </xs:documentation>
+  </xs:annotation>
+  <wsdl:types>
+    <xs:schema targetNamespace='urn:riv:ehr:accesscontrol:AssertCareEngagement:1:rivtabp20'>
+      <xs:import schemaLocation='AssertCareEngagementResponder_1.0.xsd' namespace='urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1' />
+      <xs:import schemaLocation='../../core_components/ws-addressing-1.0.xsd' namespace='http://www.w3.org/2005/08/addressing' />
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name='AssertCareEngagementRequest'>
+    <wsdl:part name='LogicalAddress' element='wsa:To' >
+    	<xs:annotation>
+      		<xs:documentation>The HSAid of the healthcare_facility on which behalf the employee is acting in her profession</xs:documentation>
+    	</xs:annotation>
+	</wsdl:part>
+    <wsdl:part name='parameters' element='tjsr:AssertCareEngagement' />
+  </wsdl:message>
+  <wsdl:message name='AssertCareEngagementResponse'>
+    <wsdl:part name='parameters' element='tjsr:AssertCareEngagementResponse' />
+  </wsdl:message>
+  <wsdl:portType name='AssertCareEngagementResponderInterface'>
+    <wsdl:operation name='AssertCareEngagement'>
+      <wsdl:input message='tns:AssertCareEngagementRequest' />
+      <wsdl:output message='tns:AssertCareEngagementResponse' />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name='AssertCareEngagementResponderBinding' type='tns:AssertCareEngagementResponderInterface'>
+    <soap:binding style='document' transport='http://schemas.xmlsoap.org/soap/http' />
+    <wsdl:operation name='AssertCareEngagement'>
+      <soap:operation soapAction='urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1:AssertCareEngagement' style='document' />
+      <wsdl:input>
+        <soap:header use='literal' message='tns:AssertCareEngagementRequest' part='LogicalAddress' />
+        <soap:body use='literal' parts='parameters' />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use='literal' />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name='AssertCareEngagementResponderService'>
+    <wsdl:port name='AssertCareEngagementResponderPort' binding='tns:AssertCareEngagementResponderBinding'>
+      <soap:address location='http://tempuri.org' />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

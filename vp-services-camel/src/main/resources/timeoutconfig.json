@@ -1,0 +1,7 @@
+[
+  {
+    "tjanstekontrakt": "default_timeouts",
+    "routetimeout": 30000,
+    "producertimeout": 29000
+  }
+]

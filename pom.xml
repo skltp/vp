@@ -1,38 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- DON'T CHANGE THE CONTENT OF THIS COMMENT UNLESS YOU REALLY KNOW WHAT
-	YOU ARE DOING! [soi-toolkit.gen.version=0.3.1] [soi-toolkit.gen.type=integrationComponent]
-	[soi-toolkit.gen.createDate=2011-06-30T14:55:14.006+02:00] [soi-toolkit.gen.artifactId=vp] -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>se.skltp.commons</groupId>
-    <artifactId>skltp-commons-mule-parent</artifactId>
-    <version>2.0.3</version>
-  </parent>
-
   <groupId>se.skltp.vp</groupId>
-  <artifactId>vp-parent</artifactId>
-  <version>3.3.1</version>
+  <artifactId>vp-parent-camel</artifactId>
+  <name>vp-parent-camel</name>
+  <version>4.0.0</version>
   <packaging>pom</packaging>
-  <name>vp-parent</name>
+  <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
   <properties>
-    <vp.mule.version>3.7.0</vp.mule.version>
-    <vp.cxf.version>2.7.15</vp.cxf.version>
-    <sonar.host.url>http://localhost:9000</sonar.host.url>
-    <sonar.jdbc.url>jdbc:jtds:sqlserver://localhost;databaseName=sonar;SelectMethod=Cursor</sonar.jdbc.url>
-    <!-- Turn off strict checking of javadoc tags for Java 8 -->
-    <additionalparam>-Xdoclint:none</additionalparam>
-    <tak.version>1.5.0</tak.version>
-    <takdatahandler.version>1.0.1</takdatahandler.version>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <spring.boot-version>2.1.0.RELEASE</spring.boot-version>
+    <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
+    <camel.version>2.24.0</camel.version>
+    <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
 
-    <surefire.plugin.version>2.20.1</surefire.plugin.version>
-    <failsafe.plugin.version>2.22.0</failsafe.plugin.version>
+    <takdatahandler.version>1.0.1</takdatahandler.version>
 
+    <maven.javadoc.skip>true</maven.javadoc.skip>
 
+    <argLine.leak>-D_</argLine.leak> <!-- Overridden when 'leak' profile is active -->
+    
     <!-- ************************-->
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
@@ -51,124 +46,273 @@
     <sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
   </properties>
 
+  <distributionManagement>
+    <repository>
+      <id>release-nexus</id>
+      <name>Release Nexus</name>
+      <url>${releases-nexus-url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshot-nexus</id>
+      <name>Snapshot Nexus</name>
+      <url>${snapshot-nexus-url}</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <scm>
-    <url>http://github.com/skltp/vp</url>
+    <url>https://github.com/skltp/vp.git</url>
     <connection>scm:git:https://github.com:443/skltp/vp.git</connection>
-    <developerConnection>scm:git:https://github.com:443/skltp/vp.git</developerConnection>
-    <tag>v3.3.1</tag>
+    <developerConnection>scm:git:https://github.com:443/skltp/vp.git
+    </developerConnection>
+    <tag>v4.0.0</tag>
   </scm>
 
-
-  <repositories>
-    <!-- Sonatype staging repo added to be able to build VP using artifacts
-      not yet pushed to central maven. In this specific case its about
-      new version of itintegration registry constracts.
-
-      <groupId>se.rivta.infrastructure.itintegration</groupId>
-            <artifactId>ServiceContracts_infrastructure_itintegration_registry</artifactId>
-            <version>2.0-RC2</version>
-         -->
-    <repository>
-      <id>sonatype-nexus-staging-repository</id>
-      <url>https://oss.sonatype.org/content/repositories/staging/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <modules>
-    <module>vp-ping</module>
-    <module>vp-services</module>
-    <module>vp-teststub</module>
+    <module>vp-wsdl-utils</module>
+    <module>vp-services-camel</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>se.skltp.vp</groupId>
+        <artifactId>utility</artifactId>
+      </dependency>
+      <!-- Spring Boot BOM -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot-version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- Camel BOM -->
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-spring-boot-dependencies</artifactId>
+        <version>${camel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>${spring.boot-version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-undertow</artifactId>
+        <version>${spring.boot-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-actuator</artifactId>
+        <version>${spring.boot-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-configuration-processor</artifactId>
+        <version>${spring.boot-version}</version>
+      </dependency>
+
+      <!-- Camel -->
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-spring-boot-starter</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-spring-boot</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-core-starter</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-stream-starter</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-stream</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-netty4-http-starter</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+
+      <!--hawt.io-->
+      <dependency>
+        <groupId>io.hawt</groupId>
+        <artifactId>hawtio-springboot</artifactId>
+        <version>2.6.0</version>
+      </dependency>
+
+      <!-- test -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <version>${spring.boot-version}</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>com.vaadin.external.google</groupId>
+            <artifactId>android-json</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-test-spring</artifactId>
+        <version>${camel.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-test</artifactId>
+        <version>${camel.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-spring</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-ext-jdk16</artifactId>
+        <version>1.46</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-stax</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-core</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.xml.ws</groupId>
+        <artifactId>jaxws-rt</artifactId>
+        <version>2.3.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <version>1.10.b1</version>
-          <configuration>
-            <properties>
-              <year>2013</year>
-              <copyright>Center for eHalsa i samverkan (CeHis).
-                &lt;http://cehis.se/&gt;
-              </copyright>
-              <product>SKLTP</product>
-            </properties>
-            <strictCheck>true</strictCheck>
-            <basedir>${basedir}</basedir>
-            <header>https://raw.githubusercontent.com/skltp/license/develop/header.txt</header>
-            <encoding>UTF-8</encoding>
-            <includes>
-              <include>src/main/**</include>
-              <include>src/test/**</include>
-            </includes>
-            <excludes>
-              <exclude>**/*.xsd</exclude>
-              <exclude>**/*.wsdl</exclude>
-              <exclude>**/*.xml</exclude>
-              <exclude>**/*.dtd</exclude>
-              <exclude>**/*.jks</exclude>
-              <exclude>**/*.pem</exclude>
-              <exclude>**/*.sh</exclude>
-              <exclude>src/test/java/org/mule/util/**</exclude>
-            </excludes>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <mapping>
-              <tag>DYNASCRIPT_STYLE</tag>
-            </mapping>
-            <useDefaultMapping>true</useDefaultMapping>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire.plugin.version}</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${failsafe.plugin.version}</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
+      <!--<plugin>-->
+      <!--<groupId>org.apache.maven.plugins</groupId>-->
+      <!--<artifactId>maven-compiler-plugin</artifactId>-->
+      <!--<configuration>-->
+      <!--<source>${java.version}</source>-->
+      <!--<target>${java.version}</target>-->
+      <!--</configuration>-->
+      <!--</plugin>-->
       <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <pushChanges>true</pushChanges>
+          <localCheckout>true</localCheckout>
+        </configuration>
       </plugin>
       <plugin>
-        <groupId>org.sonarsource.scanner.maven</groupId>
-        <artifactId>sonar-maven-plugin</artifactId>
-        <version>${sonar.plugin.version}</version>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-maven-plugin</artifactId>
+        <version>${camel.version}</version>
+        <!-- allows to fail if not all routes are fully covered during testing -->
+        <configuration>
+          <failOnError>true</failOnError>
+        </configuration>
+
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.1</version>
+        <configuration>
+          <argLine>${argLine.leak}</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.22.2</version>
+        <configuration>
+          <!-- Seems to be som kind of conflict with JAXB camel dependencies and JDK8 Jaxb impl.
+          https://stackoverflow.com/questions/42499436/classcastexception-cannot-be-cast-to-com-sun-xml-internal-bind-v2-runtime-refle -->
+          <systemPropertyVariables>
+            <com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize>true
+            </com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize>
+          </systemPropertyVariables>
+
+          <!--Make failsafe and spring-boot repackage play nice together
+          https://github.com/spring-projects/spring-boot/issues/6254-->
+          <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+          <argLine>${argLine.leak}</argLine>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>2.1.5.RELEASE</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+            </goals>
+            <configuration>
+              <additionalProperties>
+                <encoding.source>UTF-8</encoding.source>
+                <encoding.reporting>UTF-8</encoding.reporting>
+                <java.source>${maven.compiler.source}</java.source>
+                <java.target>${maven.compiler.target}</java.target>
+              </additionalProperties>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
-
   </build>
+
   <profiles>
     <profile>
-      <id>license</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.mycila.maven-license-plugin</groupId>
-            <artifactId>maven-license-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>check</id>
-                <phase>compile</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
+      <id>leak</id>
+      <properties>
+        <argLine.leak>-Dio.netty.leakDetectionLevel=paranoid -Dio.netty.leakDetection.maxRecords=32 -Dio.netty.leakDetection.targetRecords=10 -Dspring.profiles.active=leak</argLine.leak>
+      </properties>
     </profile>
     <profile>
       <id>test-coverage</id>
@@ -256,6 +400,4 @@
       </build>
     </profile>
   </profiles>
-
-
 </project>

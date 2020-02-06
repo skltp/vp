@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2012 sp1 (x64) (http://www.altova.com) by Nadeem Hossain (Mawell Scandinavia AB) -->
+<!-- 
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. Sveriges Kommuner och Landsting licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:riv:clinicalprocess:activity:actions:enum:1" targetNamespace="urn:riv:clinicalprocess:activity:actions:enum:1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:simpleType name="AddressPartTypeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AL">
+				<xs:annotation>
+					<xs:documentation>Adressrad (används för leveransadress, tilläggsinfo eller en gatuadress men ej leveransadress och gatuadress tillsammans)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ADL">
+				<xs:annotation>
+					<xs:documentation>Tillägg lokalisationsinfo (t.ex. våningsnr "3", lägenhetsnr "122")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UNIT">
+				<xs:annotation>
+					<xs:documentation>Definierar värdestypen för lokalisationsinfo (t.ex. "våning", "lägenhet")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UNID">
+				<xs:annotation>
+					<xs:documentation>Siffran eller namnet på värdestyp som kännetecknar byggnad eller fastighet (t.ex. "kvarteret Hälsan")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DAL">
+				<xs:annotation>
+					<xs:documentation>Leveransadressrad (tillåts inte stå i kombination med leveransadress och gatuadress)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DINSTA">
+				<xs:annotation>
+					<xs:documentation>Leveransområde (oftast en ort där leveransadressen skiljer sig från kommunorten)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DINSTQ">
+				<xs:annotation>
+					<xs:documentation>Leveransadressbenämning (t.ex. hisshall "B", "östra" receptionen)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DINST">
+				<xs:annotation>
+					<xs:documentation>Leveransadresstypen (t.ex. "hisshall", "receptionen")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DMOD">
+				<xs:annotation>
+					<xs:documentation>Leveranssätt (t.ex. "postutdelning", "postbox")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DMODID">
+				<xs:annotation>
+					<xs:documentation>Leveranssättbenämning (t.ex. postbox "2683")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SAL">
+				<xs:annotation>
+					<xs:documentation>Gatuadressrad (används frekvent då man inte vill bryta ned adressrymden i gatutyper, byggnadsnr etc.)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BNR">
+				<xs:annotation>
+					<xs:documentation>Byggnads- eller fastighetsnummer (används ej som gatunummer)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BNN">
+				<xs:annotation>
+					<xs:documentation>Den numeriska delen av byggnads- eller fastighetsnumret</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BNS">
+				<xs:annotation>
+					<xs:documentation>Byggnads- eller fastighetsnummer suffix (t.ex. 12"B")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="STR">
+				<xs:annotation>
+					<xs:documentation>Gatunamn (namnet samt typen av gatan)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="STB">
+				<xs:annotation>
+					<xs:documentation>Gatunamnbasen (namnet på anknytande huvudgata utan riktning)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="STTYP">
+				<xs:annotation>
+					<xs:documentation>Gatutypen (typen på gatan som berörs, t.ex. "gågata")</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIR">
+				<xs:annotation>
+					<xs:documentation>Riktning (t.ex. N, S, W, E)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="INT">
+				<xs:annotation>
+					<xs:documentation>Korsning (anger att en korsning är anknuten berörd adress)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CAR">
+				<xs:annotation>
+					<xs:documentation>C/O (care of) adress</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CEN">
+				<xs:annotation>
+					<xs:documentation>Områdes- kvartersbenämning (definierar område eller kvarter som berörd adress ligger i, t.ex. SoFo)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CNT">
+				<xs:annotation>
+					<xs:documentation>Land</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CPA">
+				<xs:annotation>
+					<xs:documentation>Län</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DEL">
+				<xs:annotation>
+					<xs:documentation>Skiljetecken (används för att särskilja text i adressrymden)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CTY">
+				<xs:annotation>
+					<xs:documentation>Postort</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="POB">
+				<xs:annotation>
+					<xs:documentation>Postbox</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZIP">
+				<xs:annotation>
+					<xs:documentation>Postnummer</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PRE">
+				<xs:annotation>
+					<xs:documentation>Distriktsområde</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="STA">
+				<xs:annotation>
+					<xs:documentation>Region eller provins</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TelTypeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="voice">
+				<xs:annotation>
+					<xs:documentation>Nummer för att föra ett röstsamtal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="fax">
+				<xs:annotation>
+					<xs:documentation>Faxnummer</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="data">
+				<xs:annotation>
+					<xs:documentation>E-post adress</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="tty">
+				<xs:annotation>
+					<xs:documentation>Nummer till texttelefon</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="sms">
+				<xs:annotation>
+					<xs:documentation>Nummer för mobila textmeddelanden</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PostalAddressUseEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PHYS">
+				<xs:annotation>
+					<xs:documentation>Adress till fysisk plats/besöksadress</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="H">
+				<xs:annotation>
+					<xs:documentation>Hemadress</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HV">
+				<xs:annotation>
+					<xs:documentation>Semesteradress</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WP">
+				<xs:annotation>
+					<xs:documentation>Adress till arbetsplats</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TMP">
+				<xs:annotation>
+					<xs:documentation>Tillfällig adress</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TimeStampTypeFormatEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="YYYY"/>
+			<xs:enumeration value="YYYYMM"/>
+			<xs:enumeration value="YYYYMMDDhh"/>
+			<xs:enumeration value="YYYYMMDDhhmm"/>
+			<xs:enumeration value="YYYYMMDDhhmmss"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ResultCodeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OK"/>
+			<xs:enumeration value="ERROR"/>
+			<xs:enumeration value="INFO"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ErrorCodeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="INVALID_REQUEST"/>
+			<xs:enumeration value="TRANSFORMATION_ERROR"/>
+			<xs:enumeration value="APPLICATION_ERROR"/>
+			<xs:enumeration value="TECHNICAL_ERROR"/>
+		</xs:restriction>
+	</xs:simpleType> 
+</xs:schema>

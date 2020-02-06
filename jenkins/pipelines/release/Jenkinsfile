@@ -1,0 +1,61 @@
+pipeline  {
+    agent any
+
+    environment {
+        JDK_PATH = tool name: 'Java 8_152'
+        JAVA_HOME = "${JDK_PATH}"
+        MAVEN_DOCKER_IMAGE = 'maven:3.6-jdk-8'
+    }
+
+    stages  {
+        stage('Preparation')  {
+            steps {
+                sh "git config user.name ${params.GIT_USER_NAME}"
+                sh "git config user.email ${params.GIT_USER_EMAIL}"
+            }
+        }
+
+        stage('Build') {
+            agent {
+                docker {
+                    image "${MAVEN_DOCKER_IMAGE}"
+                    args "-v ${JDK_PATH}:${JDK_PATH}"
+                    reuseNode true
+                }
+            }
+            steps {
+                configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
+                    sh 'mvn --global-settings ${MAVEN_SETTINGS} clean install'
+                }
+            }   
+        }
+
+        stage('Results')  {
+            steps {
+                junit '**/target/surefire-reports/TEST-*.xml'
+                archiveArtifacts '**/target/*.jar'
+            }
+        }
+
+        stage('Release')  {
+            agent {
+                docker {
+                    image "${MAVEN_DOCKER_IMAGE}"
+                    args "-v ${JDK_PATH}:${JDK_PATH}"
+                    reuseNode true
+                }
+            }      
+            steps {
+                configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
+                    sh "mvn -B --global-settings ${MAVEN_SETTINGS} -DdevelopmentVersion=${params.DEVELOPMENT_VERSION} -DreleaseVersion=${params.RELEASE_VERSION} -DtagNameFormat=v@{project.version} -Dresume=false -DskipTests -Darguments=-DskipTests -Pskltp -DdryRun=${params.DRY_RUN} release:prepare -DpushChanges=true  release:perform -Darguments=-Dmaven.javadoc.skip=true"
+                }
+            }
+        }
+    }
+
+    post  {
+        cleanup  {
+            cleanWs()
+        }
+    }
+}
