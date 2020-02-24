@@ -30,5 +30,5 @@ public class PropertyConstants {
     public static final String VP_HTTP_GET_ROUTE = "vp.status.url";
 
     public static final String PRODUCER_CHUNKED_ENCODING = "producer.chunked.encoding";
-
+    public static final String NO_AUTH_ON_HAWTIO = "no.auth.on.hawtio";
 }
