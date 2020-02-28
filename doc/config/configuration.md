@@ -26,7 +26,7 @@ Spring-boot property fil som ligger under resources i jaren. Inställningarna ka
 |spring.profiles.include|security|Sätt vilka Spring profiler som skall användas|
 |camel.springboot.name|vp-services|Namn på Spring-boot applikationen|
 |management.endpoints.web.exposure.include|hawtio,jolokia|Default aktivera övervakning via Hawtio|
-|hawtio.authenticationEnabled|false|Aktivera autentisering för att använda Hawtio|
+|hawtio.authentication.enabled|true|Aktivera/Avaktivera autentisering för att använda Hawtio. Defaultvärde true.|
 |vp.instance.id|dev_env|Identifierare för den installerade VP:n|
 |vp.http.route.url|htttp://localhost:12312/vp|Ingång för HTTP-anrop. Porten kan konfigureras|
 |vp.https.route.url|https://localhost:443/vp|Ingång för HTTPS-anrop. Porten kan konfigureras|

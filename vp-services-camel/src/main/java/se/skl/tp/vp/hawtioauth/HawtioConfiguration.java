@@ -1,22 +1,22 @@
-package se.skl.tp.vp.hawtioAuth;
+package se.skl.tp.vp.hawtioauth;
 
 import io.hawt.config.ConfigFacade;
 import io.hawt.web.auth.AuthenticationConfiguration;
 import java.net.URL;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import se.skl.tp.vp.constants.PropertyConstants;
 
 @Log4j2
-@SpringBootApplication
-public class HawtioAuthSpringBootService {
+@Configuration
+public class HawtioConfiguration {
 
   private static final String JAVA_SECURITY_AUTH_LOGIN_CONFIG = "java.security.auth.login.config";
 
-  @Value("${" + PropertyConstants.NO_AUTH_ON_HAWTIO + ":#{false}}")
-  private Boolean noAuthOnHawtIO;
+  @Value("${" + PropertyConstants.HAWTIO_AUTHENTICATION_ENABLED + ":#{true}}")
+  private Boolean hawtioAuthenticationEnabled;
 
   /**
    * Configure facade to use/not use authentication.
@@ -26,7 +26,7 @@ public class HawtioAuthSpringBootService {
    */
   @Bean(initMethod = "init")
   public ConfigFacade configFacade() throws Exception {
-    if (noAuthOnHawtIO) {
+    if (!hawtioAuthenticationEnabled) {
       System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "false");
     } else {
       final URL loginResource = this.getClass().getClassLoader().getResource("login.conf");

@@ -1,4 +1,4 @@
-package se.skl.tp.vp.hawtioAuth;
+package se.skl.tp.vp.hawtioauth;
 
 import java.security.Principal;
 import java.util.ArrayList;
