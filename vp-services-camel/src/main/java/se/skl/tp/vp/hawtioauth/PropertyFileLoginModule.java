@@ -42,12 +42,11 @@ public class PropertyFileLoginModule extends AbstractLoginModule {
       final Map<String, ?> sharedState,
       final Map<String, ?> options) {
     super.initialize(subject, callbackHandler, sharedState, options);
-    setupPropertyUserStore(options);
+    setupPropertyUserStore();
   }
 
-  private void setupPropertyUserStore(final Map<String, ?> options) {
-    parseConfig(options);
-
+  private void setupPropertyUserStore() {
+    parseConfig();
     if (PROPERTY_USERSTORES.get(filename) == null) {
       final PropertyUserStore propertyUserStore = new PropertyUserStore();
       propertyUserStore.setConfig(filename);
@@ -66,12 +65,10 @@ public class PropertyFileLoginModule extends AbstractLoginModule {
     }
   }
 
-  private void parseConfig(final Map<String, ?> options) {
-    String tmp = (String) options.get("file");
-    filename = (tmp == null ? DEFAULT_FILENAME : tmp);
-    filename = System.getProperty("login.file", filename);
-    tmp = (String) options.get("hotReload");
-    hotReload = tmp == null ? hotReload : Boolean.parseBoolean(tmp);
+  private void parseConfig() {
+    filename = DEFAULT_FILENAME;
+    filename = System.getProperty("hawtiologin.file", filename);
+    hotReload = false;
   }
 
   @Override

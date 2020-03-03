@@ -7,7 +7,7 @@ Konfigurering kan göras i filerna listade nedan. Vid respektive avsnitt finns i
  * timeoutconfig.json  
  * wsdlconfig.json
 
-För mer information om hur eventuell proxy eller lastbalanserare ska konfigureras, samt exempelfiler, se [Detaljerad konfiguration].
+För mer information om hur eventuell proxy eller lastbalanserare ska konfigureras, hur användare och lösenord för Hawtio konfigureras samt exempelfiler, se [Detaljerad konfiguration].
 Loggning och hur det går till och kan konfigureras kan man läsa om här: [Loggning konfiguration]
 
 ### Application.properties ###
@@ -26,7 +26,8 @@ Spring-boot property fil som ligger under resources i jaren. Inställningarna ka
 |spring.profiles.include|security|Sätt vilka Spring profiler som skall användas|
 |camel.springboot.name|vp-services|Namn på Spring-boot applikationen|
 |management.endpoints.web.exposure.include|hawtio,jolokia|Default aktivera övervakning via Hawtio|
-|hawtio.authentication.enabled|true|Aktivera/Avaktivera autentisering för att använda Hawtio. Defaultvärde true.|
+|hawtio.authentication.enabled|true|Aktivera/Avaktivera autentisering för att använda Hawtio. Defaultvärde false.|
+|hawtio.external.loginfile|\<path>/realm-custom.properties|Sökväg till extern login-fil. Se [Detaljerad konfiguration]
 |vp.instance.id|dev_env|Identifierare för den installerade VP:n|
 |vp.http.route.url|htttp://localhost:12312/vp|Ingång för HTTP-anrop. Porten kan konfigureras|
 |vp.https.route.url|https://localhost:443/vp|Ingång för HTTPS-anrop. Porten kan konfigureras|

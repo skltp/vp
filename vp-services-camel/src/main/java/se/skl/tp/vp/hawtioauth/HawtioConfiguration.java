@@ -56,7 +56,7 @@ public class HawtioConfiguration {
         loginFile = this.getClass().getClassLoader().getResource("realm.properties");
       }
       if (loginFile != null) {
-        setSystemPropertyIfNotSet("login.file", loginFile.toExternalForm());
+        setSystemPropertyIfNotSet("hawtiologin.file", loginFile.toExternalForm());
         setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "user");
         setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "admin");
         setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_REALM, "hawtio");
