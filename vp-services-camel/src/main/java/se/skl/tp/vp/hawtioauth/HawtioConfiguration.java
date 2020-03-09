@@ -19,7 +19,7 @@ public class HawtioConfiguration {
   @Value("${" + PropertyConstants.HAWTIO_AUTHENTICATION_ENABLED + ":#{false}}")
   private Boolean hawtioAuthenticationEnabled;
 
-  @Value("${hawtio.external.loginfile:#{null}}")
+  @Value("${" + PropertyConstants.HAWTIO_EXTERNAL_LOGINFILE + ":#{null}}")
   private String externalLoginFile;
 
   /**
