@@ -3,6 +3,7 @@ package se.skl.tp.vp.hawtioauth;
 import io.hawt.config.ConfigFacade;
 import io.hawt.web.auth.AuthenticationConfiguration;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +30,11 @@ public class HawtioConfiguration {
    * @throws Exception if an error occurs
    */
   @Bean(initMethod = "init")
-  public ConfigFacade configFacade() throws Exception {
+  public ConfigFacade configFacade() {
     //If key is set in custom.properties, but no value: true default value above only applies if the key is missing, not value..
-    hawtioAuthenticationEnabled = hawtioAuthenticationEnabled == null ? false : hawtioAuthenticationEnabled;
+    if (hawtioAuthenticationEnabled == null) {
+      hawtioAuthenticationEnabled = false;
+    }
     log.info("Configuring authentication for Hawtio: hawtioAuthenticationEnabled is " + hawtioAuthenticationEnabled);
     if (!hawtioAuthenticationEnabled) {
       System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "false");
@@ -43,33 +46,38 @@ public class HawtioConfiguration {
       }
       log.info("Using loginResource " + JAVA_SECURITY_AUTH_LOGIN_CONFIG + " : "
               + System.getProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG));
-
-      URL loginFile = null;
-      if (externalLoginFile != null) {
-        File f = new File(externalLoginFile);
-        if (f.exists() && f.isFile() && f.canRead()) {
-          loginFile = f.toURI().toURL();
-        } else {
-          log.error("The external loginFile for Hawtio was not found or not readable. Path was " + f.getAbsolutePath());
-        }
-      } else {
-        loginFile = this.getClass().getClassLoader().getResource("realm.properties");
-      }
-      if (loginFile != null) {
-        setSystemPropertyIfNotSet("hawtiologin.file", loginFile.toExternalForm());
-        setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "user");
-        setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "admin");
-        setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_REALM, "hawtio");
-        setSystemPropertyIfNotSet(
-            AuthenticationConfiguration.HAWTIO_ROLE_PRINCIPAL_CLASSES,
-            "org.eclipse.jetty.jaas.JAASRole");
-        log.info("Using loginfile for Hawtio:" + loginFile);
-      } else {
-        log.error("No loginFile found. Cannot set user and pw. Hawtio is NOT accessible.");
-      }
-      System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "true");
+      setLoginFile();
     }
     return new ConfigFacade();
+  }
+
+  private void setLoginFile() {
+    URL loginFileUrl = this.getClass().getClassLoader().getResource("realm.properties");
+    if (externalLoginFile != null) {
+      File f = new File(externalLoginFile);
+      if (f.exists() && f.isFile() && f.canRead()) {
+        try {
+          loginFileUrl = f.toURI().toURL();
+        } catch (MalformedURLException mue) {
+          log.error("The external loginFile URL is malformed. URI was " + loginFileUrl);
+        }
+      } else {
+        log.error("The external loginFile for Hawtio was not found or not readable. Path was " + f.getAbsolutePath());
+      }
+    }
+    if (loginFileUrl != null) {
+      setSystemPropertyIfNotSet("hawtiologin.file", loginFileUrl.toExternalForm());
+      setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "user");
+      setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "admin");
+      setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_REALM, "hawtio");
+      setSystemPropertyIfNotSet(
+          AuthenticationConfiguration.HAWTIO_ROLE_PRINCIPAL_CLASSES,
+          "org.eclipse.jetty.jaas.JAASRole");
+      log.info("Using loginfile for Hawtio:" + loginFileUrl);
+    } else {
+      log.error("No loginFile found. Cannot set user and pw. Hawtio is NOT accessible.");
+    }
+    System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "true");
   }
 
   private void setSystemPropertyIfNotSet(final String key, final String value) {
