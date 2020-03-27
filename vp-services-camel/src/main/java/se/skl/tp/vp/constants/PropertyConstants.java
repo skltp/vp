@@ -30,5 +30,6 @@ public class PropertyConstants {
     public static final String VP_HTTP_GET_ROUTE = "vp.status.url";
 
     public static final String PRODUCER_CHUNKED_ENCODING = "producer.chunked.encoding";
-
+    public static final String HAWTIO_AUTHENTICATION_ENABLED = "hawtio.authentication.enabled";
+    public static final String HAWTIO_EXTERNAL_LOGINFILE = "hawtio.external.loginfile";
 }
