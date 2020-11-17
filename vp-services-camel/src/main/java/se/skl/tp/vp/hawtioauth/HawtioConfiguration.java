@@ -38,46 +38,48 @@ public class HawtioConfiguration {
     log.info("Configuring authentication for Hawtio: hawtioAuthenticationEnabled is " + hawtioAuthenticationEnabled);
     if (!hawtioAuthenticationEnabled) {
       System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "false");
-      log.warn("Authentication set to false for Hawtio. Not recommended.");
+      log.warn("Authentication set to false for Hawtio. NOT recommended.");
     } else {
+      System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "true");
       final URL loginResource = this.getClass().getClassLoader().getResource("login.conf");
       if (loginResource != null) {
         setSystemPropertyIfNotSet(JAVA_SECURITY_AUTH_LOGIN_CONFIG, loginResource.toExternalForm());
+        log.info("Hawtio: Using loginResource " + JAVA_SECURITY_AUTH_LOGIN_CONFIG + " : "
+            + System.getProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG));
+        setLoginFile();
+      } else {
+        log.error("Hawtio: Login resource (login.conf) for setting system property " + JAVA_SECURITY_AUTH_LOGIN_CONFIG + " was null!");
       }
-      log.info("Using loginResource " + JAVA_SECURITY_AUTH_LOGIN_CONFIG + " : "
-              + System.getProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG));
-      setLoginFile();
     }
     return new ConfigFacade();
   }
 
   private void setLoginFile() {
-    URL loginFileUrl = this.getClass().getClassLoader().getResource("realm.properties");
+    URL loginFileUrl;
     if (externalLoginFile != null) {
       File f = new File(externalLoginFile);
       if (f.exists() && f.isFile() && f.canRead()) {
         try {
           loginFileUrl = f.toURI().toURL();
+          setSystemPropertyIfNotSet("hawtiologin.file", loginFileUrl.toExternalForm());
+          setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "user");
+          setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "admin");
+          setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_REALM, "hawtio");
+          setSystemPropertyIfNotSet(
+              AuthenticationConfiguration.HAWTIO_ROLE_PRINCIPAL_CLASSES,
+              "org.eclipse.jetty.jaas.JAASRole");
+          log.info("Hawtio: Using loginfile : " + loginFileUrl);
+
         } catch (MalformedURLException mue) {
-          log.error("The external loginFile URL is malformed. URI was " + loginFileUrl);
+          log.error("Hawtio: The external loginFile URL is malformed. URI was " + f.toURI() + " Hawtio is NOT accessible.\n" + mue.getMessage());
         }
       } else {
-        log.error("The external loginFile for Hawtio was not found or not readable. Path was " + f.getAbsolutePath());
+        log.error("Hawtio: The external loginFile was not found or not readable. Path is " + f.getAbsolutePath());
       }
-    }
-    if (loginFileUrl != null) {
-      setSystemPropertyIfNotSet("hawtiologin.file", loginFileUrl.toExternalForm());
-      setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "user");
-      setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_ROLES, "admin");
-      setSystemPropertyIfNotSet(AuthenticationConfiguration.HAWTIO_REALM, "hawtio");
-      setSystemPropertyIfNotSet(
-          AuthenticationConfiguration.HAWTIO_ROLE_PRINCIPAL_CLASSES,
-          "org.eclipse.jetty.jaas.JAASRole");
-      log.info("Using loginfile for Hawtio:" + loginFileUrl);
     } else {
-      log.error("No loginFile found. Cannot set user and pw. Hawtio is NOT accessible.");
+      log.error("Hawtio: The property " + PropertyConstants.HAWTIO_EXTERNAL_LOGINFILE + " is NOT set. It is mandatory when property " +
+          PropertyConstants.HAWTIO_AUTHENTICATION_ENABLED + " is set to true.");
     }
-    System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "true");
   }
 
   private void setSystemPropertyIfNotSet(final String key, final String value) {

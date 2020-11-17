@@ -18,7 +18,6 @@ import org.eclipse.jetty.util.security.Credential;
 
 @Log4j2
 public class PropertyFileLoginModule extends AbstractLoginModule {
-  public static final String DEFAULT_FILENAME = "realm.properties";
 
   private static ConcurrentHashMap<String, PropertyUserStore> PROPERTY_USERSTORES =
       new ConcurrentHashMap<>();
@@ -55,7 +54,7 @@ public class PropertyFileLoginModule extends AbstractLoginModule {
       final PropertyUserStore prev = PROPERTY_USERSTORES.putIfAbsent(filename, propertyUserStore);
       if (prev == null) {
         log.info("setupPropertyUserStore: Starting new PropertyUserStore. PropertiesFile: "
-                + filename + " hotReload: " + hotReload);
+            + filename + " hotReload: " + hotReload);
         try {
           propertyUserStore.start();
         } catch (Exception e) {
@@ -66,7 +65,6 @@ public class PropertyFileLoginModule extends AbstractLoginModule {
   }
 
   private void parseConfig() {
-    filename = DEFAULT_FILENAME;
     filename = System.getProperty("hawtiologin.file", filename);
     hotReload = false;
   }
@@ -81,6 +79,7 @@ public class PropertyFileLoginModule extends AbstractLoginModule {
     log.debug("Checking PropertyUserStore " + filename + " for " + userName);
     final UserIdentity userIdentity = propertyUserStore.getUserIdentity(userName);
     if (userIdentity == null) {
+      log.error("No user identity found in external login file.");
       return null;
     }
 
@@ -97,7 +96,18 @@ public class PropertyFileLoginModule extends AbstractLoginModule {
   }
 
   @Override
-  public boolean logout() throws LoginException {
+  public boolean login() {
+    boolean loginOk = false;
+    try {
+       loginOk =  super.login();
+    } catch (LoginException e) {
+      log.error("Hawtio login failed : " + e.getMessage() + " Check configuration!");
+    }
+    return loginOk;
+  }
+
+  @Override
+  public boolean logout() {
     return true;
   }
 }
