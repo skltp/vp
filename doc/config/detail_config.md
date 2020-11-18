@@ -28,7 +28,22 @@ Om SSL/TLS trafik termineras framför VP, i t ex en reverse-proxy, behöver dess
    
  2. Lägga till IP-nr (inre) för reverse-proxy’n till VP Camel's whitelist property (i `application-custom.properties`): 
      - `ip.whitelist=proxy inre ip-adress`
+ 
+### Hawtio
 
+##### Ställa in autentisering för Hawtio
+I application-custom.properties kan man sätta propertyn:
+`hawtio.authentication.enabled=true` 
+till true eller false. Default är den false. Men det rekommenderas att ha autentisering på eftersom man kan manipulera loggningen i VP via Hawtio. Att sätta på autentisering innebär att man behöver konfigurera en user och password enligt nedan. 
+##### Konfigurera ny user och password 
+För att ändra/lägga till användare/lösenord för Hawtio: Generera en md5-hash av det password ni valt, till exempel med (på Linux): `printf  '%s' "<password>" | md5sum`.
+     Skapa en ny login-fil, t.ex. realm-custom.properties. Den ska innehålla namn på user och hashat pw enligt:
+     `<user>: MD5:<password hash>, user, admin`     
+     I `application-custom.properties`: Lägg till sökväg till filen enligt:
+     `hawtio.external.loginfile=<path>/realm-custom.properties`
+     Installera om VP och starta. Det ska nu gå att surfa till http://\<server\>:8080/actuator/hawtio/ och logga in med vald user och password (om ni inte konfigurerat en annan port för Hawtio).
+     
+     
 
 ### Response Timeout
 För de virtuella tjänster i VP som har stöd för individuell inställning av timeout går detta att styra per tjänst.
@@ -46,10 +61,10 @@ Se anvisningar på sidan [Loggning konfigurering]
 #----------------------  
 
 # Porten som servern skall starta på
-server.port=8039
+server.port=<portnummer>
 
 # true om(när) en lastbalanserare används framför VP
-server.use-forward-headers=false 
+server.use-forward-headers=true 
 
 # Konfiguration för undertow accesslog
 server.undertow.accesslog.dir=/var/log/camel
@@ -65,7 +80,8 @@ server.undertow.accesslog.suffix=.log
 # Hawtio configuration
 #----------------------
 management.endpoints.web.exposure.include=hawtio,jolokia
-hawtio.authenticationEnabled=false
+hawtio.authentication.enabled=true
+hawtio.external.loginfile=/opt/vp/config/realm-custom.properties
 
 #----------------------  
 # VP configuration
@@ -78,12 +94,12 @@ base.path=/opt/vp
 vp.instance.id=NTjP_T_SERVICES_SE165565594230-10BR
 
 vp.host=0.0.0.0
-vp.http.route.url = http://${vp.host}:8080/vp
-vp.https.route.url = https://${vp.host}:20000/vp
-vp.status.url=http://${vp.host}:8080/status
+vp.http.route.url = http://${vp.host}:<portnumber>/vp
+vp.https.route.url = https://${vp.host}:<portnumber>/vp
+vp.status.url=http://${vp.host}:<portnummer>/status
 
-vp.hsa.reset.cache.url=http://${vp.host}:24000/resethsacache
-vp.reset.cache.url=http://${vp.host}:23000/resetcache
+vp.hsa.reset.cache.url=http://${vp.host}:<portnumber>/resethsacache
+vp.reset.cache.url=http://${vp.host}:<portnumber>/resetcache
 
 # Configuration if VP should perform a retry 
 #  for SocketExceptions when calling producer 
@@ -100,7 +116,7 @@ ip.whitelist=127.0.0.1,x.x.x.x,y.y.y.y,...
 hsa.files=/www/inera/home/ine-app/hsaUppdatering/files/hsacache.xml,${base.path}/config/hsacachecomplementary.xml
 
 # Defines if we should use old style default routing (VG#VE) when
-# evaluating vÃ¤gval and behÃ¶righeter. Set this to blank to
+# evaluating vägval and behörigheter. Set this to blank to
 # turn default routing off.
 vagvalrouter.default.routing.address.delimiter=#
 defaultrouting.allowedContracts=urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateQuestionResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateAnswerResponder:1
@@ -110,7 +126,7 @@ defaultrouting.allowedSenderIds=
 takcache.use.behorighet.cache=true
 takcache.use.vagval.cache=true
 takcache.persistent.file.name=${base.path}/data/localCache
-takcache.endpoint.address=http://ine-dit-app01:8085/tak-services/SokVagvalsInfo/v2
+takcache.endpoint.address=http://<server>:<portnumber>/tak-services/SokVagvalsInfo/v2
 
 # Configuration for contract specific timeouts
 timeout.json.file=${base.path}/config/timeoutconfig.json
@@ -139,28 +155,29 @@ producer.https.workers=0
 # Overrides applications default vp-config.properties
  
 #Location where certificate files are found
-TP_TLS_STORE_LOCATION=/etc/mule/conf
- 
- 
+tp.tls.store.location=/certs/
+
 #Truststore settings, what CAs and certificates VP should trust when communicating with
 #consumers and producers.
-TP_TLS_STORE_TRUSTSTORE_TYPE=jks
-TP_TLS_STORE_TRUSTSTORE_FILE=truststore.jks
-TP_TLS_STORE_TRUSTSTORE_PASSWORD=password
- 
- 
+tp.tls.store.truststore.file=truststore.jks
+tp.tls.store.truststore.password=password
+
 #Settings for the producer connector, when VP acts as producer, receiving calls from consumers
-TP_TLS_STORE_PRODUCER_TYPE=jks
-TP_TLS_STORE_PRODUCER_FILE=keystore.jks
-TP_TLS_STORE_PRODUCER_PASSWORD=password
-TP_TLS_STORE_PRODUCER_KEY_PASSWORD=password
- 
- 
+tp.tls.store.producer.file=producer.jks
+tp.tls.store.producer.password=password
+tp.tls.store.producer.keyPassword=password
+
 #Settings for the consumer connector, when VP acts as consumer, making calls to producers
-TP_TLS_STORE_CONSUMER_TYPE=jks
-TP_TLS_STORE_CONSUMER_FILE=keystore.jks
-TP_TLS_STORE_CONSUMER_PASSWORD=password
-TP_TLS_STORE_CONSUMER_KEY_PASSWORD=password
+tp.tls.store.consumer.file=consumer.jks
+tp.tls.store.consumer.password=password
+tp.tls.store.consumer.keyPassword=password
+
+tp.tls.allowedIncomingProtocols=TLSv1,TLSv1.1,TLSv1.2
+tp.tls.allowedOutgoingProtocols=TLSv1,TLSv1.1,TLSv1.2
+
+tp.tls.allowedIncomingCipherSuites=*
+tp.tls.allowedOutgoingCipherSuites=*
+ 
 ```
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)

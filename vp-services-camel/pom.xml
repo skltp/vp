@@ -6,12 +6,12 @@
   <parent>
     <groupId>se.skltp.vp</groupId>
     <artifactId>vp-parent-camel</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>vp-services-camel</artifactId>
   <name>vp-services-camel</name>
-  <version>4.0.0</version>
+  <version>4.0.1-SNAPSHOT</version>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
 
@@ -128,6 +128,11 @@
     <dependency>
       <groupId>io.hawt</groupId>
       <artifactId>hawtio-springboot</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-jaas</artifactId>
+      <version>9.4.11.v20180605</version>
     </dependency>
 
     <dependency>
