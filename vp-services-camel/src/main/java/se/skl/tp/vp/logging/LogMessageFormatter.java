@@ -19,6 +19,11 @@ public class LogMessageFormatter {
       "\nLogMessage={}\nServiceImpl={}\nHost={} ({})\nComponentId={}\nEndpoint={}\nMessageId={}\nBusinessCorrelationId={}\nExtraInfo={}\nPayload={}" +
       "{}" + // Placeholder for stack trace info if an error is logged
       "\n** {}.end *************************************************************";
+  private static final String LOG_STRING_NO_PAYLOAD = MSG_ID +
+      "\n** {}.start ***********************************************************" +
+      "\nLogMessage={}\nServiceImpl={}\nHost={} ({})\nComponentId={}\nEndpoint={}\nMessageId={}\nBusinessCorrelationId={}\nExtraInfo={}" +
+      "{}" + // Placeholder for stack trace info if an error is logged
+      "\n** {}.end *************************************************************";
 
   protected static final String UNKNOWN = "UNKNOWN";
   protected static String hostName = UNKNOWN;
@@ -44,7 +49,7 @@ public class LogMessageFormatter {
     LogMetadataInfoType metadataInfo = logEntry.getMetadataInfo();
     LogRuntimeInfoType runtimeInfo  = logEntry.getRuntimeInfo();
 
-     String logMessage              = messageInfo.getMessage();
+    String logMessage              = messageInfo.getMessage();
     String serviceImplementation   = metadataInfo.getServiceImplementation();
     String componentId             = runtimeInfo.getComponentId();
     String endpoint                = metadataInfo.getEndpoint();
@@ -58,9 +63,15 @@ public class LogMessageFormatter {
     if (lmeException != null) {
       stackTrace.append('\n').append("Stacktrace=").append(lmeException.getStackTrace());
     }
-    return MessageFormatter
-        .arrayFormat(LOG_STRING, new String[] {logEventName, logMessage, serviceImplementation,
-            hostName, hostIp, componentId, endpoint, messageId, businessCorrelationId, extraInfoString, payload, stackTrace.toString(), logEventName}).getMessage();
+    if (payload == null) {
+      return MessageFormatter
+          .arrayFormat(LOG_STRING_NO_PAYLOAD, new String[] {logEventName, logMessage, serviceImplementation,
+              hostName, hostIp, componentId, endpoint, messageId, businessCorrelationId, extraInfoString, stackTrace.toString(), logEventName}).getMessage();
+    } else {
+      return MessageFormatter
+          .arrayFormat(LOG_STRING, new String[] {logEventName, logMessage, serviceImplementation,
+              hostName, hostIp, componentId, endpoint, messageId, businessCorrelationId, extraInfoString, payload, stackTrace.toString(), logEventName}).getMessage();
+    }
   }
 
 
