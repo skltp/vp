@@ -4,6 +4,7 @@ pipeline {
         JDK_PATH = tool name: 'Java 8_152'
         JAVA_HOME = "${JDK_PATH}"
         MAVEN_IMAGE = 'maven:3.6-jdk-8'
+        SCANNER_HOME = tool name: 'SonarScanner 4.5'
     }
 
     stages {
@@ -27,8 +28,7 @@ pipeline {
         stage('SonarScanner'){
             steps {
                 withSonarQubeEnv(params.SONAR_ENV) {
-                    sh "curl http://ind-pc-sonarqube-server1.ind1.sth.basefarm.net:9000 -v -s -o/dev/null"
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ntjp-vp -Dsonar.java.binaries=**/target/classes" 
+                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=ntjp-vp -Dsonar.java.binaries=**/target/classes" 
                 }
             }
         }
