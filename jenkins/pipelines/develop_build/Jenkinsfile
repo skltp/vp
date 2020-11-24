@@ -23,7 +23,15 @@ pipeline {
                     sh 'mvn --global-settings ${MAVEN_SETTINGS} -P test-coverage,leak clean install'
                 }
             }     
-        }        
+        }
+        stage('SonarScanner'){
+            steps {
+                withSonarQubeEnv(params.SONAR_ENV) {
+                    sh "curl http://ind-pc-sonarqube-server1.ind1.sth.basefarm.net:9000 -v -s -o/dev/null"
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ntjp-vp -Dsonar.java.binaries=**/target/classes" 
+                }
+            }
+        }
     }
 
     post {
