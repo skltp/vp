@@ -27,12 +27,12 @@ pipeline {
         }
         stage('SonarScanner'){
             steps {
-                withCredentials([string(credentialsId: "${params.SONARTOKENID}", variable: "SONARTOKEN" )]) {
+                withCredentials([string(credentialsId: "${params.SONAR_TOKENID}", variable: "SONARTOKEN" )]) {
                     withSonarQubeEnv("${params.SONAR_ENV}") {
                         sh """${SCANNER_HOME}/bin/sonar-scanner \
                                     -Dsonar.projectKey=${params.SONAR_PROJECTKEY} \
                                     -Dsonar.login="${SONARTOKEN}" \
-                                    -Dsonar.java.binaries=**/target/classes \
+                                    -Dsonar.java.binaries=${params.SONAR_JAVA_BINARIES} \
                                     -Dsonar.coverage.jacoco.xmlReportPaths="${params.SONAR_JACOCO_REPORTS}" \
                                     -Dsonar.sourceEncoding=UTF-8
                             """
