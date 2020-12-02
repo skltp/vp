@@ -44,8 +44,8 @@ Spring-boot property fil som ligger under resources i jaren. Inställningarna ka
 |http.forwarded.header.port|X-VP-Forwarded-Port|Reverse proxy/LB header-Intern port|
 |http.forwarded.header.proto|X-VP-Forwarded-Proto|Reverse proxy/LB header-??|
 |ip.whitelist|127.0.0.1|Komma-separerad lista. Vilka IP-adresser får sätta headern ```sender-id``` för http-anrop. Listan kan vara tom, vilket gör att alla tillåts|
-|sender.id.allowed.list|127.0.0.1|Komma-separerad lista. Vilka adresser får sätta headern ```x-rivta-original-serviceconsumer-hsaid ```. Om listan ska användas beror på värdet av nyckeln  ```approve.the.use.of.header.originalconsumer``` nedan|
-|approve.the.use.of.header.original.consumer|false|Ska listan ```sender.id.allowed.list``` användas eller ej. Om denna ej är satt, är defaultvärdet true, vilket kan orsaka problem om listan är tom|
+|sender.id.allowed.list| |Komma-separerad lista av vilka avsändare(HSA-IDn) som får sätta headern ```x-rivta-original-serviceconsumer-hsaid ```. Tom lista innebär att alla avsändare är tillåtna. Är parametern ```throw.vp013.when.originalconsumer.not.allowed``` satt till ```true``` kommer VP013 returneras annars skrivs en varning i loggen och anropet fortsätter som vanligt.|
+|throw.vp013.when.originalconsumer.not.allowed|false|Används i kombination med ```sender.id.allowed.list```. ```true``` betyder att VP013 kastas om en ej godkänd avsändare försöker sätta headern. Vid ```false``` kommer en varning skrivas till loggen att avsändaren inte är godkänd men transaktionen forsätter som vanligt.|
 |propagate.correlation.id.for.https|false|Ska korrelations-id:t propageras vidare även för https?|
 |vp.header.user.agent|SKLTP VP/3.1|User_Agent för utgående requests|
 |vp.header.content.type|text/xml;charset=UTF-8|Content-type för utgående requests|
