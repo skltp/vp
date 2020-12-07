@@ -56,7 +56,7 @@
 
         <Logger name="se.skl.tp.vp.integrationtests.utils" level="INFO"/>
 
-        <Logger name="se.skl.tp.vp.httpheader.CheckSenderAllowedToUseHeaderImpl" level="INFO" additivity="false">
+        <Logger name="se.skl.tp.vp.httpheader.OriginalConsumerIdProcessorImpl" level="WARN" additivity="false">
             <AppenderRef ref="TestLogAppender"/>
             <AppenderRef ref="Console"/>
         </Logger>

@@ -20,7 +20,7 @@ public class PropertyConstants {
     public static final String WSDL_JSON_FILE = "wsdl.json.file";
     public static final String WSDLFILES_DIRECTORY = "wsdlfiles.directory";
 
-    public static final String APPROVE_THE_USE_OF_HEADER_ORIGINAL_CONSUMER = "approve.the.use.of.header.original.consumer";
+    public static final String THROW_VP013_WHEN_ORIGNALCONSUMER_NOT_ALLOWED = "throw.vp013.when.originalconsumer.not.allowed";
     public static final String PROPAGATE_CORRELATION_ID_FOR_HTTPS = "propagate.correlation.id.for.https";
     public static final String VP_HEADER_USER_AGENT = "vp.header.user.agent";
     public static final String VP_HEADER_CONTENT_TYPE = "vp.header.content.type";
