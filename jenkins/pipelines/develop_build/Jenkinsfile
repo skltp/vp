@@ -33,7 +33,8 @@ pipeline {
                                     -Dsonar.projectKey=${params.SONAR_PROJECTKEY} \
                                     -Dsonar.login="${SONARTOKEN}" \
                                     -Dsonar.java.binaries=${params.SONAR_JAVA_BINARIES} \
-                                    -Dsonar.coverage.jacoco.xmlReportPaths="${params.SONAR_JACOCO_REPORTS}" \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=${params.SONAR_JACOCO_REPORTS} \
+                                    -Dsonar.test.inclusions=${params.SONAR_TEST_INCLUSIONS} \
                                     -Dsonar.sourceEncoding=UTF-8
                             """
                     }
