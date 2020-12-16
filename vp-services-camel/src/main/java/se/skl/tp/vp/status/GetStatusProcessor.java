@@ -64,13 +64,17 @@ public class GetStatusProcessor implements Processor {
 
   @Override
   public void process(Exchange exchange) {
-    boolean showMemory = exchange.getIn().getHeaders().containsKey("memory");
-    Map<String, Object> map = registerInfo(showMemory);
-    JSONObject obj = new JSONObject(map);
-    try {
-      exchange.getIn().setBody(obj.toString(2).replace("\\/", "/"));
-    } catch (JSONException e) {
-      exchange.getIn().setBody(obj.toString());
+    boolean showNettyMemory = exchange.getIn().getHeaders().containsKey("netty");
+    boolean showExtendedMemory = exchange.getIn().getHeaders().containsKey("memory");
+    if (showNettyMemory) {
+      exchange.getIn().setBody(MemoryUtil.getNettyMemoryJsonString());
+    } else {
+      JSONObject jsonObject = new JSONObject(registerInfo(showExtendedMemory));
+      try {
+          exchange.getIn().setBody(jsonObject.toString(2).replace("\\/", "/"));
+      } catch (JSONException e) {
+        exchange.getIn().setBody(jsonObject.toString());
+      }
     }
     exchange.getIn().getHeaders().put(HttpHeaders.HEADER_CONTENT_TYPE, "application/json");
   }
@@ -101,7 +105,7 @@ public class GetStatusProcessor implements Processor {
     map.put(KEY_JVM_FREE_MEMORY, "" + MemoryUtil.bytesReadable(instance.freeMemory()));
     map.put(KEY_JVM_USED_MEMORY, "" + MemoryUtil.bytesReadable((instance.totalMemory() - instance.freeMemory())));
     map.put(KEY_JVM_MAX_MEMORY, "" + MemoryUtil.bytesReadable(instance.maxMemory()));
-    if(showMemory) {
+    if (showMemory) {
       map.put(KEY_DIRECT_MEMORY, "" + GetDirectMemoryString());
       map.put(KEY_VM_MAX_DIRECT_MEMORY, "" + MemoryUtil.getVMMaxMemory());
       map.put(KEY_NON_HEAP_MEMORY, "" + getNonHeapMemory());
@@ -174,7 +178,7 @@ public class GetStatusProcessor implements Processor {
         takCacheLog.getNumberBehorigheter());
   }
 
-  private String getFormattedDate(Date date){
+  private String getFormattedDate(Date date) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
     return date == null ? "" : dateFormat.format(date);
   }

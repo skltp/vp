@@ -32,4 +32,6 @@ public class PropertyConstants {
     public static final String PRODUCER_CHUNKED_ENCODING = "producer.chunked.encoding";
     public static final String HAWTIO_AUTHENTICATION_ENABLED = "hawtio.authentication.enabled";
     public static final String HAWTIO_EXTERNAL_LOGINFILE = "hawtio.external.loginfile";
+
+    public static final String MEMORY_LOG_PERIOD = "memory.logger.period.seconds";
 }

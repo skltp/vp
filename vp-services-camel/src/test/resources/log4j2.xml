@@ -79,6 +79,9 @@
             <AppenderRef ref="Console"/>
         </Logger>
 
+        <!-- Memory logging -->
+        <Logger name="se.skl.tp.vp.logging.memory" level="INFO"/>
+
         <Root level="WARN">
             <!--<AppenderRef ref="RollingRandomAccessFile"/>-->
             <AppenderRef ref="Console"/>
