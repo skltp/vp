@@ -56,7 +56,14 @@ public class TestConsumer {
   }
 
   public String sendHttpRequestToVP(String message, Map<String, Object> headers){
-    resultEndpoint.reset();
+    return sendHttpRequestToVP(message, headers, true);
+  }
+
+
+  public String sendHttpRequestToVP(String message, Map<String, Object> headers, boolean reset){
+    if(reset){
+      resultEndpoint.reset();
+    }
     return template.requestBodyAndHeaders(
             DIRECT_START_HTTP,
             message,

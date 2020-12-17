@@ -4,9 +4,22 @@ import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.impl.JndiRegistry;
 import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
 public class NettyHttpClientUnexpectedContinueTest extends CamelTestSupport {
+
+  @BeforeClass
+  public static void startLeakDetection() {
+    LeakDetectionBaseTest.startLeakDetection();
+  }
+
+  @AfterClass
+  public static void verifyNoLeaks() throws Exception {
+    LeakDetectionBaseTest.verifyNoLeaks();
+  }
 
   @Override
   protected JndiRegistry createRegistry() throws Exception {

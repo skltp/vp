@@ -4,10 +4,22 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.impl.JndiRegistry;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
 public class NettyHttpClientExpectContinueTest extends BaseNettyTest {
 
+  @BeforeClass
+  public static void startLeakDetection() {
+    LeakDetectionBaseTest.startLeakDetection();
+  }
+
+  @AfterClass
+  public static void verifyNoLeaks() throws Exception {
+    LeakDetectionBaseTest.verifyNoLeaks();
+  }
 
   @Override
   protected JndiRegistry createRegistry() throws Exception {

@@ -19,7 +19,9 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ import se.skl.tp.vp.httpheader.OutHeaderProcessorImpl;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.logging.LogExtraInfoBuilder;
 import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
 
@@ -65,6 +68,16 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
   private static boolean isContextStarted = false;
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
+
+  @BeforeClass
+  public static void startLeakDetection() {
+    LeakDetectionBaseTest.startLeakDetection();
+  }
+
+  @AfterClass
+  public static void verifyNoLeaks() throws Exception {
+    LeakDetectionBaseTest.verifyNoLeaks();
+  }
 
   @Before
   public void setUp() throws Exception {

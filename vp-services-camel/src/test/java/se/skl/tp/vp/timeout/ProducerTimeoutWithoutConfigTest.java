@@ -37,7 +37,9 @@ import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestBeanConfiguration.class)
+@SpringBootTest(properties = {
+    "timeout.json.file=notExisting.json"
+})
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class ProducerTimeoutWithoutConfigTest extends CamelTestSupport {

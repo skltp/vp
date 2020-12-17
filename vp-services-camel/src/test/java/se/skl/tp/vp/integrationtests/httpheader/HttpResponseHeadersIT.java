@@ -23,13 +23,14 @@ import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
 import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @StartTakService
-public class HttpResponseHeadersIT {
+public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   public static final String HTTPS_PRODUCER_URL = "https://localhost:19001/vardgivare-b/tjanst2";
 
   @Autowired

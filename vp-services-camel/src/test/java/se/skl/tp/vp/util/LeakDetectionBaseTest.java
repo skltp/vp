@@ -15,6 +15,7 @@ public class LeakDetectionBaseTest {
   @BeforeClass
   public static void startLeakDetection() {
     if( isLeakDectectionAcivated()) {
+      System.setProperty("io.netty.leakDetection.level", "PARANOID");
       System.setProperty("io.netty.leakDetection.maxRecords", "100");
       System.setProperty("io.netty.leakDetection.targetRecords", "10");
       System.setProperty("io.netty.leakDetection.acquireAndReleaseOnly", "true");
