@@ -6,7 +6,6 @@ import io.netty.buffer.PooledByteBufAllocatorMetric;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -82,7 +81,6 @@ public class MemoryUtil {
     try {
       return  new JSONObject(nettyMemoryMap).toString(2).replace("\\/", "/");
     } catch (JSONException e) {
-      System.out.println("EXCEPTION");
       return  new JSONObject(nettyMemoryMap).toString();
     }
   }

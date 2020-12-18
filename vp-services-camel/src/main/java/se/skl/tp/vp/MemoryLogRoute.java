@@ -19,8 +19,6 @@ public class MemoryLogRoute extends RouteBuilder {
   @Override
   public void configure() throws Exception {
     from("timer://memoryLogger?fixedRate=true&delay=120000&period="+periodInSeconds*1000).routeId("LoggerRoute")
-        .process((Exchange exchange) -> {
-          log.info(getNettyMemoryJsonString());
-        });
+        .process((Exchange exchange) -> log.info(getNettyMemoryJsonString()));
   }
 }

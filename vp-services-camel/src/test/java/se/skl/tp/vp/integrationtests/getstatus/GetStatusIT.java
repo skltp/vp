@@ -4,6 +4,7 @@ import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
 import static org.junit.Assert.assertTrue;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_HSA_CACHE_INITIALIZED;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_MANAGEMENT_NAME;
+import static se.skl.tp.vp.status.GetStatusProcessor.KEY_NETTY_DIRECT_MEMORY;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_SERVICE_STATUS;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_TAK_CACHE_INITIALIZED;
 
@@ -44,4 +45,22 @@ public class GetStatusIT extends LeakDetectionBaseTest {
     assertStringContains(statusResponse, String.format("\"%s\": \"true\"",KEY_HSA_CACHE_INITIALIZED));
   }
 
+  @Test
+  public void getStatusResponseWithMemoryTest() {
+    String statusResponse = producerTemplate.requestBody(String.format("netty4-http:%s?memory", getUrl), "", String.class );
+    assertTrue (statusResponse .startsWith("{") && statusResponse .endsWith("}"));
+    assertStringContains(statusResponse, String.format("\"%s\": \"Started\"",KEY_SERVICE_STATUS));
+    assertStringContains(statusResponse, String.format("\"%s\": \"vp-services-test\"",KEY_MANAGEMENT_NAME));
+    assertStringContains(statusResponse, String.format("\"%s\": \"true\"",KEY_TAK_CACHE_INITIALIZED));
+    assertStringContains(statusResponse, String.format("\"%s\": \"true\"",KEY_HSA_CACHE_INITIALIZED));
+    assertStringContains(statusResponse, String.format("\"%s\": \"Direct:", KEY_NETTY_DIRECT_MEMORY));
+  }
+
+  @Test
+  public void getStatusResponseWithNettyTest() {
+    String statusResponse = producerTemplate.requestBody(String.format("netty4-http:%s?netty", getUrl), "", String.class );
+    assertTrue (statusResponse .startsWith("{") && statusResponse .endsWith("}"));
+    assertStringContains(statusResponse, "DirectArena1");
+    assertStringContains(statusResponse, "NettyTotal");
+  }
 }

@@ -90,7 +90,7 @@ public class GetStatusProcessor implements Processor {
     map.put(KEY_SERVICE_STATUS, "" + serviceStatus);
     map.put(KEY_UPTIME, camelContext.getUptime());
     map.put(KEY_MANAGEMENT_NAME, camelContext.getManagementName());
-    map.put(KEY_JAVA_VERSION, (String) System.getProperties().get("java.version"));
+    map.put(KEY_JAVA_VERSION, System.getProperties().get("java.version"));
     map.put(KEY_CAMEL_VERSION, camelContext.getVersion());
 
     map.put(KEY_TAK_CACHE_INITIALIZED, "" + takService.isInitalized());
@@ -106,7 +106,7 @@ public class GetStatusProcessor implements Processor {
     map.put(KEY_JVM_USED_MEMORY, "" + MemoryUtil.bytesReadable((instance.totalMemory() - instance.freeMemory())));
     map.put(KEY_JVM_MAX_MEMORY, "" + MemoryUtil.bytesReadable(instance.maxMemory()));
     if (showMemory) {
-      map.put(KEY_DIRECT_MEMORY, "" + GetDirectMemoryString());
+      map.put(KEY_DIRECT_MEMORY, "" + getDirectMemoryString());
       map.put(KEY_VM_MAX_DIRECT_MEMORY, "" + MemoryUtil.getVMMaxMemory());
       map.put(KEY_NON_HEAP_MEMORY, "" + getNonHeapMemory());
       map.put(KEY_NETTY_DIRECT_MEMORY, "" + getNettyDirectMemory());
@@ -138,7 +138,7 @@ public class GetStatusProcessor implements Processor {
         nettyMetrics.numThreadLocalCaches());
   }
 
-  private String GetDirectMemoryString() {
+  private String getDirectMemoryString() {
     return String.format("Used: %s, Count: %d, Max Capacity: %s",
         MemoryUtil.getMemoryUsed(),
         MemoryUtil.getCount(),
