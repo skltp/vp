@@ -101,7 +101,7 @@ public class OriginalConsumerIdProcessorTest {
       originalConsumerIdProcessor.process(exchange);
       assertTrue("Expected a VP013 exception", false);
     } catch (VpSemanticException vpSemanticException) {
-      assertEquals(vpSemanticException.getErrorCode(), VpSemanticErrorCodeEnum.VP013);
+      assertEquals(VpSemanticErrorCodeEnum.VP013, vpSemanticException.getErrorCode());
     }
     Assert.assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
   }

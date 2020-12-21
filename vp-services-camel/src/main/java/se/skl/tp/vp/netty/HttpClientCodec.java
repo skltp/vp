@@ -5,7 +5,7 @@
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -40,21 +40,29 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_ALLOW_DUPLICATE_CONTENT_LENGTHS;
+import static io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_CHUNK_SIZE;
+import static io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_HEADER_SIZE;
+import static io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_INITIAL_LINE_LENGTH;
+import static io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_VALIDATE_HEADERS;
+
 /**
- * A combination of {@link HttpRequestEncoder} and {@link HttpResponseDecoder}
- * which enables easier client side HTTP implementation. {@link HttpClientCodec}
+ * A combination of {HttpRequestEncoder} and {HttpResponseDecoder}
+ * which enables easier client side HTTP implementation. {HttpClientCodec}
  * provides additional state management for <tt>HEAD</tt> and <tt>CONNECT</tt>
- * requests, which {@link HttpResponseDecoder} lacks.  Please refer to
- * {@link HttpResponseDecoder} to learn what additional state management needs
+ * requests, which {HttpResponseDecoder} lacks.  Please refer to
+ * {HttpResponseDecoder} to learn what additional state management needs
  * to be done for <tt>HEAD</tt> and <tt>CONNECT</tt> and why
- * {@link HttpResponseDecoder} can not handle it by itself.
+ * {HttpResponseDecoder} can not handle it by itself.
  *
- * If the {@link Channel} is closed and there are missing responses,
- * a {@link PrematureChannelClosureException} is thrown.
+ * If the {Channel} is closed and there are missing responses,
+ * a {PrematureChannelClosureException} is thrown.
  *
  */
 public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResponseDecoder, HttpRequestEncoder>
-    implements HttpClientUpgradeHandler.SourceCodec {
+        implements HttpClientUpgradeHandler.SourceCodec {
+    public static final boolean DEFAULT_FAIL_ON_MISSING_RESPONSE = false;
+    public static final boolean DEFAULT_PARSE_HTTP_AFTER_CONNECT_REQUEST = false;
 
     /** A queue that is used for correlating a request and a response. */
     private final Queue<HttpMethod> queue = new ArrayDeque<HttpMethod>();
@@ -72,39 +80,41 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
      * {@code maxChunkSize (8192)}).
      */
     public HttpClientCodec() {
-        this(4096, 8192, 8192, false);
+        this(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, DEFAULT_MAX_CHUNK_SIZE,
+             DEFAULT_FAIL_ON_MISSING_RESPONSE);
     }
 
     /**
      * Creates a new instance with the specified decoder options.
      */
     public HttpClientCodec(int maxInitialLineLength, int maxHeaderSize, int maxChunkSize) {
-        this(maxInitialLineLength, maxHeaderSize, maxChunkSize, false);
+        this(maxInitialLineLength, maxHeaderSize, maxChunkSize, DEFAULT_FAIL_ON_MISSING_RESPONSE);
     }
 
     /**
      * Creates a new instance with the specified decoder options.
      */
     public HttpClientCodec(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse) {
-        this(maxInitialLineLength, maxHeaderSize, maxChunkSize, failOnMissingResponse, true);
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse) {
+        this(maxInitialLineLength, maxHeaderSize, maxChunkSize, failOnMissingResponse, DEFAULT_VALIDATE_HEADERS);
     }
 
     /**
      * Creates a new instance with the specified decoder options.
      */
     public HttpClientCodec(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
-        boolean validateHeaders) {
-        this(maxInitialLineLength, maxHeaderSize, maxChunkSize, failOnMissingResponse, validateHeaders, false);
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
+            boolean validateHeaders) {
+        this(maxInitialLineLength, maxHeaderSize, maxChunkSize, failOnMissingResponse, validateHeaders,
+             DEFAULT_PARSE_HTTP_AFTER_CONNECT_REQUEST);
     }
 
     /**
      * Creates a new instance with the specified decoder options.
      */
     public HttpClientCodec(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
-        boolean validateHeaders, boolean parseHttpAfterConnectRequest) {
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
+            boolean validateHeaders, boolean parseHttpAfterConnectRequest) {
         init(new Decoder(maxInitialLineLength, maxHeaderSize, maxChunkSize, validateHeaders), new Encoder());
         this.failOnMissingResponse = failOnMissingResponse;
         this.parseHttpAfterConnectRequest = parseHttpAfterConnectRequest;
@@ -114,26 +124,38 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
      * Creates a new instance with the specified decoder options.
      */
     public HttpClientCodec(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
-        boolean validateHeaders, int initialBufferSize) {
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
+            boolean validateHeaders, int initialBufferSize) {
         this(maxInitialLineLength, maxHeaderSize, maxChunkSize, failOnMissingResponse, validateHeaders,
-            initialBufferSize, false);
+             initialBufferSize, DEFAULT_PARSE_HTTP_AFTER_CONNECT_REQUEST);
     }
 
     /**
      * Creates a new instance with the specified decoder options.
      */
     public HttpClientCodec(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
-        boolean validateHeaders, int initialBufferSize, boolean parseHttpAfterConnectRequest) {
-        init(new Decoder(maxInitialLineLength, maxHeaderSize, maxChunkSize, validateHeaders, initialBufferSize),
-            new Encoder());
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
+            boolean validateHeaders, int initialBufferSize, boolean parseHttpAfterConnectRequest) {
+        this(maxInitialLineLength, maxHeaderSize, maxChunkSize, failOnMissingResponse, validateHeaders,
+             initialBufferSize, parseHttpAfterConnectRequest, DEFAULT_ALLOW_DUPLICATE_CONTENT_LENGTHS);
+    }
+
+    /**
+     * Creates a new instance with the specified decoder options.
+     */
+    public HttpClientCodec(
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean failOnMissingResponse,
+            boolean validateHeaders, int initialBufferSize, boolean parseHttpAfterConnectRequest,
+            boolean allowDuplicateContentLengths) {
+        init(new Decoder(maxInitialLineLength, maxHeaderSize, maxChunkSize, validateHeaders, initialBufferSize,
+                         allowDuplicateContentLengths),
+             new Encoder());
         this.parseHttpAfterConnectRequest = parseHttpAfterConnectRequest;
         this.failOnMissingResponse = failOnMissingResponse;
     }
 
     /**
-     * Prepares to upgrade to another protocol from HTTP. Disables the {@link Encoder}.
+     * Prepares to upgrade to another protocol from HTTP. Disables the {Encoder}.
      */
     @Override
     public void prepareUpgradeFrom(ChannelHandlerContext ctx) {
@@ -141,7 +163,7 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
     }
 
     /**
-     * Upgrades to another protocol from HTTP. Removes the {@link Decoder} and {@link Encoder} from
+     * Upgrades to another protocol from HTTP. Removes the {Decoder} and {Encoder} from
      * the pipeline.
      */
     @Override
@@ -164,7 +186,7 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
 
         @Override
         protected void encode(
-            ChannelHandlerContext ctx, Object msg, List<Object> out) throws Exception {
+                ChannelHandlerContext ctx, Object msg, List<Object> out) throws Exception {
 
             if (upgraded) {
                 out.add(ReferenceCountUtil.retain(msg));
@@ -193,13 +215,14 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
         }
 
         Decoder(int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean validateHeaders,
-            int initialBufferSize) {
-            super(maxInitialLineLength, maxHeaderSize, maxChunkSize, validateHeaders, initialBufferSize);
+                int initialBufferSize, boolean allowDuplicateContentLengths) {
+            super(maxInitialLineLength, maxHeaderSize, maxChunkSize, validateHeaders, initialBufferSize,
+                  allowDuplicateContentLengths);
         }
 
         @Override
         protected void decode(
-            ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
+                ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
             if (done) {
                 int readable = actualReadableBytes();
                 if (readable == 0) {
@@ -233,16 +256,19 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
 
         @Override
         protected boolean isContentAlwaysEmpty(HttpMessage msg) {
+            // Get the method of the HTTP request that corresponds to the
+            // current response.
+            //
+            // Even if we do not use the method to compare we still need to poll it to ensure we keep
+            // request / response pairs in sync.
+            HttpMethod method = queue.poll();
+
             final int statusCode = ((HttpResponse) msg).status().code();
-            if (statusCode == 100 || statusCode == 101) {
-                // 100-continue and 101 switching protocols response should be excluded from paired comparison.
+            if (statusCode >= 100 && statusCode < 200) {
+                // An informational response should be excluded from paired comparison.
                 // Just delegate to super method which has all the needed handling.
                 return super.isContentAlwaysEmpty(msg);
             }
-
-            // Get the getMethod of the HTTP request that corresponds to the
-            // current response.
-            HttpMethod method = queue.poll();
 
             // If the remote peer did for example send multiple responses for one request (which is not allowed per
             // spec but may still be possible) method will be null so guard against it.
@@ -292,14 +318,14 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
 
         @Override
         public void channelInactive(ChannelHandlerContext ctx)
-            throws Exception {
+                throws Exception {
             super.channelInactive(ctx);
 
             if (failOnMissingResponse) {
                 long missingResponses = requestResponseCounter.get();
                 if (missingResponses > 0) {
                     ctx.fireExceptionCaught(new PrematureChannelClosureException(
-                        "channel gone inactive with " + missingResponses +
+                            "channel gone inactive with " + missingResponses +
                             " missing response(s)"));
                 }
             }

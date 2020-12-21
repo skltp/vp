@@ -1,5 +1,6 @@
 package se.skl.tp.vp.integrationtests;
 
+import static org.apache.camel.component.netty4.NettyConstants.NETTY_REQUEST_TIMEOUT;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.utils.MemoryUtil.getNettyMemoryJsonString;
@@ -66,7 +67,7 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
 
   // CHANGE THIS TO CHANGE BEHAVIOUR OF THE TEST
   public static final int CALLS_PER_SECOND = 25;
-  public static final int DURATION_IN_SECONDS = 60 * 15;
+  public static final int DURATION_IN_SECONDS = 60 * 60 * 15;
   public static final RandomCollection<Integer> PRODUCER_WEIGHTED_TIMEOUTS = (new RandomCollection())
       .add(10, 50)
       .add(10, 100)
@@ -133,26 +134,22 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
 
     responseCodes.clear();
     randomCalls.clear();
-
     mockProducer.setWeightedTimeouts(PRODUCER_WEIGHTED_TIMEOUTS);
     mockHttpsProducer.setWeightedTimeouts(PRODUCER_WEIGHTED_TIMEOUTS);
-
-
 
     load(() -> callWithRandomContract(), CALLS_PER_SECOND, DURATION_IN_SECONDS);
     System.out.println(getNettyMemoryJsonString());
 
-    Thread.sleep(1000 * 10);
+    TimeUnit.SECONDS.sleep(10);
     System.out.println("ResponseCodes:");
     responseCodes.forEach((key, value) -> System.out.println(key + ":" + value));
     System.out.println("RandomNumbers:");
     randomCalls.forEach((key, value) -> System.out.println(key + ":" + value));
     System.gc();
-    Thread.sleep(1000 * 60 * 1);
+    TimeUnit.SECONDS.sleep(60);
 
     System.out.println(getNettyMemoryJsonString());
     stopResetByPeerServer();
-
   }
 
   private void startResetByPeerServer() throws InterruptedException {
@@ -218,32 +215,6 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
     responseCodes.merge(responseCode, 1L, Long::sum);
     randomCalls.merge(next, 1L, Long::sum);
   }
-
-
-//  private void callWithRandomContract() {
-//    int randomNumber = new Random().nextInt(3);
-//    switch (randomNumber) {
-//
-//      case 0:
-//        callVPResetByPeer();
-//        break;
-//
-//      case 1:
-//        callVpSmallPayloads();
-//        break;
-//
-//      default:
-//        callVpLargePayloads("tp");
-//        break;
-//
-//    }
-//
-//    final Integer responseCode = testConsumer.getResultEndpoint().getExchanges()
-//        .get(0).getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, Integer.class);
-//    responseCodes.merge(responseCode, 1, Integer::sum);
-//    randomNumbers.merge(randomNumber, 1, Integer::sum);
-//
-//  }
 
 
   private void callVpLargePayloads(String senderId ) {

@@ -28,6 +28,7 @@ package se.skl.tp.vp.camel;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import java.net.URI;
 import java.util.HashMap;
@@ -54,8 +55,8 @@ public class HttpClientChannelHandler extends ClientChannelHandler {
   protected Message getResponseMessage(Exchange exchange, ChannelHandlerContext ctx, Object message) throws Exception {
     FullHttpResponse response = (FullHttpResponse) message;
 
-    if(response.status().code() == 100){
-      exchange.setProperty("continue", true);
+    if (response.status().equals(HttpResponseStatus.CONTINUE)) {
+      exchange.setProperty(NettyConstants.NETTY_CLIENT_CONTINUE, true);
     } else if (!HttpUtil.isKeepAlive(response)) {
       // just want to make sure we close the channel if the keepAlive is not true
       exchange.setProperty(NettyConstants.NETTY_CLOSE_CHANNEL_WHEN_COMPLETE, true);

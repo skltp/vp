@@ -5,7 +5,7 @@
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -26,16 +26,14 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.TooLongFrameException;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
-import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpMessage;
-import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 
 /**
- * Decodes {@link ByteBuf}s into {HttpResponse}s and
- * {@link HttpContent}s.
+ * Decodes {ByteBuf}s into {HttpResponse}s and
+ * {HttpContent}s.
  *
  * <h3>Parameters that prevents excessive memory consumption</h3>
  * <table border="1">
@@ -46,23 +44,23 @@ import io.netty.handler.codec.http.HttpVersion;
  * <td>{@code maxInitialLineLength}</td>
  * <td>The maximum length of the initial line (e.g. {@code "HTTP/1.0 200 OK"})
  *     If the length of the initial line exceeds this value, a
- *     {@link TooLongFrameException} will be raised.</td>
+ *     {TooLongFrameException} will be raised.</td>
  * </tr>
  * <tr>
  * <td>{@code maxHeaderSize}</td>
  * <td>The maximum length of all headers.  If the sum of the length of each
- *     header exceeds this value, a {@link TooLongFrameException} will be raised.</td>
+ *     header exceeds this value, a {TooLongFrameException} will be raised.</td>
  * </tr>
  * <tr>
  * <td>{@code maxChunkSize}</td>
  * <td>The maximum length of the content or each chunk.  If the content length
  *     exceeds this value, the transfer encoding of the decoded response will be
  *     converted to 'chunked' and the content will be split into multiple
- *     {@link HttpContent}s.  If the transfer encoding of the HTTP response is
+ *     {HttpContent}s.  If the transfer encoding of the HTTP response is
  *     'chunked' already, each chunk will be split into smaller chunks if the
  *     length of the chunk exceeds this value.  If you prefer not to handle
- *     {@link HttpContent}s in your handler, insert {@link HttpObjectAggregator}
- *     after this decoder in the {@link ChannelPipeline}.</td>
+ *     {HttpContent}s in your handler, insert {HttpObjectAggregator}
+ *     after this decoder in the {ChannelPipeline}.</td>
  * </tr>
  * </table>
  *
@@ -110,26 +108,34 @@ public class HttpResponseDecoder extends HttpObjectDecoder {
      * Creates a new instance with the specified parameters.
      */
     public HttpResponseDecoder(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize) {
-        super(maxInitialLineLength, maxHeaderSize, maxChunkSize, true);
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize) {
+        super(maxInitialLineLength, maxHeaderSize, maxChunkSize, DEFAULT_CHUNKED_SUPPORTED);
     }
 
     public HttpResponseDecoder(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean validateHeaders) {
-        super(maxInitialLineLength, maxHeaderSize, maxChunkSize, true, validateHeaders);
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean validateHeaders) {
+        super(maxInitialLineLength, maxHeaderSize, maxChunkSize, DEFAULT_CHUNKED_SUPPORTED, validateHeaders);
     }
 
     public HttpResponseDecoder(
-        int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean validateHeaders,
-        int initialBufferSize) {
-        super(maxInitialLineLength, maxHeaderSize, maxChunkSize, true, validateHeaders, initialBufferSize);
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean validateHeaders,
+            int initialBufferSize) {
+        super(maxInitialLineLength, maxHeaderSize, maxChunkSize, DEFAULT_CHUNKED_SUPPORTED, validateHeaders,
+              initialBufferSize);
+    }
+
+    public HttpResponseDecoder(
+            int maxInitialLineLength, int maxHeaderSize, int maxChunkSize, boolean validateHeaders,
+            int initialBufferSize, boolean allowDuplicateContentLengths) {
+        super(maxInitialLineLength, maxHeaderSize, maxChunkSize, DEFAULT_CHUNKED_SUPPORTED, validateHeaders,
+              initialBufferSize, allowDuplicateContentLengths);
     }
 
     @Override
     protected HttpMessage createMessage(String[] initialLine) {
         return new DefaultHttpResponse(
-            HttpVersion.valueOf(initialLine[0]),
-            HttpResponseStatus.valueOf(Integer.parseInt(initialLine[1]), initialLine[2]), validateHeaders);
+                HttpVersion.valueOf(initialLine[0]),
+                HttpResponseStatus.valueOf(Integer.parseInt(initialLine[1]), initialLine[2]), validateHeaders);
     }
 
     @Override

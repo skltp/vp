@@ -108,7 +108,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Object> {
       if(exchange.getUnitOfWork() == null){
           Channel channel = ctx.channel();
           String url = String.valueOf(channel.remoteAddress());
-        VP_LOG.warn("Exception without UnitOfWork, this is not propagated to Camel. Url: "  + url, cause);
+        VP_LOG.warn("Exception without UnitOfWork, this is not propagated to Camel. Url: {}", url, cause);
       } else {
           callback.done(false);
       }
@@ -187,12 +187,12 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Object> {
       return;
     }
 
-    Boolean continueWaitForAnswer = exchange.getProperty("continue", Boolean.class);
-    if(continueWaitForAnswer!=null && continueWaitForAnswer){
-      exchange.removeProperty("continue");
-      // Leave channel open and continue wait for an answer.
-      return;
-    }
+        Boolean continueWaitForAnswer = exchange.getProperty(NettyConstants.NETTY_CLIENT_CONTINUE, Boolean.class);
+        if (continueWaitForAnswer != null && continueWaitForAnswer) {
+            exchange.removeProperty(NettyConstants.NETTY_CLIENT_CONTINUE);
+            // Leave channel open and continue wait for an answer.
+            return;
+        }
 
     removeTimeoutHandlerFromPipeline(ctx);
 

@@ -120,7 +120,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
-    assertStringContains(respOutLogMsg, "-Headers={CamelHttpResponseCode=500}");
+    assertStringContains(respOutLogMsg, "CamelHttpResponseCode=500");
     assertStringContains(respOutLogMsg, "-sessionErrorTechnicalDescription=java.net.ConnectException: Cannot connect to localhost:12100");
   }
 

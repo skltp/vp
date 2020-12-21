@@ -82,6 +82,34 @@ public class VagvalProcessorTest {
   }
 
   @Test
+  public void testVagvalDefaultHttpsPort() throws Exception {
+
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo("https://tjp.nordicmedtest.se/skaulo/vp/clinicalprocess/activityprescription/actoutcome/GetMedicationHistory/2/rivtabp21", RIV20));
+    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+
+    Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
+    vagvalProcessor.process(ex);
+
+    assertEquals("tjp.nordicmedtest.se:443", ex.getProperty(VPExchangeProperties.VAGVAL_HOST));
+    assertEquals(RIV20, ex.getProperty(VPExchangeProperties.RIV_VERSION_OUT));
+
+  }
+
+  @Test
+  public void testVagvalDefaultHttpPort() throws Exception {
+
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo("http://tjp.nordicmedtest.se/skaulo/vp/clinicalprocess/activityprescription/actoutcome/GetMedicationHistory/2/rivtabp21", RIV20));
+    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+
+    Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
+    vagvalProcessor.process(ex);
+
+    assertEquals("tjp.nordicmedtest.se:8080", ex.getProperty(VPExchangeProperties.VAGVAL_HOST));
+  }
+
+  @Test
   public void testNoLogicaAddressInRequestShouldThrowVP003Exception() throws Exception {
 
     List<RoutingInfo> list = new ArrayList<>();

@@ -17,10 +17,11 @@
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>2.1.0.RELEASE</spring.boot-version>
+    <spring.boot-version>2.3.7.RELEASE</spring.boot-version>
     <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
-    <camel.version>2.24.0</camel.version>
+    <camel.version>2.25.2</camel.version>
     <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
+    <netty.version>4.1.55.Final</netty.version>
 
     <takdatahandler.version>1.0.1</takdatahandler.version>
 
@@ -158,6 +159,13 @@
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-netty4-http-starter</artifactId>
         <version>${camel.version}</version>
+      </dependency>
+
+      <!--Netty-->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-all</artifactId>
+        <version>${netty.version}</version>
       </dependency>
 
       <!--hawt.io-->
