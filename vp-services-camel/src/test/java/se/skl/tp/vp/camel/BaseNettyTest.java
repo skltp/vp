@@ -6,7 +6,6 @@ import java.util.Properties;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.converter.IOConverter;
-import org.apache.camel.impl.JndiRegistry;
 import org.apache.camel.test.AvailablePortFinder;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.AfterClass;
@@ -27,13 +26,13 @@ public class BaseNettyTest extends CamelTestSupport {
 
     if (!file.exists()) {
       // start from somewhere in the 26xxx range
-      port = AvailablePortFinder.getNextAvailable(26000);
+      port = AvailablePortFinder.getNextAvailable(26000, 27000);
     } else {
       // read port number from file
       String s = IOConverter.toString(file, null);
       port = Integer.parseInt(s);
       // use next free port
-      port = AvailablePortFinder.getNextAvailable(port + 1);
+      port = AvailablePortFinder.getNextAvailable(port + 1, port + 1000);
     }
     LeakDetectionBaseTest.startLeakDetection();
   }
@@ -52,7 +51,7 @@ public class BaseNettyTest extends CamelTestSupport {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
-
+/*
   @Override
   protected CamelContext createCamelContext() throws Exception {
     CamelContext context = super.createCamelContext();
@@ -67,12 +66,12 @@ public class BaseNettyTest extends CamelTestSupport {
     Properties prop = new Properties();
     prop.setProperty("port", "" + getPort());
     jndi.bind("prop", prop);
-
     return jndi;
   }
+*/
 
   protected int getNextPort() {
-    port = AvailablePortFinder.getNextAvailable(port + 1);
+    port = AvailablePortFinder.getNextAvailable(port + 1, port + 1000);
     return port;
   }
 

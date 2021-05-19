@@ -37,7 +37,7 @@ public class GetStatusIT extends LeakDetectionBaseTest {
 
   @Test
   public void getStatusResponseTest() {
-    String statusResponse = producerTemplate.requestBody("netty4-http:" + getUrl, "", String.class );
+    String statusResponse = producerTemplate.requestBody("netty-http:" + getUrl, "", String.class );
     assertTrue (statusResponse .startsWith("{") && statusResponse .endsWith("}"));
     assertStringContains(statusResponse, String.format("\"%s\": \"Started\"",KEY_SERVICE_STATUS));
     assertStringContains(statusResponse, String.format("\"%s\": \"vp-services-test\"",KEY_MANAGEMENT_NAME));
@@ -47,7 +47,7 @@ public class GetStatusIT extends LeakDetectionBaseTest {
 
   @Test
   public void getStatusResponseWithMemoryTest() {
-    String statusResponse = producerTemplate.requestBody(String.format("netty4-http:%s?memory", getUrl), "", String.class );
+    String statusResponse = producerTemplate.requestBody(String.format("netty-http:%s?memory", getUrl), "", String.class );
     assertTrue (statusResponse .startsWith("{") && statusResponse .endsWith("}"));
     assertStringContains(statusResponse, String.format("\"%s\": \"Started\"",KEY_SERVICE_STATUS));
     assertStringContains(statusResponse, String.format("\"%s\": \"vp-services-test\"",KEY_MANAGEMENT_NAME));
@@ -58,7 +58,7 @@ public class GetStatusIT extends LeakDetectionBaseTest {
 
   @Test
   public void getStatusResponseWithNettyTest() {
-    String statusResponse = producerTemplate.requestBody(String.format("netty4-http:%s?netty", getUrl), "", String.class );
+    String statusResponse = producerTemplate.requestBody(String.format("netty-http:%s?netty", getUrl), "", String.class );
     assertTrue (statusResponse .startsWith("{") && statusResponse .endsWith("}"));
     assertStringContains(statusResponse, "DirectArena1");
     assertStringContains(statusResponse, "NettyTotal");

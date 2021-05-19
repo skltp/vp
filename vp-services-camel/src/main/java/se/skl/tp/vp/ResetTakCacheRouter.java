@@ -9,14 +9,14 @@ import se.skl.tp.vp.vagval.ResetTakCacheProcessor;
 public class ResetTakCacheRouter extends RouteBuilder {
 
   public static final String RESET_TAK_CACHE_ROUTE = "reset-tak-cache-route";
-  public static final String NETTY4_HTTP_FROM_RESET_TAK_CACHE = "netty4-http:{{vp.reset.cache.url}}";
+  public static final String NETTY_HTTP_FROM_RESET_TAK_CACHE = "netty-http:{{vp.reset.cache.url}}";
 
   @Autowired
   ResetTakCacheProcessor resetTakCacheProcessor;
 
   @Override
   public void configure() throws Exception {
-    from(NETTY4_HTTP_FROM_RESET_TAK_CACHE).routeId(RESET_TAK_CACHE_ROUTE)
+    from(NETTY_HTTP_FROM_RESET_TAK_CACHE).routeId(RESET_TAK_CACHE_ROUTE)
         .process(resetTakCacheProcessor);
   }
 }

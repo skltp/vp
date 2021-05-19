@@ -72,7 +72,7 @@
         </Logger>
 
         <!--Communication logging, should only be turned for a troubleshooting -->
-        <Logger name="org.apache.camel.component.netty4" level="WARN" additivity="false">
+        <Logger name="org.apache.camel.component.netty" level="WARN" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
         <Logger name="io.netty" level="WARN" additivity="false">

@@ -29,6 +29,7 @@ public class AddTemporarySocketProblem extends RouteBuilder implements Processor
         .to(urlMockEndpoint);
   }
 
+  /*
   public static void toProducerOnProducerRoute(CamelContext destination,String urlMockEndpoint) throws Exception {
     destination.getRouteDefinition(TO_PRODUCER_ROUTE)
         .adviceWith(
@@ -39,7 +40,7 @@ public class AddTemporarySocketProblem extends RouteBuilder implements Processor
                 urlMockEndpoint,1)
         );
   }
-
+*/
 
   public AddTemporarySocketProblem(String interceptionUrlOrRegEx,
       String urlMockEndpoint,int maxNoOfProblem){

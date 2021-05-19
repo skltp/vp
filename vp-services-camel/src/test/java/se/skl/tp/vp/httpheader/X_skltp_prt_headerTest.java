@@ -84,10 +84,10 @@ public class X_skltp_prt_headerTest {
                         .setHeader(HttpHeaders.X_VP_SENDER_ID, constant("UnitTest"))
                         .setHeader(HttpHeaders.X_VP_INSTANCE_ID, constant("dev_env"))
                         .setHeader("X-Forwarded-For", constant("1.2.3.4"))
-                        .to("netty4-http:http://localhost:12312/vp")
+                        .to("netty-http:http://localhost:12312/vp")
                         .to("mock:result");
 
-                from("netty4-http:http://localhost:11111/vp").routeId("producent")
+                from("netty-http:http://localhost:11111/vp").routeId("producent")
                         .process((Exchange exchange)-> {
                             Thread.sleep(0);
                         });

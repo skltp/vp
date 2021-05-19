@@ -13,7 +13,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.ServiceStatus;
-import org.apache.camel.impl.EventDrivenConsumerRoute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -149,8 +148,8 @@ public class GetStatusProcessor implements Processor {
     List<String> endPoints = new ArrayList<>();
     List<Route> routes = camelContext.getRoutes();
     for (Route route : routes) {
-      String endpoint = route.getEndpoint().getEndpointKey();
-      if (endpoint.startsWith("http") && ((EventDrivenConsumerRoute) route).getStatus() == ServiceStatus.Started) {
+      String endpoint = route.getEndpoint().getEndpointKey();      
+      if (endpoint.startsWith("http") && camelContext.getRouteController().getRouteStatus(endpoint) == ServiceStatus.Started) {
         endPoints.add(route.getEndpoint().getEndpointKey());
       }
     }

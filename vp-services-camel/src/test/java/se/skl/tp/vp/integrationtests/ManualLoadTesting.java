@@ -1,6 +1,6 @@
 package se.skl.tp.vp.integrationtests;
 
-import static org.apache.camel.component.netty4.NettyConstants.NETTY_REQUEST_TIMEOUT;
+import static org.apache.camel.component.netty.NettyConstants.NETTY_REQUEST_TIMEOUT;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.utils.MemoryUtil.getNettyMemoryJsonString;

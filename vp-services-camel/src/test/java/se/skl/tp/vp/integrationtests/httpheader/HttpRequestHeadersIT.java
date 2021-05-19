@@ -14,7 +14,7 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.component.netty4.http.NettyHttpOperationFailedException;
+import org.apache.camel.component.netty.http.NettyHttpOperationFailedException;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.junit.AfterClass;
@@ -173,9 +173,9 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
             from("direct:start")
                 .routeId("start")
                 .routeDescription("consumer")
-                .to("netty4-http:" + httpRoute);
+                .to("netty-http:" + httpRoute);
             // Address below from tak-vagval-test.xml
-            from("netty4-http:http://localhost:19000/vardgivare-b/tjanst2")
+            from("netty-http:http://localhost:19000/vardgivare-b/tjanst2")
                 .routeDescription("producer")
                 .to("mock:result");
           }

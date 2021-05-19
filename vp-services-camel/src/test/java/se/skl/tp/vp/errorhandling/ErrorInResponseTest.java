@@ -198,7 +198,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
             .setHeader(HttpHeaders.X_VP_SENDER_ID, constant("UnitTest"))
             .setHeader(HttpHeaders.X_VP_INSTANCE_ID, constant("dev_env"))
             .setHeader("X-Forwarded-For", constant("1.2.3.4"))
-            .to("netty4-http:"+VP_ADDRESS+"?throwExceptionOnFailure=false")
+            .to("netty-http:"+VP_ADDRESS+"?throwExceptionOnFailure=false")
             .to("mock:result");
       }
     });

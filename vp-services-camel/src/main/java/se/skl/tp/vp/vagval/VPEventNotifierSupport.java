@@ -4,20 +4,19 @@ import static se.skl.tp.vp.VPRouter.VP_HTTPS_ROUTE;
 import static se.skl.tp.vp.VPRouter.VP_HTTP_ROUTE;
 import static se.skl.tp.vp.constants.HttpHeaders.X_SKLTP_PRODUCER_RESPONSETIME;
 import org.apache.camel.Exchange;
-import org.apache.camel.component.netty4.http.NettyHttpEndpoint;
-import org.apache.camel.management.event.ExchangeSentEvent;
+import org.apache.camel.component.netty.http.NettyHttpEndpoint;
+import org.apache.camel.impl.event.ExchangeSentEvent;
+import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.springframework.stereotype.Component;
 
-import java.util.EventObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class VPEventNotifierSupport extends EventNotifierSupport {
 
-  @Override
-  public boolean isEnabled(EventObject event) {
-    return true;
-  }
+    protected Logger log = LoggerFactory.getLogger(getClass());
 
   @Override
   protected void doStart() throws Exception {
@@ -34,7 +33,7 @@ public class VPEventNotifierSupport extends EventNotifierSupport {
   }
 
   @Override
-  public void notify(EventObject event) {
+  public void notify(CamelEvent event) {
     if (event instanceof ExchangeSentEvent) {
       ExchangeSentEvent sent = (ExchangeSentEvent) event;
       Exchange exchange = sent.getExchange();
@@ -66,4 +65,6 @@ public class VPEventNotifierSupport extends EventNotifierSupport {
         && (exchange.getFromRouteId().equals(VP_HTTP_ROUTE)
             || exchange.getFromRouteId().equals(VP_HTTPS_ROUTE));
   }
+
+
 }

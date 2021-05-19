@@ -217,12 +217,12 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
             from("direct:start")
                 .routeId("start")
                 .to(
-                    "netty4-http:"
+                    "netty-http:"
                         + httpsRoute
                         + "?sslContextParameters=#incomingSSLContextParameters&ssl=true&"
                         + "sslClientCertHeaders=true&needClientAuth=true&matchOnUriPrefix=true");
             // Address below from tak-vagval-test.xml
-            from("netty4-http:https://localhost:19001/vardgivare-b/tjanst2?sslContextParameters=#outgoingSSLContextParameters&ssl=true")
+            from("netty-http:https://localhost:19001/vardgivare-b/tjanst2?sslContextParameters=#outgoingSSLContextParameters&ssl=true")
                 .to("mock:result");
           }
         });

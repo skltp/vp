@@ -20,10 +20,9 @@
  * we handle "fix length" response in same way as a "variable length" response.
  *
  */
-package se.skl.tp.vp.netty;
+package io.netty.handler.codec.http;
 
 import static io.netty.util.internal.ObjectUtil.checkPositive;
-import static io.netty.util.internal.StringUtil.COMMA;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -49,12 +48,13 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.util.ByteProcessor;
 import io.netty.util.internal.AppendableCharSequence;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Decodes {ByteBuf}s into {HttpMessage}s and
- * {HttpContent}s.
+ * Decodes {@link ByteBuf}s into {@link HttpMessage}s and
+ * {@link HttpContent}s.
  *
  * <h3>Parameters that prevents excessive memory consumption</h3>
  * <table border="1">
@@ -67,20 +67,20 @@ import java.util.regex.Pattern;
  * <td>The maximum length of the initial line
  *     (e.g. {@code "GET / HTTP/1.0"} or {@code "HTTP/1.0 200 OK"})
  *     If the length of the initial line exceeds this value, a
- *     {TooLongFrameException} will be raised.</td>
+ *     {@link TooLongFrameException} will be raised.</td>
  * </tr>
  * <tr>
  * <td>{@code maxHeaderSize}</td>
  * <td>{@value #DEFAULT_MAX_HEADER_SIZE}</td>
  * <td>The maximum length of all headers.  If the sum of the length of each
- *     header exceeds this value, a {TooLongFrameException} will be raised.</td>
+ *     header exceeds this value, a {@link TooLongFrameException} will be raised.</td>
  * </tr>
  * <tr>
  * <td>{@code maxChunkSize}</td>
  * <td>{@value #DEFAULT_MAX_CHUNK_SIZE}</td>
  * <td>The maximum length of the content or each chunk.  If the content length
  *     (or the length of each chunk) exceeds this value, the content or chunk
- *     will be split into multiple {HttpContent}s whose length is
+ *     will be split into multiple {@link HttpContent}s whose length is
  *     {@code maxChunkSize} at maximum.</td>
  * </tr>
  * </table>
@@ -104,8 +104,8 @@ import java.util.regex.Pattern;
  *
  * If the content of an HTTP message is greater than {@code maxChunkSize} or
  * the transfer encoding of the HTTP message is 'chunked', this decoder
- * generates one {HttpMessage} instance and its following
- * {HttpContent}s per single HTTP message to avoid excessive memory
+ * generates one {@link HttpMessage} instance and its following
+ * {@link HttpContent}s per single HTTP message to avoid excessive memory
  * consumption. For example, the following HTTP message:
  * <pre>
  * GET / HTTP/1.1
@@ -119,17 +119,17 @@ import java.util.regex.Pattern;
  * Content-MD5: ...
  * <i>[blank line]</i>
  * </pre>
- * triggers {HttpRequestDecoder} to generate 3 objects:
+ * triggers {@link HttpRequestDecoder} to generate 3 objects:
  * <ol>
- * <li>An {HttpRequest},</li>
- * <li>The first {HttpContent} whose content is {@code 'abcdefghijklmnopqrstuvwxyz'},</li>
- * <li>The second {LastHttpContent} whose content is {@code '1234567890abcdef'}, which marks
+ * <li>An {@link HttpRequest},</li>
+ * <li>The first {@link HttpContent} whose content is {@code 'abcdefghijklmnopqrstuvwxyz'},</li>
+ * <li>The second {@link LastHttpContent} whose content is {@code '1234567890abcdef'}, which marks
  * the end of the content.</li>
  * </ol>
  *
- * If you prefer not to handle {HttpContent}s by yourself for your
- * convenience, insert {HttpObjectAggregator} after this decoder in the
- * {ChannelPipeline}.  However, please note that your server might not
+ * If you prefer not to handle {@link HttpContent}s by yourself for your
+ * convenience, insert {@link HttpObjectAggregator} after this decoder in the
+ * {@link ChannelPipeline}.  However, please note that your server might not
  * be as memory efficient as without the aggregator.
  *
  * <h3>Extensibility</h3>
@@ -172,7 +172,7 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
     private LastHttpContent trailer;
 
     /**
-     * The internal state of {HttpObjectDecoder}.
+     * The internal state of {@link HttpObjectDecoder}.
      * <em>Internal use only</em>.
      */
     private enum State {
@@ -653,49 +653,16 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
         value = null;
 
         List<String> contentLengthFields = headers.getAll(HttpHeaderNames.CONTENT_LENGTH);
-
         if (!contentLengthFields.isEmpty()) {
+            HttpVersion version = message.protocolVersion();
+            boolean isHttp10OrEarlier = version.majorVersion() < 1 || (version.majorVersion() == 1
+                    && version.minorVersion() == 0);
             // Guard against multiple Content-Length headers as stated in
             // https://tools.ietf.org/html/rfc7230#section-3.3.2:
-            //
-            // If a message is received that has multiple Content-Length header
-            //   fields with field-values consisting of the same decimal value, or a
-            //   single Content-Length header field with a field value containing a
-            //   list of identical decimal values (e.g., "Content-Length: 42, 42"),
-            //   indicating that duplicate Content-Length header fields have been
-            //   generated or combined by an upstream message processor, then the
-            //   recipient MUST either reject the message as invalid or replace the
-            //   duplicated field-values with a single valid Content-Length field
-            //   containing that decimal value prior to determining the message body
-            //   length or forwarding the message.
-            boolean multipleContentLengths =
-                    contentLengthFields.size() > 1 || contentLengthFields.get(0).indexOf(COMMA) >= 0;
-            if (multipleContentLengths && message.protocolVersion() == HttpVersion.HTTP_1_1) {
-                if (allowDuplicateContentLengths) {
-                    // Find and enforce that all Content-Length values are the same
-                    String firstValue = null;
-                    for (String field : contentLengthFields) {
-                        String[] tokens = COMMA_PATTERN.split(field, -1);
-                        for (String token : tokens) {
-                            String trimmed = token.trim();
-                            if (firstValue == null) {
-                                firstValue = trimmed;
-                            } else if (!trimmed.equals(firstValue)) {
-                                throw new IllegalArgumentException(
-                                        "Multiple Content-Length values found: " + contentLengthFields);
-                            }
-                        }
-                    }
-                    // Replace the duplicated field-values with a single valid Content-Length field
-                    headers.set(HttpHeaderNames.CONTENT_LENGTH, firstValue);
-                    contentLength = Long.parseLong(firstValue);
-                } else {
-                    // Reject the message as invalid
-                    throw new IllegalArgumentException(
-                            "Multiple Content-Length values found: " + contentLengthFields);
-                }
-            } else {
-                contentLength = Long.parseLong(contentLengthFields.get(0));
+            contentLength = HttpUtil.normalizeAndGetContentLength(contentLengthFields,
+                    isHttp10OrEarlier, allowDuplicateContentLengths);
+            if (contentLength != -1) {
+                headers.set(HttpHeaderNames.CONTENT_LENGTH, contentLength);
             }
         }
 
@@ -928,7 +895,7 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
             } else if (validateOWS && !isOWS(c)) {
                 // Only OWS is supported for whitespace
                 throw new IllegalArgumentException("Invalid separator, only a single space or horizontal tab allowed," +
-                        " but received a '" + c + "'");
+                        " but received a '" + c + "' (0x" + Integer.toHexString(c) + ")");
             }
         }
         return sb.length();
@@ -950,7 +917,7 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
     private static class HeaderParser implements ByteProcessor {
         private final AppendableCharSequence seq;
         private final int maxLength;
-        private int size;
+        int size;
 
         HeaderParser(AppendableCharSequence seq, int maxLength) {
             this.seq = seq;

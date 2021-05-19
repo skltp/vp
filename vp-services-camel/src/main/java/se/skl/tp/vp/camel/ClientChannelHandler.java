@@ -22,7 +22,7 @@
 package se.skl.tp.vp.camel;
 
 /**
-This is a override of the org.apache.camel.component.netty4.handlers.ClientChannelHandler version 2.24
+This is a override of the org.apache.camel.component.netty.handlers.ClientChannelHandler version 2.24
  The intention is to implement ant test handling of HTTP respone 100-Continue, and later provide it for Camel.
  */
 
@@ -34,13 +34,13 @@ import org.apache.camel.AsyncCallback;
 import org.apache.camel.CamelExchangeException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.component.netty4.NettyCamelState;
-import org.apache.camel.component.netty4.NettyConfiguration;
-import org.apache.camel.component.netty4.NettyConstants;
-import org.apache.camel.component.netty4.NettyHelper;
-import org.apache.camel.component.netty4.NettyPayloadHelper;
-import org.apache.camel.component.netty4.NettyProducer;
-import org.apache.camel.util.ExchangeHelper;
+import org.apache.camel.component.netty.NettyCamelState;
+import org.apache.camel.component.netty.NettyConfiguration;
+import org.apache.camel.component.netty.NettyConstants;
+import org.apache.camel.component.netty.NettyHelper;
+import org.apache.camel.component.netty.NettyPayloadHelper;
+import org.apache.camel.component.netty.NettyProducer;
+import org.apache.camel.support.ExchangeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

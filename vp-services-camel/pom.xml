@@ -65,14 +65,18 @@
 
     <!-- Camel -->
     <dependency>
-      <groupId>org.apache.camel</groupId>
+      <groupId>org.apache.camel.springboot</groupId>
       <artifactId>camel-spring-boot-starter</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.camel</groupId>
+      <groupId>org.apache.camel.springboot</groupId>
       <artifactId>camel-stream-starter</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+    </dependency>
+    
     <!-- test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -91,8 +95,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-netty4-http-starter</artifactId>
+      <groupId>org.apache.camel.springboot</groupId>
+      <artifactId>camel-netty-http-starter</artifactId>
     </dependency>
 
     <dependency>

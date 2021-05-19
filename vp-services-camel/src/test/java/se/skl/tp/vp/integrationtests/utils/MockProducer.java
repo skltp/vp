@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 public class MockProducer {
-  public static final String NETTY4_HTTP = "netty4-http:";
+  public static final String NETTY_HTTP = "netty-http:";
 
   private Integer responseHttpStatus=200;
   private String responseBody="response text";
@@ -60,7 +60,7 @@ public class MockProducer {
     camelContext.addRoutes(new RouteBuilder() {
       @Override
       public void configure() throws Exception {
-        from(NETTY4_HTTP + producerAddress).id(producerAddress).routeDescription("Producer")
+        from(NETTY_HTTP + producerAddress).id(producerAddress).routeDescription("Producer")
             .streamCaching()
             .process((Exchange exchange) -> {
               inHeaders.putAll(exchange.getIn().getHeaders());

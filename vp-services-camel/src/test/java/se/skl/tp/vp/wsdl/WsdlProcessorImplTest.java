@@ -11,7 +11,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;

@@ -3,6 +3,7 @@ package se.skl.tp.vp.camel;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -17,17 +18,16 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import lombok.extern.log4j.Log4j2;
-import org.apache.camel.component.netty4.ClientInitializerFactory;
-import org.apache.camel.component.netty4.NettyProducer;
-import org.apache.camel.component.netty4.http.NettyHttpConfiguration;
-import org.apache.camel.component.netty4.http.NettyHttpProducer;
+import org.apache.camel.component.netty.ClientInitializerFactory;
+import org.apache.camel.component.netty.NettyProducer;
+import org.apache.camel.component.netty.http.NettyHttpConfiguration;
+import org.apache.camel.component.netty.http.NettyHttpProducer;
 import org.apache.camel.util.ObjectHelper;
 import org.springframework.stereotype.Component;
-import se.skl.tp.vp.netty.HttpClientCodec;
 
 /*
 This is a override of HttpClientInitializerFactory class from
-camel-netty4-http component.To configure the netty4-http component
+camel-netty-http component.To configure the netty-http component
 to use this class use the "clientInitializerFactory" configuration option.
 
 The reason for overriding camel default client initializer

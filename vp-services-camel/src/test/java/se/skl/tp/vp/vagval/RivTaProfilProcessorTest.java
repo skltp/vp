@@ -38,7 +38,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

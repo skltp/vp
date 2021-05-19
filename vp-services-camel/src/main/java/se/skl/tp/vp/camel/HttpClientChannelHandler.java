@@ -22,7 +22,7 @@
 package se.skl.tp.vp.camel;
 
 /**
- This is a override of the org.apache.camel.component.netty4.http.handlers.HttpClientChannelHandler version 2.24
+ This is a override of the org.apache.camel.component.netty.http.handlers.HttpClientChannelHandler version 2.24
  The intention is to implement ant test handling of HTTP respone 100-Continue, and later provide it for Camel.
  */
 
@@ -36,11 +36,11 @@ import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.component.netty4.NettyConstants;
-import org.apache.camel.component.netty4.http.NettyHttpProducer;
+import org.apache.camel.component.netty.NettyConstants;
+import org.apache.camel.component.netty.http.NettyHttpProducer;
 
 /**
- * Netty HTTP {@link org.apache.camel.component.netty4.handlers.ClientChannelHandler} that handles the response combine
+ * Netty HTTP {@link org.apache.camel.component.netty.handlers.ClientChannelHandler} that handles the response combine
  * back from the HTTP server, called by this client.
  */
 public class HttpClientChannelHandler extends ClientChannelHandler {

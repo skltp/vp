@@ -121,9 +121,9 @@ public class RequestReaderProcessorTest extends CamelTestSupport {
     return new RouteBuilder() {
       public void configure() {
         from("direct:start")
-            .to("netty4-http:http://localhost:12123/vp");
+            .to("netty-http:http://localhost:12123/vp");
 
-        from("netty4-http:http://localhost:12123/vp")
+        from("netty-http:http://localhost:12123/vp")
             .process(requestReaderProcessor)
             .to("mock:result");
       }

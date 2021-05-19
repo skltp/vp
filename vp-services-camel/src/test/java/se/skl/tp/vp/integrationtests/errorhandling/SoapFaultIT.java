@@ -97,7 +97,8 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
             .replace().to("mock:vagvalprocessor");
       }
     };
-    camelContext.getRouteDefinition(VAGVAL_ROUTE).adviceWith(camelContext, mockNetty);
+    
+    //camelContext.getRouteDefinition(VAGVAL_ROUTE).adviceWith(camelContext, mockNetty);
   }
 
   private void makeMockVagvalProcessorThrowException() {

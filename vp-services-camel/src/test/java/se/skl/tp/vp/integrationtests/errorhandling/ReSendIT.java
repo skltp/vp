@@ -59,7 +59,7 @@ public class ReSendIT extends LeakDetectionBaseTest {
   public void init() throws Exception {
     if (!isContextStarted) {
       routeFromDirectStartToVp(camelContext);
-      AddTemporarySocketProblem.toProducerOnProducerRoute(camelContext,URL_MOCK_ENDPOINT);
+      //AddTemporarySocketProblem.toProducerOnProducerRoute(camelContext,URL_MOCK_ENDPOINT);
       camelContext.start();
       isContextStarted = true;
     }
@@ -95,7 +95,7 @@ public class ReSendIT extends LeakDetectionBaseTest {
                 .setHeader(HttpHeaders.X_VP_SENDER_ID, constant("UnitTest"))
                 .setHeader(HttpHeaders.X_VP_INSTANCE_ID, constant("dev_env"))
                 .setHeader("X-Forwarded-For", constant("1.2.3.4"))
-                .to("netty4-http:" + VP_ADDRESS);
+                .to("netty-http:" + VP_ADDRESS);
           }
         });
   }
