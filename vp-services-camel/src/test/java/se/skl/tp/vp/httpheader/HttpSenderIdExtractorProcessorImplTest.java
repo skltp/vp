@@ -79,7 +79,7 @@ public class HttpSenderIdExtractorProcessorImplTest {
 
     assertTrue(exception.getMessage().contains("VP011"));
 
-    assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
+    //assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class HttpSenderIdExtractorProcessorImplTest {
 
     assertTrue(exception.getMessage().contains("VP011"));
     
-    assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
+    //assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
 
   @Test
@@ -125,19 +125,20 @@ public class HttpSenderIdExtractorProcessorImplTest {
   }
   @Test
   public void nonInternalCallAndSenderNotWhitelistedShouldThrowVP011() throws Exception {
-	    Exchange exchange = createExchange();
-	    
-	    Exception exception = assertThrows(
-	    		VpSemanticException.class, 
-	            () -> {
-		    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
-		    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
-		    httpHeaderExtractorProcessor.process(exchange);
-	            });
+    Exchange exchange = createExchange();
+    
+    Exception exception = assertThrows(
+    		VpSemanticException.class, 
+            () -> {
+	    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
+	    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
+	    httpHeaderExtractorProcessor.process(exchange);
+            });
 
-	    assertTrue(exception.getMessage().contains("VP011"));
-	    
-    assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
+    assertTrue(exception.getMessage().contains("VP011"));
+	 
+    // Code never calls this in junit4 so I have commmented it out
+    //assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
 
   @Test
@@ -169,7 +170,6 @@ public class HttpSenderIdExtractorProcessorImplTest {
       httpHeaderExtractorProcessor.process(exchange);
     } catch (VpSemanticException e) {
       assertTrue(e.getMessage().contains("Exception, unkown certificate type found in httpheader"));
-      throw e;
     }
   }
 
