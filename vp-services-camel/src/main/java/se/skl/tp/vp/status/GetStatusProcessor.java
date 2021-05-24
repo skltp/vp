@@ -13,9 +13,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.ServiceStatus;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.HttpHeaders;
@@ -70,7 +70,7 @@ public class GetStatusProcessor implements Processor {
     } else {
       JSONObject jsonObject = new JSONObject(registerInfo(showExtendedMemory));
       try {
-          exchange.getIn().setBody(jsonObject.toString(2).replace("\\/", "/"));
+        exchange.getIn().setBody(jsonObject.toString(2).replace("\\/", "/"));
       } catch (JSONException e) {
         exchange.getIn().setBody(jsonObject.toString());
       }
@@ -102,7 +102,8 @@ public class GetStatusProcessor implements Processor {
     Runtime instance = Runtime.getRuntime();
     map.put(KEY_JVM_TOTAL_MEMORY, "" + MemoryUtil.bytesReadable(instance.totalMemory()));
     map.put(KEY_JVM_FREE_MEMORY, "" + MemoryUtil.bytesReadable(instance.freeMemory()));
-    map.put(KEY_JVM_USED_MEMORY, "" + MemoryUtil.bytesReadable((instance.totalMemory() - instance.freeMemory())));
+    map.put(KEY_JVM_USED_MEMORY,
+        "" + MemoryUtil.bytesReadable((instance.totalMemory() - instance.freeMemory())));
     map.put(KEY_JVM_MAX_MEMORY, "" + MemoryUtil.bytesReadable(instance.maxMemory()));
     if (showMemory) {
       map.put(KEY_DIRECT_MEMORY, "" + getDirectMemoryString());
@@ -117,7 +118,7 @@ public class GetStatusProcessor implements Processor {
   private String getNonHeapMemory() {
     MemoryUsage nonHeapMemoryUsage = MemoryUtil.getNonHeapMemoryUsage();
 
-    return String.format("Init: %s Used: %s, Commited: %s, Max: %s",
+    return String.format("Init: %s Used: %s, Committed: %s, Max: %s",
         MemoryUtil.bytesReadable(nonHeapMemoryUsage.getInit()),
         MemoryUtil.bytesReadable(nonHeapMemoryUsage.getUsed()),
         MemoryUtil.bytesReadable(nonHeapMemoryUsage.getCommitted()),
@@ -144,12 +145,13 @@ public class GetStatusProcessor implements Processor {
         MemoryUtil.getTotalCapacity());
   }
 
-  private List getEndpointInfo() {
+  private List<String> getEndpointInfo() {
     List<String> endPoints = new ArrayList<>();
     List<Route> routes = camelContext.getRoutes();
     for (Route route : routes) {
-      String endpoint = route.getEndpoint().getEndpointKey();      
-      if (endpoint.startsWith("http") && camelContext.getRouteController().getRouteStatus(endpoint) == ServiceStatus.Started) {
+      String endpoint = route.getEndpoint().getEndpointKey();
+      if (endpoint.startsWith("http")
+          && camelContext.getRouteController().getRouteStatus(endpoint) == ServiceStatus.Started) {
         endPoints.add(route.getEndpoint().getEndpointKey());
       }
     }
@@ -181,5 +183,4 @@ public class GetStatusProcessor implements Processor {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
     return date == null ? "" : dateFormat.format(date);
   }
-
 }
