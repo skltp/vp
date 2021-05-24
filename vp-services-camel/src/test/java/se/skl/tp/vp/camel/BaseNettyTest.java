@@ -4,12 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Properties;
 import org.apache.camel.CamelContext;
-import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.converter.IOConverter;
+import org.apache.camel.spi.PropertiesComponent;
+import org.apache.camel.spi.Registry;
 import org.apache.camel.test.AvailablePortFinder;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
@@ -20,7 +21,7 @@ public class BaseNettyTest extends CamelTestSupport {
 
   private static volatile int port;
 
-  @BeforeClass
+  @BeforeAll
   public static void initPort() throws Exception {
     File file = new File("target/nettyport.txt");
 
@@ -37,7 +38,7 @@ public class BaseNettyTest extends CamelTestSupport {
     LeakDetectionBaseTest.startLeakDetection();
   }
 
-  @AfterClass
+  @AfterAll
   public static void savePort() throws Exception {
     File file = new File("target/nettyport.txt");
 
@@ -51,24 +52,24 @@ public class BaseNettyTest extends CamelTestSupport {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
-/*
   @Override
   protected CamelContext createCamelContext() throws Exception {
     CamelContext context = super.createCamelContext();
-    context.addComponent("properties", new PropertiesComponent("ref:prop"));
+	PropertiesComponent pc = context.getPropertiesComponent();
+	pc.setLocation("ref:prop");
     return context;
   }
-
+  
   @Override
-  protected JndiRegistry createRegistry() throws Exception {
-    JndiRegistry jndi = super.createRegistry();
+  protected Registry createCamelRegistry() throws Exception {
+    Registry jndi = super.createCamelRegistry();
 
     Properties prop = new Properties();
     prop.setProperty("port", "" + getPort());
     jndi.bind("prop", prop);
     return jndi;
   }
-*/
+
 
   protected int getNextPort() {
     port = AvailablePortFinder.getNextAvailable(port + 1, port + 1000);

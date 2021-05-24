@@ -1,18 +1,18 @@
 package se.skl.tp.vp.integrationtests.httpheader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +26,7 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @StartTakService
@@ -44,7 +44,7 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  @Before
+  @BeforeEach
   public void before() {
     try {
       mockProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");

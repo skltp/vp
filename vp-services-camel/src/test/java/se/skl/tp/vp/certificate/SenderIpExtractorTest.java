@@ -1,5 +1,7 @@
 package se.skl.tp.vp.certificate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.net.InetSocketAddress;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -7,8 +9,7 @@ import org.apache.camel.Message;
 import org.apache.camel.component.netty.NettyConstants;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
 import se.skl.tp.vp.httpheader.SenderIpExtractorFromHeader;
 
@@ -20,7 +21,7 @@ public class SenderIpExtractorTest {
 
     Message message = createMessage();
     String SenderIpAddess = senderIpExtractor.getSenderIpAdress(message);
-    Assert.assertEquals("10.11.12.13", SenderIpAddess);
+    assertEquals("10.11.12.13", SenderIpAddess);
   }
 
   @Test
@@ -30,7 +31,7 @@ public class SenderIpExtractorTest {
     Message message = createMessage();
     message.setHeader("X-Forwarded-For", "13.12.10.11");
     String SenderIpAddess = senderIpExtractor.getSenderIpAdress(message);
-    Assert.assertEquals("13.12.10.11", SenderIpAddess);
+    assertEquals("13.12.10.11", SenderIpAddess);
   }
 
   private Message createMessage() {

@@ -4,15 +4,16 @@ import io.undertow.util.FileUtils;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PemConverterTest  {
 
@@ -30,11 +31,13 @@ public class PemConverterTest  {
         assertNotNull(certificate);
     }
 
-    @Test(expected = CertificateException.class)
+    @Test
     public void extractIncorrectPEMCertificateShouldThrowException() throws Exception {
         String pemCertContent = "-----BEGIN CERTIFICATE-----Incorrect CERT string-----END CERTIFICATE-----";
         PemConverter.buildCertificate(pemCertContent);
-        fail("Expected CertificateException when incorrect pem certificate");
+        assertThrows(CertificateException.class, () -> {
+        	fail("Expected CertificateException when incorrect pem certificate");
+        });
     }
 
     @Test

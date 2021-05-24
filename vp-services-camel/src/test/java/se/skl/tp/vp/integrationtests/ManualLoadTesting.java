@@ -1,6 +1,5 @@
 package se.skl.tp.vp.integrationtests;
 
-import static org.apache.camel.component.netty.NettyConstants.NETTY_REQUEST_TIMEOUT;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.utils.MemoryUtil.getNettyMemoryJsonString;
@@ -15,11 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.camel.Exchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,7 +50,7 @@ import se.skl.tp.vp.util.TestLogAppender;
  * 3. PRODUCER_WEIGHTED_TIMEOUTS - A weighted list of timeouts for the producers
  * 4. WEIGHTED_CALLS - The weight of call types from enum CallTypes
  */
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @StartTakService
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -106,13 +104,13 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
   Map<Integer, Long> responseCodes = new ConcurrentHashMap<>();
   Map<CallTypes, Long> randomCalls = new ConcurrentHashMap<>();
 
-  @BeforeClass
+  @BeforeAll
   public static void startLeakDetection() {
     System.setProperty("spring.profiles.active", "leak");
     LeakDetectionBaseTest.startLeakDetection();
   }
 
-  @Before
+  @BeforeEach
   public void before() {
 
     try {

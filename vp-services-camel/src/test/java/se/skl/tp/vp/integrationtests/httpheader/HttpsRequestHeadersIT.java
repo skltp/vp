@@ -1,5 +1,11 @@
 package se.skl.tp.vp.integrationtests.httpheader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.constants.HttpHeaders.HEADER_USER_AGENT;
 import static se.skl.tp.vp.constants.HttpHeaders.SOAP_ACTION;
 import static se.skl.tp.vp.constants.HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID;
@@ -9,6 +15,7 @@ import static se.skl.tp.vp.constants.HttpHeaders.X_VP_SENDER_ID;
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_CONSUMER;
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_CORRELATION_ID;
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_SENDER;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
@@ -16,14 +23,13 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +44,7 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @StartTakService
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -69,17 +75,17 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  @BeforeClass
+  @BeforeAll
   public static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
   }
 
-  @AfterClass
+  @AfterAll
   public static void verifyNoLeaks() throws Exception {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     if (!isContextStarted) {
       addConsumerRoute(camelContext);
@@ -91,7 +97,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
     testLogAppender.clearEvents();
   }
 
-  @After
+  @AfterEach
   public void after() {
     headerProcessor.setPropagateCorrelationIdForHttps(oldCorrelation);
   }

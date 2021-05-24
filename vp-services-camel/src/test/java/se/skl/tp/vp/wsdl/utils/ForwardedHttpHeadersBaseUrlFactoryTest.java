@@ -8,8 +8,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.PropertyConstants;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = ProxyHttpForwardedHeaderProperties.class)
 public class ForwardedHttpHeadersBaseUrlFactoryTest {
 

@@ -1,16 +1,16 @@
 package se.skl.tp.vp.integrationtests;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTP;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv21Request;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +25,7 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @StartTakService
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -55,7 +55,7 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  @Before
+  @BeforeEach
   public void before() throws Exception {
     defaultRoutedProducer.start("http://localhost:1900/default/GetActivitiesResponder");
     explicedRoutedProducer.start("http://localhost:1900/explicit/GetActivitiesResponder");

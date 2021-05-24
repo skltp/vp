@@ -5,14 +5,14 @@ import io.netty.util.ResourceLeakDetector;
 import java.util.Collection;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.core.LogEvent;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 
 @Log4j2
 public class LeakDetectionBaseTest {
 
-  @BeforeClass
+  @BeforeAll
   public static void startLeakDetection() {
     if( isLeakDectectionAcivated()) {
       System.setProperty("io.netty.leakDetection.level", "PARANOID");
@@ -23,7 +23,7 @@ public class LeakDetectionBaseTest {
     }
   }
 
-  @AfterClass
+  @AfterAll
   public static void verifyNoLeaks() throws Exception {
     if( isLeakDectectionAcivated()) {
       //Force GC to bring up leaks

@@ -1,8 +1,9 @@
 package se.skl.tp.vp.httpheader;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -14,11 +15,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.netty.NettyConstants;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +27,7 @@ import se.skl.tp.vp.errorhandling.ExceptionUtil;
 import se.skl.tp.vp.errorhandling.VpCodeMessages;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(
     classes = {
       SenderIpExtractorFromHeader.class,
@@ -48,7 +46,6 @@ public class HttpSenderIdExtractorProcessorImplTest {
   public static final String HEADER_SENDER_ID = "Sender1";
   public static final String CERT_SENDER_ID = "urken";
 
-  @Rule public final ExpectedException thrown = ExpectedException.none();
 
   @Autowired HttpSenderIdExtractorProcessorImpl httpHeaderExtractorProcessor;
 
@@ -66,15 +63,21 @@ public class HttpSenderIdExtractorProcessorImplTest {
 
   @Test
   public void internalCallAndSenderNotWhitelistedShouldThrowVP011() throws Exception {
-    thrown.expect(VpSemanticException.class);
-    thrown.expectMessage(containsString("VP011"));
-
+    
     Exchange exchange = createExchange();
-    exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
-    exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
-    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
 
-    httpHeaderExtractorProcessor.process(exchange);
+    Exception exception = assertThrows(
+    		VpSemanticException.class, 
+            () -> {
+    
+	    exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
+	    exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
+	    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
+	
+	    httpHeaderExtractorProcessor.process(exchange);
+            });
+
+    assertTrue(exception.getMessage().contains("VP011"));
 
     assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
@@ -93,16 +96,21 @@ public class HttpSenderIdExtractorProcessorImplTest {
 
   @Test
   public void internalCallThroughProxyAndSenderNotWhitelistedShouldThrowVP011() throws Exception {
-    thrown.expect(VpSemanticException.class);
-    thrown.expectMessage(containsString("VP011"));
 
     Exchange exchange = createExchange();
+    
+    Exception exception = assertThrows(
+    		VpSemanticException.class, 
+            () -> {
     exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
     exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
     exchange.getIn().setHeader("X-Forwarded-For", NOT_WHITELISTED_IP_ADDRESS);
 
     httpHeaderExtractorProcessor.process(exchange);
+            });
 
+    assertTrue(exception.getMessage().contains("VP011"));
+    
     assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
 
@@ -117,14 +125,18 @@ public class HttpSenderIdExtractorProcessorImplTest {
   }
   @Test
   public void nonInternalCallAndSenderNotWhitelistedShouldThrowVP011() throws Exception {
-    thrown.expect(VpSemanticException.class);
-    thrown.expectMessage(containsString("VP011"));
+	    Exchange exchange = createExchange();
+	    
+	    Exception exception = assertThrows(
+	    		VpSemanticException.class, 
+	            () -> {
+		    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
+		    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
+		    httpHeaderExtractorProcessor.process(exchange);
+	            });
 
-    Exchange exchange = createExchange();
-    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
-    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
-    httpHeaderExtractorProcessor.process(exchange);
-
+	    assertTrue(exception.getMessage().contains("VP011"));
+	    
     assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
 
@@ -144,7 +156,7 @@ public class HttpSenderIdExtractorProcessorImplTest {
     assertEquals(CERT_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
 
-  @Test(expected = VpSemanticException.class)
+  @Test
   public void testExtractUnkownCertificateTypeFromHeader() throws Exception {
     final Certificate wrongTypecert = Mockito.mock(Certificate.class);
     Exchange exchange = createExchange();
@@ -155,7 +167,7 @@ public class HttpSenderIdExtractorProcessorImplTest {
 
     try {
       httpHeaderExtractorProcessor.process(exchange);
-    } catch (Exception e) {
+    } catch (VpSemanticException e) {
       assertTrue(e.getMessage().contains("Exception, unkown certificate type found in httpheader"));
       throw e;
     }

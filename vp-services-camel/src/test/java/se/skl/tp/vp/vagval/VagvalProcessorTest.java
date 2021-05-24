@@ -1,8 +1,8 @@
 package se.skl.tp.vp.vagval;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP003;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP004;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP006;
@@ -25,10 +25,9 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +39,7 @@ import se.skl.tp.vp.service.TakCacheService;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
 public class VagvalProcessorTest {
 
@@ -56,7 +55,7 @@ public class VagvalProcessorTest {
   @MockBean
   TakCache takCache;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     URL url = getClass().getClassLoader().getResource("hsacache.xml");
     URL urlHsaRoot = getClass().getClassLoader().getResource("hsacachecomplementary.xml");

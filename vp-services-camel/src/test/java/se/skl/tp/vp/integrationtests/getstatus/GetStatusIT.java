@@ -1,18 +1,17 @@
 package se.skl.tp.vp.integrationtests.getstatus;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_HSA_CACHE_INITIALIZED;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_MANAGEMENT_NAME;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_NETTY_DIRECT_MEMORY;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_SERVICE_STATUS;
 import static se.skl.tp.vp.status.GetStatusProcessor.KEY_TAK_CACHE_INITIALIZED;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -22,7 +21,7 @@ import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)

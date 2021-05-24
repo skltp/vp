@@ -1,8 +1,7 @@
 package se.skl.tp.vp.errorhandling;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.util.soaprequests.RoutingInfoUtil.createRoutingInfo;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
@@ -17,10 +16,9 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +35,7 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class ErrorInResponseTest extends LeakDetectionBaseTest {
@@ -76,7 +74,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
   private static boolean isContextStarted = false;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     if(!isContextStarted){
       mockProducer = new MockProducer(camelContext, MOCK_PRODUCER_ADDRESS);
@@ -114,14 +112,14 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
-    assertStringContains(resultBody, "VP009");
-    assertStringContains(resultBody, "address");
-    assertStringContains(resultBody, "Exception Caught by Camel when contacting producer.");
+    assertTrue(resultBody.contains("VP009"));
+    assertTrue(resultBody.contains("address"));
+    assertTrue(resultBody.contains("Exception Caught by Camel when contacting producer."));
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
-    assertStringContains(respOutLogMsg, "CamelHttpResponseCode=500");
-    assertStringContains(respOutLogMsg, "-sessionErrorTechnicalDescription=java.net.ConnectException: Cannot connect to localhost:12100");
+    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
+    assertTrue(respOutLogMsg.contains("-sessionErrorTechnicalDescription=java.net.ConnectException: Cannot connect to localhost:12100"));
   }
 
   @Test //Test för när en Producent svarar med ett tomt svar
@@ -134,9 +132,9 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
-    assertStringContains(resultBody, "VP009");
-    assertStringContains(resultBody, "address");
-    assertStringContains(resultBody, "Empty message when server responded with status code:");
+    assertTrue(resultBody.contains("VP009"));
+    assertTrue(resultBody.contains("address"));
+    assertTrue(resultBody.contains("Empty message when server responded with status code:"));
     resultEndpoint.assertIsSatisfied();
   }
 
@@ -151,12 +149,12 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
-    assertStringContains(resultBody, "java.lang.NullPointerException");
+    assertTrue(resultBody.contains("java.lang.NullPointerException"));
     resultEndpoint.assertIsSatisfied();
 
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
     String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertStringContains(respOutLogMsg, "Payload=java.lang.NullPointerException");
+    assertTrue(respOutLogMsg.contains("Payload=java.lang.NullPointerException"));
   }
 
   @Test // If a producer sends soap fault, we shall return with ResponseCode 200, with the fault embedded in the body.
@@ -169,16 +167,16 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     setTakCacheMockResult(list);
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
-    assertStringContains(resultBody, "<faultcode>soap:Server</faultcode>");
-    assertStringContains(resultBody, "VP011 Caller was not on the white list of accepted IP-addresses");
+    assertTrue(resultBody.contains("<faultcode>soap:Server</faultcode>"));
+    assertTrue(resultBody.contains("VP011 Caller was not on the white list of accepted IP-addresses"));
     resultEndpoint.assertIsSatisfied();
     assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
     String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertStringContains(respOutLogMsg, "CamelHttpResponseCode=200");
-    assertStringContains(respOutLogMsg, "Internal Server Error");
-    assertStringContains(respOutLogMsg, "Payload=<soapenv:Envelope");
-    assertStringContains(respOutLogMsg, "VP011 Caller was not on the white list of accepted IP-addresses");
+    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=200"));
+    assertTrue(respOutLogMsg.contains("Internal Server Error"));
+    assertTrue(respOutLogMsg.contains("Payload=<soapenv:Envelope"));
+    assertTrue(respOutLogMsg.contains("VP011 Caller was not on the white list of accepted IP-addresses"));
   }
 
   private void setTakCacheMockResult(List<RoutingInfo> list) {

@@ -16,8 +16,9 @@
 package se.skl.tp.vp.vagval;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.vagval.RivTaProfilProcessor.RIV20;
 import static se.skl.tp.vp.vagval.RivTaProfilProcessor.RIV21;
 import static se.skl.tp.vp.vagval.RivTaProfilProcessor.UTF_8;
@@ -39,54 +40,63 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
 public class RivTaProfilProcessorTest {
 
   @Autowired
   RivTaProfilProcessor rivTaProfilProcessor;
 
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
-
   @Test
   public void testVP001ThrownWhenNoRivProfile() throws Exception {
-    thrown.expect(VpSemanticException.class);
-    thrown.expectMessage(containsString("VP001"));
+    
+    Exception exception = assertThrows(
+		  VpSemanticException.class, 
+          () -> {
 
     Exchange exchange = createExchange(null, RIV20);
     addInBodyFromFile(exchange, "testfiles/GetSubjectOfCareRequest20.xml");
     rivTaProfilProcessor.process(exchange);
+              }  );
+    
+    assertTrue(exception.getMessage().contains("VP001"));
   }
 
   @Test
   public void testVP005ThrownWhenNoOutProfileConversionIsPossible() throws Exception {
-    thrown.expect(VpSemanticException.class);
-    thrown.expectMessage(containsString("VP005"));
 
+    Exception exception = assertThrows(
+		  VpSemanticException.class, 
+          () -> {
     Exchange exchange = createExchange(RIV20, "RIVTABP22");
     addInBodyFromFile(exchange, "testfiles/GetSubjectOfCareRequest20.xml");
     rivTaProfilProcessor.process(exchange);
+          });
+    
+    assertTrue(exception.getMessage().contains("VP005"));
   }
 
   @Test
   public void testVP005ThrownWhenNoInProfileConversionIsPossible() throws Exception {
-    thrown.expect(VpSemanticException.class);
-    thrown.expectMessage(containsString("VP005"));
 
-    Exchange exchange = createExchange("RIVTABP22", RIV20);
-    addInBodyFromFile(exchange, "testfiles/GetSubjectOfCareRequest20.xml");
-    rivTaProfilProcessor.process(exchange);
+    Exception exception = assertThrows(
+	  VpSemanticException.class, 
+	  () -> {
+	    Exchange exchange = createExchange("RIVTABP22", RIV20);
+	    addInBodyFromFile(exchange, "testfiles/GetSubjectOfCareRequest20.xml");
+	    rivTaProfilProcessor.process(exchange);
+     });
+
+    assertTrue(exception.getMessage().contains("VP005"));
+
   }
 
   @Test

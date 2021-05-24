@@ -5,6 +5,8 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogOk;
 import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV20;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +17,10 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +38,7 @@ import se.skl.tp.vp.util.TestLogAppender;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(properties = {
     "timeout.json.file=notExisting.json"
 })
@@ -64,7 +66,7 @@ public class ProducerTimeoutWithoutConfigTest extends CamelTestSupport {
 
   private static boolean isContextStarted = false;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     if (!isContextStarted) {
       createRoute(camelContext);

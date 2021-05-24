@@ -1,9 +1,9 @@
 package se.skl.tp.vp.wsdl;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.xmlutil.XmlHelper.selectXPathStringValue;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,18 +12,17 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.wsdl.utils.ForwardedProxyUtil;
 
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = {WsdlProcessorImpl.class, ProxyHttpForwardedHeaderProperties.class, ForwardedProxyUtil.class, WsdlConfigurationJson.class})
 public class WsdlProcessorImplTest {
 
@@ -104,8 +103,8 @@ public class WsdlProcessorImplTest {
     Exchange ex = createExchangeWithHttpUrl("http://0.0.0.0:8080/vp/MyUnmatchedUri?wsdl");
     wsdlProcessor.process(ex);
     String body = (String) ex.getIn().getBody();
-    assertTrue(body, body.contains("No wsdl found on this path, following wsdl paths is available:"));
-    assertTrue(body, body.contains("vp/clinicalprocess/healthcond/certificate/GetCertificate/2/rivtabp21"));
+    assertTrue(body.contains("No wsdl found on this path, following wsdl paths is available:"), body);
+    assertTrue(body.contains("vp/clinicalprocess/healthcond/certificate/GetCertificate/2/rivtabp21"), body);
     assertEquals( "text/plain;UTF-8", ex.getIn().getHeader("Content-Type"));
   }
 

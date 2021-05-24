@@ -1,9 +1,9 @@
 package se.skl.tp.vp.vagval;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP002;
@@ -25,10 +25,10 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skltp.takcache.TakCache;
 
-@RunWith( CamelSpringBootRunner.class )
+@CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
 public class BehorighetProcessorTest  {
 
@@ -56,7 +56,7 @@ public class BehorighetProcessorTest  {
     @Autowired
     TakCacheService takCacheService;
 
-    @Before
+    @BeforeEach
     public void beforeTest()  {
         URL url = getClass().getClassLoader().getResource("hsacache.xml");
         URL urlHsaRoot = getClass().getClassLoader().getResource("hsacachecomplementary.xml");
@@ -74,7 +74,7 @@ public class BehorighetProcessorTest  {
 
         Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, RECEIVER_1);
 
-        assertFalse("testAuthorizonIsOk behorighetProcessor.process should not throw exception",isVpSemanticExceptionThrownWhenProcessed(ex));
+        assertFalse(isVpSemanticExceptionThrownWhenProcessed(ex), "testAuthorizonIsOk behorighetProcessor.process should not throw exception");
     }
 
     @Test
@@ -84,8 +84,8 @@ public class BehorighetProcessorTest  {
         Mockito.when(takCache.isAuthorized(anyString(), anyString(), AdditionalMatchers.not(eq(AUTHORIZED_RECEIVER_IN_HSA_TREE)) )).thenReturn(false);
 
         Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE);
-        assertFalse("testAuthorizonByClimbingHsaTree behorighetProcessor.process should not throw exception",
-            isVpSemanticExceptionThrownWhenProcessed(ex));
+        assertFalse(isVpSemanticExceptionThrownWhenProcessed(ex), 
+        		"testAuthorizonByClimbingHsaTree behorighetProcessor.process should not throw exception");
 
     }
 
@@ -97,8 +97,7 @@ public class BehorighetProcessorTest  {
 
         Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, RECEIVER_1_DEFAULT_RECEIVER_2);
 
-        assertFalse("testAuthorizonByDefaultRouting behorighetProcessor.process should not throw exception",
-            isVpSemanticExceptionThrownWhenProcessed(ex));
+        assertFalse(isVpSemanticExceptionThrownWhenProcessed(ex), "testAuthorizonByDefaultRouting behorighetProcessor.process should not throw exception");
     }
 
     private boolean isVpSemanticExceptionThrownWhenProcessed(Exchange ex) throws Exception {
@@ -175,7 +174,7 @@ public class BehorighetProcessorTest  {
             behorighetProcessor.process(ex);
             fail("Förväntade ett VP008 SemanticException");
         }catch(VpSemanticException vpSemanticException){
-            assertEquals(VP008, vpSemanticException.getErrorCode());
+            assertEquals(vpSemanticException.getErrorCode(), VP008);
         }
     }
 

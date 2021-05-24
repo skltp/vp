@@ -1,25 +1,24 @@
 package se.skl.tp.vp.vagval;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheInitializationException;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 
-@RunWith( CamelSpringBootRunner.class )
+@CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
 public class ResetHsaCacheProcessorTest {
     @Autowired
@@ -28,7 +27,7 @@ public class ResetHsaCacheProcessorTest {
     @MockBean(name="hsaCache")
     HsaCache hsaCacheMock;
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         Mockito.when(hsaCacheMock.init(any())).thenReturn(hsaCacheMock);
     }

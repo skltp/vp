@@ -6,12 +6,11 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,7 +21,7 @@ import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
-@RunWith( CamelSpringBootRunner.class )
+@CamelSpringBootTest
 @ContextConfiguration(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 public class  CertificateReaderIT  extends CamelTestSupport {
@@ -39,12 +38,12 @@ public class  CertificateReaderIT  extends CamelTestSupport {
   @Value("${" + PropertyConstants.VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER + "}")
   String forwardedHeader;
 
-  @BeforeClass
+  @BeforeAll
   public static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
   }
 
-  @AfterClass
+  @AfterAll
   public static void verifyNoLeaks() throws Exception {
     LeakDetectionBaseTest.verifyNoLeaks();
   }

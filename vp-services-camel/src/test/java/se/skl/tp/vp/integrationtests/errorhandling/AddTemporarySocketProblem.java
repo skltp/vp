@@ -6,7 +6,11 @@ import java.net.SocketException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.builder.AdviceWith;
+import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.ModelCamelContext;
+import org.apache.camel.reifier.RouteReifier;
 
 public class AddTemporarySocketProblem extends RouteBuilder implements Processor {
 
@@ -28,20 +32,34 @@ public class AddTemporarySocketProblem extends RouteBuilder implements Processor
         .process(this)
         .to(urlMockEndpoint);
   }
-
-  /*
+/*
   public static void toProducerOnProducerRoute(CamelContext destination,String urlMockEndpoint) throws Exception {
-    destination.getRouteDefinition(TO_PRODUCER_ROUTE)
+
+	  ModelCamelContext mcc = destination.adapt(ModelCamelContext.class);
+	  RouteReifier.adviceWith(mcc.getRouteDefinition(TO_PRODUCER_ROUTE), mcc, 
+			  new AdviceWithRouteBuilder() {
+
+				@Override
+				public void configure() throws Exception {
+					// TODO Auto-generated method stub
+					
+				}
+
+	  });
+	  
+	  ModelCamelContext mcc = destination.adapt(ModelCamelContext.class);
+	  
+	  mcc.getRouteDefinition(TO_PRODUCER_ROUTE)).
         .adviceWith(
             destination,
-            new AddTemporarySocketProblem(
-                  ".*localhost:12126.*",
+            new AddTemporarySocketProblem( ".*localhost:12126.*",
                 //"mock_producer_address",
                 urlMockEndpoint,1)
         );
+	  
+
   }
 */
-
   public AddTemporarySocketProblem(String interceptionUrlOrRegEx,
       String urlMockEndpoint,int maxNoOfProblem){
     this.regExpOrUrl = interceptionUrlOrRegEx;

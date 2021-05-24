@@ -1,34 +1,41 @@
 package se.skl.tp.vp.camel;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Properties;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultExchange;
-//import org.apache.camel.impl.JndiRegistry;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-//import se.skl.tp.vp.util.LeakDetectionBaseTest;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.camel.spi.Registry;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
 public class NettyHttpClientUnexpectedContinueTest extends CamelTestSupport {
 
-	/*
-  @BeforeClass
+  @BeforeAll
   public static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
   }
 
-  @AfterClass
+  @AfterAll
   public static void verifyNoLeaks() throws Exception {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
   @Override
-  protected JndiRegistry createRegistry() throws Exception {
-    JndiRegistry registry = super.createRegistry();
+  protected Registry createCamelRegistry() throws Exception {
+    Registry registry = super.createCamelRegistry();
+
+    Properties prop = new Properties();
     registry.bind("continuePipelineFactory", new VPHttpClientPipelineFactory());
     return registry;
   }
-
+  
   @Test
   public void testHandlingOfUnexpected100Continue() throws Exception {
     getMockEndpoint("mock:input").expectedBodiesReceived("request body");
@@ -48,5 +55,4 @@ public class NettyHttpClientUnexpectedContinueTest extends CamelTestSupport {
 
   }
 
-*/
 }
