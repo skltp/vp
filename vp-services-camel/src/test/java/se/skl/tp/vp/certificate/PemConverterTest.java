@@ -33,11 +33,12 @@ public class PemConverterTest  {
 
     @Test
     public void extractIncorrectPEMCertificateShouldThrowException() throws Exception {
-        String pemCertContent = "-----BEGIN CERTIFICATE-----Incorrect CERT string-----END CERTIFICATE-----";
-        PemConverter.buildCertificate(pemCertContent);
         assertThrows(CertificateException.class, () -> {
-        	fail("Expected CertificateException when incorrect pem certificate");
+            String pemCertContent = "-----BEGIN CERTIFICATE-----Incorrect CERT string-----END CERTIFICATE-----";
+            PemConverter.buildCertificate(pemCertContent);
         });
+    	//fail("Expected CertificateException when incorrect pem certificate");
+
     }
 
     @Test
