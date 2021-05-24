@@ -12,6 +12,7 @@ import org.apache.camel.spi.Registry;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
@@ -27,15 +28,14 @@ public class NettyHttpClientUnexpectedContinueTest extends CamelTestSupport {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
+  @BeforeEach
   @Override
-  protected Registry createCamelRegistry() throws Exception {
-    Registry registry = super.createCamelRegistry();
-
-    Properties prop = new Properties();
-    registry.bind("continuePipelineFactory", new VPHttpClientPipelineFactory());
-    return registry;
+  public void setUp() throws Exception {
+      // REALLY important to call super
+      super.setUp();
+	  context.getRegistry().bind("continuePipelineFactory", new VPHttpClientPipelineFactory());	  
   }
-  
+    
   @Test
   public void testHandlingOfUnexpected100Continue() throws Exception {
     getMockEndpoint("mock:input").expectedBodiesReceived("request body");

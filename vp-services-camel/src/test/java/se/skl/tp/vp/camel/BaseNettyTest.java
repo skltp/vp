@@ -53,21 +53,13 @@ public class BaseNettyTest extends CamelTestSupport {
   }
 
   @Override
-  protected CamelContext createCamelContext() throws Exception {
-    CamelContext context = super.createCamelContext();
-	PropertiesComponent pc = context.getPropertiesComponent();
-	pc.setLocation("ref:prop");
-    return context;
-  }
-  
-  @Override
-  protected Registry createCamelRegistry() throws Exception {
-    Registry registry = super.createCamelRegistry();
-
-    Properties prop = new Properties();
-    prop.setProperty("port", "" + getPort());
-    registry.bind("prop", prop);
-    return registry;
+  public void setUp() throws Exception {
+      // REALLY important to call super
+      super.setUp();
+      
+      PropertiesComponent pc = context.getPropertiesComponent();
+		pc.setLocation("ref:prop");
+	    context.getRegistry().bind("properties", pc);	
   }
 
 
