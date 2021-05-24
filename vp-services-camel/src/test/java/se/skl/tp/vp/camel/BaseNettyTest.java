@@ -62,12 +62,12 @@ public class BaseNettyTest extends CamelTestSupport {
   
   @Override
   protected Registry createCamelRegistry() throws Exception {
-    Registry jndi = super.createCamelRegistry();
+    Registry registry = super.createCamelRegistry();
 
     Properties prop = new Properties();
     prop.setProperty("port", "" + getPort());
-    jndi.bind("prop", prop);
-    return jndi;
+    registry.bind("prop", prop);
+    return registry;
   }
 
 

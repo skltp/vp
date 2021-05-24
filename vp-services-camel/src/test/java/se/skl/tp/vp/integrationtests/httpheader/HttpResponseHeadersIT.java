@@ -65,7 +65,7 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
     assertEquals("<mocked answer/>", response);
 
-    assertNull( "SoapAction not expected in response", testConsumer.getReceivedHeader(HttpHeaders.SOAP_ACTION));
+    assertNull( testConsumer.getReceivedHeader(HttpHeaders.SOAP_ACTION), "SoapAction not expected in response");
 
     String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
     assertTrue(respInLog.contains("SOAPAction=mySoapAction"));
@@ -85,10 +85,10 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
 
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS));
     assertEquals("<mocked answer/>", response);
-    assertNull( "MULE_CORRELATION_GROUP_SIZE not expected in response", testConsumer.getReceivedHeader("MULE_CORRELATION_GROUP_SIZE"));
-    assertNull( "MULE_CORRELATION_ID not expected in response", testConsumer.getReceivedHeader("MULE_CORRELATION_ID"));
-    assertNull( "MULE_CORRELATION_SEQUENCE not expected in response", testConsumer.getReceivedHeader("MULE_CORRELATION_SEQUENCE"));
-    assertNull( "MULE_ENCODING not expected in response", testConsumer.getReceivedHeader("MULE_ENCODING"));
+    assertNull( testConsumer.getReceivedHeader("MULE_CORRELATION_GROUP_SIZE"), "MULE_CORRELATION_GROUP_SIZE not expected in response");
+    assertNull( testConsumer.getReceivedHeader("MULE_CORRELATION_ID"), "MULE_CORRELATION_ID not expected in response");
+    assertNull( testConsumer.getReceivedHeader("MULE_CORRELATION_SEQUENCE"), "MULE_CORRELATION_SEQUENCE not expected in response");
+    assertNull( testConsumer.getReceivedHeader("MULE_ENCODING"), "MULE_ENCODING not expected in response");
 
   }
 
@@ -102,9 +102,9 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS));
     assertEquals("<mocked answer/>", response);
 
-    assertNull( "X-MULE_CORRELATION_GROUP_SIZE not expected in response", testConsumer.getReceivedHeader("X-MULE_CORRELATION_GROUP_SIZE"));
-    assertNull( "X-MULE_CORRELATION_ID not expected in response", testConsumer.getReceivedHeader("X-MULE_CORRELATION_ID"));
-    assertNull( "X-MULE_CORRELATION_SEQUENCE not expected in response", testConsumer.getReceivedHeader("X-MULE_CORRELATION_SEQUENCE"));
+    assertNull( testConsumer.getReceivedHeader("X-MULE_CORRELATION_GROUP_SIZE"), "X-MULE_CORRELATION_GROUP_SIZE not expected in response");
+    assertNull( testConsumer.getReceivedHeader("X-MULE_CORRELATION_ID"), "X-MULE_CORRELATION_ID not expected in response");
+    assertNull( testConsumer.getReceivedHeader("X-MULE_CORRELATION_SEQUENCE"), "X-MULE_CORRELATION_SEQUENCE not expected in response");
   }
 
   @Test
