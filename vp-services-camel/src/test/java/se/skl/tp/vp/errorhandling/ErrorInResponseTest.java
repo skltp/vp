@@ -116,8 +116,8 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(resultBody.contains("address"));
     assertTrue(resultBody.contains("Exception Caught by Camel when contacting producer."));
     resultEndpoint.assertIsSatisfied();
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
     assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
     assertTrue(respOutLogMsg.contains("-sessionErrorTechnicalDescription=java.net.ConnectException: Cannot connect to localhost:12100"));
   }
@@ -152,16 +152,16 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(resultBody.contains("java.lang.NullPointerException"));
     resultEndpoint.assertIsSatisfied();
 
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
     assertTrue(respOutLogMsg.contains("Payload=java.lang.NullPointerException"));
   }
 
-  @Test // If a producer sends soap fault, we shall return with ResponseCode 200, with the fault embedded in the body.
+  @Test // If a producer sends soap fault, we shall return with ResponseCode 500, with the fault embedded in the body.
   public void soapFaultPropagatedToCustomerTest() throws InterruptedException {
     mockProducer.setResponseHttpStatus(500);
     mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT));
-
+ 
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
     setTakCacheMockResult(list);
@@ -170,10 +170,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(resultBody.contains("<faultcode>soap:Server</faultcode>"));
     assertTrue(resultBody.contains("VP011 Caller was not on the white list of accepted IP-addresses"));
     resultEndpoint.assertIsSatisfied();
-    assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=200"));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
     assertTrue(respOutLogMsg.contains("Internal Server Error"));
     assertTrue(respOutLogMsg.contains("Payload=<soapenv:Envelope"));
     assertTrue(respOutLogMsg.contains("VP011 Caller was not on the white list of accepted IP-addresses"));
