@@ -123,7 +123,7 @@ public class RequestReaderProcessorTest extends CamelTestSupport {
         from("direct:start")
             .to("netty-http:http://localhost:12123/vp");
 
-        from("netty-http:http://localhost:12123/vp")
+        from("netty-http:http://localhost:12123/vp").streamCaching()
             .process(requestReaderProcessor)
             .to("mock:result");
       }
