@@ -31,9 +31,7 @@ public class HandleProducerExceptionProcessor implements Processor {
          if (exception instanceof NettyHttpOperationFailedException) {
                NettyHttpOperationFailedException operationFailedException = (NettyHttpOperationFailedException) exception;
               if (operationFailedException.getStatusCode() == HTTP_STATUS_500 && operationFailedException.getContentAsString().contains(SOAP_XMLNS)) {
-                  log.warn("Producer responded with HTTP 500. Passing response error message from producer to consumer with HTTP 200");
-                  exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
-                  return;  //Pass on error message with an ok(200) response code..
+                  return;
               }
           }
         String message = exception.getMessage();
