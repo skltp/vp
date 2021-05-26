@@ -73,11 +73,13 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
 
   private XMLStreamReader toStreamReader(Exchange exchange) throws XMLStreamException {
     try {
-      return exchange.getIn().getBody(XMLStreamReader.class);
+    	if(exchange.getProperty(Exchange.CHARSET_NAME) == null)
+    		exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
+        return exchange.getIn().getBody(XMLStreamReader.class);
     } catch (Exception e) {
-      log.warn("Failed convert payload to XMLStreamReader. Trying with default encoding UTF-8...");
-      exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
-      return exchange.getIn().getBody(XMLStreamReader.class);
+        log.warn("Failed convert payload to XMLStreamReader. Trying with default encoding UTF-8... " + e.getMessage());
+        exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
+        return exchange.getIn().getBody(XMLStreamReader.class);
     }
   }
 
