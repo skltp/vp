@@ -44,7 +44,6 @@ public class RivTaProfilProcessor implements Processor {
 
         String rivVersionIn = (String) exchange.getProperty(VPExchangeProperties.RIV_VERSION);
         String rivVersionOut = (String) exchange.getProperty(VPExchangeProperties.RIV_VERSION_OUT);
-        System.out.println(">>>>>>>>>>>>>>>>" + rivVersionIn + " " + rivVersionOut);
         if(rivVersionIn == null){
             throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP001);
         }
