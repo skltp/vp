@@ -40,7 +40,7 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
       String corrId = exchange.getProperty(VPExchangeProperties.SKLTP_CORRELATION_ID, String.class);
       String contentType = exchange.getIn().getHeader(Exchange.CONTENT_TYPE, String.class);
       String soapAction = exchange.getIn().getHeader(SOAP_ACTION, String.class);
-      String msg = String.format("Failed parsning payload.\nCorrelationId: %s\nContent-Type: %s\nSoapAction: %s",
+      String msg = String.format("Failed parsing payload.\nCorrelationId: %s\nContent-Type: %s\nSoapAction: %s",
           corrId, contentType, soapAction);
       log.error(msg, e);
       throw new VpTechnicalException(e);
@@ -73,6 +73,7 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
 
   private XMLStreamReader toStreamReader(Exchange exchange) throws XMLStreamException {
     try {
+    	// Make sure message has a charset
     	if(exchange.getProperty(Exchange.CHARSET_NAME) == null)
     		exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
         return exchange.getIn().getBody(XMLStreamReader.class);

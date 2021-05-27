@@ -148,6 +148,7 @@ public class VPRouter extends RouteBuilder {
 
 
         from(NETTY_HTTPS_INCOMING_FROM).routeId(VP_HTTPS_ROUTE)
+        	.setProperty(VPExchangeProperties.EXCHANGE_CREATED,  simple("${date:exchangeCreated}"))
             .choice()
               .when(header("wsdl").isNotNull()).process(wsdlProcessor)
               .when(header("xsd").isNotNull()).process(wsdlProcessor)
@@ -159,6 +160,7 @@ public class VPRouter extends RouteBuilder {
             .end();
 
         from(NETTY_HTTP_FROM).routeId(VP_HTTP_ROUTE)
+        	.setProperty(VPExchangeProperties.EXCHANGE_CREATED,  simple("${date:exchangeCreated}"))
             .choice()
               .when(header("wsdl").isNotNull()).process(wsdlProcessor)
               .when(header("xsd").isNotNull()).process(wsdlProcessor)
@@ -171,7 +173,6 @@ public class VPRouter extends RouteBuilder {
 
         from(DIRECT_VP).routeId(VAGVAL_ROUTE)
             .streamCaching()
-            .setProperty(VPExchangeProperties.EXCHANGE_CREATED,  simple("${date:exchangeCreated}"))
             .setProperty(VPExchangeProperties.HTTP_URL_IN,  header(Exchange.HTTP_URL))
             .setProperty(VPExchangeProperties.VP_X_FORWARDED_HOST,  header("{{http.forwarded.header.host}}"))
             .setProperty(VPExchangeProperties.VP_X_FORWARDED_PORT,  header("{{http.forwarded.header.port}}"))
