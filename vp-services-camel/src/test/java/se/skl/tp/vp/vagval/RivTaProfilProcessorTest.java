@@ -26,6 +26,7 @@ import static se.skl.tp.vp.vagval.RivTaProfilProcessor.UTF_8;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Iterator;
 import javax.xml.stream.XMLEventReader;
@@ -108,8 +109,10 @@ public class RivTaProfilProcessorTest {
     final URL resultFile = Thread.currentThread().getContextClassLoader()
         .getResource("testfiles/GetSubjectOfCareRequest20.xml");
     final XMLEventReader expected = XMLInputFactory.newInstance().createXMLEventReader(resultFile.openStream());
-    XMLStreamReader resultBody = exchange.getIn().getBody(XMLStreamReader.class);
-    this.executeComparison(toXMLEventReader(resultBody), expected);
+    ByteArrayOutputStream resultBody = exchange.getIn().getBody(ByteArrayOutputStream.class);
+
+    XMLEventReader result = toXMLEventReader(resultBody);
+    this.executeComparison(result, expected);
     assertEquals(RIV20, exchange.getProperty(VPExchangeProperties.RIV_VERSION));
   }
 
@@ -248,8 +251,8 @@ public class RivTaProfilProcessorTest {
   }
 
   private XMLEventReader toXMLEventReader(final XMLStreamReader xmlStreamReader) throws XMLStreamException {
-    return XMLInputFactory.newInstance().createXMLEventReader(xmlStreamReader);
-  }
+	    return XMLInputFactory.newInstance().createXMLEventReader(xmlStreamReader);
+	  }
 
   private XMLEventReader toXMLEventReader(final ByteArrayOutputStream baos) throws XMLStreamException {
     return XMLInputFactory.newInstance().createXMLEventReader(new ByteArrayInputStream(baos.toByteArray()), UTF_8);

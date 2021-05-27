@@ -1,6 +1,7 @@
 package se.skl.tp.vp.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_RIV20;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_RIV21;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv20Request;
@@ -54,10 +55,12 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
   public void riv20To21TransformationTest(){
     mockProducer.setResponseBody("<camel works fine!/>");
 
-    String response = testConsumer.sendHttpsRequestToVP(createGetActivitiesRiv20Request(RECEIVER_RIV21), new HashMap<>());
+    String indata = createGetActivitiesRiv20Request(RECEIVER_RIV21);
+    String response = testConsumer.sendHttpsRequestToVP(indata, new HashMap<>());
     assertEquals("<camel works fine!/>", response);
 
     String inBody = mockProducer.getInBody();
+    assertNotEquals("", inBody);
     assertThat(inBody, CompareMatcher.isSimilarTo(createGetActivitiesRiv21Request(RECEIVER_RIV21)));
 //    assertStringContains(inBody, String.format("LogicalAddress>%s",RECEIVER_RIV21));
 //    assertStringContains(inBody, "=\"http://schemas.xmlsoap.org/soap/envelope/\"");

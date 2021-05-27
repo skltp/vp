@@ -1,7 +1,6 @@
 package se.skl.tp.vp.vagval;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -45,17 +44,18 @@ public class RivTaProfilProcessor implements Processor {
 
         String rivVersionIn = (String) exchange.getProperty(VPExchangeProperties.RIV_VERSION);
         String rivVersionOut = (String) exchange.getProperty(VPExchangeProperties.RIV_VERSION_OUT);
+        System.out.println(">>>>>>>>>>>>>>>>" + rivVersionIn + " " + rivVersionOut);
         if(rivVersionIn == null){
             throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP001);
         }
 
         if (!rivVersionIn.equalsIgnoreCase(rivVersionOut)) {
             if (rivVersionIn.equalsIgnoreCase(RIV20) && rivVersionOut.equalsIgnoreCase(RIV21)) {
-                ByteArrayOutputStream strPayload = doTransform(exchange, RIV20_NS, RIV21_NS, RIV20_ELEM, RIV21_ELEM);
-                exchange.getIn().setBody(strPayload, InputStream.class);
+            	ByteArrayOutputStream strPayload = doTransform(exchange, RIV20_NS, RIV21_NS, RIV20_ELEM, RIV21_ELEM);
+                exchange.getIn().setBody(strPayload);
             } else if (rivVersionIn.equalsIgnoreCase(RIV21) && rivVersionOut.equalsIgnoreCase(RIV20)) {
-                ByteArrayOutputStream strPayload = doTransform(exchange, RIV21_NS, RIV20_NS, RIV21_ELEM, RIV20_ELEM);
-                exchange.getIn().setBody(strPayload, InputStream.class);
+            	ByteArrayOutputStream strPayload = doTransform(exchange, RIV21_NS, RIV20_NS, RIV21_ELEM, RIV20_ELEM);
+                exchange.getIn().setBody(strPayload);
             }else {
                 throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP005, rivVersionIn);
             }
@@ -66,6 +66,7 @@ public class RivTaProfilProcessor implements Processor {
     static ByteArrayOutputStream doTransform(final Exchange msg, final String fromNs, final String toNs, final String fromElem,
                                              final String toElem) {
         log.info("Transforming {} -> {}. ", fromNs, toNs);
+        
         try {
             return transformXml(msg.getIn().getBody(XMLStreamReader.class), fromNs, toNs, fromElem, toElem);
         } catch (Exception e) {
