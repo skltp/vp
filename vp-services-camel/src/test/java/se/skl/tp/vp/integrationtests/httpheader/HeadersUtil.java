@@ -47,4 +47,10 @@ public class HeadersUtil {
     headers.put(HttpHeaders.X_SKLTP_CORRELATION_ID, TEST_CORRELATION_ID);
     return headers;
   }
+
+  public static Map<String, Object> createHttpHeadersWithXRivta(Map<String, Object> rivtaHeaders) {
+    Map<String, Object> headers = createHttpHeaders();
+    headers.putAll(rivtaHeaders);
+    return headers;
+  }
 }

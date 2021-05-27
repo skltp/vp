@@ -6,6 +6,7 @@ import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_CONSUMER
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_CORRELATION_ID;
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_SENDER;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelExecutionException;
@@ -89,6 +90,18 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
     assertEquals(headerContentType, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.HEADER_CONTENT_TYPE));
     assertEquals(vpHeaderUserAgent, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.HEADER_USER_AGENT));
     assertEquals(TEST_SENDER, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_VP_SENDER_ID));
+  }
+
+  @Test
+  public void checkRIVHeadersPropagatedConfigTest() {
+    Map<String, Object> headers = new HashMap<>();
+    headers.put("x-rivta-test1", "test1");
+    headers.put("x-rivta-TEST2", "TEST2");
+    headers.put("x-rivta-123", "123");
+    template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeadersWithXRivta(headers));
+    for(String key: headers.keySet()){
+      assertEquals(headers.get(key), resultEndpoint.getExchanges().get(0).getIn().getHeader(key));
+     }
   }
 
   @Test
