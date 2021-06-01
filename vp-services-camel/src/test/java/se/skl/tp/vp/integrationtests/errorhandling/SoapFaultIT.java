@@ -2,7 +2,6 @@ package se.skl.tp.vp.integrationtests.errorhandling;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.VPRouter.VAGVAL_PROCESSOR_ID;
 import static se.skl.tp.vp.VPRouter.VAGVAL_ROUTE;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_NO_PRODUCER_AVAILABLE;
@@ -16,7 +15,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.builder.AdviceWithRouteBuilder;
+import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+
+import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
@@ -35,6 +36,7 @@ import se.skl.tp.vp.util.soaprequests.SoapUtils;
 @CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@StartTakService
 public class SoapFaultIT extends LeakDetectionBaseTest {
 
   public static final String TEST_EXCEPTION_MESSAGE = "Test exception message!";
@@ -90,16 +92,14 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
   }
 
   private void replaceVagvalProcessor() throws Exception {
-    AdviceWithRouteBuilder mockNetty = new AdviceWithRouteBuilder() {
 
-      @Override
-      public void configure() throws Exception {
-        weaveById(VAGVAL_PROCESSOR_ID)
-            .replace().to("mock:vagvalprocessor");
-      }
-    };
+	  AdviceWith.adviceWith(camelContext, VAGVAL_ROUTE, a -> {
+		  a.weaveById(VAGVAL_PROCESSOR_ID)
+          .replace().to("mock:vagvalprocessor");		  
+		  
+		}
+	  );  
     
-    //camelContext.getRouteDefinition(VAGVAL_ROUTE).adviceWith(camelContext, mockNetty);
   }
 
   private void makeMockVagvalProcessorThrowException() {

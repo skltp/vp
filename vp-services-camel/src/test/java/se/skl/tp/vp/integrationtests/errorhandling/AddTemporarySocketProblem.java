@@ -21,8 +21,7 @@ public class AddTemporarySocketProblem implements Processor {
 
   public void toProducerOnProducerRoute(CamelContext destination,String urlMockEndpoint) throws Exception {
 
-	  AdviceWith.adviceWith(destination, "tmpRoute", a -> {
-		  a.replaceFromWith(TO_PRODUCER_ROUTE);
+	  AdviceWith.adviceWith(destination, TO_PRODUCER_ROUTE, a -> {
 		  a.interceptSendToEndpoint(".*localhost:12126.*")
 		  	.skipSendToOriginalEndpoint()
 		  	.process(this)
@@ -31,6 +30,8 @@ public class AddTemporarySocketProblem implements Processor {
 	  );  
   }
 
+  public AddTemporarySocketProblem() {}
+  
   public AddTemporarySocketProblem(String interceptionUrlOrRegEx,
       String urlMockEndpoint,int maxNoOfProblem){
     this.maxException = maxNoOfProblem;

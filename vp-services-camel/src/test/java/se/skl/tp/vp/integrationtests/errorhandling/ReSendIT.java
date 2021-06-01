@@ -58,7 +58,7 @@ public class ReSendIT extends LeakDetectionBaseTest {
   public void init() throws Exception {
     if (!isContextStarted) {
       routeFromDirectStartToVp(camelContext);
-      //AddTemporarySocketProblem.toProducerOnProducerRoute(camelContext,URL_MOCK_ENDPOINT);
+      (new AddTemporarySocketProblem()).toProducerOnProducerRoute(camelContext,URL_MOCK_ENDPOINT);
       camelContext.start();
       isContextStarted = true;
     }
