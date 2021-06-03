@@ -129,8 +129,8 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
     assertSoapFault(soapBody, VP011.getCode(), "VP011 Caller was not on the white list of accepted IP-addresses");
-    assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertRespOutLogWithRespCode200("VP011 Caller was not on the white list of accepted IP-addresses");
+    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertRespOutLogWithRespCode500("VP011 Caller was not on the white list of accepted IP-addresses");
   }
 
   @Test
@@ -323,11 +323,11 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
   }
 
-  private void assertRespOutLogWithRespCode200(String msg) {
+  private void assertRespOutLogWithRespCode500(String msg) {
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
     String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
     assertStringContains(respOutLogMsg, msg);
-    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=200");
+    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
   }
 
   private String getAndAssertRespOutLog() {
