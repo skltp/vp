@@ -120,7 +120,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
   public static final String RECEIVER_HTTPS = "HttpsProducer";
 
-  @Test // If a producer sends soap fault, we shall return to consumer with ResponseCode 200, with the fault embedded in the body.
+  @Test // If a producer sends soap fault, we shall return to consumer with ResponseCode 500, with the fault embedded in the body.
   public void soapFaultPropagatedToConsumerTestIT() throws Exception {
     mockHttpsProducer.setResponseHttpStatus(500);
     mockHttpsProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT));
@@ -323,12 +323,19 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
   }
 
+  private void assertRespOutLogWithRespCode200(String msg) {
+	    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+	    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+	    assertStringContains(respOutLogMsg, msg);
+	    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=200");
+	  }
+
   private void assertRespOutLogWithRespCode500(String msg) {
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertStringContains(respOutLogMsg, msg);
-    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
-  }
+	    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+	    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+	    assertStringContains(respOutLogMsg, msg);
+	    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
+	  }
 
   private String getAndAssertRespOutLog() {
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
