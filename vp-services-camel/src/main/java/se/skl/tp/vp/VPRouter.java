@@ -60,7 +60,8 @@ public class VPRouter extends RouteBuilder {
         + "keepAlive={{producer.http.keepAlive}}&"
         + "workerGroup=#sharedClientHttpPool&"
         + "clientInitializerFactory=#VPHttpClientPipelineFactory&"
-        + "connectTimeout={{producer.http.connect.timeout}}";
+        + "connectTimeout={{producer.http.connect.timeout}}&"
+        + "requestTimeout={{producer.http.request.timeout}}";
     public static final String NETTY_HTTPS_OUTGOING_TOD = "netty-http:${exchangeProperty.vagvalHost}?"
         + "sslContextParameters=#outgoingSSLContextParameters&"
         + "ssl=true&"
@@ -71,7 +72,8 @@ public class VPRouter extends RouteBuilder {
         + "keepAlive={{producer.https.keepAlive}}&"
         + "workerGroup=#sharedClientHttpsPool&"
         + "clientInitializerFactory=#VPHttpClientPipelineFactory&"
-        + "connectTimeout={{producer.https.connect.timeout}}";
+        + "connectTimeout={{producer.https.connect.timeout}}&"
+        + "requestTimeout={{producer.https.request.timeout}}";
 
     public static final String VAGVAL_PROCESSOR_ID = "VagvalProcessor";
     public static final String BEHORIGHET_PROCESSOR_ID = "BehorighetProcessor";
