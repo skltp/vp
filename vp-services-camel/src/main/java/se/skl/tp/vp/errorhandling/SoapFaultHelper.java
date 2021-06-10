@@ -10,6 +10,7 @@ import org.apache.camel.Exchange;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import se.skl.tp.vp.constants.VPExchangeProperties;
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 
 public class SoapFaultHelper {
 
@@ -58,25 +59,27 @@ public class SoapFaultHelper {
     return (s == null) ? "" : s.toString();
   }
 
-  private static Object createSoapFault(String cause) {
+  private static Object createSoapFault(String faultMessage, String faultDetails, VpSemanticErrorCodeEnum errorCode) {
     try {
       MessageFactory messageFactory = MessageFactory.newInstance();
       SOAPMessage soapMessage = messageFactory.createMessage();
       SOAPFault soapFault = soapMessage.getSOAPBody().addFault();
-      soapFault.setFaultCode(new QName(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, "Server"));
-      soapFault.setFaultString(cause);
+      soapFault.setFaultCode(new QName(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, errorCode.getFaultCode()));
+
+      //soapFault.addDetail(faultDetails); TODO NTP-1944 faultDetails -> Detail delen
+
+      soapFault.setFaultString(faultMessage);
       return soapMessage.getSOAPPart();
     } catch (SOAPException e1) {
-      return generateSoap11FaultWithCause(cause);
+      return generateSoap11FaultWithCause(faultMessage);
     }
   }
 
-  public static void setSoapFaultInResponse(Exchange exchange, String cause, String errorCode){
-
-    exchange.getOut().setBody(createSoapFault(cause));
+  public static void setSoapFaultInResponse(Exchange exchange, String faultString, String faultDetails, VpSemanticErrorCodeEnum errorCode){
+    exchange.getOut().setBody(createSoapFault(faultString, faultDetails, errorCode));
     exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
     exchange.setProperty(VPExchangeProperties.SESSION_ERROR, Boolean.TRUE);
-    exchange.setProperty(VPExchangeProperties.SESSION_ERROR_CODE, errorCode);
+    exchange.setProperty(VPExchangeProperties.SESSION_ERROR_CODE, errorCode.getVpDigitErrorCode());
     exchange.setProperty(VPExchangeProperties.SESSION_HTML_STATUS, SoapFaultHelper.getStatusMessage(nvl(exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE)), null));
   }
 }

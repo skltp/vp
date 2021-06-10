@@ -113,8 +113,8 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
     assertTrue(resultBody.contains("VP009"));
-    assertTrue(resultBody.contains("address"));
-    assertTrue(resultBody.contains("Exception Caught by Camel when contacting producer."));
+    assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten"));
+    // NTP-1944 todo testa messageDetails
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
@@ -133,8 +133,8 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
     assertTrue(resultBody.contains("VP009"));
-    assertTrue(resultBody.contains("address"));
-    assertTrue(resultBody.contains("Empty message when server responded with status code:"));
+    assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten"));
+    // NTP-1944 todo testa messageDetails
     resultEndpoint.assertIsSatisfied();
   }
 

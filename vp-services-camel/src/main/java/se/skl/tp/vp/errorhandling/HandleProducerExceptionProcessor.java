@@ -34,21 +34,27 @@ public class HandleProducerExceptionProcessor implements Processor {
                   return;
               }
           }
-        String message = exception.getMessage();
+        String messageString = exception.getMessage();
         if (exception instanceof ReadTimeoutException) {
-          message = "Timeout when waiting on response from producer.";
+          messageString = "Timeout when waiting on response from producer.";
         }
 
-        log.debug("Exception Caught by Camel when contacting producer. Exception information: " + left(message, 200) + "...");
+        log.debug("Exception Caught by Camel when contacting producer. Exception information: " + left(messageString, 200) + "...");
+
+
+        VpSemanticErrorCodeEnum errorCode = VpSemanticErrorCodeEnum.getDefault();
+        String message = exceptionUtil.createMessage(errorCode);
+
         String addr = (String) exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>");
         String vpMsg = String.format("%s. Exception Caught by Camel when contacting producer. Exception information: (%s: %s)",
-            addr, exception.getClass().getName(), message);
-        String cause = exceptionUtil.createMessage(VpSemanticErrorCodeEnum.VP009, vpMsg);
-        SoapFaultHelper.setSoapFaultInResponse(exchange, cause, VpSemanticErrorCodeEnum.VP009.toString());
+            addr, exception.getClass().getName(), messageString);
+        String messageDetails = exceptionUtil.createDetailsMessage(errorCode, vpMsg);
+
+        SoapFaultHelper.setSoapFaultInResponse(exchange, message, messageDetails, VpSemanticErrorCodeEnum.getDefault());
       }
     } catch (Exception e) {
       log.error("An error occured in HandleProducerExceptionProcessor", e);
-      throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP009, "unknown");
+      throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.getDefault(), "unknown");
     }
 
   }

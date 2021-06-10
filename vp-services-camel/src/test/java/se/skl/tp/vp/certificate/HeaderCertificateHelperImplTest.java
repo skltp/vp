@@ -67,7 +67,8 @@ public class HeaderCertificateHelperImplTest {
       headerCertificateHelper.getSenderIDFromHeaderCertificate(null);
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
-      assertEquals("VP002 No certificate found in httpheader x-vp-auth-cert", e.getMessage());
+      assertEquals("VP002 Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
+      assertEquals("No certificate found in httpheader x-vp-auth-cert", e.getMessageDetails());
     }
   }
 

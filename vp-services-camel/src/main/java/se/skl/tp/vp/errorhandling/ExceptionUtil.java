@@ -15,21 +15,23 @@ public class ExceptionUtil {
     this.vpCodeMessages = vpCodeMessages;
   }
 
-
   public VpSemanticException createVpSemanticException(VpSemanticErrorCodeEnum codeEnum){
     return createVpSemanticException(codeEnum, null);
   }
 
   public VpSemanticException createVpSemanticException(VpSemanticErrorCodeEnum codeEnum, Object ...suffix){
-    String exceptionMessage = createMessage(codeEnum, suffix);
-    return new VpSemanticException(exceptionMessage, codeEnum);
+    String errorMsg = createMessage(codeEnum);
+    String messageDetails = createDetailsMessage(codeEnum, suffix);
+
+    return new VpSemanticException(codeEnum, errorMsg, messageDetails);
   }
 
-  public String createMessage(VpSemanticErrorCodeEnum codeEnum, Object ...suffix) {
-    String errorMsg = vpCodeMessages.getMessage(codeEnum);
-    return codeEnum + " " + String.format(errorMsg, suffix);
+  public String createMessage(VpSemanticErrorCodeEnum codeEnum) {
+    return codeEnum + " " + vpCodeMessages.getMessage(codeEnum);  //NTP-1944 todo: add platform name
   }
 
-
-
+  public String createDetailsMessage(VpSemanticErrorCodeEnum codeEnum, Object ...suffix) {
+    String errorMsg = vpCodeMessages.getMessageDetails(codeEnum);
+    return String.format(errorMsg, suffix);
+  }
 }

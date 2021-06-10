@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
+import se.skl.tp.vp.errorhandling.ExceptionUtil;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
@@ -89,7 +90,9 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
   }
 
   private VpSemanticException createVP002Exception(String msg) {
-    return new VpSemanticException(String.format("%s %s", VpSemanticErrorCodeEnum.VP002, msg)
-        , VpSemanticErrorCodeEnum.VP002);
+    // todo NTP-1944 det ska vara bra om vi ska använda ExceptionUtil.createVpSemanticException för generera VpSemanticException, men jag
+    // kan inte @Autowired ExceptionUtil. Det behövs att reda på varför
+    // message och message details är felaktiga nu
+    return new VpSemanticException(VpSemanticErrorCodeEnum.VP002, VpSemanticErrorCodeEnum.VP002 + " No senderId found in Certificate" , msg);
   }
 }

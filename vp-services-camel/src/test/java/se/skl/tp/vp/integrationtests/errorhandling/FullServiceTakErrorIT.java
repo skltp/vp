@@ -61,7 +61,7 @@ public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
-    assertStringContains(soapBody.getFault().getFaultString(), VP008.getCode());
+    assertStringContains(soapBody.getFault().getFaultString(), VP008.getVpDigitErrorCode());
 
     assertEquals(1,testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String errorLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);

@@ -23,12 +23,24 @@ public class VpCodeMessagesTest {
   @Test
   public void messageByKeyTest() throws Exception {
     String result = vpCodeMessages.getMessage("VP001");
-    assertEquals("No RIV version configured", result);
+    assertEquals("Rivta-version saknas i anrop eller stöds ej av tjänsteplattformen.", result);
   }
 
   @Test
   public void messageByErrorCodeTest() throws Exception {
     String result = vpCodeMessages.getMessage(VpSemanticErrorCodeEnum.VP001);
+    assertEquals("Rivta-version saknas i anrop eller stöds ej av tjänsteplattformen.", result);
+  }
+
+  @Test
+  public void messageDetailsByKeyTest() throws Exception {
+    String result = vpCodeMessages.getMessageDetails("VP001");
+    assertEquals("No RIV version configured", result);
+  }
+
+  @Test
+  public void messageDetailsByErrorCodeTest() throws Exception {
+    String result = vpCodeMessages.getMessageDetails(VpSemanticErrorCodeEnum.VP001);
     assertEquals("No RIV version configured", result);
   }
 

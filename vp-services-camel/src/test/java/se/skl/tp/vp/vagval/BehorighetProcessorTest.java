@@ -121,9 +121,10 @@ public class BehorighetProcessorTest  {
             fail("Förväntade ett VP002 SemanticException");
         }catch(VpSemanticException vpSemanticException){
             assertEquals(VP002, vpSemanticException.getErrorCode());
-            assertTrue(vpSemanticException.getMessage().contains(   "No sender ID (SERIALNUMBER) found in certificate"));
-            assertTrue(vpSemanticException.getMessage().contains( NAMNRYMD_1));
-            assertTrue(vpSemanticException.getMessage().contains( RECEIVER_1));
+            assertTrue(vpSemanticException.getMessage().contains("Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad."));
+            assertTrue(vpSemanticException.getMessageDetails().contains("No sender ID (SERIALNUMBER) found in certificate"));
+            assertTrue(vpSemanticException.getMessageDetails().contains( NAMNRYMD_1));
+            assertTrue(vpSemanticException.getMessageDetails().contains( RECEIVER_1));
         }
     }
 
@@ -138,9 +139,10 @@ public class BehorighetProcessorTest  {
             fail("Förväntade ett VP003 SemanticException");
         }catch(VpSemanticException vpSemanticException){
             assertEquals(VP003, vpSemanticException.getErrorCode());
-            assertTrue(vpSemanticException.getMessage().contains( "No receiverId (logical address) found in message header"));
-            assertTrue(vpSemanticException.getMessage().contains( NAMNRYMD_1));
-            assertTrue(vpSemanticException.getMessage().contains( SENDER_1));
+            assertTrue(vpSemanticException.getMessage().contains( " Logisk adressat (ReceiverId) saknas i RivHeadern i inkommande meddelande."));
+            assertTrue(vpSemanticException.getMessageDetails().contains( "No receiverId (logical address) found in message header"));
+            assertTrue(vpSemanticException.getMessageDetails().contains( NAMNRYMD_1));
+            assertTrue(vpSemanticException.getMessageDetails().contains( SENDER_1));
         }
     }
 
@@ -155,10 +157,11 @@ public class BehorighetProcessorTest  {
             fail("Förväntade ett VP007 SemanticException");
         }catch(VpSemanticException vpSemanticException){
             assertEquals(VP007, vpSemanticException.getErrorCode());
-            assertTrue(vpSemanticException.getMessage().contains( "Authorization missing for"));
-            assertTrue(vpSemanticException.getMessage().contains( NAMNRYMD_1));
-            assertTrue(vpSemanticException.getMessage().contains( SENDER_1));
-            assertTrue(vpSemanticException.getMessage().contains( RECEIVER_1));
+            assertTrue(vpSemanticException.getMessage().contains( "Tjänstekonsumenten saknar behörighet att anropa den logiska adressaten via detta tjänstekontrakt. Kontrollera uppgifterna och vid behov, tillse att det beställs konfiguration i aktuell tjänsteplattform."));
+            assertTrue(vpSemanticException.getMessageDetails().contains( "Authorization missing for"));
+            assertTrue(vpSemanticException.getMessageDetails().contains( NAMNRYMD_1));
+            assertTrue(vpSemanticException.getMessageDetails().contains( SENDER_1));
+            assertTrue(vpSemanticException.getMessageDetails().contains( RECEIVER_1));
         }
     }
 
@@ -174,6 +177,7 @@ public class BehorighetProcessorTest  {
             behorighetProcessor.process(ex);
             fail("Förväntade ett VP008 SemanticException");
         }catch(VpSemanticException vpSemanticException){
+            assertTrue(vpSemanticException.getMessage().contains( "Internt fel i tjänsteplattformen. Ingen kontakt med tjänsteadresseringskatalogen. Informera tjänsteplattformsförvaltningen."));
             assertEquals(vpSemanticException.getErrorCode(), VP008);
         }
     }
