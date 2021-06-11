@@ -63,10 +63,10 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
       exchange.setProperty(VPExchangeProperties.SENDER_ID, getSenderIdFromCertificate(message));
     }
     
-    handleForwardedList(message);
+    handleRoutingHistory(message);
   }
 
-  private void handleForwardedList(Message message) {
+  private void handleRoutingHistory(Message message) {
 	    String forwardedList = message.getHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, String.class);
 	    if(forwardedList == null || forwardedList.length() == 0) {
 	    	forwardedList = vpInstanceId;
