@@ -159,7 +159,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg, "Payload=java.lang.NullPointerException");
   }
 
-  @Test // If a producer sends soap fault, we shall return with ResponseCode 200, with the fault embedded in the body.
+  @Test // If a producer sends soap fault, we shall return with ResponseCode 500, with the fault embedded in the body.
   public void soapFaultPropagatedToCustomerTest() throws InterruptedException {
     mockProducer.setResponseHttpStatus(500);
     mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT));
@@ -172,10 +172,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertStringContains(resultBody, "<faultcode>soap:Server</faultcode>");
     assertStringContains(resultBody, "VP011 Caller was not on the white list of accepted IP-addresses");
     resultEndpoint.assertIsSatisfied();
-    assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
     String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertStringContains(respOutLogMsg, "CamelHttpResponseCode=200");
+    assertStringContains(respOutLogMsg, "CamelHttpResponseCode=500");
     assertStringContains(respOutLogMsg, "Internal Server Error");
     assertStringContains(respOutLogMsg, "Payload=<soapenv:Envelope");
     assertStringContains(respOutLogMsg, "VP011 Caller was not on the white list of accepted IP-addresses");

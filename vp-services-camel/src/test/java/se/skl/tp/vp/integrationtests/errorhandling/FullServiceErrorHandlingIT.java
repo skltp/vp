@@ -120,7 +120,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
   public static final String RECEIVER_HTTPS = "HttpsProducer";
 
-  @Test // If a producer sends soap fault, we shall return to consumer with ResponseCode 200, with the fault embedded in the body.
+  @Test // If a producer sends soap fault, we shall return to consumer with ResponseCode 500, with the fault embedded in the body.
   public void soapFaultPropagatedToConsumerTestIT() throws Exception {
     mockHttpsProducer.setResponseHttpStatus(500);
     mockHttpsProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT));
@@ -129,8 +129,8 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
     assertSoapFault(soapBody, VP011.getCode(), "VP011 Caller was not on the white list of accepted IP-addresses");
-    assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertRespOutLogWithRespCode200("VP011 Caller was not on the white list of accepted IP-addresses");
+    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertRespOutLogWithRespCode500("VP011 Caller was not on the white list of accepted IP-addresses");
   }
 
   @Test
@@ -324,11 +324,18 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   }
 
   private void assertRespOutLogWithRespCode200(String msg) {
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertStringContains(respOutLogMsg, msg);
-    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=200");
-  }
+	    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+	    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+	    assertStringContains(respOutLogMsg, msg);
+	    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=200");
+	  }
+
+  private void assertRespOutLogWithRespCode500(String msg) {
+	    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+	    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+	    assertStringContains(respOutLogMsg, msg);
+	    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
+	  }
 
   private String getAndAssertRespOutLog() {
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
