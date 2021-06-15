@@ -2,3 +2,6 @@ vp-services-camel/target/
 .idea/
 target/
 *.iml
+/*.project
+/.settings/*.prefs
+/vp-services-camel/*.project
