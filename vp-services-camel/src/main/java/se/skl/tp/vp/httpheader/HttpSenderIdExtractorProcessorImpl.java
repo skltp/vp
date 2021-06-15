@@ -1,6 +1,9 @@
 package se.skl.tp.vp.httpheader;
 
 import lombok.extern.log4j.Log4j2;
+
+import java.util.regex.Pattern;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 @Service
 @Log4j2
 public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractorProcessor {
+
+  private static final Pattern COMMA = Pattern.compile(",");
 
   private IPWhitelistHandler ipWhitelistHandler;
   private HeaderCertificateHelper headerCertificateHelper;
@@ -57,8 +62,28 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
       log.debug("Try extract senderId from provided certificate");
       exchange.setProperty(VPExchangeProperties.SENDER_ID, getSenderIdFromCertificate(message));
     }
+    
+    handleRoutingHistory(message);
   }
 
+  private void handleRoutingHistory(Message message) {
+	    String forwardedList = message.getHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, String.class);
+	    if(forwardedList == null || forwardedList.length() == 0) {
+	    	forwardedList = vpInstanceId;
+	    } else if(isInForwardedList(forwardedList)) {
+	        throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP014);    	
+	    } else {
+	    	forwardedList += "," + vpInstanceId;   	
+	    }
+	    message.setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, forwardedList);	  
+  }
+  
+  private boolean isInForwardedList(String s) {
+	  
+	  return COMMA.splitAsStream(s).filter(e -> e.trim().equals(vpInstanceId)).count() > 0;
+	  
+  }
+  
   private String getSenderIdFromCertificate(Message message) {
     Object certificate = message.getHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
     return headerCertificateHelper.getSenderIDFromHeaderCertificate(certificate);

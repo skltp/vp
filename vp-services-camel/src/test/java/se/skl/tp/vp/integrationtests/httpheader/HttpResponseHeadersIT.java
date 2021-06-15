@@ -151,4 +151,25 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertTrue(respOutLog.contains("Content-Type=text/xml; charset=UTF-8"));
   }
 
+  @Test
+  public void testRoutingHistory() {
+    mockProducer.setResponseBody("<mocked answer/>");
+    mockProducer.addResponseHeader(HttpHeaders.SOAP_ACTION, "mySoapAction");
+
+    Map<String, Object> headers = new HashMap<>();
+    headers.put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
+    headers.put(HttpHeaders.X_VP_SENDER_ID, "tp");
+    headers.put(HttpHeaders.X_RIVTA_ROUTING_HISTORY, "some-server");
+    
+    String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
+    assertEquals("<mocked answer/>", response);
+
+    assertTrue("some-server,dev_env,mock-producer".equals(testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY)));
+
+    String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    assertTrue(respInLog.contains("x-rivta-routing-history=some-server,dev_env,mock-producer"));
+
+    String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,dev_env,mock-producer"));
+  }
 }
