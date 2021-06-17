@@ -47,8 +47,8 @@ public class HttpSenderIdExtractorProcessorImplTest {
   public static final String NOT_WHITELISTED_IP_ADDRESS = "10.20.30.40";
   public static final String HEADER_SENDER_ID = "Sender1";
   public static final String CERT_SENDER_ID = "urken";
-  public static final String NOTOK_FORWARDED_LIST = "dev_env,some_server";
-  public static final String OK_FORWARDED_LIST = "some_server,some_other_server";
+  public static final String NOTOK_ROUTING_HISTORY = "dev_env,some_server";
+  public static final String OK_ROUTING_HISTORY = "some_server,some_other_server";
 
   @Rule public final ExpectedException thrown = ExpectedException.none();
 
@@ -82,30 +82,27 @@ public class HttpSenderIdExtractorProcessorImplTest {
   }
   
   @Test
-  public void internalInForwardedListShouldTBeOk() throws Exception {
-
+  public void routingHistoryShouldTBeOk() throws Exception {
 
     Exchange exchange = createExchange();
-    exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
-    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, OK_FORWARDED_LIST);
-    exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
+    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, OK_ROUTING_HISTORY);
     exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
 
     httpHeaderExtractorProcessor.process(exchange);
 
-    assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
+    assertEquals(CERT_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
 
   @Test
-  public void internalInForwardedListShouldThrowVP014() throws Exception {
+  public void routingHistoryShouldThrowVP014() throws Exception {
     thrown.expect(VpSemanticException.class);
     thrown.expectMessage(containsString("VP014"));
 
     Exchange exchange = createExchange();
-    exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
-    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, NOTOK_FORWARDED_LIST);
-    exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
+    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, NOTOK_ROUTING_HISTORY);
     exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
 
     httpHeaderExtractorProcessor.process(exchange);
 
