@@ -27,6 +27,7 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
   private SenderIpExtractor senderIpExtractor;
   private String vpInstanceId;
   private ExceptionUtil exceptionUtil;
+  private boolean useRoutingHistory;
 
   @Autowired
   public HttpSenderIdExtractorProcessorImpl(Environment env,
@@ -37,7 +38,8 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
     this.headerCertificateHelper = headerCertificateHelper;
     this.ipWhitelistHandler = ipWhitelistHandler;
     this.senderIpExtractor = senderIpExtractor;
-    vpInstanceId = env.getProperty(PropertyConstants.VP_INSTANCE_ID);
+    this.vpInstanceId = env.getProperty(PropertyConstants.VP_INSTANCE_ID);
+    this.useRoutingHistory = "true".equals(env.getProperty(PropertyConstants.VP_USE_ROUTING_HISTORY));
     this.exceptionUtil = exceptionUtil;
   }
 
@@ -61,9 +63,9 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
     } else {
       log.debug("Try extract senderId from provided certificate");
       exchange.setProperty(VPExchangeProperties.SENDER_ID, getSenderIdFromCertificate(message));
+      if(useRoutingHistory)
+    	  handleRoutingHistory(message);
     }
-    
-    handleRoutingHistory(message);
   }
 
   private void handleRoutingHistory(Message message) {
