@@ -47,8 +47,8 @@ public class HttpSenderIdExtractorProcessorImplTest {
   public static final String NOT_WHITELISTED_IP_ADDRESS = "10.20.30.40";
   public static final String HEADER_SENDER_ID = "Sender1";
   public static final String CERT_SENDER_ID = "urken";
-  public static final String NOTOK_ROUTING_HISTORY = "dev_env,some_server";
-  public static final String OK_ROUTING_HISTORY = "some_server,some_other_server";
+  public static final String NOTOK_ROUTING_HISTORY = "dev_env#some_server";
+  public static final String OK_ROUTING_HISTORY = "some_server#some_other_server";
 
   @Rule public final ExpectedException thrown = ExpectedException.none();
 

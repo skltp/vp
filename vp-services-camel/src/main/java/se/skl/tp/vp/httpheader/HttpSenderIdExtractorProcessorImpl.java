@@ -20,7 +20,8 @@ import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 @Log4j2
 public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractorProcessor {
 
-  private static final Pattern COMMA = Pattern.compile(",");
+  private static final String ROUTE_DELIMITER = "#";
+  private static final Pattern ROUTE_DELIMITER_PATTERN = Pattern.compile(ROUTE_DELIMITER);
 
   private IPWhitelistHandler ipWhitelistHandler;
   private HeaderCertificateHelper headerCertificateHelper;
@@ -73,19 +74,18 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
 	    if(forwardedList == null || forwardedList.length() == 0) {
 	    	forwardedList = vpInstanceId;
 	    } else if(isInForwardedList(forwardedList)) {
-	        throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP014);    	
+	        throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP014);
 	    } else {
-	    	forwardedList += "," + vpInstanceId;   	
+	    	forwardedList += ROUTE_DELIMITER + vpInstanceId;
 	    }
-	    message.setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, forwardedList);	  
+	    message.setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, forwardedList);
   }
-  
+
   private boolean isInForwardedList(String s) {
-	  
-	  return COMMA.splitAsStream(s).filter(e -> e.trim().equals(vpInstanceId)).count() > 0;
-	  
+    return ROUTE_DELIMITER_PATTERN.splitAsStream(s)
+        .anyMatch(e -> e.trim().equals(vpInstanceId));
   }
-  
+
   private String getSenderIdFromCertificate(Message message) {
     Object certificate = message.getHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
     return headerCertificateHelper.getSenderIDFromHeaderCertificate(certificate);
