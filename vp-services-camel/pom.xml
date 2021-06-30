@@ -6,12 +6,12 @@
   <parent>
     <groupId>se.skltp.vp</groupId>
     <artifactId>vp-parent-camel</artifactId>
-    <version>4.0.1-RC4</version>
+    <version>4.0.1-RC5-SNAPSHOT</version>
   </parent>
 
   <artifactId>vp-services-camel</artifactId>
   <name>vp-services-camel</name>
-  <version>4.0.1-RC4</version>
+  <version>4.0.1-RC5-SNAPSHOT</version>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
 
