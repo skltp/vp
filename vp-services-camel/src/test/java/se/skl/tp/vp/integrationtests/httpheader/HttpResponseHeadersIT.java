@@ -163,12 +163,13 @@ public class HttpResponseHeadersIT {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
     assertEquals("<mocked answer/>", response);
 
-    assertTrue("some-server,dev_env,mock-producer".equals(testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY)));
+    // Since http, vpInstanceId should not have been added to routing history 
+    String routing_history = testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
+    assertTrue("some-server,mock-producer".equals(routing_history));
 
     String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
-    assertTrue(respInLog.contains("x-rivta-routing-history=some-server,dev_env,mock-producer"));
+    assertTrue(respInLog.contains("x-rivta-routing-history=some-server,mock-producer"));
 
     String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,dev_env,mock-producer"));
-  }
+    assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,mock-producer"));  }
 }
