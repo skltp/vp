@@ -6,7 +6,7 @@
   <groupId>se.skltp.vp</groupId>
   <artifactId>vp-parent-camel</artifactId>
   <name>vp-parent-camel</name>
-  <version>4.0.1-RC5-SNAPSHOT</version>
+  <version>4.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
@@ -17,10 +17,11 @@
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>2.1.0.RELEASE</spring.boot-version>
+    <spring.boot-version>2.4.4</spring.boot-version>
     <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
-    <camel.version>2.24.0</camel.version>
+    <camel.version>3.7.4</camel.version>
     <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
+    <netty.version>4.1.63.Final</netty.version>
 
     <takdatahandler.version>1.0.1</takdatahandler.version>
 
@@ -94,7 +95,7 @@
       </dependency>
       <!-- Camel BOM -->
       <dependency>
-        <groupId>org.apache.camel</groupId>
+        <groupId>org.apache.camel.springboot</groupId>
         <artifactId>camel-spring-boot-dependencies</artifactId>
         <version>${camel.version}</version>
         <type>pom</type>
@@ -130,12 +131,12 @@
 
       <!-- Camel -->
       <dependency>
-        <groupId>org.apache.camel</groupId>
+        <groupId>org.apache.camel.springboot</groupId>
         <artifactId>camel-spring-boot-starter</artifactId>
         <version>${camel.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.camel</groupId>
+        <groupId>org.apache.camel.springboot</groupId>
         <artifactId>camel-spring-boot</artifactId>
         <version>${camel.version}</version>
       </dependency>
@@ -155,9 +156,16 @@
         <version>${camel.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-netty4-http-starter</artifactId>
+        <groupId>org.apache.camel.springboot</groupId>
+        <artifactId>camel-netty-http-starter</artifactId>
         <version>${camel.version}</version>
+      </dependency>
+
+      <!--Netty-->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-all</artifactId>
+        <version>${netty.version}</version>
       </dependency>
 
       <!--hawt.io-->

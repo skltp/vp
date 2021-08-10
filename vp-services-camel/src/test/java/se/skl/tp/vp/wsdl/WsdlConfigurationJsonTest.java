@@ -1,19 +1,20 @@
 package se.skl.tp.vp.wsdl;
 
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.PropertyConstants;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = ProxyHttpForwardedHeaderProperties.class)
 public class WsdlConfigurationJsonTest {
 

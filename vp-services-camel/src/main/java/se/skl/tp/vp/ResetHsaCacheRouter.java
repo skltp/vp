@@ -9,14 +9,14 @@ import se.skl.tp.vp.vagval.ResetHsaCacheProcessor;
 public class ResetHsaCacheRouter extends RouteBuilder {
 
   public static final String RESET_HSA_CACHE_ROUTE = "reset-hsa-cache-route";
-  public static final String NETTY4_HTTP_FROM_RESET_HSA_CACHE = "netty4-http:{{vp.hsa.reset.cache.url}}";
+  public static final String NETTY_HTTP_FROM_RESET_HSA_CACHE = "netty-http:{{vp.hsa.reset.cache.url}}";
 
   @Autowired
   ResetHsaCacheProcessor resetHsaCacheProcessor;
 
   @Override
   public void configure() throws Exception {
-    from(NETTY4_HTTP_FROM_RESET_HSA_CACHE).routeId(RESET_HSA_CACHE_ROUTE)
+    from(NETTY_HTTP_FROM_RESET_HSA_CACHE).routeId(RESET_HSA_CACHE_ROUTE)
         .process(resetHsaCacheProcessor);
   }
 }

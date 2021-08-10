@@ -1,17 +1,17 @@
 package se.skl.tp.vp.integrationtests;
 
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.requestreader.RequestReaderProcessorXMLEventReaderTest.MTOM_TEXT_1;
 import static se.skl.tp.vp.requestreader.RequestReaderProcessorXMLEventReaderTest.MTOM_TEXT_2;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +24,7 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @StartTakService
@@ -61,7 +61,7 @@ public class FullServiceMtomIT extends LeakDetectionBaseTest {
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  @Before
+  @BeforeEach
   public void before() {
     try {
       mockProducer.start(HTTP_PRODUCER_URL);
@@ -104,6 +104,5 @@ public class FullServiceMtomIT extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpsUrl);
 
   }
-
 
 }

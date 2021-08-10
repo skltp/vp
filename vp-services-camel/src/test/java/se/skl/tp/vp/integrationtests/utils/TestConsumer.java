@@ -19,7 +19,7 @@ import se.skl.tp.vp.constants.PropertyConstants;
 public class TestConsumer {
   public static final String DIRECT_START_HTTP = "direct:start_http";
   public static final String DIRECT_START_HTTPS = "direct:start_https";
-  private static final String NETTY_PREFIX = "netty4-http:";
+  private static final String NETTY_PREFIX = "netty-http:";
   public static final String HTTPS_NETTY_OPTIONS = "sslContextParameters=#outgoingSSLContextParameters&ssl=true&throwExceptionOnFailure=false";
   public static final String HTTP_NETTY_OPTIONS = "throwExceptionOnFailure=false";
 
@@ -56,7 +56,14 @@ public class TestConsumer {
   }
 
   public String sendHttpRequestToVP(String message, Map<String, Object> headers){
-    resultEndpoint.reset();
+    return sendHttpRequestToVP(message, headers, true);
+  }
+
+
+  public String sendHttpRequestToVP(String message, Map<String, Object> headers, boolean reset){
+    if(reset){
+      resultEndpoint.reset();
+    }
     return template.requestBodyAndHeaders(
             DIRECT_START_HTTP,
             message,
@@ -99,7 +106,7 @@ public class TestConsumer {
     String vpHttpBaseUrl = env.getProperty(PropertyConstants.VP_HTTP_ROUTE_URL);
     path = path.startsWith("/") ? path.substring(1) : path;
     String delimiter = path.contains("?") ? "&" : "?";
-    String endpointUri = String.format("netty4-http:%s/%s%s%s", vpHttpBaseUrl, path, delimiter, HTTP_NETTY_OPTIONS);
+    String endpointUri = String.format("netty-http:%s/%s%s%s", vpHttpBaseUrl, path, delimiter, HTTP_NETTY_OPTIONS);
 
     resultEndpoint.reset();
     return template.requestBodyAndHeaders(
@@ -113,7 +120,7 @@ public class TestConsumer {
     String vpHttpsBaseUrl = env.getProperty(PropertyConstants.VP_HTTPS_ROUTE_URL);
     path = path.startsWith("/") ? path.substring(1) : path;
     String delimiter = path.contains("?") ? "&" : "?";
-    String endpointUri = String.format("netty4-http:%s/%s%s%s", vpHttpsBaseUrl, path, delimiter, HTTPS_NETTY_OPTIONS);
+    String endpointUri = String.format("netty-http:%s/%s%s%s", vpHttpsBaseUrl, path, delimiter, HTTPS_NETTY_OPTIONS);
 
     resultEndpoint.reset();
     return template.requestBodyAndHeaders(

@@ -1,8 +1,8 @@
 package se.skl.tp.vp.vagval;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP003;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP004;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP006;
@@ -24,11 +24,10 @@ import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.camel.support.DefaultExchange;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +39,7 @@ import se.skl.tp.vp.service.TakCacheService;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
 public class VagvalProcessorTest {
 
@@ -56,7 +55,7 @@ public class VagvalProcessorTest {
   @MockBean
   TakCache takCache;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     URL url = getClass().getClassLoader().getResource("hsacache.xml");
     URL urlHsaRoot = getClass().getClassLoader().getResource("hsacachecomplementary.xml");
@@ -79,6 +78,34 @@ public class VagvalProcessorTest {
     assertEquals(ADDRESS_1, ex.getProperty(VPExchangeProperties.VAGVAL));
     assertEquals(RIV20, ex.getProperty(VPExchangeProperties.RIV_VERSION_OUT));
 
+  }
+
+  @Test
+  public void testVagvalDefaultHttpsPort() throws Exception {
+
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo("https://tjp.nordicmedtest.se/skaulo/vp/clinicalprocess/activityprescription/actoutcome/GetMedicationHistory/2/rivtabp21", RIV20));
+    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+
+    Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
+    vagvalProcessor.process(ex);
+
+    assertEquals("tjp.nordicmedtest.se:443", ex.getProperty(VPExchangeProperties.VAGVAL_HOST));
+    assertEquals(RIV20, ex.getProperty(VPExchangeProperties.RIV_VERSION_OUT));
+
+  }
+
+  @Test
+  public void testVagvalDefaultHttpPort() throws Exception {
+
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo("http://tjp.nordicmedtest.se/skaulo/vp/clinicalprocess/activityprescription/actoutcome/GetMedicationHistory/2/rivtabp21", RIV20));
+    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+
+    Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
+    vagvalProcessor.process(ex);
+
+    assertEquals("tjp.nordicmedtest.se:8080", ex.getProperty(VPExchangeProperties.VAGVAL_HOST));
   }
 
   @Test

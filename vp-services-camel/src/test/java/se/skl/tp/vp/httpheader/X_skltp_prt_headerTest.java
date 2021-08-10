@@ -1,6 +1,6 @@
 package se.skl.tp.vp.httpheader;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.skl.tp.vp.util.soaprequests.RoutingInfoUtil.createRoutingInfo;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
@@ -16,23 +16,22 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -53,7 +52,7 @@ public class X_skltp_prt_headerTest {
     @Autowired
     TakCacheService takCacheService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         createRoute(camelContext);
         camelContext.start();
@@ -84,10 +83,10 @@ public class X_skltp_prt_headerTest {
                         .setHeader(HttpHeaders.X_VP_SENDER_ID, constant("UnitTest"))
                         .setHeader(HttpHeaders.X_VP_INSTANCE_ID, constant("dev_env"))
                         .setHeader("X-Forwarded-For", constant("1.2.3.4"))
-                        .to("netty4-http:http://localhost:12312/vp")
+                        .to("netty-http:http://localhost:12312/vp")
                         .to("mock:result");
 
-                from("netty4-http:http://localhost:11111/vp").routeId("producent")
+                from("netty-http:http://localhost:11111/vp").routeId("producent")
                         .process((Exchange exchange)-> {
                             Thread.sleep(0);
                         });

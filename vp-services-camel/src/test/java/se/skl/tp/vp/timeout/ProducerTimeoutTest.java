@@ -1,10 +1,12 @@
 package se.skl.tp.vp.timeout;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.skl.tp.vp.util.soaprequests.RoutingInfoUtil.createRoutingInfo;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogOk;
 import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV20;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,12 +18,12 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +42,7 @@ import se.skl.tp.vp.util.TestLogAppender;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -66,17 +68,17 @@ public class ProducerTimeoutTest extends CamelTestSupport {
 
   private static boolean isContextStarted = false;
 
-  @BeforeClass
+  @BeforeAll
   public static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
   }
 
-  @AfterClass
+  @AfterAll
   public static void verifyNoLeaks() throws Exception {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     if (!isContextStarted) {
       createRoute(camelContext);
@@ -154,10 +156,10 @@ public class ProducerTimeoutTest extends CamelTestSupport {
                 .setHeader(HttpHeaders.X_VP_SENDER_ID, constant("UnitTest"))
                 .setHeader(HttpHeaders.X_VP_INSTANCE_ID, constant("dev_env"))
                 .setHeader("X-Forwarded-For", constant("1.2.3.4"))
-                .to("netty4-http:http://localhost:12312/vp?throwExceptionOnFailure=false")
+                .to("netty-http:http://localhost:12312/vp?throwExceptionOnFailure=false")
                 .to("mock:result");
             ;
-            from("netty4-http:http://localhost:12123/vp")
+            from("netty-http:http://localhost:12123/vp")
                 .process(
                     (Exchange exchange) -> {
                       Thread.sleep(1000);

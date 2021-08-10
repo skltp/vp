@@ -1,7 +1,7 @@
 package se.skl.tp.vp;
 
 import io.netty.channel.EventLoopGroup;
-import org.apache.camel.component.netty4.NettyWorkerPoolBuilder;
+import org.apache.camel.component.netty.NettyWorkerPoolBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

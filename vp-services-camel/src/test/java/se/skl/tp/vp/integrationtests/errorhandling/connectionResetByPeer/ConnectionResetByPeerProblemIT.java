@@ -3,9 +3,9 @@ package se.skl.tp.vp.integrationtests.errorhandling.connectionResetByPeer;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,9 +16,8 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.util.CharsetUtil;
 import java.util.Map;
 import org.apache.camel.CamelContext;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -30,7 +29,7 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @TestPropertySource(locations = {"classpath:application.properties", "classpath:vp-messages.properties"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -88,4 +87,5 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
 
         ResetByPeerServer.stopServer();
     }
+    
 }

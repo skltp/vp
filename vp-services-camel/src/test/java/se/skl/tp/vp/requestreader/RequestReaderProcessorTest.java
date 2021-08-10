@@ -1,5 +1,6 @@
 package se.skl.tp.vp.requestreader;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv20Request;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv21Request;
@@ -10,16 +11,15 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @ContextConfiguration(classes = RequestReaderProcessorXMLEventReader.class)
 @TestPropertySource("classpath:application.properties")
 public class RequestReaderProcessorTest extends CamelTestSupport {
@@ -121,9 +121,9 @@ public class RequestReaderProcessorTest extends CamelTestSupport {
     return new RouteBuilder() {
       public void configure() {
         from("direct:start")
-            .to("netty4-http:http://localhost:12123/vp");
+            .to("netty-http:http://localhost:12123/vp");
 
-        from("netty4-http:http://localhost:12123/vp")
+        from("netty-http:http://localhost:12123/vp").streamCaching()
             .process(requestReaderProcessor)
             .to("mock:result");
       }

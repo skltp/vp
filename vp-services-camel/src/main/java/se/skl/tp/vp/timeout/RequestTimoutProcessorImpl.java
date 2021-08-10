@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 
-import static org.apache.camel.component.netty4.NettyConstants.NETTY_REQUEST_TIMEOUT;
+import static org.apache.camel.component.netty.NettyConstants.NETTY_REQUEST_TIMEOUT;
 
 @Service
 public class RequestTimoutProcessorImpl implements RequestTimoutProcessor {

@@ -1,18 +1,18 @@
 package se.skl.tp.vp.integrationtests.httpheader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,13 +23,14 @@ import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
 import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @StartTakService
-public class HttpResponseHeadersIT {
+public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   public static final String HTTPS_PRODUCER_URL = "https://localhost:19001/vardgivare-b/tjanst2";
 
   @Autowired
@@ -43,7 +44,7 @@ public class HttpResponseHeadersIT {
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  @Before
+  @BeforeEach
   public void before() {
     try {
       mockProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");
@@ -64,7 +65,7 @@ public class HttpResponseHeadersIT {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
     assertEquals("<mocked answer/>", response);
 
-    assertNull( "SoapAction not expected in response", testConsumer.getReceivedHeader(HttpHeaders.SOAP_ACTION));
+    assertNull( testConsumer.getReceivedHeader(HttpHeaders.SOAP_ACTION), "SoapAction not expected in response");
 
     String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
     assertTrue(respInLog.contains("SOAPAction=mySoapAction"));
@@ -84,10 +85,10 @@ public class HttpResponseHeadersIT {
 
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS));
     assertEquals("<mocked answer/>", response);
-    assertNull( "MULE_CORRELATION_GROUP_SIZE not expected in response", testConsumer.getReceivedHeader("MULE_CORRELATION_GROUP_SIZE"));
-    assertNull( "MULE_CORRELATION_ID not expected in response", testConsumer.getReceivedHeader("MULE_CORRELATION_ID"));
-    assertNull( "MULE_CORRELATION_SEQUENCE not expected in response", testConsumer.getReceivedHeader("MULE_CORRELATION_SEQUENCE"));
-    assertNull( "MULE_ENCODING not expected in response", testConsumer.getReceivedHeader("MULE_ENCODING"));
+    assertNull( testConsumer.getReceivedHeader("MULE_CORRELATION_GROUP_SIZE"), "MULE_CORRELATION_GROUP_SIZE not expected in response");
+    assertNull( testConsumer.getReceivedHeader("MULE_CORRELATION_ID"), "MULE_CORRELATION_ID not expected in response");
+    assertNull( testConsumer.getReceivedHeader("MULE_CORRELATION_SEQUENCE"), "MULE_CORRELATION_SEQUENCE not expected in response");
+    assertNull( testConsumer.getReceivedHeader("MULE_ENCODING"), "MULE_ENCODING not expected in response");
 
   }
 
@@ -101,9 +102,9 @@ public class HttpResponseHeadersIT {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS));
     assertEquals("<mocked answer/>", response);
 
-    assertNull( "X-MULE_CORRELATION_GROUP_SIZE not expected in response", testConsumer.getReceivedHeader("X-MULE_CORRELATION_GROUP_SIZE"));
-    assertNull( "X-MULE_CORRELATION_ID not expected in response", testConsumer.getReceivedHeader("X-MULE_CORRELATION_ID"));
-    assertNull( "X-MULE_CORRELATION_SEQUENCE not expected in response", testConsumer.getReceivedHeader("X-MULE_CORRELATION_SEQUENCE"));
+    assertNull( testConsumer.getReceivedHeader("X-MULE_CORRELATION_GROUP_SIZE"), "X-MULE_CORRELATION_GROUP_SIZE not expected in response");
+    assertNull( testConsumer.getReceivedHeader("X-MULE_CORRELATION_ID"), "X-MULE_CORRELATION_ID not expected in response");
+    assertNull( testConsumer.getReceivedHeader("X-MULE_CORRELATION_SEQUENCE"), "X-MULE_CORRELATION_SEQUENCE not expected in response");
   }
 
   @Test
@@ -163,7 +164,7 @@ public class HttpResponseHeadersIT {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
     assertEquals("<mocked answer/>", response);
 
-    // Since http, vpInstanceId should not have been added to routing history 
+    // Since http, vpInstanceId should not have beeen be added to routing history 
     String routing_history = testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
     assertTrue("some-server,mock-producer".equals(routing_history));
 
@@ -171,5 +172,6 @@ public class HttpResponseHeadersIT {
     assertTrue(respInLog.contains("x-rivta-routing-history=some-server,mock-producer"));
 
     String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,mock-producer"));  }
+    assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,mock-producer"));
+  }
 }

@@ -36,5 +36,7 @@ public class VPExchangeProperties {
   public static final String VP_X_FORWARDED_HOST = "httpXForwardedHost";
   public static final String VP_X_FORWARDED_PORT = "httpXForwardedPort";
 
+  public static final String EXCHANGE_CREATED = "exchangeCreated";
+
 
 }

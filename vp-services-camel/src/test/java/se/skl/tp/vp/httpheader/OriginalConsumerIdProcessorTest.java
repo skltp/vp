@@ -1,22 +1,21 @@
 package se.skl.tp.vp.httpheader;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -29,7 +28,7 @@ import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.TestLogAppender;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @ContextConfiguration(classes = {OriginalConsumerIdProcessorImpl.class, ExceptionUtil.class, VpCodeMessages.class})
 @TestPropertySource("classpath:application.properties")
 public class OriginalConsumerIdProcessorTest {
@@ -48,7 +47,7 @@ public class OriginalConsumerIdProcessorTest {
   @Autowired
   OriginalConsumerIdProcessorImpl originalConsumerIdProcessor;
 
-  @Before
+  @BeforeEach
   public void beforeTest() {
     originalThrowExceptionIfNotAllowed = originalConsumerIdProcessor.throwExceptionIfNotAllowed;
     originalAllowedSenderIds = originalConsumerIdProcessor.allowedSenderIds;
@@ -56,7 +55,7 @@ public class OriginalConsumerIdProcessorTest {
 
   }
 
-  @After
+  @AfterEach
   public void after() {
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = originalThrowExceptionIfNotAllowed;
     originalConsumerIdProcessor.allowedSenderIds = originalAllowedSenderIds;
@@ -72,7 +71,7 @@ public class OriginalConsumerIdProcessorTest {
     originalConsumerIdProcessor.process(exchange);
     assertEquals(A_TEST_CONSUMER_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
 
-    Assert.assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
+    assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
   }
 
   @Test
@@ -83,12 +82,12 @@ public class OriginalConsumerIdProcessorTest {
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = false;
     originalConsumerIdProcessor.process(exchange);
     assertEquals(A_TEST_CONSUMER_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
-    Assert.assertEquals(1, TestLogAppender.getNumEvents(LOG_CLASS));
-    Assert.assertEquals(Level.WARN, TestLogAppender.getEvents(LOG_CLASS).get(0).getLevel() );
+    assertEquals(1, TestLogAppender.getNumEvents(LOG_CLASS));
+    assertEquals(Level.WARN, TestLogAppender.getEvents(LOG_CLASS).get(0).getLevel() );
 
     final String eventMessage = TestLogAppender.getEventMessage(LOG_CLASS, 0);
-    Assert.assertTrue(eventMessage.contains(originalConsumerIdProcessor.allowedSenderIds.toString()) );
-    Assert.assertTrue(eventMessage.contains(NOT_APPROVED_SENDER_ID));
+    assertTrue(eventMessage.contains(originalConsumerIdProcessor.allowedSenderIds.toString()) );
+    assertTrue(eventMessage.contains(NOT_APPROVED_SENDER_ID));
   }
 
   @Test
@@ -99,11 +98,11 @@ public class OriginalConsumerIdProcessorTest {
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = true;
     try {
       originalConsumerIdProcessor.process(exchange);
-      assertTrue("Expected a VP013 exception", false);
+      assertTrue(false, "Expected a VP013 exception");
     } catch (VpSemanticException vpSemanticException) {
-      assertEquals(vpSemanticException.getErrorCode(), VpSemanticErrorCodeEnum.VP013);
+      assertEquals(VpSemanticErrorCodeEnum.VP013, vpSemanticException.getErrorCode());
     }
-    Assert.assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
+    assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
   }
 
   @Test
@@ -113,7 +112,7 @@ public class OriginalConsumerIdProcessorTest {
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = true;
     originalConsumerIdProcessor.process(exchange);
     assertEquals(null, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
-    Assert.assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
+    assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
 
   }
 
@@ -126,7 +125,7 @@ public class OriginalConsumerIdProcessorTest {
     originalConsumerIdProcessor.allowedSenderIds = Collections.emptyList();
     originalConsumerIdProcessor.process(exchange);
     assertEquals(A_TEST_CONSUMER_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
-    Assert.assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
+    assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
   }
 
   @Test
@@ -136,9 +135,9 @@ public class OriginalConsumerIdProcessorTest {
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = false;
     originalConsumerIdProcessor.process(exchange);
     assertEquals(A_TEST_CONSUMER_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
-    Assert.assertEquals(1, TestLogAppender.getNumEvents(LOG_CLASS));
+    assertEquals(1, TestLogAppender.getNumEvents(LOG_CLASS));
 
-    Assert.assertEquals(Level.WARN, TestLogAppender.getEvents(LOG_CLASS).get(0).getLevel() );
+    assertEquals(Level.WARN, TestLogAppender.getEvents(LOG_CLASS).get(0).getLevel() );
   }
 
 
