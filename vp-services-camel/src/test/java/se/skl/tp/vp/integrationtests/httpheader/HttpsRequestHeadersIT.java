@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import se.skl.tp.vp.TestBeanConfiguration;
+import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.httpheader.OutHeaderProcessorImpl;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;

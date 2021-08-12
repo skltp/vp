@@ -14,7 +14,8 @@ public enum VpSemanticErrorCodeEnum {
     VP010("VP010"),
     VP011("VP011"),
     VP012("VP012"),
-    VP013("VP013");
+    VP013("VP013"),
+    VP014("VP014");
 
     private String code;
     public String getCode() {
