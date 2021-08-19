@@ -25,6 +25,7 @@ public class PropertyConstants {
     public static final String PROPAGATE_CORRELATION_ID_FOR_HTTPS = "propagate.correlation.id.for.https";
     public static final String VP_HEADER_USER_AGENT = "vp.header.user.agent";
     public static final String VP_HEADER_CONTENT_TYPE = "vp.header.content.type";
+    public static final String VP_USE_ROUTING_HISTORY = "vp.use.routing.history";
 
     public static final String VP_HTTP_ROUTE_URL = "vp.http.route.url";
     public static final String VP_HTTPS_ROUTE_URL = "vp.https.route.url";
