@@ -17,11 +17,14 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
 
   private SenderIdExtractor senderIdExtractor;
+  private String vpInstance;
   private static final String PATTERN_PROPERTY = "${" + PropertyConstants.CERTIFICATE_SENDERID_SUBJECT_PATTERN + "}";
+  private static final String VP_INSTANCE = "${" + PropertyConstants.VP_INSTANCE_NAME + "}";
 
   @Autowired
-  public HeaderCertificateHelperImpl(@Value(PATTERN_PROPERTY) String certificateSenderId) {
+  public HeaderCertificateHelperImpl(@Value(PATTERN_PROPERTY) String certificateSenderId, @Value(VP_INSTANCE) String vpInstance) {
     senderIdExtractor = new SenderIdExtractor(certificateSenderId);
+    this.vpInstance = vpInstance;
   }
 
   public String getSenderIDFromHeaderCertificate(Object certificate) {
@@ -89,10 +92,10 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
     return senderIdExtractor.extractSenderFromPrincipal(principalName);
   }
 
-  private VpSemanticException createVP002Exception(String msg) {
-    // todo NTP-1944 det ska vara bra om vi ska använda ExceptionUtil.createVpSemanticException för generera VpSemanticException, men jag
-    // kan inte @Autowired ExceptionUtil. Det behövs att reda på varför
-    // message och message details är felaktiga nu
-    return new VpSemanticException(VpSemanticErrorCodeEnum.VP002, VpSemanticErrorCodeEnum.VP002 + " No senderId found in Certificate" , msg);
+  private VpSemanticException createVP002Exception(String details) {
+
+    return new VpSemanticException(VpSemanticErrorCodeEnum.VP002,
+        VpSemanticErrorCodeEnum.VP002 +" [" + vpInstance + "] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad." ,
+        details);
   }
 }

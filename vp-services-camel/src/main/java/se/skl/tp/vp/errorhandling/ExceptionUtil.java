@@ -1,7 +1,9 @@
 package se.skl.tp.vp.errorhandling;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
@@ -9,6 +11,9 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 public class ExceptionUtil {
 
   VpCodeMessages vpCodeMessages;
+
+  @Value("${vp.instance.name}")
+  String platformName;
 
   @Autowired
   public ExceptionUtil(VpCodeMessages vpCodeMessages) {
@@ -27,7 +32,7 @@ public class ExceptionUtil {
   }
 
   public String createMessage(VpSemanticErrorCodeEnum codeEnum) {
-    return codeEnum + " " + vpCodeMessages.getMessage(codeEnum);  //NTP-1944 todo: add platform name
+    return codeEnum + " [" + platformName + "] "+ vpCodeMessages.getMessage(codeEnum);
   }
 
   public String createDetailsMessage(VpSemanticErrorCodeEnum codeEnum, Object ...suffix) {
