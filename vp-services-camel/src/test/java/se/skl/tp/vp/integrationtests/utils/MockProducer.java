@@ -5,6 +5,8 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamReader;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import se.skl.tp.vp.constants.HttpHeaders;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Route;
@@ -60,7 +62,8 @@ public class MockProducer {
               inBody = exchange.getIn().getBody(String.class);
               inBodyXmlReader = exchange.getIn().getBody(XMLStreamReader.class);
               exchange.getOut().setBody(responseBody);
-              outHeaders.put(Exchange.HTTP_RESPONSE_CODE, responseHttpStatus);
+              addResponseHeader(Exchange.HTTP_RESPONSE_CODE, responseHttpStatus);
+              updateRoutingHistory();
               exchange.getOut().setHeaders(outHeaders);
               Thread.sleep(timeout);
             });
@@ -68,6 +71,14 @@ public class MockProducer {
     });
   }
 
+  private void updateRoutingHistory() {
+	  String routinghistory = getInHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
+	  if(routinghistory == null || routinghistory.length() == 0)
+          addResponseHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, "mock-producer");
+	  else
+          addResponseHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, routinghistory +",mock-producer");		  
+  }
+  
   public String getInHeader(String header){
     return (String)inHeaders.get(header);
   }

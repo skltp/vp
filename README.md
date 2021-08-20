@@ -1,2 +1,2 @@
-# vp-camel
-POC för att bygga VP med Apache Camel
+# VP
+Virtualiserings Plattformen (VP) byggd med Apache Camel

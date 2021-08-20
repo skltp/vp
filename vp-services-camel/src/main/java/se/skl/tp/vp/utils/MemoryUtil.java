@@ -9,6 +9,9 @@ import sun.misc.SharedSecrets;
 import sun.misc.VM;
 
 public class MemoryUtil {
+
+  private MemoryUtil() {}
+
   private static MemoryMXBean mbean = ManagementFactory.getMemoryMXBean();
 
   public static String getMemoryUsed() {

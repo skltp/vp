@@ -6,7 +6,7 @@
   <groupId>se.skltp.vp</groupId>
   <artifactId>vp-parent-camel</artifactId>
   <name>vp-parent-camel</name>
-  <version>4.0.1-SNAPSHOT</version>
+  <version>4.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
@@ -31,7 +31,7 @@
     <!-- ************************-->
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
-    <jacoco.plugin.version>0.8.2</jacoco.plugin.version>
+    <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
     <sonar.plugin.version>3.5.0.1254</sonar.plugin.version>
 
     <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
@@ -42,8 +42,12 @@
     <sonar.language>java</sonar.language>
     <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-    <sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
-    <sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/report/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.coverage.exclusions>
+      **/se/skl/tp/vp/config/*,
+      **/se/skl/tp/vp/constants/*
+    </sonar.coverage.exclusions>
+
   </properties>
 
   <distributionManagement>
@@ -70,6 +74,7 @@
   <modules>
     <module>vp-wsdl-utils</module>
     <module>vp-services-camel</module>
+    <module>report</module>
   </modules>
 
   <dependencyManagement>
@@ -239,6 +244,7 @@
           <localCheckout>true</localCheckout>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-maven-plugin</artifactId>
@@ -247,16 +253,17 @@
         <configuration>
           <failOnError>true</failOnError>
         </configuration>
-
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
+        <version>2.22.2</version>
         <configuration>
           <argLine>${argLine.leak}</argLine>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -318,6 +325,7 @@
       <id>test-coverage</id>
       <build>
         <plugins>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
@@ -325,6 +333,7 @@
               <argLine>${surefireArgLine}</argLine>
             </configuration>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -346,6 +355,7 @@
               <argLine>${failsafeArgLine}</argLine>
             </configuration>
           </plugin>
+
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>

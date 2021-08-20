@@ -150,4 +150,26 @@ public class HttpResponseHeadersIT {
     assertTrue(respOutLog.contains("Content-Type=text/xml; charset=UTF-8"));
   }
 
+  @Test
+  public void testRoutingHistory() {
+    mockProducer.setResponseBody("<mocked answer/>");
+    mockProducer.addResponseHeader(HttpHeaders.SOAP_ACTION, "mySoapAction");
+
+    Map<String, Object> headers = new HashMap<>();
+    headers.put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
+    headers.put(HttpHeaders.X_VP_SENDER_ID, "tp");
+    headers.put(HttpHeaders.X_RIVTA_ROUTING_HISTORY, "some-server");
+    
+    String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
+    assertEquals("<mocked answer/>", response);
+
+    // Since http, vpInstanceId should not have been added to routing history 
+    String routing_history = testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
+    assertTrue("some-server,mock-producer".equals(routing_history));
+
+    String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    assertTrue(respInLog.contains("x-rivta-routing-history=some-server,mock-producer"));
+
+    String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,mock-producer"));  }
 }

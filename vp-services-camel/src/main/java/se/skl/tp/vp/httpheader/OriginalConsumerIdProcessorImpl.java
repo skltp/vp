@@ -2,6 +2,7 @@ package se.skl.tp.vp.httpheader;
 
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP013;
 
+import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Exchange;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,36 +20,35 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
   @Autowired
   ExceptionUtil exceptionUtil;
 
-  public boolean isEnforceSenderIdCheck() {
-    return enforceSenderIdCheck;
-  }
+  @Value("#{T(java.util.Arrays).asList('${" + PropertyConstants.SENDER_ID_ALLOWED_LIST + ":}')}")
+  protected List<String> allowedSenderIds;
 
-  public void setEnforceSenderIdCheck(boolean enforceSenderIdCheck) {
-    this.enforceSenderIdCheck = enforceSenderIdCheck;
-  }
+  @Value("${" + PropertyConstants.THROW_VP013_WHEN_ORIGNALCONSUMER_NOT_ALLOWED + ":#{false}}")
+  protected boolean throwExceptionIfNotAllowed;
 
-  @Autowired
-  private CheckSenderAllowedToUseHeader checkSenderIdAgainstList;
+  private static final String MSG_SENDER_NOT_ALLOWED_SET_HEADER = "Sender '{}' not allowed to set header {}, accepted senderId's in '{}': [{}]";
 
-  @Value("${" + PropertyConstants.APPROVE_THE_USE_OF_HEADER_ORIGINAL_CONSUMER + ":#{true}}")
-  private boolean enforceSenderIdCheck;
-
-  private static final String MSG_SENDER_NOT_ALLOWED_SET_HEADER = "Sender '{}' not allowed to set {} \n" +
-      PropertyConstants.APPROVE_THE_USE_OF_HEADER_ORIGINAL_CONSUMER + " was set to {} and sender not on list...";
 
   public void process(Exchange exchange) {
-    String originalConsumer = null;
 
     if (exchange.getIn().getHeaders().containsKey(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID)) {
       String senderId = exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class);
-      boolean isSenderAllowed = checkSenderIdAgainstList.isSenderIdAllowedToUseXrivtaOriginalConsumerIdHeader(senderId);
-      if (enforceSenderIdCheck && !isSenderAllowed) {
-        log.error(VP013.getCode() + MSG_SENDER_NOT_ALLOWED_SET_HEADER, senderId, HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, enforceSenderIdCheck);
-        throw exceptionUtil.createVpSemanticException(VP013);
+      if (!isSenderAllowedToSetOriginalConsumerIdHeader(senderId)) {
+
+        if (throwExceptionIfNotAllowed) {
+          throw exceptionUtil.createVpSemanticException(VP013);
+        }
+        log.warn(MSG_SENDER_NOT_ALLOWED_SET_HEADER, senderId, HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyConstants.SENDER_ID_ALLOWED_LIST, allowedSenderIds.toString());
       }
-      originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
+
     }
+
+    String originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
     exchange.setProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalConsumer);
+  }
+
+  public boolean isSenderAllowedToSetOriginalConsumerIdHeader(String senderId) {
+    return allowedSenderIds.isEmpty() || (senderId != null && allowedSenderIds.contains(senderId.trim()));
   }
 
 }
