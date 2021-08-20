@@ -11,6 +11,7 @@
 
   <artifactId>vp-services-camel</artifactId>
   <name>vp-services-camel</name>
+  <version>4.1.0-SNAPSHOT</version>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
 
