@@ -27,6 +27,7 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.TJANSTEKONTRAKT_GE
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.soap.SOAPBody;
@@ -37,11 +38,14 @@ import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.constants.HttpHeaders;
+import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.errorhandling.SoapFaultHelper;
+import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
@@ -64,6 +68,9 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   @Autowired
   MockProducer mockHttpsProducer;
 
+  @Autowired
+  private Environment env;
+
   public static final String HTTPS_PRODUCER_URL = "https://localhost:19001/vardgivare-b/tjanst2";
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
@@ -71,14 +78,16 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   public static final String REMOTE_SOAP_FAULT =
       "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
           "  <soapenv:Header/>  <soapenv:Body>    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-          "      <faultcode>soap:Server</faultcode>\n" +
-          "      <faultstring>VP011 Caller was not on the white list of accepted IP-addresses. IP-address: 84.17.194.105. " +
-          "HTTP header that caused checking: x-vp-sender-id (se.skl.tp.vp.exceptions.VpSemanticException). " +
-          "Message payload is of type: ReversibleXMLStreamReader</faultstring>\n" +
+          "      <faultcode>soap:Client</faultcode>\n" +
+          "      <faultstring>VP011 [NTjP Remote] Anrop har gjorts utanför TLS vilket ej är tillåtet. Tjänstekonsumenten ska alltid använda TLS för säker kommunikation.</faultstring>" +
+          "      <details>Caller was not on the white list of accepted IP-addresses. IP-address: 84.17.194.105. HTTP header that caused checking: x-vp-sender-id (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</details>" +
           "    </soap:Fault>  </soapenv:Body></soapenv:Envelope>";
 
   @Value("VP013")
   String msgVP013;
+
+  @Value("${" + PropertyConstants.VP_INSTANCE_NAME + "}")
+  String instanceName;
 
   @BeforeEach
   public void beforeTest(){
@@ -96,13 +105,15 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
     String result = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_UNIT_TEST), headers);
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP002, "");
+    assertSoapFault(soapBody, VP002, new String[]{""}, new String[]{});
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
 
     assertErrorLog(VP002.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP002");
-    assertRespOutLog("VP002 No certificate found in httpheader x-vp-auth-cert");
+
+    String VP002_error= env.getProperty("VP002");
+    assertRespOutLog("VP002 [" + instanceName + "] " + VP002_error);
   }
 
   @Test
@@ -111,13 +122,15 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(""), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP003, "");
+    assertSoapFault(soapBody, VP003, new String[]{""}, new String[]{});
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
 
     assertErrorLog(VP003.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP003");
-    assertRespOutLog("VP003 No receiverId (logical address) found in message header. null");
+
+    String VP003_error = env.getProperty("VP003");
+    assertRespOutLog("VP003 [" + instanceName + "] " + VP003_error);
   }
 
   public static final String RECEIVER_HTTPS = "HttpsProducer";
@@ -125,29 +138,40 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   @Test // If a producer sends soap fault, we shall return to consumer with ResponseCode 500, with the fault embedded in the body.
   public void soapFaultPropagatedToConsumerTestIT() throws Exception {
     mockHttpsProducer.setResponseHttpStatus(500);
-    mockHttpsProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT));
+    mockHttpsProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT,
+        VPFaultCodeEnum.Client));
     Map<String, Object> headers = new HashMap<>();
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP011, "VP011 Caller was not on the white list of accepted IP-addresses");
+
+   assertSoapFault(soapBody, VP011,
+        new String[]{"Anrop har gjorts utanför TLS vilket ej är tillåtet"},
+        new String[]{""});
+
     assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertRespOutLogWithRespCode500("VP011 Caller was not on the white list of accepted IP-addresses");
+    assertRespOutLogWithRespCode500("VP011");
+    assertRespOutLogWithRespCode500("Caller was not on the white list of accepted IP-addresses");
   }
 
   @Test
   public void shouldGetVP004WhenRecieverNotInVagval() throws Exception {
     Map<String, Object> headers = new HashMap<>();
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_WITH_NO_VAGVAL), headers);
-
+    System.out.println("<----- " + Charset.defaultCharset());
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP004, " No receiverId (logical address) found for",
-            RECEIVER_WITH_NO_VAGVAL, TJANSTEKONTRAKT_GET_CERTIFICATE_KEY);
+    assertSoapFault(soapBody, VP004,
+        new String[]{"Det finns inget vägval i tjänsteadresseringskatalogen som matchar anropets logiska adressat"},
+        new String[]{"No receiverId (logical address) found for", RECEIVER_WITH_NO_VAGVAL,
+            TJANSTEKONTRAKT_GET_CERTIFICATE_KEY}
+
+    );
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
 
     assertErrorLog(VP004.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP004");
-    assertRespOutLog("VP004 No receiverId (logical address) found for serviceNamespace: " +
+    assertRespOutLog("VP004");
+    assertRespOutLog("No receiverId (logical address) found for serviceNamespace: " +
             "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1, receiverId: NoVagvalReceiver");
   }
 
@@ -157,10 +181,12 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_TRAILING_WHITESPACE), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP004, " No receiverId (logical address) found for",
-        RECEIVER_TRAILING_WHITESPACE,
-        TJANSTEKONTRAKT_GET_CERTIFICATE_KEY,
-        "Whitespace detected in incoming request!");
+    assertSoapFault(soapBody, VP004,
+        new String[]{"Det finns inget vägval i tjänsteadresseringskatalogen som matchar anropets logiska adressat"},
+        new String[]{"No receiverId (logical address) found for", RECEIVER_TRAILING_WHITESPACE,
+            TJANSTEKONTRAKT_GET_CERTIFICATE_KEY, "Whitespace detected in incoming request!"}
+
+    );
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
   }
@@ -171,10 +197,11 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_LEADING_WHITESPACE), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP004, " No receiverId (logical address) found for",
-        RECEIVER_LEADING_WHITESPACE,
-        TJANSTEKONTRAKT_GET_CERTIFICATE_KEY,
-        "Whitespace detected in incoming request!");
+    assertSoapFault(soapBody, VP004,
+        new String[]{"Det finns inget vägval i tjänsteadresseringskatalogen som matchar anropets logiska adressat"},
+        new String[]{"No receiverId (logical address) found for", RECEIVER_LEADING_WHITESPACE,
+            TJANSTEKONTRAKT_GET_CERTIFICATE_KEY, "Whitespace detected in incoming request!"}
+    );
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
   }
@@ -184,13 +211,17 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     Map<String, Object> headers = new HashMap<>();
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_UNKNOWN_RIVVERSION), headers);
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP005, "rivtabp20");
+    assertSoapFault(soapBody, VP005,
+        new String[]{"Tjänsteproducenten stödjer inte anropets angivna rivta-version. Kontrollera uppgifterna."},
+        new String[]{"rivtabp20"});
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
 
     assertErrorLog(VP005.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP005");
-    assertRespOutLog("VP005 No receiverId (logical address) with matching Riv-version found for rivtabp20");
+    assertRespOutLog("VP005");
+    assertRespOutLog("Tjänsteproducenten stödjer inte anropets angivna rivta-version. Kontrollera uppgifterna.");
+    assertRespOutLog("No receiverId (logical address) with matching Riv-version found for rivtabp20");
   }
 
   @Test
@@ -199,12 +230,16 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_MULTIPLE_VAGVAL), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP006, "RecevierMultipleVagval");
+    assertSoapFault(soapBody, VP006,
+        new String[]{"Internt fel i tjänsteplattformen."},
+        new String[]{"RecevierMultipleVagval"});
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
 
     assertErrorLog(VP006.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP006");
-    assertRespOutLog("VP006 More than one receiverId (logical address) with matching Riv-version found for serviceNamespace: " +
+    assertRespOutLog("VP006");
+    assertRespOutLog("Internt fel i tjänsteplattformen.");
+    assertRespOutLog("More than one receiverId (logical address) with matching Riv-version found for serviceNamespace: " +
             "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1");
   }
 
@@ -214,13 +249,18 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NOT_AUHORIZED), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP007, "Authorization missing for", RECEIVER_NOT_AUHORIZED, TJANSTEKONTRAKT_GET_CERTIFICATE_KEY);
+    assertSoapFault(soapBody, VP007,
+        new String[]{"Tjänstekonsumenten saknar behörighet att anropa den logiska adressaten via detta tjänstekontrakt."},
+        new String[]{"Authorization missing for", RECEIVER_NOT_AUHORIZED,
+            TJANSTEKONTRAKT_GET_CERTIFICATE_KEY} );
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
 
     assertErrorLog(VP007.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP007");
-    assertRespOutLog("VP007 Authorization missing for serviceNamespace: urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1");
+    assertRespOutLog("VP007");
+    assertRespOutLog("Tjänstekonsumenten saknar behörighet att anropa den logiska adressaten via detta tjänstekontrakt.");
+    assertRespOutLog("Authorization missing for serviceNamespace: urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1");
   }
 
   @Test
@@ -229,7 +269,9 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP009, "");
+    assertSoapFault(soapBody, VP009,
+        new String[]{"Fel vid kontakt med tjänsteproducenten."},
+        new String[]{""});
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
@@ -239,7 +281,8 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String respOutLogMsg = getAndAssertRespOutLog();
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "VP009 Error connecting to service producer at address");
+    assertStringContains(respOutLogMsg, "VP009");
+    assertStringContains(respOutLogMsg, "Error connecting to service producer at address");
     assertExtraInfoLog(respOutLogMsg, RECEIVER_NO_PRODUCER_AVAILABLE, "https://localhost:1974/Im/not/available");
   }
 
@@ -249,9 +292,13 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NO_PHYSICAL_ADDRESS), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP010, "RecevierNoPhysicalAddress");
+    assertSoapFault(soapBody, VP010,
+        new String[]{"Internt fel i tjänsteplattformen."},
+        new String[]{"RecevierNoPhysicalAddress"});
     assertErrorLog(VP010.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP010");
-    assertRespOutLog("VP010 Physical Address field is empty in Service Producer for serviceNamespace: " +
+    assertRespOutLog("VP010");
+    assertRespOutLog("Internt fel i tjänsteplattformen.");
+    assertRespOutLog("Physical Address field is empty in Service Producer for serviceNamespace: " +
             "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1, receiverId: RecevierNoPhysicalAddress");
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
@@ -267,9 +314,13 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP011, "10.20.30.40");
+    assertSoapFault(soapBody, VP011,
+        new String[]{"Anrop har gjorts utanför TLS vilket ej är tillåtet"},
+        new String[]{"10.20.30.40"});
     assertErrorLog(VP011.getVpDigitErrorCode(), "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP011");
-    assertRespOutLog("VP011 Caller was not on the white list of accepted IP-addresses.  IP-address: 10.20.30.40. " +
+    assertRespOutLog("VP011");
+    assertRespOutLog("Anrop har gjorts utanför TLS vilket ej är tillåtet");
+    assertRespOutLog("Caller was not on the white list of accepted IP-addresses.  IP-address: 10.20.30.40. " +
             "HTTP header that caused checking: X-Forwarded-For");
   }
 
@@ -282,9 +333,12 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP013, msgVP013);
+    assertSoapFault(soapBody, VP013,
+        new String[]{"Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid."},
+        new String[]{"Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid"} );
     assertErrorLog(VP013.getVpDigitErrorCode(), msgVP013);
-    assertRespOutLog("VP013 Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid.");
+    assertRespOutLog("Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid.");
+    assertRespOutLog("VP013 ");
   }
 
   @Test
@@ -296,19 +350,25 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP013, msgVP013);
+    assertSoapFault(soapBody, VP013,
+        new String[]{"Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid."},
+        new String[]{"Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid"});
     assertErrorLog(VP013.getVpDigitErrorCode(), msgVP013);
-    assertRespOutLog("VP013 Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid.");
+    assertRespOutLog("Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid.");
+    assertRespOutLog("VP013 ");
   }
 
   private void assertSoapFault(SOAPBody soapBody, VpSemanticErrorCodeEnum errorCodeEnum,
-      String... messages) {
+      String[] messages, String[] details) {
     assertNotNull(soapBody, "Expected a SOAP message");
     assertNotNull(soapBody.hasFault(), "Expected a SOAPFault");
     assertStringContains(soapBody.getFault().getFaultString(), errorCodeEnum.getVpDigitErrorCode());
     assertStringContains(soapBody.getFault().getFaultCode(), errorCodeEnum.getFaultCode());
     for(String message : messages){
       assertStringContains(soapBody.getFault().getFaultString(), message);
+    }
+    for(String detail : details){
+      assertStringContains(soapBody.getFault().getDetail().getTextContent(), detail);
     }
   }
 
