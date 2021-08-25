@@ -16,6 +16,7 @@ import org.apache.camel.Exchange;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import se.skl.tp.vp.constants.VPExchangeProperties;
+import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 
 public class SoapFaultHelper {
@@ -30,15 +31,16 @@ public class SoapFaultHelper {
           "  <soapenv:Header/>" +
           "  <soapenv:Body>" +
           "    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-          "      <faultcode>soap:Server</faultcode>\n" +
+          "      <faultcode>soap:%s</faultcode>\n" +
           "      <faultstring>%s</faultstring>\n" +
+          "      <detail></detail> " +
           "    </soap:Fault>" +
           "  </soapenv:Body>" +
           "</soapenv:Envelope>";
 
 
-  public static String generateSoap11FaultWithCause(String cause) {
-    return String.format(SOAP_FAULT, escape(cause));
+  public static String generateSoap11FaultWithCause(String cause, VPFaultCodeEnum codeEnum) {
+    return String.format(SOAP_FAULT, codeEnum.getFaultCode(), escape(cause));
   }
 
   private static final String escape(final String string) {
@@ -77,7 +79,7 @@ public class SoapFaultHelper {
 
       return soapMessage.getSOAPPart();
     } catch (SOAPException e1) {
-      return generateSoap11FaultWithCause(faultMessage);
+      return generateSoap11FaultWithCause(faultMessage, VPFaultCodeEnum.Server);
     }
   }
 

@@ -29,6 +29,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
+import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.service.TakCacheService;
@@ -44,13 +45,12 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
   public static final String REMOTE_EXCEPTION_MESSAGE = "Fel fel fel";
   public static final String REMOTE_SOAP_FAULT =
-          "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-          "  <soapenv:Header/>  <soapenv:Body>    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-          "      <faultcode>soap:Server</faultcode>\n" +
-          "      <faultstring>VP011 Caller was not on the white list of accepted IP-addresses. IP-address: 84.17.194.105. " +
-                  "HTTP header that caused checking: x-vp-sender-id (se.skl.tp.vp.exceptions.VpSemanticException). " +
-                  "Message payload is of type: ReversibleXMLStreamReader</faultstring>\n" +
-          "    </soap:Fault>  </soapenv:Body></soapenv:Envelope>";
+      "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
+          + "  <soapenv:Header/>  <soapenv:Body>    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
+          + "      <faultcode>soap:Client</faultcode>\n"
+          + "      <faultstring>VP011 [NTjP Remote] Anrop har gjorts utanför TLS vilket ej är tillåtet. Tjänstekonsumenten ska alltid använda TLS för säker kommunikation.</faultstring>"
+          + "      <details> Caller was not on the white list of accepted IP-addresses. IP-address: 84.17.194.105. HTTP header that caused checking: x-vp-sender-id (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</details>\n"
+          + "    </soap:Fault>  </soapenv:Body></soapenv:Envelope>";
   public static final String VP_ADDRESS = "http://localhost:12312/vp";
   public static final String NO_EXISTING_PRODUCER = "http://localhost:12100/vp";
   public static final String MOCK_PRODUCER_ADDRESS = "http://localhost:12126/vp";
@@ -94,13 +94,14 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   @Test //Test för när ett SOAP-fault kommer från Producenten
   public void errorInResponseTest() throws Exception {
     mockProducer.setResponseHttpStatus(200);
-    mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_EXCEPTION_MESSAGE));
+    mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_EXCEPTION_MESSAGE,
+        VPFaultCodeEnum.Client));
 
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
     setTakCacheMockResult(list);
 
-    resultEndpoint.expectedBodiesReceived(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_EXCEPTION_MESSAGE));
+    resultEndpoint.expectedBodiesReceived(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_EXCEPTION_MESSAGE, VPFaultCodeEnum.Client));
 
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     resultEndpoint.assertIsSatisfied();
@@ -164,23 +165,28 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   @Test // If a producer sends soap fault, we shall return with ResponseCode 500, with the fault embedded in the body.
   public void soapFaultPropagatedToCustomerTest() throws InterruptedException {
     mockProducer.setResponseHttpStatus(500);
-    mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT));
+    mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT, VPFaultCodeEnum.Client));
  
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
     setTakCacheMockResult(list);
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
+
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
-    assertTrue(resultBody.contains("<faultcode>soap:Server</faultcode>"));
-    assertTrue(resultBody.contains("VP011 Caller was not on the white list of accepted IP-addresses"));
+    assertTrue(resultBody.contains("<faultcode>soap:Client</faultcode>"));
+    assertTrue(resultBody.contains("VP011"));
+    assertTrue(resultBody.contains("Anrop har gjorts"));
+    assertTrue(resultBody.contains("Caller was not on the white list of accepted IP-addresses"));
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
     assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
     assertTrue(respOutLogMsg.contains("Internal Server Error"));
     assertTrue(respOutLogMsg.contains("Payload=<soapenv:Envelope"));
-    assertTrue(respOutLogMsg.contains("VP011 Caller was not on the white list of accepted IP-addresses"));
+    assertTrue(respOutLogMsg.contains("VP011"));
+    assertTrue(respOutLogMsg.contains("Anrop har gjorts"));
   }
 
   private void setTakCacheMockResult(List<RoutingInfo> list) {
