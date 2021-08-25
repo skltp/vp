@@ -1,10 +1,8 @@
 package se.skl.tp.vp.httpheader;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
@@ -45,16 +43,19 @@ public class HttpSenderIdExtractorProcessorImplTest {
   public static final String NOT_WHITELISTED_IP_ADDRESS = "10.20.30.40";
   public static final String HEADER_SENDER_ID = "Sender1";
   public static final String CERT_SENDER_ID = "urken";
+  public static final String NOTOK_ROUTING_HISTORY = "dev_env#some_server";
+  public static final String OK_ROUTING_HISTORY = "some_server#some_other_server";
 
-
-  @Autowired HttpSenderIdExtractorProcessorImpl httpHeaderExtractorProcessor;
+  @Autowired
+  HttpSenderIdExtractorProcessorImpl httpHeaderExtractorProcessor;
 
   @Test
   public void internalCallShouldSetSenderIdFromInHeader() throws Exception {
     Exchange exchange = createExchange();
     exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
     exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
-    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
 
     httpHeaderExtractorProcessor.process(exchange);
 
@@ -70,16 +71,95 @@ public class HttpSenderIdExtractorProcessorImplTest {
     		VpSemanticException.class, 
             () -> {
     
-	    exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
-	    exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
-	    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
-	
-	    httpHeaderExtractorProcessor.process(exchange);
+			    exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
+			    exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
+    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS,
+        mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
+			
+			    httpHeaderExtractorProcessor.process(exchange);
             });
 
     assertTrue(exception.getMessage().contains("VP011"));
+  }
 
-    //assertEquals(HEADER_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
+  @Test
+  public void routingHistoryShouldBeOk() throws Exception {
+
+    Exchange exchange = createExchange();
+    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, OK_ROUTING_HISTORY);
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
+
+    httpHeaderExtractorProcessor.process(exchange);
+
+    assertEquals(exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY), "some_server#some_other_server#dev_env");
+    assertEquals(CERT_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
+  }
+
+  @Test
+  public void routingHistoryShouldBeConcatenated() throws Exception {
+
+    Exchange exchange = createExchange();
+    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, OK_ROUTING_HISTORY);
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
+
+    httpHeaderExtractorProcessor.process(exchange);
+    String result = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, String.class);
+
+    assertEquals(result, OK_ROUTING_HISTORY + "#" + VP_INSTANCE_ID);
+  }
+
+  @Test
+  public void routingHistoryShouldContainSenderId() throws Exception {
+
+    Exchange exchange = createExchange();
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
+
+    httpHeaderExtractorProcessor.process(exchange);
+    String result = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, String.class);
+
+    assertTrue(result.contains(CERT_SENDER_ID));
+  }
+
+  @Test
+  public void routingHistoryShouldContainSenderIdFromCertificateEvenWhenHeaderIsSet()
+      throws Exception {
+
+    Exchange exchange = createExchange();
+    exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
+
+    httpHeaderExtractorProcessor.process(exchange);
+    String result = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, String.class);
+
+    assertTrue(result.contains(CERT_SENDER_ID));
+  }
+
+  @Test
+  public void routingHistoryShouldThrowVP014() throws Exception {
+
+    Exchange exchange = createExchange();
+    
+    Exception exception = assertThrows(
+    		VpSemanticException.class, 
+            () -> {
+  
+			    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, NOTOK_ROUTING_HISTORY);
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+			    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
+			
+			    httpHeaderExtractorProcessor.process(exchange);
+            });
+
+    assertTrue(exception.getMessage().contains("VP014"));
   }
 
   @Test
@@ -117,12 +197,14 @@ public class HttpSenderIdExtractorProcessorImplTest {
   @Test
   public void nonInternalCallShouldSetSenderIdFromCertificate() throws Exception {
     Exchange exchange = createExchange();
-    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
     exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
     httpHeaderExtractorProcessor.process(exchange);
 
     assertEquals(CERT_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID));
   }
+
   @Test
   public void nonInternalCallAndSenderNotWhitelistedShouldThrowVP011() throws Exception {
     Exchange exchange = createExchange();
@@ -130,7 +212,8 @@ public class HttpSenderIdExtractorProcessorImplTest {
     Exception exception = assertThrows(
     		VpSemanticException.class, 
             () -> {
-	    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
+        exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS,
+                mockInetAddress(NOT_WHITELISTED_IP_ADDRESS));
 	    exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, createMockCertificate());
 	    httpHeaderExtractorProcessor.process(exchange);
             });
@@ -149,7 +232,8 @@ public class HttpSenderIdExtractorProcessorImplTest {
     exchange.getIn().setHeader(HttpHeaders.X_VP_SENDER_ID, HEADER_SENDER_ID);
     exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, RTP_INSTANCE_ID);
     exchange.getIn().setHeader("X-Forwarded-For", NOT_WHITELISTED_IP_ADDRESS);
-    exchange.getIn().setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
+    exchange.getIn()
+        .setHeader(NettyConstants.NETTY_REMOTE_ADDRESS, mockInetAddress(WHITELISTED_IP_ADDRESS));
     exchange.getIn().setHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, cert);
 
     httpHeaderExtractorProcessor.process(exchange);

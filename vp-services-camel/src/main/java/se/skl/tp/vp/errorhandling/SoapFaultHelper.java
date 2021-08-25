@@ -1,11 +1,17 @@
 package se.skl.tp.vp.errorhandling;
 
+import java.util.Iterator;
 import javax.xml.namespace.QName;
+import javax.xml.soap.Detail;
+import javax.xml.soap.DetailEntry;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.Name;
 import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -65,10 +71,10 @@ public class SoapFaultHelper {
       SOAPMessage soapMessage = messageFactory.createMessage();
       SOAPFault soapFault = soapMessage.getSOAPBody().addFault();
       soapFault.setFaultCode(new QName(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, errorCode.getFaultCode()));
-
-      //soapFault.addDetail(faultDetails); TODO NTP-1944 faultDetails -> Detail delen
-
       soapFault.setFaultString(faultMessage);
+      Detail d = soapFault.addDetail();
+      d.addTextNode(faultDetails);
+
       return soapMessage.getSOAPPart();
     } catch (SOAPException e1) {
       return generateSoap11FaultWithCause(faultMessage);

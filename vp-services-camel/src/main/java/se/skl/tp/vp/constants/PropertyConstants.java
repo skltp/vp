@@ -10,6 +10,7 @@ public class PropertyConstants {
     public static final String IP_WHITELIST = "ip.whitelist";
     public static final String SENDER_ID_ALLOWED_LIST = "sender.id.allowed.list";
     public static final String VP_INSTANCE_ID = "vp.instance.id";
+    public static final String VP_INSTANCE_NAME = "vp.instance.name";
 
     public static final String VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER = "http.forwarded.header.xfor";
 
@@ -24,6 +25,7 @@ public class PropertyConstants {
     public static final String PROPAGATE_CORRELATION_ID_FOR_HTTPS = "propagate.correlation.id.for.https";
     public static final String VP_HEADER_USER_AGENT = "vp.header.user.agent";
     public static final String VP_HEADER_CONTENT_TYPE = "vp.header.content.type";
+    public static final String VP_USE_ROUTING_HISTORY = "vp.use.routing.history";
 
     public static final String VP_HTTP_ROUTE_URL = "vp.http.route.url";
     public static final String VP_HTTPS_ROUTE_URL = "vp.https.route.url";

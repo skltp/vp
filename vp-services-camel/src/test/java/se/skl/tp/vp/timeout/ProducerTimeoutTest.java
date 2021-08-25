@@ -26,6 +26,7 @@ import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
@@ -34,6 +35,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
+import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.service.TakCacheService;
@@ -63,6 +65,9 @@ public class ProducerTimeoutTest extends CamelTestSupport {
   @Autowired TimeoutConfiguration timeoutConfiguration;
 
   @Autowired TakCacheService takCacheService;
+
+  @Value("${" + PropertyConstants.VP_INSTANCE_NAME + "}")
+  private String vpInstance;
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
@@ -129,7 +134,7 @@ public class ProducerTimeoutTest extends CamelTestSupport {
       assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout=460");
     }
     String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "VP009 Error connecting to service producer at address");
+    assertStringContains(respOutLogMsg, "VP009 [" + vpInstance + "] Fel vid kontakt med tjänsteproducenten.");
     assertStringContains(respOutLogMsg, "Timeout when waiting on response from producer");
   }
 
