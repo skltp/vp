@@ -170,9 +170,10 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
     } catch (CamelExecutionException e) {
       NettyHttpOperationFailedException ne = (NettyHttpOperationFailedException) e.getExchange().getException();
       String err = ne.getContentAsString();
-      assert(err.contains("VP013 Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid"));
+      assert(err.contains("VP013"));
+      assert(err.contains("Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid. Kontakta tjänsteplattformsförvaltningen."));
       assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out",
-          "VP013 Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid");
+          "Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid");
     }
   }
 

@@ -114,11 +114,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     setTakCacheMockResult(list);
 
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
-    InputStream resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(InputStream.class);
-    String inputContext = IOUtils.toString(resultBody, "UTF-8");
-    assertTrue(inputContext.contains("VP009"));
-    assertTrue(inputContext.contains("Fel vid kontakt"));
-    assertTrue(inputContext.contains("Error connecting to service producer at address " + NO_EXISTING_PRODUCER));
+    String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
+    assertTrue(resultBody.contains("VP009"));
+    assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten."));
+    assertTrue(resultBody.contains("Error connecting to service producer at address " + NO_EXISTING_PRODUCER));
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
@@ -135,11 +134,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     setTakCacheMockResult(list);
 
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
-    InputStream resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(InputStream.class);
-    String inputContext = IOUtils.toString(resultBody, "UTF-8");
-    assertTrue(inputContext.contains("VP009"));
-    assertTrue(inputContext.contains("Fel vid kontakt"));
-    assertTrue(inputContext.contains("Error connecting to service producer at address " + MOCK_PRODUCER_ADDRESS));
+    String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
+    assertTrue(resultBody.contains("VP009"));
+    assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten."));
+    assertTrue(resultBody.contains("Error connecting to service producer at address " + MOCK_PRODUCER_ADDRESS));
     resultEndpoint.assertIsSatisfied();
   }
 
@@ -206,7 +204,6 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
             .setHeader(HttpHeaders.X_VP_SENDER_ID, constant("UnitTest"))
             .setHeader(HttpHeaders.X_VP_INSTANCE_ID, constant("dev_env"))
             .setHeader("X-Forwarded-For", constant("1.2.3.4"))
-            .setHeader(HttpHeaders.HEADER_CONTENT_TYPE, constant("text/xml;charset=UTF-8"))
             .to("netty-http:"+VP_ADDRESS+"?throwExceptionOnFailure=false")
             .to("mock:result");
       }
