@@ -14,10 +14,9 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +30,7 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -55,11 +54,11 @@ public class ReSendIT extends LeakDetectionBaseTest {
   @Produce(uri = "direct:start")
   protected ProducerTemplate template;
 
-  @Before
+  @BeforeEach
   public void init() throws Exception {
     if (!isContextStarted) {
       routeFromDirectStartToVp(camelContext);
-      AddTemporarySocketProblem.toProducerOnProducerRoute(camelContext,URL_MOCK_ENDPOINT);
+      (new AddTemporarySocketProblem()).toProducerOnProducerRoute(camelContext,URL_MOCK_ENDPOINT);
       camelContext.start();
       isContextStarted = true;
     }
@@ -95,7 +94,7 @@ public class ReSendIT extends LeakDetectionBaseTest {
                 .setHeader(HttpHeaders.X_VP_SENDER_ID, constant("UnitTest"))
                 .setHeader(HttpHeaders.X_VP_INSTANCE_ID, constant("dev_env"))
                 .setHeader("X-Forwarded-For", constant("1.2.3.4"))
-                .to("netty4-http:" + VP_ADDRESS);
+                .to("netty-http:" + VP_ADDRESS);
           }
         });
   }

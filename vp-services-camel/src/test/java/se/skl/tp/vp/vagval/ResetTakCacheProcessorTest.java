@@ -1,18 +1,17 @@
 package se.skl.tp.vp.vagval;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
 import static org.mockito.Mockito.mock;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.camel.support.DefaultExchange;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import se.skltp.takcache.TakCache;
 import se.skltp.takcache.TakCacheLog;
 
-@RunWith( CamelSpringBootRunner.class )
+@CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
 public class ResetTakCacheProcessorTest {
     @Autowired
@@ -33,7 +32,7 @@ public class ResetTakCacheProcessorTest {
     private String log1 =  "Test log1";
     private String log2 =  "Test log2";
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         testLog.add(log1);
         testLog.add(log2);

@@ -6,45 +6,34 @@ import java.net.SocketException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.builder.AdviceWith;
 
-public class AddTemporarySocketProblem extends RouteBuilder implements Processor {
+/**
+ * Should this class be deprecated. Does not seem to be in use. /hanwik
+ *
+ */
+public class AddTemporarySocketProblem implements Processor {
 
   public static final String BODY_ON_SECOND_INVOKATION = "<anybody><message>re-sent</message></anybody>";
-
-  //Config
-  private String regExpOrUrl;
-  private String urlMockEndpoint;
-
 
   private int reSendAttempts = 0;
   private int maxException =1;
 
+  public void toProducerOnProducerRoute(CamelContext destination,String urlMockEndpoint) throws Exception {
 
-  @Override
-  public void configure() {
-    interceptSendToEndpoint(regExpOrUrl)
-        .skipSendToOriginalEndpoint()
-        .process(this)
-        .to(urlMockEndpoint);
+	  AdviceWith.adviceWith(destination, TO_PRODUCER_ROUTE, a -> {
+		  a.interceptSendToEndpoint(".*localhost:12126.*")
+		  	.skipSendToOriginalEndpoint()
+		  	.process(this)
+		  	.to(urlMockEndpoint);
+		}
+	  );  
   }
 
-  public static void toProducerOnProducerRoute(CamelContext destination,String urlMockEndpoint) throws Exception {
-    destination.getRouteDefinition(TO_PRODUCER_ROUTE)
-        .adviceWith(
-            destination,
-            new AddTemporarySocketProblem(
-                  ".*localhost:12126.*",
-                //"mock_producer_address",
-                urlMockEndpoint,1)
-        );
-  }
-
-
+  public AddTemporarySocketProblem() {}
+  
   public AddTemporarySocketProblem(String interceptionUrlOrRegEx,
       String urlMockEndpoint,int maxNoOfProblem){
-    this.regExpOrUrl = interceptionUrlOrRegEx;
-    this.urlMockEndpoint = urlMockEndpoint;
     this.maxException = maxNoOfProblem;
   }
 
@@ -53,7 +42,7 @@ public class AddTemporarySocketProblem extends RouteBuilder implements Processor
     if (shouldThrowException()) {
       throw new SocketException("Simulated Error");
     } else {
-      exchange.getOut().setBody(BODY_ON_SECOND_INVOKATION);
+      exchange.getMessage().setBody(BODY_ON_SECOND_INVOKATION);
     }
   }
 

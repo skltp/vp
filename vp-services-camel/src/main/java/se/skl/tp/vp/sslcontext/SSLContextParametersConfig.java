@@ -1,6 +1,6 @@
 package se.skl.tp.vp.sslcontext;
 
-import org.apache.camel.util.jsse.*;
+import org.apache.camel.support.jsse.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

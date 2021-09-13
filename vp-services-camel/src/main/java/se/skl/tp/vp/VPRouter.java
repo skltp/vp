@@ -7,8 +7,9 @@ import java.net.SocketException;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.netty4.http.NettyHttpOperationFailedException;
+import org.apache.camel.component.netty.http.NettyHttpOperationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import se.skl.tp.vp.certificate.CertificateExtractorProcessor;
 import se.skl.tp.vp.charset.ConvertRequestCharset;
@@ -40,18 +41,18 @@ public class VPRouter extends RouteBuilder {
     public static final String DIRECT_PRODUCER_ROUTE = "direct:to-producer";
     public static final String DIRECT_PRODUCER_ERROR = "direct:producer-error";
 
-    public static final String NETTY4_HTTPS_INCOMING_FROM = "netty4-http:{{vp.https.route.url}}?"
+    public static final String NETTY_HTTPS_INCOMING_FROM = "netty-http:{{vp.https.route.url}}?"
         + "sslContextParameters=#incomingSSLContextParameters&ssl=true&"
         + "sslClientCertHeaders=true&"
         + "needClientAuth=true&"
         + "matchOnUriPrefix=true&"
         + "chunkedMaxContentLength={{vp.max.receive.length}}&"
         + "nettyHttpBinding=#VPNettyHttpBinding";
-    public static final String NETTY4_HTTP_FROM = "netty4-http:{{vp.http.route.url}}?"
+    public static final String NETTY_HTTP_FROM = "netty-http:{{vp.http.route.url}}?"
         + "matchOnUriPrefix=true&"
         + "chunkedMaxContentLength={{vp.max.receive.length}}&"
         + "nettyHttpBinding=#VPNettyHttpBinding";
-    public static final String NETTY4_HTTP_TOD = "netty4-http:http://${property.vagvalHost}?"
+    public static final String NETTY_HTTP_OUTGOING_TOD = "netty-http:${exchangeProperty.vagvalHost}?"
         + "useRelativePath=true&"
         + "nettyHttpBinding=#VPNettyHttpBinding&"
         + "chunkedMaxContentLength={{vp.max.receive.length}}&"
@@ -59,8 +60,9 @@ public class VPRouter extends RouteBuilder {
         + "keepAlive={{producer.http.keepAlive}}&"
         + "workerGroup=#sharedClientHttpPool&"
         + "clientInitializerFactory=#VPHttpClientPipelineFactory&"
-        + "connectTimeout={{producer.http.connect.timeout}}";
-    public static final String NETTY4_HTTPS_OUTGOING_TOD = "netty4-http:https://${property.vagvalHost}?"
+        + "connectTimeout={{producer.http.connect.timeout}}&"
+        + "requestTimeout={{producer.http.request.timeout}}";
+    public static final String NETTY_HTTPS_OUTGOING_TOD = "netty-http:${exchangeProperty.vagvalHost}?"
         + "sslContextParameters=#outgoingSSLContextParameters&"
         + "ssl=true&"
         + "useRelativePath=true&"
@@ -70,7 +72,8 @@ public class VPRouter extends RouteBuilder {
         + "keepAlive={{producer.https.keepAlive}}&"
         + "workerGroup=#sharedClientHttpsPool&"
         + "clientInitializerFactory=#VPHttpClientPipelineFactory&"
-        + "connectTimeout={{producer.https.connect.timeout}}";
+        + "connectTimeout={{producer.https.connect.timeout}}&"
+        + "requestTimeout={{producer.https.request.timeout}}";
 
     public static final String VAGVAL_PROCESSOR_ID = "VagvalProcessor";
     public static final String BEHORIGHET_PROCESSOR_ID = "BehorighetProcessor";
@@ -128,6 +131,12 @@ public class VPRouter extends RouteBuilder {
     @Autowired
     private ConvertResponseCharset convertResponseCharset;
 
+    @Value("${producer.http.tod.cache:20}")
+    private int httpToDCache;
+
+    @Value("${producer.https.tod.cache:30}")
+    private int httpsToDCache;
+
     @Override
     public void configure() throws Exception {
 
@@ -140,7 +149,8 @@ public class VPRouter extends RouteBuilder {
             .handled(true);
 
 
-        from(NETTY4_HTTPS_INCOMING_FROM).routeId(VP_HTTPS_ROUTE)
+        from(NETTY_HTTPS_INCOMING_FROM).routeId(VP_HTTPS_ROUTE)
+        	.setProperty(VPExchangeProperties.EXCHANGE_CREATED,  simple("${date:exchangeCreated}"))
             .choice()
               .when(header("wsdl").isNotNull()).process(wsdlProcessor)
               .when(header("xsd").isNotNull()).process(wsdlProcessor)
@@ -151,7 +161,8 @@ public class VPRouter extends RouteBuilder {
                 .bean(MessageInfoLogger.class, LOG_RESP_OUT_METHOD)
             .end();
 
-        from(NETTY4_HTTP_FROM).routeId(VP_HTTP_ROUTE)
+        from(NETTY_HTTP_FROM).routeId(VP_HTTP_ROUTE)
+        	.setProperty(VPExchangeProperties.EXCHANGE_CREATED,  simple("${date:exchangeCreated}"))
             .choice()
               .when(header("wsdl").isNotNull()).process(wsdlProcessor)
               .when(header("xsd").isNotNull()).process(wsdlProcessor)
@@ -204,10 +215,10 @@ public class VPRouter extends RouteBuilder {
             .removeHeaders(headerFilter.getRequestHeadersToRemove(), headerFilter.getRequestHeadersToKeep())
             .bean(MessageInfoLogger.class, LOG_REQ_OUT_METHOD)
             .choice().when(exchangeProperty(VPExchangeProperties.VAGVAL).contains("https://"))
-                    .recipientList(simple(NETTY4_HTTPS_OUTGOING_TOD))
+                    .toD(NETTY_HTTPS_OUTGOING_TOD, httpsToDCache)
                     .endChoice()
                 .otherwise()
-                    .recipientList(simple(NETTY4_HTTP_TOD))
+                    .toD(NETTY_HTTP_OUTGOING_TOD, httpToDCache)
                     .endChoice()
             .end()
             .bean(MessageInfoLogger.class, LOG_RESP_IN_METHOD)

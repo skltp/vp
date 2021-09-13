@@ -1,12 +1,14 @@
 package se.skl.tp.vp.certificate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import io.undertow.util.FileUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.security.cert.X509Certificate;
 import javax.security.auth.x500.X500Principal;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 

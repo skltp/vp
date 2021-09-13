@@ -1,9 +1,10 @@
 package se.skl.tp.vp.constants;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.errorhandling.VpCodeMessages;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 
-@RunWith(SpringRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 public class VpCodeMessagesTest {
 

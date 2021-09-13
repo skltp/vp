@@ -1,20 +1,21 @@
 package se.skl.tp.vp.timeout;
 
+import static se.skl.tp.vp.wsdl.PathHelper.getPath;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.PropertyConstants;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class TimeoutConfigurationJson implements TimeoutConfiguration {
@@ -30,29 +31,31 @@ public class TimeoutConfigurationJson implements TimeoutConfiguration {
   }
 
   public TimeoutConfigurationJson(
-      @Value("${" + PropertyConstants.TIMEOUT_JSON_FILE + "}") String timeout_json_file,
+      @Value("${" + PropertyConstants.TIMEOUT_JSON_FILE + "}") String timeoutJsonFile,
       @Value("${" + PropertyConstants.TIMEOUT_JSON_FILE_DEFAULT_TJANSTEKONTRAKT_NAME + "}")
-          String timeout_json_file_default_tjanstekontrakt_name)
+          String timeoutJsonFileDefaultTjanstekontraktName)
       throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     try {
-      timeoutConfigs = objectMapper.readValue(new File(timeout_json_file), new TypeReference<List<TimeoutConfig>>() {});
+      timeoutConfigs = objectMapper.readValue(getPath(timeoutJsonFile).toFile(), new TypeReference<List<TimeoutConfig>>() {});
     } catch (FileNotFoundException e) {
-      LOGGER.warn("Json file for timeouts not found at " + timeout_json_file + ".");
+      LOGGER.warn("Json file for timeouts not found at " + timeoutJsonFile + ".");
     } catch (JsonParseException e) {
-      LOGGER.warn("Json file for timeouts " + timeout_json_file + " could not be parsed.");
+      LOGGER.warn("Json file for timeouts " + timeoutJsonFile + " could not be parsed.");
+    } catch (URISyntaxException e) {
+      LOGGER.warn("Json file for timeouts failed " + timeoutJsonFile + ".", e);
     }
     if (timeoutConfigs == null) {
       timeoutConfigs = new ArrayList<>();
     }
     boolean defaultTimeoutsExist = false;
     for (TimeoutConfig timeoutConfig : timeoutConfigs) {
-      if (timeoutConfig.getTjanstekontrakt().equalsIgnoreCase(timeout_json_file_default_tjanstekontrakt_name)) {
+      if (timeoutConfig.getTjanstekontrakt().equalsIgnoreCase(timeoutJsonFileDefaultTjanstekontraktName)) {
         defaultTimeoutsExist = true;
       }
     }
     if (!defaultTimeoutsExist) {
-      createDefaultTimeoutsWhenMissing(timeout_json_file_default_tjanstekontrakt_name);
+      createDefaultTimeoutsWhenMissing(timeoutJsonFileDefaultTjanstekontraktName);
       LOGGER.warn("Could not find any default timeoutvalues, using producertimeout=29000 and routetimeout=30000 as default timeouts. " +
               "Please create and configure a timeoutconfig.json file to set this manually.");
     }

@@ -1,8 +1,8 @@
 package se.skl.tp.vp;
 
-import java.util.EventObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.management.event.CamelContextStartedEvent;
+import org.apache.camel.impl.event.CamelContextStartedEvent;
+import org.apache.camel.spi.CamelEvent;
 import org.apache.camel.support.EventNotifierSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,11 +22,6 @@ public class VPStartupEventNotifier extends EventNotifierSupport {
     }
 
     @Override
-    public boolean isEnabled(EventObject event) {
-        return true;
-    }
-
-    @Override
     protected void doStart() throws Exception {
         setIgnoreCamelContextEvents(false);
 
@@ -40,6 +35,7 @@ public class VPStartupEventNotifier extends EventNotifierSupport {
         setIgnoreExchangeRedeliveryEvents(true);
     }
 
+    /*
     @Override
     public void notify(EventObject event) {
          if (event instanceof CamelContextStartedEvent) {
@@ -47,11 +43,20 @@ public class VPStartupEventNotifier extends EventNotifierSupport {
             initHSACache();
         }
     }
-
+*/
     private void initHSACache() {
         hsaCacheService.resetCache();
     }
     private void initTakCache() {
         takCacheService.refresh();
     }
+
+	@Override
+	public void notify(CamelEvent event) throws Exception {
+        if (event instanceof CamelContextStartedEvent) {
+            initTakCache();
+            initHSACache();
+        }
+		
+	}
 }

@@ -1,7 +1,11 @@
 package se.skl.tp.vp.integrationtests.utils;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
@@ -18,11 +22,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 public class MockProducer {
-  public static final String NETTY4_HTTP = "netty4-http:";
+  public static final String NETTY_HTTP = "netty-http:";
 
   private Integer responseHttpStatus=200;
   private String responseBody="response text";
+  private String responseResourceXml =null;
   private Integer timeout=0;
+
+  private RandomCollection<Integer> weightedTimeouts = new RandomCollection<>();
 
   private CamelContext camelContext;
 
@@ -55,20 +62,32 @@ public class MockProducer {
     camelContext.addRoutes(new RouteBuilder() {
       @Override
       public void configure() throws Exception {
-        from(NETTY4_HTTP + producerAddress).id(producerAddress).routeDescription("Producer")
+        from(NETTY_HTTP + producerAddress).id(producerAddress).routeDescription("Producer")
             .streamCaching()
             .process((Exchange exchange) -> {
               inHeaders.putAll(exchange.getIn().getHeaders());
               inBody = exchange.getIn().getBody(String.class);
               inBodyXmlReader = exchange.getIn().getBody(XMLStreamReader.class);
-              exchange.getOut().setBody(responseBody);
+              if(responseResourceXml != null){
+                addResponseFromFile(exchange, responseResourceXml);
+              } else {
+                exchange.getOut().setBody(responseBody);
+              }
               addResponseHeader(Exchange.HTTP_RESPONSE_CODE, responseHttpStatus);
               updateRoutingHistory();
               exchange.getOut().setHeaders(outHeaders);
-              Thread.sleep(timeout);
+              final long timeoutValue = getTimeoutValue();
+              Thread.sleep(timeoutValue);
             });
       }
     });
+  }
+
+  private long getTimeoutValue() {
+    if(weightedTimeouts.isEmpty()){
+      return timeout;
+    }
+    return weightedTimeouts.next();
   }
 
   private void updateRoutingHistory() {
@@ -86,4 +105,11 @@ public class MockProducer {
   public void addResponseHeader(String key, Object value){
     outHeaders.put(key, value);
   }
+
+  private void addResponseFromFile(Exchange exchange, String fileName) throws IOException, XMLStreamException {
+    final URL resource = Thread.currentThread().getContextClassLoader().getResource(fileName);
+    final XMLStreamReader xstream = XMLInputFactory.newInstance().createXMLStreamReader(resource.openStream());
+    exchange.getOut().setBody(xstream);
+  }
+
 }

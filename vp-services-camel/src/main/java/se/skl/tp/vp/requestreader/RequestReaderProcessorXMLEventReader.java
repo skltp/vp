@@ -3,12 +3,15 @@ package se.skl.tp.vp.requestreader;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
 import static se.skl.tp.vp.constants.HttpHeaders.SOAP_ACTION;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Exchange;
+import org.apache.camel.converter.jaxp.StaxConverter;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
@@ -40,7 +43,7 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
       String corrId = exchange.getProperty(VPExchangeProperties.SKLTP_CORRELATION_ID, String.class);
       String contentType = exchange.getIn().getHeader(Exchange.CONTENT_TYPE, String.class);
       String soapAction = exchange.getIn().getHeader(SOAP_ACTION, String.class);
-      String msg = String.format("Failed parsning payload.\nCorrelationId: %s\nContent-Type: %s\nSoapAction: %s",
+      String msg = String.format("Failed parsing payload.\nCorrelationId: %s\nContent-Type: %s\nSoapAction: %s",
           corrId, contentType, soapAction);
       log.error(msg, e);
       throw new VpTechnicalException(e);
@@ -71,14 +74,16 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
     }
   }
 
-  private XMLStreamReader toStreamReader(Exchange exchange) throws XMLStreamException {
+  private XMLStreamReader toStreamReader(Exchange exchange) throws XMLStreamException, IOException {
+	InputStream body = exchange.getIn().getBody(InputStream.class);
     try {
-      return exchange.getIn().getBody(XMLStreamReader.class);
+    	return new StaxConverter().createXMLStreamReader(body, exchange);
     } catch (Exception e) {
-      log.warn("Failed convert payload to XMLStreamReader. Trying with default encoding UTF-8...");
-      exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
-      return exchange.getIn().getBody(XMLStreamReader.class);
+    	// This will basically handle the case where encoding is UTF-8 but xml prolog is UTF-16
+        log.warn("Failed convert payload to XMLStreamReader. Trying with default encoding UTF-8... " + e.getMessage());
+        exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
+        body.reset();
+    	return new StaxConverter().createXMLStreamReader(body, exchange);
     }
   }
-
 }

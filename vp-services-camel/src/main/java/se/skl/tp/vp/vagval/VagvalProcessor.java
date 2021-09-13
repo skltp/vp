@@ -39,7 +39,8 @@ public class VagvalProcessor implements Processor {
 
         URI uri = new URI(routingInfo.getAddress());
         if(uri.getPort() == -1) {
-            exchange.setProperty(VPExchangeProperties.VAGVAL_HOST, uri.getHost());
+            int defaultPort = uri.getScheme()!=null &&  uri.getScheme().equalsIgnoreCase("https") ? 443 : 8080;
+            exchange.setProperty(VPExchangeProperties.VAGVAL_HOST, String.format("%s:%d", uri.getHost(), defaultPort));
         } else {
             exchange.setProperty(VPExchangeProperties.VAGVAL_HOST, String.format("%s:%d", uri.getHost(), uri.getPort()));
         }

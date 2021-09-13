@@ -6,10 +6,11 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,8 +19,9 @@ import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
 import se.skl.tp.vp.TestBeanConfiguration;
+import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
-@RunWith( CamelSpringBootRunner.class )
+@CamelSpringBootTest
 @ContextConfiguration(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 public class SenderIpExtractorIT extends CamelTestSupport {
@@ -35,6 +37,16 @@ public class SenderIpExtractorIT extends CamelTestSupport {
 
     @Value("${" + PropertyConstants.VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER + "}")
     String forwardedHeader;
+
+    @BeforeAll
+    public static void startLeakDetection() {
+        LeakDetectionBaseTest.startLeakDetection();
+    }
+
+    @AfterAll
+    public static void verifyNoLeaks() throws Exception {
+        LeakDetectionBaseTest.verifyNoLeaks();
+    }
 
     @Test
     public void extractIPFromNettyHeader() throws Exception {
@@ -63,9 +75,9 @@ public class SenderIpExtractorIT extends CamelTestSupport {
         return new RouteBuilder() {
             public void configure() {
                 from("direct:start")
-                        .to("netty4-http:http://localhost:12123/vp");
+                        .to("netty-http:http://localhost:12123/vp");
 
-                from("netty4-http:http://localhost:12123/vp")
+                from("netty-http:http://localhost:12123/vp")
                         .process((Exchange exchange) -> {
                             String senderIpAdress = senderIpExtractor.getSenderIpAdress(exchange.getIn());
                             exchange.setProperty(VPExchangeProperties.SENDER_IP_ADRESS, senderIpAdress);

@@ -1,18 +1,18 @@
 package se.skl.tp.vp.integrationtests;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_RIV20;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_RIV21;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv20Request;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv21Request;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -25,7 +25,7 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @StartTakService
@@ -41,7 +41,7 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  @Before
+  @BeforeEach
   public void before() {
     try {
       mockProducer.start(HTTP_PRODUCER_URL);
@@ -55,10 +55,12 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
   public void riv20To21TransformationTest(){
     mockProducer.setResponseBody("<camel works fine!/>");
 
-    String response = testConsumer.sendHttpsRequestToVP(createGetActivitiesRiv20Request(RECEIVER_RIV21), new HashMap<>());
+    String indata = createGetActivitiesRiv20Request(RECEIVER_RIV21);
+    String response = testConsumer.sendHttpsRequestToVP(indata, new HashMap<>());
     assertEquals("<camel works fine!/>", response);
 
     String inBody = mockProducer.getInBody();
+    assertNotEquals("", inBody);
     assertThat(inBody, CompareMatcher.isSimilarTo(createGetActivitiesRiv21Request(RECEIVER_RIV21)));
 //    assertStringContains(inBody, String.format("LogicalAddress>%s",RECEIVER_RIV21));
 //    assertStringContains(inBody, "=\"http://schemas.xmlsoap.org/soap/envelope/\"");

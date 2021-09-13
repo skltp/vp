@@ -1,17 +1,15 @@
 package se.skl.tp.vp;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.apache.camel.test.spring.EnableRouteCoverage;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest(classes = VpServicesApplication.class)
-@EnableRouteCoverage
+@org.apache.camel.test.spring.junit5.EnableRouteCoverage
 @DirtiesContext
 public class ApplicationTest {
 

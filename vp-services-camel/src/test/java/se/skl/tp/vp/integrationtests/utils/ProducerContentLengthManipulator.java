@@ -5,8 +5,8 @@ import io.netty.handler.codec.http.HttpResponse;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Message;
-import org.apache.camel.component.netty4.http.DefaultNettyHttpBinding;
-import org.apache.camel.component.netty4.http.NettyHttpConfiguration;
+import org.apache.camel.component.netty.http.DefaultNettyHttpBinding;
+import org.apache.camel.component.netty.http.NettyHttpConfiguration;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,19 +1,20 @@
 package se.skl.tp.vp.integrationtests.errorhandling;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP008;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_NOT_AUHORIZED;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.soap.SOAPBody;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -27,7 +28,7 @@ import se.skl.tp.vp.util.soaprequests.SoapUtils;
 import se.skltp.takcache.TakCacheLog;
 import se.skltp.takcache.TakCacheLog.RefreshStatus;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
@@ -40,7 +41,7 @@ public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
 
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  @Before
+  @BeforeEach
   public void beforeTest(){
     testLogAppender.clearEvents();
   }
@@ -55,8 +56,8 @@ public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
     String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NOT_AUHORIZED), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertNotNull("Expected a SOAP message", soapBody);
-    assertNotNull("Expected a SOAPFault", soapBody.hasFault());
+    assertNotNull(soapBody, "Expected a SOAP message");
+    assertNotNull(soapBody.hasFault(), "Expected a SOAPFault");
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
@@ -68,6 +69,5 @@ public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
     assertStringContains(errorLogMsg, "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP008");
 
   }
-
 
 }

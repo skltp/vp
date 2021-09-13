@@ -1,8 +1,8 @@
 package se.skl.tp.vp.integrationtests.errorhandling;
 
-import static org.apache.camel.test.junit4.TestSupport.assertStringContains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP002;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP003;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP004;
@@ -25,14 +25,15 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNKNOWN_R
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_WITH_NO_VAGVAL;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.TJANSTEKONTRAKT_GET_CERTIFICATE_KEY;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.soap.SOAPBody;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,7 +50,7 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.soaprequests.SoapUtils;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @SpringBootTest
 @TestPropertySource(locations = {"classpath:application.properties","classpath:vp-messages.properties"})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -78,7 +79,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   @Value("VP013")
   String msgVP013;
 
-  @Before
+  @BeforeEach
   public void beforeTest(){
     try {
       mockHttpsProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");
@@ -301,8 +302,8 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   }
 
   private void assertSoapFault(SOAPBody soapBody, String code, String ...messages) {
-    assertNotNull("Expected a SOAP message", soapBody);
-    assertNotNull("Expected a SOAPFault", soapBody.hasFault());
+    assertNotNull(soapBody, "Expected a SOAP message");
+    assertNotNull(soapBody.hasFault(), "Expected a SOAPFault");
     assertStringContains(soapBody.getFault().getFaultString(), code);
     for(String message : messages){
       assertStringContains(soapBody.getFault().getFaultString(), message);
@@ -355,4 +356,5 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg, "-rivversion=rivtabp20");
     assertStringContains(respOutLogMsg, "-routerBehorighetTrace=" + expectedReceiverId);
   }
+  
 }
