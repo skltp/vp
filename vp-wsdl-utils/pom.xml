@@ -11,7 +11,6 @@
 
   <artifactId>vp-wsdl-utils</artifactId>
   <name>vp-wsdl-utils</name>
-  <version>4.1.0-SNAPSHOT</version>
   <description>SKLTP VP wsdl utility</description>
 
   <dependencies>
