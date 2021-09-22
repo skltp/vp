@@ -45,12 +45,13 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
   public static final String REMOTE_EXCEPTION_MESSAGE = "Fel fel fel";
   public static final String REMOTE_SOAP_FAULT =
-      "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
-          + "  <soapenv:Header/>  <soapenv:Body>    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
-          + "      <faultcode>soap:Client</faultcode>\n"
+      "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+          + "  <soapenv:Header/>  <soapenv:Body>    "
+          +     "<soapenv:Fault>"
+          + "      <faultcode>soapenv:Client</faultcode>"
           + "      <faultstring>VP011 [NTjP Remote] Anrop har gjorts utanför TLS vilket ej är tillåtet. Tjänstekonsumenten ska alltid använda TLS för säker kommunikation.</faultstring>"
           + "      <details> Caller was not on the white list of accepted IP-addresses. IP-address: 84.17.194.105. HTTP header that caused checking: x-vp-sender-id (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</details>\n"
-          + "    </soap:Fault>  </soapenv:Body></soapenv:Envelope>";
+          + "    </soapenv:Fault>  </soapenv:Body></soapenv:Envelope>";
   public static final String VP_ADDRESS = "http://localhost:12312/vp";
   public static final String NO_EXISTING_PRODUCER = "http://localhost:12100/vp";
   public static final String MOCK_PRODUCER_ADDRESS = "http://localhost:12126/vp";
@@ -171,7 +172,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
 
     String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
-    assertTrue(resultBody.contains("<faultcode>soap:Client</faultcode>"));
+    assertTrue(resultBody.contains("<faultcode>soapenv:Client</faultcode>"));
     assertTrue(resultBody.contains("VP011"));
     assertTrue(resultBody.contains("Anrop har gjorts"));
     assertTrue(resultBody.contains("Caller was not on the white list of accepted IP-addresses"));

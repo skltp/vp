@@ -29,7 +29,10 @@ import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import javax.xml.soap.Detail;
+import javax.xml.soap.DetailEntry;
 import javax.xml.soap.SOAPBody;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -76,12 +79,12 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
   public static final String REMOTE_SOAP_FAULT =
-      "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-          "  <soapenv:Header/>  <soapenv:Body>    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-          "      <faultcode>soap:Client</faultcode>\n" +
+      "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+          "  <soapenv:Header/>  <soapenv:Body>    <soapenv:Fault>" +
+          "      <faultcode>soap:Client</faultcode>" +
           "      <faultstring>VP011 [NTjP Remote] Anrop har gjorts utanför TLS vilket ej är tillåtet. Tjänstekonsumenten ska alltid använda TLS för säker kommunikation.</faultstring>" +
           "      <details>Caller was not on the white list of accepted IP-addresses. IP-address: 84.17.194.105. HTTP header that caused checking: x-vp-sender-id (se.skl.tp.vp.exceptions.VpSemanticException). Message payload is of type: ReversibleXMLStreamReader</details>" +
-          "    </soap:Fault>  </soapenv:Body></soapenv:Envelope>";
+          "    </soapenv:Fault>  </soapenv:Body></soapenv:Envelope>";
 
   @Value("VP013")
   String msgVP013;
@@ -379,7 +382,12 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
       assertStringContains(soapBody.getFault().getFaultString(), message);
     }
     for(String detail : details){
-      assertStringContains(soapBody.getFault().getDetail().getTextContent(), detail);
+      Iterator currentDetailChildren = soapBody.getFault().getDetail().getChildElements();
+      if(currentDetailChildren.hasNext()){
+        DetailEntry detailEntry = (DetailEntry)currentDetailChildren.next();
+        String text = detailEntry.getTextContent();
+        assertStringContains(text, detail);
+      }
     }
   }
 
