@@ -62,8 +62,6 @@ public class ProducerTimeoutWithoutConfigTest extends CamelTestSupport {
 
   @Autowired TakCacheService takCacheService;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   private static boolean isContextStarted = false;
 
   @BeforeEach
@@ -75,7 +73,7 @@ public class ProducerTimeoutWithoutConfigTest extends CamelTestSupport {
       takCacheService.refresh();
     }
     resultEndpoint.reset();
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
     isContextStarted = true;
   }
 
@@ -90,8 +88,8 @@ public class ProducerTimeoutWithoutConfigTest extends CamelTestSupport {
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     resultEndpoint.expectedHeaderReceived(Exchange.HTTP_RESPONSE_CODE, 200);
     resultEndpoint.assertIsSatisfied();
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
-    String reqOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
+    String reqOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
     assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout=29000");
   }
 

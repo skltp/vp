@@ -37,8 +37,6 @@ public class FullServiceInvalidContentLengthIT extends LeakDetectionBaseTest {
   @Autowired
   MockProducer mockProducer;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void before() throws Exception {
     try {
@@ -46,7 +44,7 @@ public class FullServiceInvalidContentLengthIT extends LeakDetectionBaseTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -58,7 +56,7 @@ public class FullServiceInvalidContentLengthIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
     assertEquals("<mocked answer/>", response);
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "skltp-messages");
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");

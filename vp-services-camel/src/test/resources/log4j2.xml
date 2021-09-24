@@ -1,4 +1,4 @@
-<Configuration status="WARN" monitorInterval="30">
+<Configuration status="WARN" monitorInterval="30"  packages="se.skl.tp.vp">
     <Properties>
         <Property name="LOG_PATTERN">
             %d %-5p [%t] %-30c - %X{corr.id} %m%n

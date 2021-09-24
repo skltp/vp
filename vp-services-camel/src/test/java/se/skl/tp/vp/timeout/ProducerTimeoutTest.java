@@ -64,8 +64,6 @@ public class ProducerTimeoutTest extends CamelTestSupport {
 
   @Autowired TakCacheService takCacheService;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   private static boolean isContextStarted = false;
 
   @BeforeAll
@@ -87,7 +85,7 @@ public class ProducerTimeoutTest extends CamelTestSupport {
       takCacheService.refresh();
     }
     resultEndpoint.reset();
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
     isContextStarted = true;
   }
 
@@ -116,19 +114,19 @@ public class ProducerTimeoutTest extends CamelTestSupport {
     assertStringContains(resultBody, "Timeout");
     resultEndpoint.assertIsSatisfied();
 
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String errorLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
     assertStringContains(errorLogMsg, "-errorCode=VP009");
     assertStringContains(errorLogMsg, "Stacktrace=io.netty.handler.timeout.ReadTimeoutException");
 
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
-    String reqOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
+    String reqOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
     if (onlyDefaultTimeoutInConfig) {
       assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout=500");
     } else {
       assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout=460");
     }
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "VP009 Error connecting to service producer at address");
     assertStringContains(respOutLogMsg, "Timeout when waiting on response from producer");
   }

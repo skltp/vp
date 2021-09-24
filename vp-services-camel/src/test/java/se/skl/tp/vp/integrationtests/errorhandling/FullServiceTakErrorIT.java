@@ -39,11 +39,9 @@ public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
   @Autowired
   TakCacheService takCacheService;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void beforeTest(){
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -63,8 +61,8 @@ public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
         soapBody.getFault().getFaultString());
     assertStringContains(soapBody.getFault().getFaultString(), VP008.getCode());
 
-    assertEquals(1,testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String errorLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertEquals(1,TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
     assertStringContains(errorLogMsg, "-errorCode=VP008");
     assertStringContains(errorLogMsg, "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP008");
 
