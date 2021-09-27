@@ -13,6 +13,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.ServiceStatus;
+import org.apache.camel.impl.engine.DefaultRoute;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,18 +146,21 @@ public class GetStatusProcessor implements Processor {
         MemoryUtil.getTotalCapacity());
   }
 
-  private List<String> getEndpointInfo() {
-    List<String> endPoints = new ArrayList<>();
-    List<Route> routes = camelContext.getRoutes();
-    for (Route route : routes) {
-      String endpoint = route.getEndpoint().getEndpointKey();
-      if (endpoint.startsWith("http")
-          && camelContext.getRouteController().getRouteStatus(endpoint) == ServiceStatus.Started) {
-        endPoints.add(route.getEndpoint().getEndpointKey());
-      }
-    }
-    return endPoints;
-  }
+  private List getEndpointInfo() {
+	    List<String> endPoints = new ArrayList<>();
+	    List<Route> routes = camelContext.getRoutes();
+	    for (Route route : routes) {
+	      String endpoint = route.getEndpoint().getEndpointKey();
+	      if (endpoint.contains("http://") && ((DefaultRoute) route).getStatus() == ServiceStatus.Started) {
+	        String key = route.getEndpoint().getEndpointKey();
+	        if (key.indexOf('?') > -1) {
+	          key = key.substring(0, key.indexOf('?'));
+	        }
+	        endPoints.add(key);
+	      }
+	    }
+	    return endPoints;
+	  }
 
   public String getHsaRefreshInfo(HsaCacheStatus hsaCacheStatus) {
     return String.format("Date:%s Status:%s oldNum:%d newNum:%d",
