@@ -32,13 +32,13 @@ public class VPNettyHttpBinding extends DefaultNettyHttpBinding {
   public HttpRequest toNettyRequest(Message message, String uri, NettyHttpConfiguration configuration) throws Exception {
     // DefaultNettyHttpBinding will in some situations set port to -1 in the
     // in the HTTP "host" header. This will cause Apache proxy server to return a
-    // HTTP 400 error. Therefor override DefaultNettyHttpBinding and change the
+    // HTTP 400 error. Therefore override DefaultNettyHttpBinding and change the
     // default "host header".
     // See ch. “14.23 Host”  in https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
     HttpRequest request = super.toNettyRequest(message, uri, configuration);
     URI u = new URI(uri);
     int port = u.getPort();
-    String hostHeader = u.getHost() + (port == 80 || port == -1 ? "" : ":" + u.getPort());
+    String hostHeader = u.getHost() + (port == 80 || port == -1 ? "" : ":" + port);
     request.headers().set(HttpHeaderNames.HOST.toString(), hostHeader);
     if (useChunked) {
       request.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);

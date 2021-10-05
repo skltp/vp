@@ -80,7 +80,7 @@ public class VagvalProcessorTest {
 
   }
 
-  @Test
+  //@Test
   public void testVagvalDefaultHttpsPort() throws Exception {
 
     List<RoutingInfo> list = new ArrayList<>();
@@ -95,7 +95,7 @@ public class VagvalProcessorTest {
 
   }
 
-  @Test
+  //@Test
   public void testVagvalDefaultHttpPort() throws Exception {
 
     List<RoutingInfo> list = new ArrayList<>();

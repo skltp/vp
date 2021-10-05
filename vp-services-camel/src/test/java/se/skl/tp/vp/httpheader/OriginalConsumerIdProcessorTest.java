@@ -40,8 +40,6 @@ public class OriginalConsumerIdProcessorTest {
   private boolean originalThrowExceptionIfNotAllowed;
   private List<String> originalAllowedSenderIds;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   private static final String LOG_CLASS = "se.skl.tp.vp.httpheader.OriginalConsumerIdProcessorImpl";
 
   @Autowired

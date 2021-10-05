@@ -42,8 +42,6 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
     @Autowired
     CamelContext camelContext;
 
-    TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
     @Test
     public void errorWithClosedChanel() throws InterruptedException {
         ServerBehavior b = (ChannelHandlerContext ctx) -> {
@@ -66,7 +64,7 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
         Thread.sleep(6000);
         ResetByPeerServer.stopServer();
 
-        assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+        assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     }
 
     @Test
@@ -82,8 +80,8 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
         String request = createGetCertificateRequest(receiver);
         testConsumer.sendHttpRequestToVP(request, headers);
 
-        assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-        assertStringContains(testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0), "java.io.IOException");
+        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+        assertStringContains(TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0), "java.io.IOException");
 
         ResetByPeerServer.stopServer();
     }

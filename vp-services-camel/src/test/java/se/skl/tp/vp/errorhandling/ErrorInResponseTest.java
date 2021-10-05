@@ -68,8 +68,6 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   @MockBean
   TakCache takCache;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @Autowired
   TakCacheService takCacheService;
 

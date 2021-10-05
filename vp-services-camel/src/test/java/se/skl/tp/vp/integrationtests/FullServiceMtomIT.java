@@ -59,8 +59,6 @@ public class FullServiceMtomIT extends LeakDetectionBaseTest {
   @Value("${http.forwarded.header.proto}")
   String forwardedHeaderProto;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void before() {
     try {
@@ -68,7 +66,7 @@ public class FullServiceMtomIT extends LeakDetectionBaseTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -80,7 +78,7 @@ public class FullServiceMtomIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpsRequestToVP(MTOM_TEXT_1, headers);
     assertEquals("<This worked!/>", response);
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "skltp-messages");
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
@@ -97,7 +95,7 @@ public class FullServiceMtomIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpsRequestToVP(MTOM_TEXT_2, headers);
     assertEquals("<This also worked!/>", response);
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "skltp-messages");
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");

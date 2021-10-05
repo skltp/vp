@@ -74,6 +74,7 @@ Spring-boot property fil som ligger under resources i jaren. Inställningarna ka
 |producer.https.keepAlive|true|Sätt keepAlive http header mot https producent samt aktivera keepAlive på socket|
 |producer.http.workers|50|Antal Netty Eventloop threads för http producer|
 |producer.https.workers|150|Antal Netty Eventloop threads för https producer|
+|vp.use.routing.history|true|Anger ifall rundgångsskydd ska användas|
 
 ### Application-security.properties ###
 Default Spring-boot property fil (Kräver att Spring profilen 'security' är aktiverad). Denna fil i original ligger under resources i jaren. Inställningarna kan överlagras enligt de sätt som Spring-boot föreskriver. 

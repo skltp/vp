@@ -8,16 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.util.TestLogAppender;
 
 @CamelSpringBootTest
 public class IPWhitelistHandlerTest {
 
   IPWhitelistHandler ipWhitelistHandler;
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
 
-  private static final String LOG_CLASS = "se.skl.tp.vp.httpheader.IPWhitelistHandlerImpl";
+  //private static final String LOG_CLASS = "se.skl.tp.vp.httpheader.IPWhitelistHandlerImpl";
 
   private static final String whitelist = "127.0.0.1,1.2.3.4,5.6.7.8";
 
@@ -27,7 +25,7 @@ public class IPWhitelistHandlerTest {
       ipWhitelistHandler = new IPWhitelistHandlerImpl(whitelist);
     }
 
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -109,7 +107,7 @@ public class IPWhitelistHandlerTest {
 
   private void testLogMessage(int num, String message) {
     String logClass = IPWhitelistHandlerImpl.class.getName();
-    assertEquals(num, testLogAppender.getNumEvents(logClass));
-    assertTrue(testLogAppender.getEventMessage(logClass, 0).contains(message));
+    assertEquals(num, TestLogAppender.getNumEvents(logClass));
+    assertTrue(TestLogAppender.getEventMessage(logClass, 0).contains(message));
   }
 }

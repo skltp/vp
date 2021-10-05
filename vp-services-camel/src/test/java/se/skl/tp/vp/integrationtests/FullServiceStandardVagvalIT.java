@@ -1,7 +1,6 @@
 package se.skl.tp.vp.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTP;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv21Request;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
@@ -53,13 +52,11 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
   @Value("${vp.instance.id}")
   String vpInstanceId;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void before() throws Exception {
     defaultRoutedProducer.start("http://localhost:1900/default/GetActivitiesResponder");
     explicedRoutedProducer.start("http://localhost:1900/explicit/GetActivitiesResponder");
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -73,7 +70,7 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "-senderid=SenderWithDefaultBehorighet");
     assertStringContains(respOutLogMsg, "-receiverid=AnyReceiver");
@@ -93,7 +90,7 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_EXPLICIT_PRODUCER, response);
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "-senderid=SenderWithDefaultBehorighet");
     assertStringContains(respOutLogMsg, "-receiverid=HttpProducer");
@@ -114,7 +111,7 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertStringContains(response, "VP007" );
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "-senderid=AnySender");
     assertStringContains(respOutLogMsg, "-receiverid=AnyReceiver");
@@ -136,7 +133,7 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "-senderid=tp");
     assertStringContains(respOutLogMsg, "-receiverid=GetActivitiesReceiverWithNoExplicitVagval");
@@ -157,7 +154,7 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_HSATREE_PRODUCER, response);
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "-senderid=SenderWithDefaultBehorighet");
     assertStringContains(respOutLogMsg, "-receiverid=SE0000000001-1234");

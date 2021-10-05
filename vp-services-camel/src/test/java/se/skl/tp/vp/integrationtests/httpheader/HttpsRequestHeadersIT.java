@@ -74,8 +74,6 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
 
   private static boolean isContextStarted = false;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeAll
   public static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
@@ -95,7 +93,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
     }
     producerResultEndpoint.reset();
     oldCorrelation = headerProcessor.getPropagateCorrelationIdForHttps();
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @AfterEach
@@ -118,7 +116,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeadersWithCorrId());
     assertNull(producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_SKLTP_CORRELATION_ID));
     assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", "BusinessCorrelationId=");
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertFalse(respOutLogMsg.contains(X_SKLTP_CORRELATION_ID));
 
@@ -131,7 +129,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
     assertNull(producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_SKLTP_CORRELATION_ID));
     assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", "BusinessCorrelationId=");
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertFalse(respOutLogMsg.contains(X_SKLTP_CORRELATION_ID));
   }
@@ -172,7 +170,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeaders());
     assertEquals(TEST_SENDER, producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
 
-    String reqInLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
     assertStringContains(reqInLogMsg, "LogMessage=req-in");
     boolean b = reqInLogMsg.contains(LogExtraInfoBuilder.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "=" + TEST_SENDER);
     assertFalse(b);
@@ -189,8 +187,8 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
   }
 
   private void assertLogExistAndContainsMessages(String logger, String msg1, String msg2) {
-    assertEquals(1, testLogAppender.getNumEvents(logger));
-    String logMessage = testLogAppender.getEventMessage(logger, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(logger));
+    String logMessage = TestLogAppender.getEventMessage(logger, 0);
     assertStringContains(logMessage, msg1);
     assertStringContains(logMessage, msg2);
   }
@@ -211,7 +209,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
 
   private void negativeHeaderAndLogTest(String header) {
     assertNull(producerResultEndpoint.getExchanges().get(0).getIn().getHeader(header));
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertFalse(respOutLogMsg.contains(header));
   }
