@@ -21,7 +21,7 @@ public class ExceptionUtil {
   }
 
   public VpSemanticException createVpSemanticException(VpSemanticErrorCodeEnum codeEnum){
-    return createVpSemanticException(codeEnum, null);
+    return createVpSemanticException(codeEnum, "");
   }
 
   public VpSemanticException createVpSemanticException(VpSemanticErrorCodeEnum codeEnum, Object ...suffix){

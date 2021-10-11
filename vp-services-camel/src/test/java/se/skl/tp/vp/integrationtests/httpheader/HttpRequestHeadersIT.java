@@ -72,8 +72,6 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
 
   private static boolean isContextStarted = false;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeAll
   public static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
@@ -92,6 +90,7 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
       isContextStarted = true;
     }
     resultEndpoint.reset();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -154,7 +153,7 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
     template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeaders());
     assertEquals(TEST_SENDER, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
 
-    String reqInLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
     assertStringContains(reqInLogMsg, "LogMessage=req-in");
     boolean b = reqInLogMsg.contains(LogExtraInfoBuilder.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID);
     assertFalse(b);
@@ -170,15 +169,16 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
     } catch (CamelExecutionException e) {
       NettyHttpOperationFailedException ne = (NettyHttpOperationFailedException) e.getExchange().getException();
       String err = ne.getContentAsString();
-      assert(err.contains("VP013 Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid"));
+      assert(err.contains("VP013"));
+      assert(err.contains("Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid. Kontakta tjänsteplattformsförvaltningen."));
       assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out",
-          "VP013 Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid");
+          "Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid");
     }
   }
 
   private void assertLogExistAndContainsMessages(String logger, String msg1, String msg2) {
-    assertEquals(1, testLogAppender.getNumEvents(logger));
-    String logMsg = testLogAppender.getEventMessage(logger, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(logger));
+    String logMsg = TestLogAppender.getEventMessage(logger, 0);
     assertStringContains(logMsg, msg1);
     assertStringContains(logMsg, msg2);
   }

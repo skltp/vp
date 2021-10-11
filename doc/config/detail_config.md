@@ -148,6 +148,12 @@ headers.reg.exp.requestHeadersToRemove=(?i)x-vp.*|PEER_CERTIFICATES|X-Forwarded.
 producer.http.workers=0
 producer.https.workers=0
 
+# -----------------------------------------------------------
+# Memory logger (30min=60*30s=1800s)
+# If greater than 0, generate periodic events every period.
+# -----------------------------------------------------------
+memory.logger.period.seconds=0
+
 ```
 
 ### Exempel på application-security.properties

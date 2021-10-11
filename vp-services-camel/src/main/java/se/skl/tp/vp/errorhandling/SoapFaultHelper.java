@@ -27,14 +27,14 @@ public class SoapFaultHelper {
    * Generic soap fault template, just use String.format(SOAP_FAULT, message);
    */
   private static final String SOAP_FAULT =
-      "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+      "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
           "  <soapenv:Header/>" +
           "  <soapenv:Body>" +
-          "    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-          "      <faultcode>soap:%s</faultcode>\n" +
-          "      <faultstring>%s</faultstring>\n" +
+          "    <soapenv:Fault>" +
+          "      <faultcode>soapenv:%s</faultcode>" +
+          "      <faultstring>%s</faultstring>" +
           "      <detail></detail> " +
-          "    </soap:Fault>" +
+          "    </soapenv:Fault>" +
           "  </soapenv:Body>" +
           "</soapenv:Envelope>";
 
@@ -75,8 +75,8 @@ public class SoapFaultHelper {
       soapFault.setFaultCode(new QName(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, errorCode.getFaultCode()));
       soapFault.setFaultString(faultMessage);
       Detail d = soapFault.addDetail();
-      d.addTextNode(faultDetails);
-
+      DetailEntry entry = d.addDetailEntry(new QName("detailString"));
+      entry.addTextNode(faultDetails);
       return soapMessage.getSOAPPart();
     } catch (SOAPException e1) {
       return generateSoap11FaultWithCause(faultMessage, VPFaultCodeEnum.Server);

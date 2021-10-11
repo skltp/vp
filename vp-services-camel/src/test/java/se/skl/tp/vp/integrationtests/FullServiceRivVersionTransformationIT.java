@@ -39,8 +39,6 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
 
   public static final String HTTP_PRODUCER_URL = "http://localhost:19000/GetActivitiesResponder";
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void before() {
     try {
@@ -48,7 +46,7 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
     } catch (Exception e) {
       e.printStackTrace();
     }
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -65,14 +63,14 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
 //    assertStringContains(inBody, String.format("LogicalAddress>%s",RECEIVER_RIV21));
 //    assertStringContains(inBody, "=\"http://schemas.xmlsoap.org/soap/envelope/\"");
 
-    assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
 
-    String reqInLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
     assertStringContains(reqInLogMsg, "-rivversion=rivtabp20");
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "-rivversion=RIVTABP21");
 
   }
@@ -87,14 +85,14 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
     String inBody = mockProducer.getInBody();
     assertThat(inBody, CompareMatcher.isSimilarTo(createGetActivitiesRiv20Request(RECEIVER_RIV20)));
 
-    assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
 
-    String reqInLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
     assertStringContains(reqInLogMsg, "-rivversion=rivtabp21");
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "-rivversion=RIVTABP20");
 
   }
