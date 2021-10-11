@@ -49,8 +49,6 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
   @Autowired
   private CamelContext camelContext;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void mockVagvalProcessor() throws Exception {
     replaceVagvalProcessor();
@@ -74,16 +72,16 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
   }
 
   private void assertNumLogMessages() {
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
   }
 
   private void assertCorrelationIdIsSameInAllLogs() {
     // This check is done in old VP, VpFullServiceTest.testWhenErrorOneInfoEventAndOneErrorEventIsCreated(). Needed??
-    String errMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
-    String reqInMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
-    String respOutMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String errMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
+    String reqInMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String respOutMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     String corr1 = errMsg.substring(errMsg.indexOf("BusinessCorrelationId"), errMsg.indexOf("ExtraInfo")).trim();
     String corr2 = reqInMsg.substring(reqInMsg.indexOf("BusinessCorrelationId"), reqInMsg.indexOf("ExtraInfo")).trim();
     String corr3 = respOutMsg.substring(respOutMsg.indexOf("BusinessCorrelationId"), respOutMsg.indexOf("ExtraInfo")).trim();

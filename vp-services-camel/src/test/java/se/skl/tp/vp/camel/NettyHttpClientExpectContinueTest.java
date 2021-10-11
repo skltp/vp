@@ -33,7 +33,6 @@ public class NettyHttpClientExpectContinueTest extends BaseNettyTest {
   public void setUp() throws Exception {
       // REALLY important to call super
       super.setUp();
-	  context.getRegistry().bind("continuePipelineFactory", new VPHttpClientPipelineFactory());	  
   }
   
   @Test
@@ -48,7 +47,7 @@ public class NettyHttpClientExpectContinueTest extends BaseNettyTest {
     exchange.getIn().setBody(body);
 
     System.out.println("Port:"+ getPort());
-    String url = String.format("netty-http:http://localhost:%s/foo?clientInitializerFactory=#continuePipelineFactory", getPort());
+    String url = String.format("netty-http:http://localhost:%s/foo", getPort());
     Exchange result = template.send(url, exchange);
 
     assertFalse(result.isFailed());

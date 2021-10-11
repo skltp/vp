@@ -42,8 +42,6 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   @Value("${vp.instance.id}")
   String vpInstanceId;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void before() {
     try {
@@ -51,7 +49,7 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -67,10 +65,10 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
 
     assertNull( testConsumer.getReceivedHeader(HttpHeaders.SOAP_ACTION), "SoapAction not expected in response");
 
-    String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
     assertTrue(respInLog.contains("SOAPAction=mySoapAction"));
 
-    String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertFalse(respOutLog.contains("SOAPAction=mySoapAction"));
   }
 
@@ -116,10 +114,10 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertEquals("<mocked answer/>", response);
     assertEquals( "myRandomValue", testConsumer.getReceivedHeader("MyRandomHeader"));
 
-    String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
     assertTrue(respInLog.contains("MyRandomHeader=myRandomValue"));
 
-    String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertTrue(respOutLog.contains("MyRandomHeader=myRandomValue"));
 
   }
@@ -133,10 +131,10 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertEquals("<mocked answer/>", response);
     assertEquals( "text/xml; charset=UTF-8", testConsumer.getReceivedHeader("Content-Type"));
 
-    String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
     assertTrue(respInLog.contains("Content-Type=text/plain;charset=UTF-8"));
 
-    String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertTrue(respOutLog.contains("Content-Type=text/xml; charset=UTF-8"));
 
   }
@@ -147,7 +145,7 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertTrue(response.contains("VP004"));
     assertEquals( "text/xml; charset=UTF-8", testConsumer.getReceivedHeader("Content-Type"));
 
-    String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertTrue(respOutLog.contains("Content-Type=text/xml; charset=UTF-8"));
   }
 
@@ -168,10 +166,10 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     String routing_history = testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
     assertTrue("some-server,mock-producer".equals(routing_history));
 
-    String respInLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
     assertTrue(respInLog.contains("x-rivta-routing-history=some-server,mock-producer"));
 
-    String respOutLog = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,mock-producer"));
   }
 }

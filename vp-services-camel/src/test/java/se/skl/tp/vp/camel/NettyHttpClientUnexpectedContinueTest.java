@@ -33,7 +33,6 @@ public class NettyHttpClientUnexpectedContinueTest extends CamelTestSupport {
   public void setUp() throws Exception {
       // REALLY important to call super
       super.setUp();
-	  context.getRegistry().bind("continuePipelineFactory", new VPHttpClientPipelineFactory());	  
   }
     
   @Test
@@ -46,7 +45,7 @@ public class NettyHttpClientUnexpectedContinueTest extends CamelTestSupport {
     DefaultExchange exchange = new DefaultExchange(context);
     exchange.getIn().setBody(body);
 
-    Exchange result = template.send("netty-http:http://localhost:19009?clientInitializerFactory=#continuePipelineFactory", exchange);
+    Exchange result = template.send("netty-http:http://localhost:19009", exchange);
 
     assertFalse(result.isFailed());
     assertTrue(result.getIn().getBody(String.class).startsWith("WELCOME TO THE WILD"));

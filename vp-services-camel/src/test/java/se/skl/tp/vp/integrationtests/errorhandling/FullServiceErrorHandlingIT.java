@@ -65,8 +65,6 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
   public static final String HTTPS_PRODUCER_URL = "https://localhost:19001/vardgivare-b/tjanst2";
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   public static final String REMOTE_SOAP_FAULT =
       "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
           "  <soapenv:Header/>  <soapenv:Body>    <soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
@@ -86,7 +84,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -130,7 +128,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
     assertSoapFault(soapBody, VP011.getCode(), "VP011 Caller was not on the white list of accepted IP-addresses");
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     assertRespOutLogWithRespCode500("VP011 Caller was not on the white list of accepted IP-addresses");
   }
 
@@ -311,36 +309,36 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   }
 
   private void assertErrorLog(String code, String message) {
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String errorLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
     assertStringContains(errorLogMsg, code);
     assertStringContains(errorLogMsg, message);
   }
 
   private void assertRespOutLog(String msg) {
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
     assertStringContains(respOutLogMsg, msg);
     assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
   }
 
   private void assertRespOutLogWithRespCode200(String msg) {
-	    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-	    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+	    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+	    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
 	    assertStringContains(respOutLogMsg, msg);
 	    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=200");
 	  }
 
   private void assertRespOutLogWithRespCode500(String msg) {
-	    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-	    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+	    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+	    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
 	    assertStringContains(respOutLogMsg, msg);
 	    assertStringContains(respOutLogMsg,"CamelHttpResponseCode=500");
 	  }
 
   private String getAndAssertRespOutLog() {
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    return testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    return TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
   }
 
   private void assertExtraInfoLog(String respOutLogMsg, String expectedReceiverId, String expectedProducerUrl) {

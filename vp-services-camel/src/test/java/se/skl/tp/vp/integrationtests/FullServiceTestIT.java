@@ -68,8 +68,6 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   @Value("${http.forwarded.header.proto}")
   String forwardedHeaderProto;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void before() {
     try {
@@ -78,7 +76,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -90,11 +88,11 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
     assertEquals("<mocked answer/>", response);
 
-    Map<String, Object> producerheaders = mockProducer.getInHeaders();
+    //Map<String, Object> producerheaders = mockProducer.getInHeaders();
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "skltp-messages");
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
@@ -118,7 +116,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
@@ -139,7 +137,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
@@ -161,7 +159,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
@@ -184,7 +182,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
@@ -209,7 +207,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
@@ -233,7 +231,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
@@ -279,7 +277,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
@@ -300,7 +298,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "ComponentId=vp-services");
     assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpsUrl);
@@ -341,7 +339,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String reqInLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
     assertStringContains(reqInLogMsg, "-senderIpAdress=1.2.3.4");
     assertStringContains(reqInLogMsg, "-httpXForwardedProto=https");
     assertStringContains(reqInLogMsg, "-httpXForwardedHost=skltp-lb.example.org");
@@ -400,11 +398,11 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   private void assertMessageLogsExists() {
-    assertEquals(0, testLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_IN));
-    assertEquals(1, testLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
   }
 
   private void assertExtraInfoLog(String respOutLogMsg, String expectedReceiverId, String expectedProducerUrl) {

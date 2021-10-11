@@ -49,13 +49,11 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
   @Value("${vp.instance.id}")
   String vpInstanceId;
 
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   @BeforeEach
   public void before() throws Exception {
     defaultRoutedProducer.start("http://localhost:1900/default/GetActivitiesResponder");
     explicedRoutedProducer.start("http://localhost:1900/explicit/GetActivitiesResponder");
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
   @Test
@@ -103,7 +101,7 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
   }
 
   private void assertLogMessage(String receiver, String trace) {
-    String respOutLogMsg = testLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
     assertStringContains(respOutLogMsg, "-senderid=SenderWithDefaultBehorighet");
     assertStringContains(respOutLogMsg, "-endpoint_url=http://localhost:1900/default/GetActivitiesResponder");

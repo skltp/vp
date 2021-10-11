@@ -98,9 +98,6 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
   @Autowired
   MockProducer mockProducer;
 
-
-  TestLogAppender testLogAppender = TestLogAppender.getInstance();
-
   Map<Integer, Long> responseCodes = new ConcurrentHashMap<>();
   Map<CallTypes, Long> randomCalls = new ConcurrentHashMap<>();
 
@@ -121,7 +118,7 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    testLogAppender.clearEvents();
+    TestLogAppender.clearEvents();
   }
 
 

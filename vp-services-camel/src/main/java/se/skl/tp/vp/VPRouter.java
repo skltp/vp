@@ -52,17 +52,15 @@ public class VPRouter extends RouteBuilder {
         + "matchOnUriPrefix=true&"
         + "chunkedMaxContentLength={{vp.max.receive.length}}&"
         + "nettyHttpBinding=#VPNettyHttpBinding";
-    public static final String NETTY_HTTP_OUTGOING_TOD = "netty-http:${exchangeProperty.vagvalHost}?"
+    public static final String NETTY_HTTP_OUTGOING_TOD = "netty-http:http://${exchangeProperty.vagvalHost}?"
         + "useRelativePath=true&"
         + "nettyHttpBinding=#VPNettyHttpBinding&"
         + "chunkedMaxContentLength={{vp.max.receive.length}}&"
         + "disconnect={{producer.http.disconnect}}&"
         + "keepAlive={{producer.http.keepAlive}}&"
         + "workerGroup=#sharedClientHttpPool&"
-        + "clientInitializerFactory=#VPHttpClientPipelineFactory&"
-        + "connectTimeout={{producer.http.connect.timeout}}&"
-        + "requestTimeout={{producer.http.request.timeout}}";
-    public static final String NETTY_HTTPS_OUTGOING_TOD = "netty-http:${exchangeProperty.vagvalHost}?"
+        + "connectTimeout={{producer.http.connect.timeout}}";
+    public static final String NETTY_HTTPS_OUTGOING_TOD = "netty-http:https://${exchangeProperty.vagvalHost}?"
         + "sslContextParameters=#outgoingSSLContextParameters&"
         + "ssl=true&"
         + "useRelativePath=true&"
@@ -71,9 +69,7 @@ public class VPRouter extends RouteBuilder {
         + "disconnect={{producer.https.disconnect}}&"
         + "keepAlive={{producer.https.keepAlive}}&"
         + "workerGroup=#sharedClientHttpsPool&"
-        + "clientInitializerFactory=#VPHttpClientPipelineFactory&"
-        + "connectTimeout={{producer.https.connect.timeout}}&"
-        + "requestTimeout={{producer.https.request.timeout}}";
+        + "connectTimeout={{producer.https.connect.timeout}}";
 
     public static final String VAGVAL_PROCESSOR_ID = "VagvalProcessor";
     public static final String BEHORIGHET_PROCESSOR_ID = "BehorighetProcessor";
@@ -130,12 +126,6 @@ public class VPRouter extends RouteBuilder {
 
     @Autowired
     private ConvertResponseCharset convertResponseCharset;
-
-    @Value("${producer.http.tod.cache:20}")
-    private int httpToDCache;
-
-    @Value("${producer.https.tod.cache:30}")
-    private int httpsToDCache;
 
     @Override
     public void configure() throws Exception {
@@ -215,10 +205,10 @@ public class VPRouter extends RouteBuilder {
             .removeHeaders(headerFilter.getRequestHeadersToRemove(), headerFilter.getRequestHeadersToKeep())
             .bean(MessageInfoLogger.class, LOG_REQ_OUT_METHOD)
             .choice().when(exchangeProperty(VPExchangeProperties.VAGVAL).contains("https://"))
-                    .toD(NETTY_HTTPS_OUTGOING_TOD, httpsToDCache)
+                    .recipientList(simple(NETTY_HTTPS_OUTGOING_TOD))
                     .endChoice()
                 .otherwise()
-                    .toD(NETTY_HTTP_OUTGOING_TOD, httpToDCache)
+                    .recipientList(simple(NETTY_HTTP_OUTGOING_TOD))
                     .endChoice()
             .end()
             .bean(MessageInfoLogger.class, LOG_RESP_IN_METHOD)
