@@ -26,11 +26,13 @@ public class HandleEmptyResponseProcessorImpl implements HandleEmptyResponseProc
             String strPayload = exchange.getIn().getBody(String.class);
             if (strPayload == null || strPayload.length() == 0 ) {
                 log.debug("Found return message with length 0, replace with SoapFault because CXF doesn't like the empty string");
+                VpSemanticErrorCodeEnum errorCode = VpSemanticErrorCodeEnum.getDefault();
+                String message = exceptionUtil.createMessage(errorCode);
                 String addr = exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>", String.class);
-                String cause = exceptionUtil.createMessage(VpSemanticErrorCodeEnum.VP009,
+                String messageDetails = exceptionUtil.createDetailsMessage(errorCode,
                     addr + ". Empty message when server responded with status code: " + SoapFaultHelper
                         .getStatusMessage(httpResponseCode.toString(), "NULL"));
-                SoapFaultHelper.setSoapFaultInResponse(exchange, cause, VpSemanticErrorCodeEnum.VP009.toString());
+                SoapFaultHelper.setSoapFaultInResponse(exchange, message, messageDetails, errorCode);
             }
         } catch (Exception e) {
             log.error("An error occured in CheckPayloadTransformer!.", e);

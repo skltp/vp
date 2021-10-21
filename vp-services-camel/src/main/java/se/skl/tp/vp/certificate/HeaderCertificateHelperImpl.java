@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
+import se.skl.tp.vp.errorhandling.ExceptionUtil;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
@@ -16,11 +17,14 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
 
   private SenderIdExtractor senderIdExtractor;
+  private String vpInstance;
   private static final String PATTERN_PROPERTY = "${" + PropertyConstants.CERTIFICATE_SENDERID_SUBJECT_PATTERN + "}";
+  private static final String VP_INSTANCE = "${" + PropertyConstants.VP_INSTANCE_NAME + "}";
 
   @Autowired
-  public HeaderCertificateHelperImpl(@Value(PATTERN_PROPERTY) String certificateSenderId) {
+  public HeaderCertificateHelperImpl(@Value(PATTERN_PROPERTY) String certificateSenderId, @Value(VP_INSTANCE) String vpInstance) {
     senderIdExtractor = new SenderIdExtractor(certificateSenderId);
+    this.vpInstance = vpInstance;
   }
 
   public String getSenderIDFromHeaderCertificate(Object certificate) {
@@ -88,8 +92,10 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
     return senderIdExtractor.extractSenderFromPrincipal(principalName);
   }
 
-  private VpSemanticException createVP002Exception(String msg) {
-    return new VpSemanticException(String.format("%s %s", VpSemanticErrorCodeEnum.VP002, msg)
-        , VpSemanticErrorCodeEnum.VP002);
+  private VpSemanticException createVP002Exception(String details) {
+
+    return new VpSemanticException(VpSemanticErrorCodeEnum.VP002,
+        VpSemanticErrorCodeEnum.VP002 +" [" + vpInstance + "] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad." ,
+        details);
   }
 }

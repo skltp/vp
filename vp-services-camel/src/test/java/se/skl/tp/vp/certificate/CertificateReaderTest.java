@@ -1,6 +1,5 @@
 package se.skl.tp.vp.certificate;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,10 +15,12 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 
 public class CertificateReaderTest {
 
+  final String vpInstance = "NTjP Develop";
+
   @Test
   public void testSenderIdExtractedFromCertificateSubject() throws Exception {
     Exchange exchange = createExchange("SERIALNUMBER=SE5565594230-BCQ,CN=kentor.ntjp.sjunet.org,O=Inera AB,L=Stockholm,C=SE");
-    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)");
+    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)", vpInstance);
     certificateExtractorProcessor.process(exchange);
 
     assertEquals("SE5565594230-BCQ", exchange.getProperty(VPExchangeProperties.SENDER_ID));
@@ -34,7 +35,7 @@ public class CertificateReaderTest {
 
 	    Exchange exchange = createExchangeWithoutNettyCert();
 	
-	    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)");
+	    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)", vpInstance);
 	    certificateExtractorProcessor.process(exchange);
             });
     assertTrue(exception.getMessage().contains("VP002"));
@@ -45,7 +46,7 @@ public class CertificateReaderTest {
   public void testExtractSenderIdInHexFormat() throws Exception {
     // TODO Hitta exempel på hur ett riktigt serialnumber i hex format ser ut.
     Exchange exchange = createExchange("2.5.4.5=#13145453544e4d54323332313030303135362d423032,CN=kentor.ntjp.sjunet.org,O=Inera AB,L=Stockholm,C=SE");
-    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)");
+    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)", vpInstance);
     certificateExtractorProcessor.process(exchange);
 
     assertEquals("TSTNMT2321000156-B02", exchange.getProperty(VPExchangeProperties.SENDER_ID));
@@ -59,7 +60,7 @@ public class CertificateReaderTest {
     		VpSemanticException.class, 
             () ->  {
 	    Exchange exchange = createExchange("CN=kentor.ntjp.sjunet.org,O=Inera AB,L=Stockholm,C=SE");
-	    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)");
+	    CertificateExtractorProcessor certificateExtractorProcessor = new CertificateExtractorProcessorImpl("(?:2.5.4.5|SERIALNUMBER)=([^,]+)", vpInstance);
 	    certificateExtractorProcessor.process(exchange);
     });
     assertTrue(exception.getMessage().contains("VP002"));

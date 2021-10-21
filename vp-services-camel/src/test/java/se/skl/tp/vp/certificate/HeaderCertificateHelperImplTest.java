@@ -18,7 +18,8 @@ public class HeaderCertificateHelperImplTest {
   public static final String PRINCIPAL_HEX_OU = "OU=#00074861726d6f6e79";
   public static final String PRINCIPAL_MISSING_OU = "CN=Hermione Granger, O=Apache Software Foundation, L=Hogwarts, ST=Hants, C=GB";
   final String pattern = "OU=([^,]+)";
-  HeaderCertificateHelperImpl headerCertificateHelper = new HeaderCertificateHelperImpl(pattern);
+  final String vpInstance = "NTjP Develop";
+  HeaderCertificateHelperImpl headerCertificateHelper = new HeaderCertificateHelperImpl(pattern, vpInstance);
 
   @Test
   public void getSenderIDFromHeaderCertificate() {
@@ -46,7 +47,8 @@ public class HeaderCertificateHelperImplTest {
       headerCertificateHelper.getSenderIDFromHeaderCertificate(new X500Principal(""));
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
-      assertEquals("VP002 Exception, unkown certificate type found in httpheader x-vp-auth-cert", e.getMessage());
+      assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
+      assertEquals("Exception, unkown certificate type found in httpheader x-vp-auth-cert", e.getMessageDetails());
     }
   }
 
@@ -57,7 +59,8 @@ public class HeaderCertificateHelperImplTest {
           "-----BEGIN CERTIFICATE-----This string will cause a parse error-----END CERTIFICATE-----");
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
-      assertEquals("VP002 Exception occured parsing certificate in httpheader x-vp-auth-cert", e.getMessage());
+      assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
+      assertEquals("Exception occured parsing certificate in httpheader x-vp-auth-cert", e.getMessageDetails());
     }
   }
 
@@ -67,7 +70,8 @@ public class HeaderCertificateHelperImplTest {
       headerCertificateHelper.getSenderIDFromHeaderCertificate(null);
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
-      assertEquals("VP002 No certificate found in httpheader x-vp-auth-cert", e.getMessage());
+      assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
+      assertEquals("No certificate found in httpheader x-vp-auth-cert", e.getMessageDetails());
     }
   }
 
@@ -77,7 +81,8 @@ public class HeaderCertificateHelperImplTest {
       headerCertificateHelper.getSenderIDFromHeaderCertificate(mockCert(PRINCIPAL_MISSING_OU));
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
-      assertEquals("VP002 No senderId found in Certificate", e.getMessage());
+      assertEquals("No senderId found in Certificate", e.getMessageDetails());
+      assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
     }
   }
 

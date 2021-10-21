@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.constants.VPExchangeProperties;
+import se.skl.tp.vp.errorhandling.ExceptionUtil;
+import se.skl.tp.vp.errorhandling.VpCodeMessages;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
@@ -16,11 +18,14 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 public class CertificateExtractorProcessorImpl implements CertificateExtractorProcessor {
 
   SenderIdExtractor senderIdExtractor;
+  private String vpInstance;
   private static final String PATTERN_PROPERTY = "${" + PropertyConstants.CERTIFICATE_SENDERID_SUBJECT_PATTERN + "}";
+  private static final String VP_INSTANCE = "${" + PropertyConstants.VP_INSTANCE_NAME + "}";
 
   @Autowired
-  public CertificateExtractorProcessorImpl(@Value(PATTERN_PROPERTY) String certificateSenderidSubject) {
+  public CertificateExtractorProcessorImpl(@Value(PATTERN_PROPERTY) String certificateSenderidSubject, @Value(VP_INSTANCE) String vpInstance) {
     senderIdExtractor = new SenderIdExtractor(certificateSenderidSubject);
+    this.vpInstance = vpInstance;
   }
 
   @Override
@@ -29,12 +34,12 @@ public class CertificateExtractorProcessorImpl implements CertificateExtractorPr
     String senderId = senderIdExtractor.extractSenderFromPrincipal(principal);
 
     if (senderId == null) {
-      throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002 + " No senderId found in Certificate: " + principal,
-          VpSemanticErrorCodeEnum.VP002);
+      throw new VpSemanticException(VpSemanticErrorCodeEnum.VP002,
+          VpSemanticErrorCodeEnum.VP002 +" [" + vpInstance + "] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.",
+          "No senderId found in Certificate: " + principal);
     }
 
     exchange.setProperty(VPExchangeProperties.SENDER_ID, senderId);
-
   }
 
 
