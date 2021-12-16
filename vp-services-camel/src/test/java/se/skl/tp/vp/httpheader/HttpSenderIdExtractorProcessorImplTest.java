@@ -253,7 +253,9 @@ public class HttpSenderIdExtractorProcessorImplTest {
     try {
       httpHeaderExtractorProcessor.process(exchange);
     } catch (VpSemanticException e) {
-      assertTrue(e.getMessage().contains("Exception, unkown certificate type found in httpheader"));
+      assertTrue(e.getMessage().contains("VP002"));
+      assertTrue(e.getMessage().contains("Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad"));
+      assertTrue(e.getMessageDetails().contains("Exception, unkown certificate type found in httpheader"));
     }
   }
 

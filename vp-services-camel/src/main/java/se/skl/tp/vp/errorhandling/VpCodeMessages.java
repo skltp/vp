@@ -18,11 +18,19 @@ public class VpCodeMessages {
   }
 
   public String getMessage(VpSemanticErrorCodeEnum vpSemanticErrorCodeEnum) {
-    return env.getProperty(vpSemanticErrorCodeEnum.getCode());
+    return env.getProperty(vpSemanticErrorCodeEnum.getVpDigitErrorCode());
+  }
+
+  public String getMessageDetails(VpSemanticErrorCodeEnum vpSemanticErrorCodeEnum) {
+    return env.getProperty(vpSemanticErrorCodeEnum.getVpDigitErrorCode() + "_DETAILS");
   }
 
   public String getMessage(String key) {
     return env.getProperty(key);
- }
+  }
+
+  public String getMessageDetails(String key) {
+    return env.getProperty(key+ "_DETAILS");
+  }
 
 }

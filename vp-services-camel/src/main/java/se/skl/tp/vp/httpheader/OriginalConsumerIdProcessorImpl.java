@@ -45,6 +45,9 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
 
     String originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
     exchange.setProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalConsumer);
+    
+    // This property should always be populated.
+    exchange.setProperty(VPExchangeProperties.OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalConsumer);
   }
 
   public boolean isSenderAllowedToSetOriginalConsumerIdHeader(String senderId) {

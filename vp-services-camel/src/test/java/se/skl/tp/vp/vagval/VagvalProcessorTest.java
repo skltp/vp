@@ -121,7 +121,8 @@ public class VagvalProcessorTest {
       fail("Förväntade ett VP003 SemanticException");
     } catch (VpSemanticException vpSemanticException) {
       assertEquals(VP003, vpSemanticException.getErrorCode());
-      assertTrue(vpSemanticException.getMessage().contains("No receiverId (logical address) found in message header"));
+      assertTrue(vpSemanticException.getMessage().contains("Logisk adressat (ReceiverId) saknas i RivHeadern i inkommande meddelande"));
+      assertTrue(vpSemanticException.getMessageDetails().contains("No receiverId (logical address) found in message header"));
     }
   }
 
@@ -136,9 +137,10 @@ public class VagvalProcessorTest {
       fail("Förväntade ett VP004 SemanticException");
     } catch (VpSemanticException vpSemanticException) {
       assertEquals(VP004, vpSemanticException.getErrorCode());
-      assertTrue(vpSemanticException.getMessage().contains("No receiverId (logical address) found for"));
-      assertTrue(vpSemanticException.getMessage().contains(NAMNRYMD_1));
-      assertTrue(vpSemanticException.getMessage().contains(RECEIVER_1));
+      assertTrue(vpSemanticException.getMessage().contains("Det finns inget vägval i tjänsteadresseringskatalogen som matchar anropets logiska adressat (ReceiverId) och tjänstekontrakt. Kontrollera uppgifterna i anropet och vid behov, beställ konfigurering i aktuell tjänsteplattform."));
+      assertTrue(vpSemanticException.getMessageDetails().contains("No receiverId (logical address) found for"));
+      assertTrue(vpSemanticException.getMessageDetails().contains(NAMNRYMD_1));
+      assertTrue(vpSemanticException.getMessageDetails().contains(RECEIVER_1));
     }
   }
 
@@ -156,10 +158,11 @@ public class VagvalProcessorTest {
       fail("Förväntade ett VP006 SemanticException");
     } catch (VpSemanticException vpSemanticException) {
       assertEquals(VP006, vpSemanticException.getErrorCode());
-      assertTrue(vpSemanticException.getMessage()
+      assertTrue(vpSemanticException.getMessage().contains("Internt fel i tjänsteplattformen. Det finns fler än en tjänsteproducent definierad i tjänsteadresseringskatalogen som matchar logisk adressat (ReceiverId), tjänstekontrakt och dagens datum. Tyder på felkonfiguration. Rapportera felet till tjänsteplattformsförvaltningen."));
+      assertTrue(vpSemanticException.getMessageDetails()
           .contains("More than one receiverId (logical address) with matching Riv-version found for"));
-      assertTrue(vpSemanticException.getMessage().contains(NAMNRYMD_1));
-      assertTrue(vpSemanticException.getMessage().contains(RECEIVER_1));
+      assertTrue(vpSemanticException.getMessageDetails().contains(NAMNRYMD_1));
+      assertTrue(vpSemanticException.getMessageDetails().contains(RECEIVER_1));
     }
   }
 
@@ -178,6 +181,7 @@ public class VagvalProcessorTest {
       fail("Förväntade ett VP008 SemanticException");
     } catch (VpSemanticException vpSemanticException) {
       assertEquals(VP008, vpSemanticException.getErrorCode());
+      assertTrue(vpSemanticException.getMessage().contains("Internt fel i tjänsteplattformen. Ingen kontakt med tjänsteadresseringskatalogen. Informera tjänsteplattformsförvaltningen."));
     }
   }
 
@@ -194,9 +198,10 @@ public class VagvalProcessorTest {
       fail("Förväntade ett VP010 SemanticException");
     } catch (VpSemanticException vpSemanticException) {
       assertEquals(VP010, vpSemanticException.getErrorCode());
-      assertTrue(vpSemanticException.getMessage().contains("Physical Address field is empty in Service Producer for"));
-      assertTrue(vpSemanticException.getMessage().contains(NAMNRYMD_1));
-      assertTrue(vpSemanticException.getMessage().contains(RECEIVER_1));
+      assertTrue(vpSemanticException.getMessage().contains("Internt fel i tjänsteplattformen. URL saknas för tjänsteproducenten i tjänsteplattformens tjänsteadresseringskatalog."));
+      assertTrue(vpSemanticException.getMessageDetails().contains("Physical Address field is empty in Service Producer for"));
+      assertTrue(vpSemanticException.getMessageDetails().contains(NAMNRYMD_1));
+      assertTrue(vpSemanticException.getMessageDetails().contains(RECEIVER_1));
     }
   }
 

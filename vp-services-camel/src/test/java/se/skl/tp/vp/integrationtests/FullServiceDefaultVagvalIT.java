@@ -96,8 +96,8 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request("TooManyReceivers#SecondReceiverRiv21#NotValidReceiver"), headers);
-    assertTrue(response.contains("VP007 Authorization missing for serviceNamespace: urn:riv:clinicalprocess:activity:actions:GetActivitiesResponder:1, " +
-                    "receiverId: TooManyReceivers#SecondReceiverRiv21#NotValidReceiver, senderId: SenderWithDefaultBehorighet"));
+    assertTrue(response.contains("VP007"));
+    assertTrue(response.contains("Tjänstekonsumenten saknar behörighet att anropa den logiska adressaten via detta tjänstekontrakt. Kontrollera uppgifterna och vid behov, tillse att det beställs konfiguration i aktuell tjänsteplattform."));
   }
 
   private void assertLogMessage(String receiver, String trace) {
