@@ -80,6 +80,14 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- Log4J BOM placed first to override version -->
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-bom</artifactId>
+        <version>2.16.0</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
 
       <dependency>
         <groupId>se.skltp.vp</groupId>
