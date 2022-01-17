@@ -22,22 +22,23 @@ pipeline {
                     sh 'pwd'
                     echo 'Compiling, testing and building...'
                     sh 'mvn --global-settings ${MAVEN_SETTINGS} -P test-coverage,leak clean install'
+                    script {
+                        pomVersion = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+                    }
                 }
             }     
         }
         stage('SonarScanner'){
             steps {
-                withCredentials([string(credentialsId: "${params.SONAR_TOKENID}", variable: "SONARTOKEN" )]) {
-                    withSonarQubeEnv("${params.SONAR_ENV}") {
-                        sh """${SCANNER_HOME}/bin/sonar-scanner \
-                                    -Dsonar.projectKey=${params.SONAR_PROJECTKEY} \
-                                    -Dsonar.login="${SONARTOKEN}" \
-                                    -Dsonar.java.binaries=${params.SONAR_JAVA_BINARIES} \
-                                    -Dsonar.coverage.jacoco.xmlReportPaths=${params.SONAR_JACOCO_REPORTS} \
-                                    -Dsonar.test.inclusions=${params.SONAR_TEST_INCLUSIONS} \
-                                    -Dsonar.sourceEncoding=UTF-8
-                            """
-                    }
+                withSonarQubeEnv(credentialsId: "${params.SONAR_TOKENID}", installationName: "${params.SONAR_ENV}") {
+                    sh """${SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=${params.SONAR_PROJECTKEY} \
+                            -Dsonar.projectVersion=${pomVersion} \
+                            -Dsonar.java.binaries=${params.SONAR_JAVA_BINARIES} \
+                            -Dsonar.coverage.jacoco.xmlReportPaths=${params.SONAR_JACOCO_REPORTS} \
+                            -Dsonar.test.inclusions=${params.SONAR_TEST_INCLUSIONS} \
+                            -Dsonar.sourceEncoding=UTF-8
+                        """
                 }
             }
         }
