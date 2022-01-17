@@ -50,6 +50,9 @@ pipeline {
             junit '**/target/surefire-reports/TEST-*.xml'
             jacoco()
             archiveArtifacts '**/target/*.jar'
+            timeout(time: 1, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+            }
         }
 
         unsuccessful {
