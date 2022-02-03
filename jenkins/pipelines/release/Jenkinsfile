@@ -47,7 +47,7 @@ pipeline  {
             }      
             steps {
                 configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
-                    sh "mvn -B -e -X --global-settings ${MAVEN_SETTINGS} -DdevelopmentVersion=${params.DEVELOPMENT_VERSION} -DreleaseVersion=${params.RELEASE_VERSION} -DtagNameFormat=v@{project.version} -Dresume=false -DskipTests -Darguments=-DskipTests -Pskltp -DdryRun=${params.DRY_RUN} release:prepare -DpushChanges=true  release:perform -Darguments=-Dmaven.javadoc.skip=true"
+                    sh "mvn -B --global-settings ${MAVEN_SETTINGS} -DdevelopmentVersion=${params.DEVELOPMENT_VERSION} -DreleaseVersion=${params.RELEASE_VERSION} -DtagNameFormat=v@{project.version} -Dresume=false -DskipTests -Darguments=-DskipTests -Pskltp -DdryRun=${params.DRY_RUN} release:prepare -DpushChanges=true  release:perform -Darguments=-Dmaven.javadoc.skip=true"
                 }
             }
         }
