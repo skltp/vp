@@ -29,6 +29,7 @@ Spring-boot property fil som ligger under resources i jaren. Inställningarna ka
 |hawtio.authentication.enabled|false|Aktivera/Avaktivera autentisering för att använda Hawtio. Defaultvärde false.|
 |hawtio.external.loginfile|\<path>/realm-custom.properties|Sökväg till extern login-fil. Se [Detaljerad konfiguration]
 |vp.instance.id|dev_env|Identifierare för den installerade VP:n|
+|vp.instance.name|SKLTP_DEFAULT_NAME|Namn för den installerade VP:n, används i felmeddelanden. Ändra till ett unikt namn|
 |vp.http.route.url|htttp://localhost:12312/vp|Ingång för HTTP-anrop. Porten kan konfigureras|
 |vp.https.route.url|https://localhost:443/vp|Ingång för HTTPS-anrop. Porten kan konfigureras|
 |vp.hsa.reset.cache.url|http://localhost:24000/resethsacache|Ingång för anrop för att uppdatera HSA-cachen. Porten kan konfigureras|
