@@ -65,8 +65,8 @@ public class PathHelper {
    * Delete a non empty dir and all files within (From internet)
    */
   public static void deleteDirectory(Path path) throws IOException {
-    FileVisitor visitor =
-        new SimpleFileVisitor<Path>() {
+    FileVisitor<Path> visitor =
+        new SimpleFileVisitor<>() {
 
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)

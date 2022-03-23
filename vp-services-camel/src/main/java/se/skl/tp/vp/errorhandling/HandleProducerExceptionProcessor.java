@@ -45,7 +45,7 @@ public class HandleProducerExceptionProcessor implements Processor {
         VpSemanticErrorCodeEnum errorCode = VpSemanticErrorCodeEnum.getDefault();
         String message = exceptionUtil.createMessage(errorCode);
 
-        String addr = (String) exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>");
+        String addr = exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>", String.class);
         String vpMsg = String.format("%s. Exception Caught by Camel when contacting producer. Exception information: (%s: %s)",
             addr, exception.getClass().getName(), messageString);
         String messageDetails = exceptionUtil.createDetailsMessage(errorCode, vpMsg);

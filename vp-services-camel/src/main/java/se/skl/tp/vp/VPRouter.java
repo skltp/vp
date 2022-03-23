@@ -128,6 +128,7 @@ public class VPRouter extends RouteBuilder {
     private ConvertResponseCharset convertResponseCharset;
 
     @Override
+    @SuppressWarnings("unchecked") // Caused by Camel's onException method
     public void configure() throws Exception {
 
         onException(Exception.class)

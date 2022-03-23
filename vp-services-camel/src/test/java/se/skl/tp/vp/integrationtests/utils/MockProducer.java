@@ -71,11 +71,11 @@ public class MockProducer {
               if(responseResourceXml != null){
                 addResponseFromFile(exchange, responseResourceXml);
               } else {
-                exchange.getOut().setBody(responseBody);
+                exchange.getMessage().setBody(responseBody);
               }
               addResponseHeader(Exchange.HTTP_RESPONSE_CODE, responseHttpStatus);
               updateRoutingHistory();
-              exchange.getOut().setHeaders(outHeaders);
+              exchange.getMessage().setHeaders(outHeaders);
               final long timeoutValue = getTimeoutValue();
               Thread.sleep(timeoutValue);
             });
@@ -109,7 +109,7 @@ public class MockProducer {
   private void addResponseFromFile(Exchange exchange, String fileName) throws IOException, XMLStreamException {
     final URL resource = Thread.currentThread().getContextClassLoader().getResource(fileName);
     final XMLStreamReader xstream = XMLInputFactory.newInstance().createXMLStreamReader(resource.openStream());
-    exchange.getOut().setBody(xstream);
+    exchange.getMessage().setBody(xstream);
   }
 
 }
