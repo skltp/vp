@@ -347,7 +347,6 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <argLine>-Dfile.encoding=UTF-8 ${surefireArgLine}</argLine>
-              <forkCount>0</forkCount>
             </configuration>
           </plugin>
 
@@ -370,7 +369,6 @@
             </executions>
             <configuration>
               <argLine>-Dfile.encoding=UTF-8 ${failsafeArgLine}</argLine>
-              <forkCount>0</forkCount>
             </configuration>
           </plugin>
 
