@@ -29,7 +29,7 @@ public class MemoryUtil {
   }
 
   public static String getVMMaxMemory() {
-    return hotSpotDiagnostic.getVMOption("MaxDirectMemorySize").toString();
+    return hotSpotDiagnostic.getVMOption("MaxDirectMemorySize").getValue();
   }
 
   public static long getCount() {
