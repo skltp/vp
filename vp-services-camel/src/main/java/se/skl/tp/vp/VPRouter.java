@@ -40,6 +40,7 @@ public class VPRouter extends RouteBuilder {
     public static final String DIRECT_VP = "direct:vp";
     public static final String DIRECT_PRODUCER_ROUTE = "direct:to-producer";
     public static final String DIRECT_PRODUCER_ERROR = "direct:producer-error";
+    public static final String DIRECT_WSDL = "direct:wsdl";
 
     public static final String NETTY_HTTPS_INCOMING_FROM = "netty-http:{{vp.https.route.url}}?"
         + "sslContextParameters=#incomingSSLContextParameters&ssl=true&"
@@ -143,8 +144,8 @@ public class VPRouter extends RouteBuilder {
         from(NETTY_HTTPS_INCOMING_FROM).routeId(VP_HTTPS_ROUTE)
         	.setProperty(VPExchangeProperties.EXCHANGE_CREATED,  simple("${date:exchangeCreated}"))
             .choice()
-              .when(header("wsdl").isNotNull()).process(wsdlProcessor)
-              .when(header("xsd").isNotNull()).process(wsdlProcessor)
+              .when(header("wsdl").isNotNull()).to(DIRECT_WSDL)
+              .when(header("xsd").isNotNull()).to(DIRECT_WSDL)
             .otherwise()
                 .process(certificateExtractorProcessor)
                 .to(DIRECT_VP)
@@ -155,8 +156,8 @@ public class VPRouter extends RouteBuilder {
         from(NETTY_HTTP_FROM).routeId(VP_HTTP_ROUTE)
         	.setProperty(VPExchangeProperties.EXCHANGE_CREATED,  simple("${date:exchangeCreated}"))
             .choice()
-              .when(header("wsdl").isNotNull()).process(wsdlProcessor)
-              .when(header("xsd").isNotNull()).process(wsdlProcessor)
+              .when(header("wsdl").isNotNull()).to(DIRECT_WSDL)
+              .when(header("xsd").isNotNull()).to(DIRECT_WSDL)
             .otherwise()
                 .process(httpSenderIdExtractorProcessor)
                 .to(DIRECT_VP)
@@ -228,5 +229,12 @@ public class VPRouter extends RouteBuilder {
             .bean(MessageInfoLogger.class, LOG_RESP_OUT_METHOD)
             // Always return status 500 to when soap fault
             .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500));
+
+        from(DIRECT_WSDL)
+            .process(wsdlProcessor)
+            .removeHeaders(headerFilter.getRequestHeadersToRemove(), headerFilter.getRequestHeadersToKeep())
+            .removeHeaders(headerFilter.getResponseHeadersToRemove(), headerFilter.getResponseHeadersToKeep())
+        .end();
+
     }
 }
