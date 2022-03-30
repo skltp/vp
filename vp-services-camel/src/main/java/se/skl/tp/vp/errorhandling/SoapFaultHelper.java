@@ -84,8 +84,8 @@ public class SoapFaultHelper {
   }
 
   public static void setSoapFaultInResponse(Exchange exchange, String faultString, String faultDetails, VpSemanticErrorCodeEnum errorCode){
-    exchange.getOut().setBody(createSoapFault(faultString, faultDetails, errorCode));
-    exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
+    exchange.getMessage().setBody(createSoapFault(faultString, faultDetails, errorCode));
+    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
     exchange.setProperty(VPExchangeProperties.SESSION_ERROR, Boolean.TRUE);
     exchange.setProperty(VPExchangeProperties.SESSION_ERROR_CODE, errorCode.getVpDigitErrorCode());
     exchange.setProperty(VPExchangeProperties.SESSION_HTML_STATUS, SoapFaultHelper.getStatusMessage(nvl(exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE)), null));
