@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 
-@Service
-@Log4j2
 /**
  * This function processes custom handling of Exceptions raised by data Producers.
  */
+@Service
+@Log4j2
 public class HandleProducerExceptionProcessor implements Processor {
 
-    private ExceptionUtil exceptionUtil;
+    private final ExceptionUtil exceptionUtil;
     private static final String SOAP_XMLNS = "http://schemas.xmlsoap.org/soap/envelope/";
     private static final Integer HTTP_STATUS_500 = 500;
 
@@ -82,10 +82,10 @@ public class HandleProducerExceptionProcessor implements Processor {
 
                 // If a status code was recorded in prior steps, append it to the message component that will form
                 //   part of the faultDetails element.
-                if (statusCode != null) {
+                if (statusCode != null && !statusCode.equals(200)) {
                     vpMessage = vpMessage.concat(
                             String.format(
-                                    "\nHTTP Exception occurred during communication. Classification: VP_PRODUCER_HTTP_STATUS=%s",
+                                    "\nVP_PRODUCER_EXCEPTION_HTTP_STATUS=%s",
                                     statusCode)
                     );
                 }
@@ -95,7 +95,7 @@ public class HandleProducerExceptionProcessor implements Processor {
                 SoapFaultHelper.setSoapFaultInResponse(exchange, message, messageDetails, VpSemanticErrorCodeEnum.getDefault());
             }
         } catch (Exception e) {
-            log.error("An error occured in HandleProducerExceptionProcessor", e);
+            log.error("An error occurred in HandleProducerExceptionProcessor", e);
             throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.getDefault(), "unknown");
         }
     }
