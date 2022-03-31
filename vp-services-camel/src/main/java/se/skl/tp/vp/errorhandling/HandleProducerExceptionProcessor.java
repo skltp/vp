@@ -66,13 +66,13 @@ public class HandleProducerExceptionProcessor implements Processor {
                 }
 
                 log.debug("Exception Caught by Camel when contacting producer. Exception information: "
-                        + truncateToMaxLength(messageString, 200) + "...");
+                        + truncateToFixedMaxLength(messageString) + "...");
 
                 // Prepare response in accordance to VP problem code standards.
                 VpSemanticErrorCodeEnum errorCode = VpSemanticErrorCodeEnum.getDefault();
                 String message = exceptionUtil.createMessage(errorCode);
 
-                String address = (String) exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>");
+                String address = exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>", String.class);
                 String vpMessage = String.format(
                         "%s. Exception Caught by Camel when contacting producer. Exception information: (%s: %s)",
                         address,
@@ -103,15 +103,14 @@ public class HandleProducerExceptionProcessor implements Processor {
     /**
      * This function will take a text, and truncate it to provided length value if it is too long.
      * @param text Text to be truncated, if too long.
-     * @param length Max length of text.
      * @return A potentially truncated string, or the entire string if short enough.
      */
-    private String truncateToMaxLength(String text, int length) {
+    private String truncateToFixedMaxLength(String text) {
         if (text == null) {
             return null;
         }
 
-        int i = Math.min(text.length(), length);
+        int i = Math.min(text.length(), 200);
         return text.substring(0, i);
     }
 }
