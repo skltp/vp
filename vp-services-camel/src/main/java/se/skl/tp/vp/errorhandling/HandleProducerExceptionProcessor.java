@@ -5,16 +5,20 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.netty.http.NettyHttpOperationFailedException;
+import org.apache.camel.http.base.HttpOperationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 
+/**
+ * This function processes custom handling of Exceptions raised by data Producers.
+ */
 @Service
 @Log4j2
 public class HandleProducerExceptionProcessor implements Processor {
 
-  private ExceptionUtil exceptionUtil;
+  private final ExceptionUtil exceptionUtil;
   private static final String SOAP_XMLNS = "http://schemas.xmlsoap.org/soap/envelope/";
   private static final Integer HTTP_STATUS_500 = 500;
 
@@ -26,47 +30,88 @@ public class HandleProducerExceptionProcessor implements Processor {
   @Override
   public void process(Exchange exchange) throws Exception {
     try {
+
       Exception exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+
       if (exception != null) {
-         if (exception instanceof NettyHttpOperationFailedException) {
-               NettyHttpOperationFailedException operationFailedException = (NettyHttpOperationFailedException) exception;
-              if (operationFailedException.getStatusCode() == HTTP_STATUS_500 && operationFailedException.getContentAsString().contains(SOAP_XMLNS)) {
-                  return;
-              }
+
+        // placeholder for tracking HTTP Status Code.
+        Integer statusCode = null;
+
+        // Detect Netty HTTP Operational Failure. Record HTTP Status Code.
+        //   Abort if HTTP 500 AND SOAP-schema reference present in exception.
+        if (exception instanceof NettyHttpOperationFailedException) {
+          NettyHttpOperationFailedException opFailedException = (NettyHttpOperationFailedException) exception;
+          statusCode = opFailedException.getStatusCode();
+
+          if (statusCode.equals(HTTP_STATUS_500)
+              && opFailedException.getContentAsString().contains(SOAP_XMLNS)) {
+            return;
           }
+        }
+
+        // Detect general HTTP Operational Failure. Record HTTP Status Code.
+        if (exception instanceof HttpOperationFailedException) {
+          HttpOperationFailedException opFailedException = (HttpOperationFailedException) exception;
+          statusCode = opFailedException.getStatusCode();
+        }
+
+
+        // Record Exception message.
         String messageString = exception.getMessage();
+
+        // Override above Exception message if it was due to a timeout.
         if (exception instanceof ReadTimeoutException) {
           messageString = "Timeout when waiting on response from producer.";
         }
 
-        log.debug("Exception Caught by Camel when contacting producer. Exception information: " + left(messageString, 200) + "...");
+        log.debug("Exception Caught by Camel when contacting producer. Exception information: "
+            + truncateToFixedMaxLength(messageString) + "...");
 
-
+        // Prepare response in accordance to VP problem code standards.
         VpSemanticErrorCodeEnum errorCode = VpSemanticErrorCodeEnum.getDefault();
         String message = exceptionUtil.createMessage(errorCode);
 
-        String addr = (String) exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>");
-        String vpMsg = String.format("%s. Exception Caught by Camel when contacting producer. Exception information: (%s: %s)",
-            addr, exception.getClass().getName(), messageString);
-        String messageDetails = exceptionUtil.createDetailsMessage(errorCode, vpMsg);
+        String address = exchange.getProperty(VPExchangeProperties.VAGVAL, "<UNKNOWN>", String.class);
+        String vpMessage = String.format(
+            "%s. Exception Caught by Camel when contacting producer. Exception information: (%s: %s)",
+            address,
+            exception.getClass().getName(),
+            messageString
+        );
 
+        // If a status code was recorded in prior steps, append it to the message component that will form
+        //   part of the faultDetails element.
+        if (statusCode != null && !statusCode.equals(200)) {
+          vpMessage = vpMessage.concat(
+              String.format(
+                  "\nVP_PRODUCER_EXCEPTION_HTTP_STATUS=%s",
+                  statusCode)
+          );
+        }
+
+        // Assemble a SOAP Fault response.
+        String messageDetails = exceptionUtil.createDetailsMessage(errorCode, vpMessage);
         SoapFaultHelper.setSoapFaultInResponse(exchange, message, messageDetails, VpSemanticErrorCodeEnum.getDefault());
       }
     } catch (Exception e) {
-      log.error("An error occured in HandleProducerExceptionProcessor", e);
+      log.error("An error occurred in HandleProducerExceptionProcessor", e);
       throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.getDefault(), "unknown");
     }
-
   }
 
-  private String left(String s, int len) {
-    if (s == null) {
+  /**
+   * This function will take a text, and truncate it to provided length value if it is too long.
+   *
+   * @param text Text to be truncated, if too long.
+   * @return A potentially truncated string, or the entire string if short enough.
+   */
+  private String truncateToFixedMaxLength(String text) {
+    if (text == null) {
       return null;
     }
 
-    int i = s.length() > len ? len : s.length();
-    return s.substring(0, i);
+    int i = Math.min(text.length(), 200);
+    return text.substring(0, i);
   }
-
-
 }
