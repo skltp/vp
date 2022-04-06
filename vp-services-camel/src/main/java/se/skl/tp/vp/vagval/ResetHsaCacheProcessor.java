@@ -19,6 +19,7 @@ public class ResetHsaCacheProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String result = hsaCacheService.resetCache();
+        exchange.getMessage().getHeaders().clear();
         exchange.getMessage().setBody(result);
     }
 }

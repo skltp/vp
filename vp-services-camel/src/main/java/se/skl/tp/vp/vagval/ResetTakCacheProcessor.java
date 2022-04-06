@@ -21,6 +21,7 @@ public class ResetTakCacheProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         TakCacheLog result = takService.refresh();
         exchange.getMessage().setBody(getResultAsString(result));
+        exchange.getMessage().getHeaders().clear();
         exchange.getMessage().setHeader("Content-Type", "text/html;");
         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
     }

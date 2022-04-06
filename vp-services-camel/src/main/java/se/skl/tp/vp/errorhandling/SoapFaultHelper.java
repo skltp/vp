@@ -1,6 +1,7 @@
 package se.skl.tp.vp.errorhandling;
 
 import java.util.Iterator;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Detail;
 import javax.xml.soap.DetailEntry;
@@ -13,6 +14,7 @@ import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import org.apache.camel.Exchange;
+import org.apache.camel.support.DefaultMessage;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import se.skl.tp.vp.constants.VPExchangeProperties;
@@ -85,6 +87,7 @@ public class SoapFaultHelper {
 
   public static void setSoapFaultInResponse(Exchange exchange, String faultString, String faultDetails, VpSemanticErrorCodeEnum errorCode){
     exchange.getMessage().setBody(createSoapFault(faultString, faultDetails, errorCode));
+    exchange.getMessage().getHeaders().clear();
     exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
     exchange.setProperty(VPExchangeProperties.SESSION_ERROR, Boolean.TRUE);
     exchange.setProperty(VPExchangeProperties.SESSION_ERROR_CODE, errorCode.getVpDigitErrorCode());
