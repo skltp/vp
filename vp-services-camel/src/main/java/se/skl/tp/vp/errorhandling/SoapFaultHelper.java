@@ -1,25 +1,14 @@
 package se.skl.tp.vp.errorhandling;
 
-import java.util.Iterator;
-import java.util.Map;
-import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.DetailEntry;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 import org.apache.camel.Exchange;
-import org.apache.camel.support.DefaultMessage;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
+
+import javax.xml.namespace.QName;
+import javax.xml.soap.*;
 
 public class SoapFaultHelper {
 
@@ -45,7 +34,7 @@ public class SoapFaultHelper {
     return String.format(SOAP_FAULT, codeEnum.getFaultCode(), escape(cause));
   }
 
-  private static final String escape(final String string) {
+  private static String escape(final String string) {
     return StringEscapeUtils.escapeXml(string);
   }
 
@@ -56,7 +45,7 @@ public class SoapFaultHelper {
     }
 
     try {
-      Integer intCode = Integer.valueOf(code);
+      int intCode = Integer.parseInt(code);
       String reason = HttpStatus.valueOf(intCode).getReasonPhrase();
       return code + " " + reason;
     } catch (Exception e) {
