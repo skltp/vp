@@ -30,20 +30,18 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
 
 
   public void process(Exchange exchange) {
+    String originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
 
     if (exchange.getIn().getHeaders().containsKey(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID)) {
       String senderId = exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class);
-      if (!isSenderAllowedToSetOriginalConsumerIdHeader(senderId)) {
-
+      if (!senderIsOriginalConsumer(senderId, originalConsumer) && !isSenderAllowedToSetOriginalConsumerIdHeader(senderId)) {
         if (throwExceptionIfNotAllowed) {
           throw exceptionUtil.createVpSemanticException(VP013);
         }
         log.warn(MSG_SENDER_NOT_ALLOWED_SET_HEADER, senderId, HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyConstants.SENDER_ID_ALLOWED_LIST, allowedSenderIds.toString());
       }
-
     }
 
-    String originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
     exchange.setProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalConsumer);
     
     // This property should always be populated.
@@ -52,6 +50,12 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
 
   public boolean isSenderAllowedToSetOriginalConsumerIdHeader(String senderId) {
     return allowedSenderIds.isEmpty() || (senderId != null && allowedSenderIds.contains(senderId.trim()));
+  }
+
+  // Special case that allows for AgP calls
+  private boolean senderIsOriginalConsumer(String senderId, String originalConsumer) {
+    if (senderId == null || originalConsumer == null) return false;
+    return senderId.equals(originalConsumer);
   }
 
 }
