@@ -26,6 +26,9 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
   @Value("${" + PropertyConstants.THROW_VP013_WHEN_ORIGNALCONSUMER_NOT_ALLOWED + ":#{false}}")
   protected boolean throwExceptionIfNotAllowed;
 
+  @Value("${" + PropertyConstants.VP_INSTANCE_ID + ":#{null}}")
+  protected String vpInstanceId;
+
   private static final String MSG_SENDER_NOT_ALLOWED_SET_HEADER = "Sender '{}' not allowed to set header {}, accepted senderId's in '{}': [{}]";
 
 
@@ -34,7 +37,7 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
 
     if (exchange.getIn().getHeaders().containsKey(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID)) {
       String senderId = exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class);
-      if (!senderIsOriginalConsumer(senderId, originalConsumer) && !isSenderAllowedToSetOriginalConsumerIdHeader(senderId)) {
+      if (!isInternalCall(exchange) && !isSenderAllowedToSetOriginalConsumerIdHeader(senderId)) {
         if (throwExceptionIfNotAllowed) {
           throw exceptionUtil.createVpSemanticException(VP013);
         }
@@ -52,10 +55,10 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
     return allowedSenderIds.isEmpty() || (senderId != null && allowedSenderIds.contains(senderId.trim()));
   }
 
-  // Special case that allows for AgP calls
-  private boolean senderIsOriginalConsumer(String senderId, String originalConsumer) {
-    if (senderId == null || originalConsumer == null) return false;
-    return senderId.equals(originalConsumer);
+  private boolean isInternalCall(Exchange exchange) {
+    if (vpInstanceId == null) return false;
+    String senderVpInstanceId = exchange.getIn().getHeader(HttpHeaders.X_VP_INSTANCE_ID, String.class);
+    return vpInstanceId.equals(senderVpInstanceId);
   }
 
 }
