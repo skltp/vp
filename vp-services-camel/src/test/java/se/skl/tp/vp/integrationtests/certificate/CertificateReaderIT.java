@@ -6,19 +6,18 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.component.netty.NettyConstants;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.TestBeanConfiguration;
-import se.skl.tp.vp.constants.PropertyConstants;
+import se.skl.tp.vp.certificate.CertificateExtractorProcessor;
 import se.skl.tp.vp.constants.VPExchangeProperties;
-import se.skl.tp.vp.httpheader.SenderIpExtractor;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
 @CamelSpringBootTest
@@ -26,17 +25,14 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 @TestPropertySource("classpath:application.properties")
 public class  CertificateReaderIT  extends CamelTestSupport {
 
-  @EndpointInject(uri = "mock:result")
+  @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;
 
-  @Produce(uri = "direct:start")
+  @Produce("direct:start")
   protected ProducerTemplate template;
 
   @Autowired
-  SenderIpExtractor senderIpExtractor;
-
-  @Value("${" + PropertyConstants.VAGVALROUTER_SENDER_IP_ADRESS_HTTP_HEADER + "}")
-  String forwardedHeader;
+  CertificateExtractorProcessor certificateExtractorProcessor;
 
   @BeforeAll
   public static void startLeakDetection() {
@@ -48,25 +44,17 @@ public class  CertificateReaderIT  extends CamelTestSupport {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
+  private final String certificateSubject =
+          "CN=Hermione Granger, O=Apache Software Foundation, OU=Harmony, L=Hogwarts, ST=Hants, C=GB";
+
   @Test
-  public void extractIPFromNettyHeader() throws Exception {
+  public void extractSenderIdFromCertHeader() throws Exception {
     String expectedBody = "test";
 
     resultEndpoint.expectedBodiesReceived(expectedBody);
-    resultEndpoint.expectedPropertyReceived(VPExchangeProperties.SENDER_IP_ADRESS, "127.0.0.1");
+    resultEndpoint.expectedPropertyReceived(VPExchangeProperties.SENDER_ID, "Harmony");
 
     template.sendBody(expectedBody);
-    resultEndpoint.assertIsSatisfied();
-  }
-
-  @Test
-  public void extractIPFromForwardedHeader() throws Exception {
-    String expectedBody = "test";
-
-    resultEndpoint.expectedBodiesReceived(expectedBody);
-    resultEndpoint.expectedPropertyReceived(VPExchangeProperties.SENDER_IP_ADRESS, "127.1.1.1");
-
-    template.sendBodyAndHeader(expectedBody, forwardedHeader, "127.1.1.1");
     resultEndpoint.assertIsSatisfied();
   }
 
@@ -79,8 +67,8 @@ public class  CertificateReaderIT  extends CamelTestSupport {
 
         from("netty-http:http://localhost:12123/vp")
             .process((Exchange exchange) -> {
-              String senderIpAdress = senderIpExtractor.getSenderIpAdress(exchange.getIn());
-              exchange.setProperty(VPExchangeProperties.SENDER_IP_ADRESS, senderIpAdress);
+              exchange.getIn().setHeader(NettyConstants.NETTY_SSL_CLIENT_CERT_SUBJECT_NAME, certificateSubject);
+              certificateExtractorProcessor.process(exchange);
             })
             .to("mock:result");
       }
