@@ -162,8 +162,9 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
 
   @Test
   public void checkSenderNotAllowedToSetXrivtaOriginalConsumer() {
-    Map<String, Object> headers = HeadersUtil.createHttpHeadersWithMembers();
+    Map<String, Object> headers = HeadersUtil.createHttpProxyHeaders();
     headers.put(HttpHeaders.X_VP_SENDER_ID, "SENDER3");
+    headers.put(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "aTestConsumer");
     try {
       template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, headers);
     } catch (CamelExecutionException e) {

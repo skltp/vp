@@ -1,8 +1,6 @@
 package se.skl.tp.vp.integrationtests.errorhandling;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP002;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP003;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP004;
@@ -27,14 +25,14 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.TJANSTEKONTRAKT_GE
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
-import java.nio.charset.Charset;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.xml.soap.Detail;
 import javax.xml.soap.DetailEntry;
 import javax.xml.soap.SOAPBody;
 
+import io.undertow.util.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
@@ -337,7 +335,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   public void shouldGetVP013WhenIllegalSender() throws Exception {
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_VP_SENDER_ID, "SENDER3"); //Not on list sender.id.allowed.list
-    headers.put(HttpHeaders.X_VP_INSTANCE_ID, "dev_env");
+    headers.put(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, readPemCertificateFile("certs/clientPemWithWhiteSpaces.pem"));
     headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, TEST_CONSUMER);
     String result = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
 
@@ -345,25 +343,6 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     assertSoapFault(soapBody, VP013,
         new String[]{"Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid."},
         new String[]{"Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid"} );
-    assertErrorLog(VP013.getVpDigitErrorCode(), msgVP013);
-
-    String VP013error = env.getProperty("VP013");
-    assertRespOutLog("VP013 [" + instanceName + "] " + VP013error);
-    assertRespOutLog("Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid.");
-  }
-
-  @Test
-  public void shouldGetVP013WhenEmptySender() throws Exception {
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(HttpHeaders.X_VP_SENDER_ID, ""); //Not on list sender.id.allowed.list
-    headers.put(HttpHeaders.X_VP_INSTANCE_ID, "dev_env");
-    headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, TEST_CONSUMER);
-    String result = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
-
-    SOAPBody soapBody = SoapUtils.getSoapBody(result);
-    assertSoapFault(soapBody, VP013,
-        new String[]{"Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid."},
-        new String[]{"Sender is not approved to set header x-rivta-original-serviceconsumer-hsaid"});
     assertErrorLog(VP013.getVpDigitErrorCode(), msgVP013);
 
     String VP013error = env.getProperty("VP013");
@@ -436,5 +415,10 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg, "-rivversion=rivtabp20");
     assertStringContains(respOutLogMsg, "-routerBehorighetTrace=" + expectedReceiverId);
   }
-  
+
+  private String readPemCertificateFile(String pemFile) {
+    URL filePath = FullServiceErrorHandlingIT.class.getClassLoader().getResource(pemFile);
+    String pemCertContent = FileUtils.readFile(filePath);
+    return pemCertContent;
+  }
 }
