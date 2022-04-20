@@ -2,8 +2,11 @@ package se.skl.tp.vp.integrationtests.httpheader;
 
 import static org.apache.camel.language.constant.ConstantLanguage.constant;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.undertow.util.FileUtils;
 import se.skl.tp.vp.constants.HttpHeaders;
 
 public class HeadersUtil {
@@ -26,6 +29,17 @@ public class HeadersUtil {
     // This header is used as alias for the incoming address, when processing access to vp (whitelist)
     headers.put("X-Forwarded-For", constant("1.2.3.4"));
     headers.put(HttpHeaders.SOAP_ACTION, "action");
+    return headers;
+  }
+
+  public static Map<String, Object> createHttpProxyHeaders() {
+    Map<String, Object> headers = new HashMap<>();
+    headers.put(HttpHeaders.X_VP_SENDER_ID, TEST_SENDER);
+    // This header is used as alias for the incoming address, when processing access to vp (whitelist)
+    headers.put("X-Forwarded-For", constant("1.2.3.4"));
+    headers.put(HttpHeaders.SOAP_ACTION, "action");
+    URL filePath = HeadersUtil.class.getClassLoader().getResource("certs/clientPemWithWhiteSpaces.pem");
+    headers.put(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, FileUtils.readFile(filePath));
     return headers;
   }
 
