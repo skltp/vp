@@ -52,45 +52,4 @@ public class PathHelper {
     }
     return res;
   }
-
-  public static String subtractDirectoryFromPath(File dir, File path) {
-    return dir.toURI().relativize(path.toURI()).getPath();
-  }
-
-  public static String subtractDirectoryFromPath(String dir, File path) {
-    return subtractDirectoryFromPath(new File(dir), path);
-  }
-
-  /**
-   * Delete a non empty dir and all files within (From internet)
-   */
-  public static void deleteDirectory(Path path) throws IOException {
-    FileVisitor<Path> visitor =
-        new SimpleFileVisitor<>() {
-
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-              throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            if (exc != null) {
-              throw exc;
-            }
-            Files.delete(dir);
-            return FileVisitResult.CONTINUE;
-          }
-        };
-
-    Files.walkFileTree(path, visitor);
-  }
 }
