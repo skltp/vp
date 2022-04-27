@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -135,6 +136,7 @@ public class WsdlConfigurationJson implements WsdlConfiguration {
     try (InputStream is = new FileInputStream(file.toFile())) {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setNamespaceAware(true);
+      dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document document = db.parse(is);
       Node node = document.getDocumentElement();
