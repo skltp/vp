@@ -47,7 +47,7 @@ public class VPEventNotifierSupport extends EventNotifierSupport {
                   + " millis to send to external system : "
                   + sent.getEndpoint().getEndpointKey());
         }
-        exchange.getOut().setHeader(X_SKLTP_PRODUCER_RESPONSETIME, timeTaken);
+        exchange.getMessage().setHeader(X_SKLTP_PRODUCER_RESPONSETIME, timeTaken);
       }
     }
   }

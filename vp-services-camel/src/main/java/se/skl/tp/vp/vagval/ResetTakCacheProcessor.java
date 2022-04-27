@@ -20,9 +20,10 @@ public class ResetTakCacheProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         TakCacheLog result = takService.refresh();
-        exchange.getOut().setBody(getResultAsString(result));
-        exchange.getOut().setHeader("Content-Type", "text/html;");
-        exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
+        exchange.getMessage().setBody(getResultAsString(result));
+        exchange.getMessage().getHeaders().clear();
+        exchange.getMessage().setHeader("Content-Type", "text/html;");
+        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
     }
 
     private String getResultAsString(TakCacheLog result) {

@@ -1,40 +1,45 @@
 package se.skl.tp.vp.utils;
 
+import com.sun.management.HotSpotDiagnosticMXBean;
 import io.netty.buffer.PoolArenaMetric;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocatorMetric;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
+
+import java.lang.management.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.misc.SharedSecrets;
-import sun.misc.VM;
 
 public class MemoryUtil {
 
   private MemoryUtil() {
   }
 
-
+  private static final BufferPoolMXBean directBufferPool = getDirectBufferPool();
+  private static final HotSpotDiagnosticMXBean hotSpotDiagnostic = getHotSpotDiagnostic();
   private static final MemoryMXBean mbean = ManagementFactory.getMemoryMXBean();
 
   public static String getMemoryUsed() {
-    return bytesReadable(SharedSecrets.getJavaNioAccess().getDirectBufferPool().getMemoryUsed());
+    return bytesReadable(directBufferPool.getMemoryUsed());
   }
 
   public static String getTotalCapacity() {
-    return bytesReadable(SharedSecrets.getJavaNioAccess().getDirectBufferPool().getTotalCapacity());
+    return bytesReadable(directBufferPool.getTotalCapacity());
   }
 
   public static String getVMMaxMemory() {
-    return bytesReadable(VM.maxDirectMemory());
+    try {
+      String rawValue = hotSpotDiagnostic.getVMOption("MaxDirectMemorySize").getValue();
+      return bytesReadable(Long.parseLong(rawValue));
+    }
+    catch (Exception e) {
+      return "";
+    }
   }
 
   public static long getCount() {
-    return SharedSecrets.getJavaNioAccess().getDirectBufferPool().getCount();
+    return directBufferPool.getCount();
   }
 
   public static MemoryUsage getNonHeapMemoryUsage() {
@@ -93,5 +98,22 @@ public class MemoryUtil {
     }
     int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
     return String.format("%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
+  }
+
+  private static BufferPoolMXBean getDirectBufferPool() {
+    for (BufferPoolMXBean pool : ManagementFactory.getPlatformMXBeans(BufferPoolMXBean.class)) {
+      if (pool.getName().equals("direct")) {
+        return pool;
+      }
+    }
+    throw new RuntimeException("Could not find direct BufferPoolMXBean");
+  }
+
+  private static HotSpotDiagnosticMXBean getHotSpotDiagnostic() {
+    HotSpotDiagnosticMXBean hsdiag = ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class);
+    if (hsdiag == null) {
+      throw new RuntimeException("Could not find HotSpotDiagnosticMXBean");
+    }
+    return hsdiag;
   }
 }

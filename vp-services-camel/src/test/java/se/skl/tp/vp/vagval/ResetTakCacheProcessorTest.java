@@ -46,8 +46,8 @@ public class ResetTakCacheProcessorTest {
     public void testResetIsOK() throws Exception {
         Exchange ex = createExchange();
         processor.process(ex);
-        assertStringContains(ex.getOut().getBody(String.class), log1);
-        assertStringContains(ex.getOut().getBody(String.class), log2);
+        assertStringContains(ex.getMessage().getBody(String.class), log1);
+        assertStringContains(ex.getMessage().getBody(String.class), log2);
     }
 
     private Exchange createExchange() {
