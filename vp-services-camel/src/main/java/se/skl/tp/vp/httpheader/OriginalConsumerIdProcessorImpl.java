@@ -26,24 +26,25 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
   @Value("${" + PropertyConstants.THROW_VP013_WHEN_ORIGNALCONSUMER_NOT_ALLOWED + ":#{false}}")
   protected boolean throwExceptionIfNotAllowed;
 
+  @Value("${" + PropertyConstants.VP_INSTANCE_ID + ":#{null}}")
+  protected String vpInstanceId;
+
   private static final String MSG_SENDER_NOT_ALLOWED_SET_HEADER = "Sender '{}' not allowed to set header {}, accepted senderId's in '{}': [{}]";
 
 
   public void process(Exchange exchange) {
+    String originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
 
     if (exchange.getIn().getHeaders().containsKey(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID)) {
       String senderId = exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class);
-      if (!isSenderAllowedToSetOriginalConsumerIdHeader(senderId)) {
-
+      if (!isInternalCall(exchange) && !isSenderAllowedToSetOriginalConsumerIdHeader(senderId)) {
         if (throwExceptionIfNotAllowed) {
           throw exceptionUtil.createVpSemanticException(VP013);
         }
         log.warn(MSG_SENDER_NOT_ALLOWED_SET_HEADER, senderId, HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, PropertyConstants.SENDER_ID_ALLOWED_LIST, allowedSenderIds.toString());
       }
-
     }
 
-    String originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
     exchange.setProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, originalConsumer);
     
     // This property should always be populated.
@@ -52,6 +53,12 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
 
   public boolean isSenderAllowedToSetOriginalConsumerIdHeader(String senderId) {
     return allowedSenderIds.isEmpty() || (senderId != null && allowedSenderIds.contains(senderId.trim()));
+  }
+
+  private boolean isInternalCall(Exchange exchange) {
+    if (vpInstanceId == null) return false;
+    String senderVpInstanceId = exchange.getIn().getHeader(HttpHeaders.X_VP_INSTANCE_ID, String.class);
+    return vpInstanceId.equals(senderVpInstanceId);
   }
 
 }

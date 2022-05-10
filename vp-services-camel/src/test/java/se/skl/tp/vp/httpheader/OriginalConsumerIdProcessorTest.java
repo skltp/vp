@@ -36,6 +36,7 @@ public class OriginalConsumerIdProcessorTest {
   private static final String A_TEST_CONSUMER_ID = "aTestConsumerId";
   private static final String APPROVED_SENDER_ID = "SENDER1";
   private static final String NOT_APPROVED_SENDER_ID = "SENDER3";
+  private static final String VP_INSTANCE_ID = "dev_env";
 
   private boolean originalThrowExceptionIfNotAllowed;
   private List<String> originalAllowedSenderIds;
@@ -112,6 +113,18 @@ public class OriginalConsumerIdProcessorTest {
     assertEquals(null, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
     assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
 
+  }
+
+  @Test
+  public void senderNotApprovedButCallFromAgpWithHeaderShouldBeOKTest() {
+    Exchange exchange = createExchange();
+    exchange.setProperty(VPExchangeProperties.SENDER_ID, NOT_APPROVED_SENDER_ID);
+    exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, NOT_APPROVED_SENDER_ID);
+    exchange.getIn().setHeader(HttpHeaders.X_VP_INSTANCE_ID, VP_INSTANCE_ID);
+    originalConsumerIdProcessor.throwExceptionIfNotAllowed = true;
+    originalConsumerIdProcessor.process(exchange);
+    assertEquals(NOT_APPROVED_SENDER_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
+    assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
   }
 
   @Test

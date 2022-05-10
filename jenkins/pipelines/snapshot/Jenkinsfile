@@ -1,0 +1,55 @@
+pipeline {
+  agent any
+
+  environment {
+    JDK_PATH = tool name: 'Java 8_152'
+    JAVA_HOME = "${JDK_PATH}"
+    MAVEN_DOCKER_IMAGE = 'maven:3.6-jdk-8'
+  }
+
+  stages {
+    stage('Preparation') { // for display purposes
+      steps {
+          checkout([$class: 'GitSCM', branches: [[name: CHECKOUT ]],
+              userRemoteConfigs: [[url: 'https://github.com/skltp/vp.git']]])
+      }
+    }
+    stage('Build') {
+      agent {
+        docker {
+          image "${MAVEN_DOCKER_IMAGE}"
+          args "-v ${JDK_PATH}:${JDK_PATH}"
+          reuseNode true
+        }
+      }
+      steps {
+        configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
+          sh 'mvn --global-settings ${MAVEN_SETTINGS} clean install'
+        }
+      }
+    }
+
+    stage('Results'){
+      steps{
+        junit '**/target/surefire-reports/TEST-*.xml'
+        archiveArtifacts '**/target/*.jar'
+      }
+
+    }
+
+    stage('Nexus') {
+      agent {
+        docker {
+          image "${MAVEN_DOCKER_IMAGE}"
+          args "-v ${JDK_PATH}:${JDK_PATH}"
+          reuseNode true
+        }
+      }
+      steps {
+        configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
+          sh 'mvn --global-settings ${MAVEN_SETTINGS} -Pskltp -DskipTests=true deploy'
+        }
+      }
+    }
+  }
+}
