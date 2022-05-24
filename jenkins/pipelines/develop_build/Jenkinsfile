@@ -17,8 +17,8 @@ pipeline {
                 }
             }
             steps {
-                echo 'Starting Build stage...'
-                configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
+                echo 'Since we are running a develop build, we use the byggReleaseConfig for Maven'
+                configFileProvider([configFile(fileId: "byggReleaseConfig", variable: 'MAVEN_SETTINGS')]) {
                     sh 'pwd'
                     echo 'Compiling, testing and building...'
                     sh 'mvn --global-settings ${MAVEN_SETTINGS} -P test-coverage,leak clean install'
@@ -26,9 +26,12 @@ pipeline {
                         pomVersion = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
                     }
                 }
-            }     
+            }
         }
         stage('SonarScanner'){
+            when {
+                branch 'develop'
+            }
             steps {
                 withSonarQubeEnv(credentialsId: "${params.SONAR_TOKENID}", installationName: "${params.SONAR_ENV}") {
                     sh """${SCANNER_HOME}/bin/sonar-scanner \
@@ -46,12 +49,17 @@ pipeline {
 
     post {
         always {
-            echo 'Starting results handling...'
-            junit '**/target/surefire-reports/TEST-*.xml'
-            jacoco()
-            archiveArtifacts '**/target/*.jar'
-            timeout(time: 1, unit: 'MINUTES') {
-                waitForQualityGate abortPipeline: true
+            script {
+                junit '**/target/surefire-reports/TEST-*.xml'
+                jacoco()
+                archiveArtifacts '**/target/*.jar'
+                echo "Branch: ${BRANCH_NAME}. Only handle Sonar results on the develop branch."
+                if ("${BRANCH_NAME}" == 'develop') {
+                    echo 'Starting results handling...'
+                    timeout(time: 1, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
+                }
             }
         }
 
