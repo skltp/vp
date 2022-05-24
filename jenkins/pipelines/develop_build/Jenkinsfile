@@ -50,12 +50,12 @@ pipeline {
     post {
         always {
             script {
+                echo 'Starting results handling...'
                 junit '**/target/surefire-reports/TEST-*.xml'
                 jacoco()
                 archiveArtifacts '**/target/*.jar'
                 echo "Branch: ${BRANCH_NAME}. Only handle Sonar results on the develop branch."
                 if ("${BRANCH_NAME}" == 'develop') {
-                    echo 'Starting results handling...'
                     timeout(time: 1, unit: 'MINUTES') {
                         waitForQualityGate abortPipeline: true
                     }
