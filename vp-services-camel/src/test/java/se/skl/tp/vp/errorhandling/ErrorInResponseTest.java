@@ -8,7 +8,6 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertifica
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogOk;
 import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV20;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.camel.CamelContext;
@@ -18,7 +17,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -40,7 +38,7 @@ import se.skltp.takcache.TakCache;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
   public static final String REMOTE_EXCEPTION_MESSAGE = "Fel fel fel";
@@ -59,10 +57,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   @Autowired
   private CamelContext camelContext;
 
-  @EndpointInject(uri = "mock:result")
+  @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;
 
-  @Produce(uri = "direct:start")
+  @Produce("direct:start")
   protected ProducerTemplate template;
 
   @MockBean
@@ -73,16 +71,12 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
   private static MockProducer mockProducer;
 
-  private static boolean isContextStarted = false;
-
   @BeforeEach
   public void setUp() throws Exception {
-    if(!isContextStarted){
-      mockProducer = new MockProducer(camelContext, MOCK_PRODUCER_ADDRESS);
-      addConsumerRoute(camelContext);
-      camelContext.start();
-      isContextStarted=true;
-    }
+    mockProducer = new MockProducer(camelContext, MOCK_PRODUCER_ADDRESS);
+    addConsumerRoute(camelContext);
+    camelContext.start();
+
     resultEndpoint.reset();
     Mockito.when(takCache.refresh()).thenReturn(createTakCacheLogOk());
     takCacheService.refresh();

@@ -75,7 +75,7 @@ public class LogMessageFormatter {
   }
 
 
-  private static String extraInfoToString(Map extraInfo) {
+  private static String extraInfoToString(Map<String,String> extraInfo) {
 
     if (extraInfo == null) {
       return "";

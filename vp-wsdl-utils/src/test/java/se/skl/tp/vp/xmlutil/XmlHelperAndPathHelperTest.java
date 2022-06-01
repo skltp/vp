@@ -10,6 +10,7 @@ import static se.skl.tp.vp.wsdl.PathHelper.findFoldersInDirectory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.dom4j.DocumentException;
@@ -36,10 +37,12 @@ public class XmlHelperAndPathHelperTest {
 
     List<File> files = findFilesInDirectory(xmlfolder.getPath(), ".*\\.xsd$");
     assumeTrue(files.size() == 3);
+    Collections.sort(files);
     sad = files.get(0);
 
     files = findFilesInDirectory(xmlfolder.getPath(), ".*\\.wsdl$");
     assumeTrue(files.size() == 2);
+    Collections.sort(files);
     happy = files.get(0);
   }
 

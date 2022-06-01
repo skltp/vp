@@ -35,12 +35,12 @@ public class SoapFaultHelperTest {
   public void setSoapClientFaultInResponse() {
     Exchange exchange = createExchange();
     SoapFaultHelper.setSoapFaultInResponse(exchange, "Something wrong client","Fail details" ,VpSemanticErrorCodeEnum.VP001);
-    String body = exchange.getOut().getBody(String.class);
+    String body = exchange.getMessage().getBody(String.class);
     assertTrue( body.contains("http://schemas.xmlsoap.org/soap/envelope/"), body);
     assertTrue( body.contains("Client"), body);
     assertTrue( body.contains("Something wrong"), body);
     assertTrue( body.contains("Fail details"), body);
-    assertTrue((int)exchange.getOut().getHeader(Exchange.HTTP_RESPONSE_CODE)==500);
+    assertTrue((int)exchange.getMessage().getHeader(Exchange.HTTP_RESPONSE_CODE)==500);
     assertTrue((Boolean)exchange.getProperty(VPExchangeProperties.SESSION_ERROR));
     assertTrue(exchange.getProperty(VPExchangeProperties.SESSION_ERROR_CODE).equals(VpSemanticErrorCodeEnum.VP001.toString()));
 

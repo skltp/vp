@@ -2,9 +2,9 @@ pipeline {
   agent any
 
   environment {
-    JDK_PATH = tool name: 'Java 8_152'
+    JDK_PATH = tool name: 'openjdk-11'
     JAVA_HOME = "${JDK_PATH}"
-    MAVEN_DOCKER_IMAGE = 'maven:3.6-jdk-8'
+    MAVEN_DOCKER_IMAGE = 'maven:3.8.4-jdk-11'
   }
 
   stages {
