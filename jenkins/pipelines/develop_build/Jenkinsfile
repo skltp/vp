@@ -30,7 +30,7 @@ pipeline {
         }
         stage('SonarScanner'){
             when {
-                branch 'develop'
+                branch '*/develop'
             }
             steps {
                 withSonarQubeEnv(credentialsId: "${params.SONAR_TOKENID}", installationName: "${params.SONAR_ENV}") {
@@ -55,7 +55,7 @@ pipeline {
                 jacoco()
                 archiveArtifacts '**/target/*.jar'
                 echo "Branch: ${BRANCH_NAME}. Only handle Sonar results on the develop branch."
-                if ("${BRANCH_NAME}" == 'develop') {
+                if ("${BRANCH_NAME}".endsWith("/develop") {
                     timeout(time: 1, unit: 'MINUTES') {
                         waitForQualityGate abortPipeline: true
                     }
