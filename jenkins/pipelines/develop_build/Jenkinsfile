@@ -1,8 +1,18 @@
 pipeline {
     agent any
+        parameters {
+            string(name: 'SONAR_TOKENID', description: 'The SonarQube access token ID.', defaultValue: 'ntjp-sonarqube-token')
+            string(name: 'SONAR_ENV', description: 'The SonarQube environment to use when scanning.', defaultValue: 'inera-sonarqube')
+            string(name: 'SONAR_PROJECTKEY', description: 'The project key for the SQ project we are scanning', defaultValue: 'ntjp-vp')
+            string(name: 'SONAR_JAVA_BINARIES', description: 'What binaries to scan.', defaultValue: '**/target/classes')
+            string(name: 'SONAR_JACOCO_REPORTS', description: 'Where the jacoco coverage report is stored.', defaultValue: './report/target/site/jacoco-aggregate/jacoco.xml')
+            string(name: 'SONAR_TEST_INCLUSIONS', description: 'What tests to include in the scan', defaultValue: '**/src/test/**/*.java ')
+            string(name: 'EMAIL_RECIPIENTS', description: 'The email addresses to send build status to', defaultValue: 'fd8ba3ec.inera.se@emea.teams.ms')
+    }
+
     environment{
         JDK_PATH = tool name: 'openjdk-11'
-        JAVA_HOME = "${JDK_PATH}"
+        JAVA_HOME = "${env.JDK_PATH}"
         MAVEN_IMAGE = 'maven:3.8.4-jdk-11'
         SCANNER_HOME = tool name: 'SonarScanner 4.5'
     }
@@ -11,8 +21,8 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image "${MAVEN_IMAGE}"
-                    args "-v ${JDK_PATH}:${JDK_PATH}"
+                    image "${env.MAVEN_IMAGE}"
+                    args "-v ${env.JDK_PATH}:${env.JDK_PATH}"
                     reuseNode true
                 }
             }
@@ -30,11 +40,11 @@ pipeline {
         }
         stage('SonarScanner'){
             when {
-                branch '*/develop'
+                branch 'develop'
             }
             steps {
                 withSonarQubeEnv(credentialsId: "${params.SONAR_TOKENID}", installationName: "${params.SONAR_ENV}") {
-                    sh """${SCANNER_HOME}/bin/sonar-scanner \
+                    sh """${env.SCANNER_HOME}/bin/sonar-scanner \
                             -Dsonar.projectKey=${params.SONAR_PROJECTKEY} \
                             -Dsonar.projectVersion=${pomVersion} \
                             -Dsonar.java.binaries=${params.SONAR_JAVA_BINARIES} \
@@ -55,7 +65,7 @@ pipeline {
                 jacoco()
                 archiveArtifacts '**/target/*.jar'
                 echo "Branch: ${BRANCH_NAME}. Only handle Sonar results on the develop branch."
-                if ("${BRANCH_NAME}".endsWith('/develop')) {
+                if ("${BRANCH_NAME}" == 'develop') {
                     timeout(time: 1, unit: 'MINUTES') {
                         waitForQualityGate abortPipeline: true
                     }
