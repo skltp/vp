@@ -34,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.TestBeanConfiguration;
+import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
@@ -69,6 +70,9 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
   protected ProducerTemplate template;
 
   @Autowired private CamelContext camelContext;
+
+  @Autowired
+  ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties;
 
   private static boolean isContextStarted = false;
 
@@ -162,7 +166,8 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
 
   @Test
   public void checkSenderNotAllowedToSetXrivtaOriginalConsumer() {
-    Map<String, Object> headers = HeadersUtil.createHttpProxyHeaders();
+    String authCertHeadername = proxyHttpForwardedHeaderProperties.getAuth_cert();
+    Map<String, Object> headers = HeadersUtil.createHttpProxyHeaders(authCertHeadername);
     headers.put(HttpHeaders.X_VP_SENDER_ID, "SENDER3");
     headers.put(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "aTestConsumer");
     try {

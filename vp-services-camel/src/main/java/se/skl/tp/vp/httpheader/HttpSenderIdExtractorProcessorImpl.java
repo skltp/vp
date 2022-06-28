@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.certificate.HeaderCertificateHelper;
@@ -42,6 +43,9 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
         .equals(env.getProperty(PropertyConstants.VP_USE_ROUTING_HISTORY));
     this.exceptionUtil = exceptionUtil;
   }
+
+  @Value("${http.forwarded.header.auth_cert:X-VP-Auth-Cert}")
+  String authCertHeaderName;
 
   @Override
   public void process(Exchange exchange) throws Exception {
@@ -90,7 +94,8 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
   }
 
   private String getSenderIdFromCertificate(Message message) {
-    Object certificate = message.getHeader(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
+    Object certificate = message.getHeader(authCertHeaderName);
+
     return headerCertificateHelper.getSenderIDFromHeaderCertificate(certificate);
   }
 

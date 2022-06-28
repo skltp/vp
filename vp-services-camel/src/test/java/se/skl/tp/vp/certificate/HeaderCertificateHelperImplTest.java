@@ -10,6 +10,7 @@ import java.security.cert.X509Certificate;
 import javax.security.auth.x500.X500Principal;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Value;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
 public class HeaderCertificateHelperImplTest {
@@ -20,6 +21,9 @@ public class HeaderCertificateHelperImplTest {
   final String pattern = "OU=([^,]+)";
   final String vpInstance = "NTjP Develop";
   HeaderCertificateHelperImpl headerCertificateHelper = new HeaderCertificateHelperImpl(pattern, vpInstance);
+
+  @Value("${http.forwarded.header.auth_cert}")
+  private String authCertName;
 
   @Test
   public void getSenderIDFromHeaderCertificate() {
@@ -48,7 +52,8 @@ public class HeaderCertificateHelperImplTest {
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
       assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
-      assertEquals("Exception, unkown certificate type found in httpheader x-vp-auth-cert", e.getMessageDetails());
+      String expectedMessage = "Exception, unkown certificate type found in httpheader " + authCertName;
+      assertEquals(expectedMessage, e.getMessageDetails());
     }
   }
 
@@ -60,7 +65,8 @@ public class HeaderCertificateHelperImplTest {
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
       assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
-      assertEquals("Exception occured parsing certificate in httpheader x-vp-auth-cert", e.getMessageDetails());
+      String expectedMessage = "Exception occured parsing certificate in httpheader " + authCertName;
+      assertEquals(expectedMessage, e.getMessageDetails());
     }
   }
 
@@ -71,7 +77,8 @@ public class HeaderCertificateHelperImplTest {
       fail("Exception was not thrown when certificate OU missing");
     } catch (final VpSemanticException e) {
       assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
-      assertEquals("No certificate found in httpheader x-vp-auth-cert", e.getMessageDetails());
+      String expectedMessage = "No certificate found in httpheader " + authCertName;
+      assertEquals(expectedMessage, e.getMessageDetails());
     }
   }
 

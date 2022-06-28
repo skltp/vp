@@ -26,6 +26,9 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
     this.vpInstance = vpInstance;
   }
 
+  @Value("${http.forwarded.header.auth_cert:X-VP-Auth-Cert}")
+  String authCertHeaderName;
+
   public String getSenderIDFromHeaderCertificate(Object certificate) {
     String senderId = null;
     boolean isUnknownCertificateType = false;
@@ -33,7 +36,7 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
     evaluateCertificateNotNull(certificate);
 
     try {
-      if (isX509Certificate(certificate)) {
+      if (isX509Certificate(certificate, authCertHeaderName)) {
         senderId = extractFromX509Certificate(certificate);
       } else if (PemConverter.isPEMCertificate(certificate)) {
         senderId = extractFromPemFormatCertificate(certificate);
@@ -41,9 +44,9 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
         isUnknownCertificateType = true;
       }
     } catch (Exception e) {
-      log.error("Error occured parsing certificate in httpheader: {}", HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, e);
+      log.error("Error occured parsing certificate in httpheader: {}", authCertHeaderName, e);
       throw createVP002Exception("Exception occured parsing certificate in httpheader "
-          + HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
+          + authCertHeaderName);
     }
 
     evaluateResult(senderId, isUnknownCertificateType);
@@ -53,14 +56,14 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
   private void evaluateCertificateNotNull(Object certificate) {
     if (certificate == null) {
       throw createVP002Exception("No certificate found in httpheader "
-          + HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
+          + authCertHeaderName);
     }
   }
 
   private void evaluateResult(String senderId, boolean isUnknownCertificateType) {
     if (isUnknownCertificateType) {
       throw createVP002Exception("Exception, unkown certificate type found in httpheader "
-          + HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
+          + authCertHeaderName);
 
     } else if (senderId == null) {
       throw createVP002Exception("No senderId found in Certificate");
@@ -77,9 +80,9 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
     return extractSenderIdFromCertificate(x509Certificate);
   }
 
-  private static boolean isX509Certificate(Object certificate) {
+  private static boolean isX509Certificate(Object certificate, String headerName) {
     if (certificate instanceof X509Certificate) {
-      log.debug("Found X509Certificate in httpheader: {}", HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
+      log.debug("Found X509Certificate in httpheader: {}", headerName);
       return true;
     }
     return false;
