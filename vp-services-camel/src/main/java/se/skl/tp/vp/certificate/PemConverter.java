@@ -65,7 +65,7 @@ public class PemConverter {
 
   public static boolean isPEMCertificate(Object certificate) {
     if (certificate instanceof String && containsCorrectPemHeaders((String) certificate)) {
-      log.debug("Found possible PEM-encoded certificate in httpheader {}", HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY);
+      log.debug("Found possible PEM-encoded certificate in httpheader {{http.forwarded.header.auth_cert}}");
       return true;
     }
     return false;

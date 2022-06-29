@@ -43,6 +43,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.errorhandling.SoapFaultHelper;
@@ -71,6 +72,9 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
   @Autowired
   private Environment env;
+
+  @Autowired
+  ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties;
 
   public static final String HTTPS_PRODUCER_URL = "https://localhost:19001/vardgivare-b/tjanst2";
 
@@ -335,7 +339,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   public void shouldGetVP013WhenIllegalSender() throws Exception {
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_VP_SENDER_ID, "SENDER3"); //Not on list sender.id.allowed.list
-    headers.put(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, readPemCertificateFile("certs/clientPemWithWhiteSpaces.pem"));
+    headers.put(proxyHttpForwardedHeaderProperties.getAuth_cert(), readPemCertificateFile("certs/clientPemWithWhiteSpaces.pem"));
     headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, TEST_CONSUMER);
     String result = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
 

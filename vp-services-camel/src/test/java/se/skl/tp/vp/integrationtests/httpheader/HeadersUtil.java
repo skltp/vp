@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.undertow.util.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 
 public class HeadersUtil {
@@ -32,14 +34,14 @@ public class HeadersUtil {
     return headers;
   }
 
-  public static Map<String, Object> createHttpProxyHeaders() {
+  public static Map<String, Object> createHttpProxyHeaders(String certAuthHeaderName) {
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_VP_SENDER_ID, TEST_SENDER);
     // This header is used as alias for the incoming address, when processing access to vp (whitelist)
     headers.put("X-Forwarded-For", constant("1.2.3.4"));
     headers.put(HttpHeaders.SOAP_ACTION, "action");
     URL filePath = HeadersUtil.class.getClassLoader().getResource("certs/clientPemWithWhiteSpaces.pem");
-    headers.put(HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY, FileUtils.readFile(filePath));
+    headers.put(certAuthHeaderName, FileUtils.readFile(filePath));
     return headers;
   }
 

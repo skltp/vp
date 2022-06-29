@@ -1,6 +1,5 @@
 package se.skl.tp.vp.logging;
 
-import static se.skl.tp.vp.constants.HttpHeaders.CERTIFICATE_FROM_REVERSE_PROXY;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import java.util.Arrays;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
+import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 
@@ -35,7 +35,8 @@ public class LogExtraInfoBuilder {
   public static final String VP_X_FORWARDED_PROTO = VPExchangeProperties.VP_X_FORWARDED_PROTO;
   public static final String VP_X_FORWARDED_PORT = VPExchangeProperties.VP_X_FORWARDED_PORT;
 
-  protected static final List<String> HEADERS_TO_FILTER = Arrays.asList(CERTIFICATE_FROM_REVERSE_PROXY, "x-fk-auth-cert");
+  private static final ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties = new ProxyHttpForwardedHeaderProperties();
+  protected static final List<String> HEADERS_TO_FILTER = Arrays.asList(proxyHttpForwardedHeaderProperties.getAuth_cert(), "x-fk-auth-cert");
   protected static final String FILTERED_TEXT = "<filtered>";
 
 

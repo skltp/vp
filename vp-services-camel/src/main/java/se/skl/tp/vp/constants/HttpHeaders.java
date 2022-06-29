@@ -63,12 +63,6 @@ public class HttpHeaders {
 	 * @since VP-2.2.4
 	 */
 	public static final String X_VP_INSTANCE_ID = "x-vp-instance-id";
-	/**
-	 * Incoming HTTP Header x-vp-auth-cert, carrying a X509 certificate, used when implementing a reverse proxy.
-	 *
-	 * @since VP-1.3
-	 */
-	public static final String CERTIFICATE_FROM_REVERSE_PROXY 	= "x-vp-auth-cert";
 
 	public static final String HEADER_USER_AGENT = "User-Agent";
 

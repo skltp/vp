@@ -25,4 +25,5 @@ public class ProxyHttpForwardedHeaderProperties {
 
   String proto;
 
+  String auth_cert;
 }
