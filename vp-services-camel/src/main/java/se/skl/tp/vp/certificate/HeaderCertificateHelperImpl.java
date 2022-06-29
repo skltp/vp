@@ -26,7 +26,7 @@ public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
     this.vpInstance = vpInstance;
   }
 
-  @Value("${http.forwarded.header.auth_cert:X-VP-Auth-Cert}")
+  @Value("${http.forwarded.header.auth_cert}")
   String authCertHeaderName;
 
   public String getSenderIDFromHeaderCertificate(Object certificate) {

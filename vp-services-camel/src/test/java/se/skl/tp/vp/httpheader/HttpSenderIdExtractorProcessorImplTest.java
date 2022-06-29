@@ -48,7 +48,7 @@ public class HttpSenderIdExtractorProcessorImplTest {
   public static final String NOTOK_ROUTING_HISTORY = "dev_env#some_server";
   public static final String OK_ROUTING_HISTORY = "some_server#some_other_server";
 
-  @Value("${http.forwarded.header.auth_cert:X-VP-Auth-Cert}")
+  @Value("${http.forwarded.header.auth_cert}")
   String authCertHeaderName;
 
   @Autowired

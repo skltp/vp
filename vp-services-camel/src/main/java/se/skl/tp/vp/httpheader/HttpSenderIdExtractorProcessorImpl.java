@@ -44,7 +44,7 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
     this.exceptionUtil = exceptionUtil;
   }
 
-  @Value("${http.forwarded.header.auth_cert:X-VP-Auth-Cert}")
+  @Value("${http.forwarded.header.auth_cert}")
   String authCertHeaderName;
 
   @Override
