@@ -33,8 +33,10 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
+import se.skltp.takcache.BehorigheterCache;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
+import se.skltp.takcache.VagvalCache;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
@@ -65,6 +67,12 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
   @MockBean
   TakCache takCache;
+
+  @MockBean
+  VagvalCache vagvalCache;
+
+  @MockBean
+  BehorigheterCache behorigheterCache;
 
   @Autowired
   TakCacheService takCacheService;
@@ -199,10 +207,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   }
 
   private void setTakCacheMockResult(List<RoutingInfo> list) {
-    Mockito.when(takCache.getRoutingInfo("urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest"))
+    Mockito.when(vagvalCache.getRoutingInfo("urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest"))
         .thenReturn(list);
     Mockito
-        .when(takCache.isAuthorized("UnitTest", "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest"))
+        .when(behorigheterCache.isAuthorized("UnitTest", "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest"))
         .thenReturn(true);
   }
 

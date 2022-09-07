@@ -17,13 +17,14 @@
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>2.5.12</spring.boot-version>
+    <spring.boot-version>2.6.6</spring.boot-version>
     <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
     <camel.version>3.7.4</camel.version>
     <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
     <netty.version>4.1.63.Final</netty.version>
 
-    <takdatahandler.version>1.0.1</takdatahandler.version>
+<!--    <takdatahandler.version>1.0.1</takdatahandler.version>-->
+    <takdatahandler.version>2.1.0-RC1</takdatahandler.version>
 
     <maven.javadoc.skip>true</maven.javadoc.skip>
 
@@ -33,22 +34,6 @@
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
     <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
-    <sonar.plugin.version>3.5.0.1254</sonar.plugin.version>
-
-    <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
-    <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-    <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-    <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
-
-    <sonar.language>java</sonar.language>
-    <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
-    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/report/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-    <sonar.coverage.exclusions>
-      **/se/skl/tp/vp/config/*,
-      **/se/skl/tp/vp/constants/*
-    </sonar.coverage.exclusions>
-
   </properties>
 
   <distributionManagement>
@@ -329,12 +314,11 @@
       <id>test-coverage</id>
       <build>
         <plugins>
-
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-Dfile.encoding=UTF-8 @{surefireArgLine}</argLine>
+              <argLine>-Dfile.encoding=UTF-8</argLine>
             </configuration>
           </plugin>
 
@@ -356,7 +340,7 @@
               </execution>
             </executions>
             <configuration>
-              <argLine>-Dfile.encoding=UTF-8 @{failsafeArgLine}</argLine>
+              <argLine>-Dfile.encoding=UTF-8</argLine>
             </configuration>
           </plugin>
 

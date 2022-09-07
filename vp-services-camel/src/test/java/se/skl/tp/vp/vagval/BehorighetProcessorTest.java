@@ -38,7 +38,9 @@ import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.service.TakCacheService;
+import se.skltp.takcache.BehorigheterCache;
 import se.skltp.takcache.TakCache;
+import se.skltp.takcache.VagvalCache;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
@@ -55,6 +57,8 @@ public class BehorighetProcessorTest  {
 
     @Autowired
     TakCacheService takCacheService;
+    @MockBean
+    BehorigheterCache behorigheterCache;
 
     @BeforeEach
     public void beforeTest()  {
@@ -70,7 +74,7 @@ public class BehorighetProcessorTest  {
     @Test
     public void testAuthorizonIsOk() throws Exception {
 
-        Mockito.when(takCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
 
         Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, RECEIVER_1);
 
@@ -80,8 +84,8 @@ public class BehorighetProcessorTest  {
     @Test
     public void testAuthorizonByClimbingHsaTree() throws Exception {
 
-        Mockito.when(takCache.isAuthorized(anyString(), anyString(), eq(AUTHORIZED_RECEIVER_IN_HSA_TREE) )).thenReturn(true);
-        Mockito.when(takCache.isAuthorized(anyString(), anyString(), AdditionalMatchers.not(eq(AUTHORIZED_RECEIVER_IN_HSA_TREE)) )).thenReturn(false);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), eq(AUTHORIZED_RECEIVER_IN_HSA_TREE) )).thenReturn(true);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), AdditionalMatchers.not(eq(AUTHORIZED_RECEIVER_IN_HSA_TREE)) )).thenReturn(false);
 
         Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE);
         assertFalse(isVpSemanticExceptionThrownWhenProcessed(ex), 
@@ -92,8 +96,8 @@ public class BehorighetProcessorTest  {
     @Test
     public void testAuthorizonByDefaultRouting() throws Exception {
 
-        Mockito.when(takCache.isAuthorized(anyString(), anyString(), eq(RECEIVER_2) )).thenReturn(true);
-        Mockito.when(takCache.isAuthorized(anyString(), anyString(),  AdditionalMatchers.not(eq(RECEIVER_2)) )).thenReturn(false);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), eq(RECEIVER_2) )).thenReturn(true);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(),  AdditionalMatchers.not(eq(RECEIVER_2)) )).thenReturn(false);
 
         Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, RECEIVER_1_DEFAULT_RECEIVER_2);
 
@@ -113,7 +117,7 @@ public class BehorighetProcessorTest  {
     @Test
     public void testNoSenderIdShouldThrowVP002Exception() throws Exception {
 
-        Mockito.when(takCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
 
         try {
             Exchange ex = createExchangeWithProperties(null, NAMNRYMD_1, RECEIVER_1);
@@ -131,7 +135,7 @@ public class BehorighetProcessorTest  {
     @Test
     public void testNoLogicalAddressShouldThrowVP003Exception() throws Exception {
 
-        Mockito.when(takCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
 
         try {
             Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, null);
@@ -149,7 +153,7 @@ public class BehorighetProcessorTest  {
     @Test
     public void testNotAuthorizedShouldThrowVP007Exception() throws Exception {
 
-        Mockito.when(takCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(false);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(false);
 
         try {
             Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, RECEIVER_1);
@@ -170,7 +174,7 @@ public class BehorighetProcessorTest  {
         Mockito.when(takCache.refresh()).thenReturn(createTakCacheLogFailed());
         takCacheService.refresh();
 
-        Mockito.when(takCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
 
         try {
             Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_1, RECEIVER_1);

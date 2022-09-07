@@ -36,8 +36,7 @@ import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.service.TakCacheService;
-import se.skltp.takcache.RoutingInfo;
-import se.skltp.takcache.TakCache;
+import se.skltp.takcache.*;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
@@ -45,13 +44,12 @@ public class VagvalProcessorTest {
 
   @Autowired
   VagvalProcessor vagvalProcessor;
-
   @Autowired
   HsaCache hsaCache;
-
   @Autowired
   TakCacheService takCacheService;
-
+  @MockBean
+  VagvalCache vagvalCache;
   @MockBean
   TakCache takCache;
 
@@ -66,11 +64,13 @@ public class VagvalProcessorTest {
   }
 
   @Test
-  public void testVagvalFound() throws Exception {
-
+  public void testVagvalFound() throws Exception
+  {
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(ADDRESS_1, RIV20));
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+//    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
     vagvalProcessor.process(ex);
@@ -85,7 +85,7 @@ public class VagvalProcessorTest {
 
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo("https://tjp.nordicmedtest.se/skaulo/vp/clinicalprocess/activityprescription/actoutcome/GetMedicationHistory/2/rivtabp21", RIV20));
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
     vagvalProcessor.process(ex);
@@ -100,7 +100,7 @@ public class VagvalProcessorTest {
 
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo("http://tjp.nordicmedtest.se/skaulo/vp/clinicalprocess/activityprescription/actoutcome/GetMedicationHistory/2/rivtabp21", RIV20));
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
     vagvalProcessor.process(ex);
@@ -113,7 +113,7 @@ public class VagvalProcessorTest {
 
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(ADDRESS_1, RIV20));
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     try {
       Exchange ex = createExchangeWithProperties(NAMNRYMD_1, null);
@@ -129,7 +129,7 @@ public class VagvalProcessorTest {
   @Test
   public void testNoVagvalFoundShouldThrowVP004Exception() throws Exception {
 
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(Collections.emptyList());
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(Collections.emptyList());
 
     try {
       Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
@@ -150,7 +150,7 @@ public class VagvalProcessorTest {
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(ADDRESS_1, RIV20));
     list.add(createRoutingInfo(ADDRESS_1, RIV21));
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     try {
       Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
@@ -173,7 +173,7 @@ public class VagvalProcessorTest {
 
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(ADDRESS_1, RIV20));
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     try {
       Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
@@ -190,7 +190,7 @@ public class VagvalProcessorTest {
 
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo("", RIV20));
-    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     try {
       Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);

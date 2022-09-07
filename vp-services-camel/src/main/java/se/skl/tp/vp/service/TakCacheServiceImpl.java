@@ -10,29 +10,28 @@ import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vagval.VagvalHandler;
 import se.skl.tp.vagval.VagvalHandlerImpl;
 import se.skl.tp.vp.config.DefaultRoutingProperties;
-import se.skltp.takcache.RoutingInfo;
-import se.skltp.takcache.TakCache;
-import se.skltp.takcache.TakCacheLog;
+import se.skltp.takcache.*;
 import se.skltp.takcache.TakCacheLog.RefreshStatus;
 
 @Service
 public class TakCacheServiceImpl implements TakCacheService {
-
   TakCache takCache;
-
   BehorighetHandler behorighetHandler;
-
   VagvalHandler vagvalHandler;
-
   TakCacheLog takCacheLog = null;
-
   Date lastResetDate;
 
   @Autowired
-  public TakCacheServiceImpl(HsaCache hsaCache, TakCache takCache, DefaultRoutingProperties defaultRoutingProperties) {
+  public TakCacheServiceImpl(HsaCache hsaCache, TakCache takCache, BehorigheterCache behorigheterCache, VagvalCache vagvalCache, DefaultRoutingProperties defaultRoutingProperties) {
     this.takCache = takCache;
-    behorighetHandler = new BehorighetHandlerImpl(hsaCache, takCache, defaultRoutingProperties);
-    vagvalHandler = new VagvalHandlerImpl(hsaCache, takCache, defaultRoutingProperties);
+
+    // The below if-then-else clauses are there to select the correct cache depending on if we're executing unit or integration tests, or are in "production".
+    BehorigheterCache behorigheterCacheToSet = (takCache.getBehorigeterCache() != null ? takCache.getBehorigeterCache() : behorigheterCache);
+    VagvalCache vagvalCacheToSet = (takCache.getVagvalCache() != null ? takCache.getVagvalCache() : vagvalCache);
+
+    behorighetHandler = new BehorighetHandlerImpl(hsaCache, behorigheterCacheToSet, defaultRoutingProperties);
+    vagvalHandler = new VagvalHandlerImpl(hsaCache, vagvalCacheToSet, defaultRoutingProperties);
+    takCache.refresh();
   }
 
   @Override
