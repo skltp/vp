@@ -34,12 +34,6 @@
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
     <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
-    <sonar.plugin.version>3.5.0.1254</sonar.plugin.version>
-
-    <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
-    <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-    <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-    <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
   </properties>
 
   <distributionManagement>
