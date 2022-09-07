@@ -36,7 +36,7 @@ public class RouteProcessorByClassHelper<T> {
 
   private Optional<Map<T, Integer>> createResult(T processor, int orderOfApperance) {
     Map<T, Integer> result = new HashMap<>();
-    result.put(processor, new Integer(orderOfApperance));
+    result.put(processor, orderOfApperance);
     return Optional.ofNullable(result);
   }
 
