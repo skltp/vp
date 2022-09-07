@@ -21,11 +21,22 @@ public class TakCacheServiceImpl implements TakCacheService {
   TakCacheLog takCacheLog = null;
   Date lastResetDate;
 
+  /**
+   * Constructor.
+   * This constructor has been extended with two new parameters, <code>BehorigheterCache</code> and <code>VagvalCache</code>.
+   * If <code>takCache</code> has a <code>BehorigheterCache</code> and <code>VagvalCache</code> set already, those are
+   * used to create the corresponding <code>Handlers</code>. Otherwise, the incoming caches are used instead.
+   * @param hsaCache
+   * @param takCache
+   * @param behorigheterCache
+   * @param vagvalCache
+   * @param defaultRoutingProperties
+   */
   @Autowired
   public TakCacheServiceImpl(HsaCache hsaCache, TakCache takCache, BehorigheterCache behorigheterCache, VagvalCache vagvalCache, DefaultRoutingProperties defaultRoutingProperties) {
     this.takCache = takCache;
 
-    // The below if-then-else clauses are there to select the correct cache depending on if we're executing unit or integration tests, or are in "production".
+    // The below if-then-else clauses are used to select a suitable cache depending on if we're executing unit or integration tests, or are in "production".
     BehorigheterCache behorigheterCacheToSet = (takCache.getBehorigeterCache() != null ? takCache.getBehorigeterCache() : behorigheterCache);
     VagvalCache vagvalCacheToSet = (takCache.getVagvalCache() != null ? takCache.getVagvalCache() : vagvalCache);
 

@@ -59,21 +59,12 @@ public class ProducerTimeoutTest extends CamelTestSupport {
   protected ProducerTemplate template;
 
   @Autowired SenderIpExtractor senderIpExtractor;
-
   @Autowired CamelContext camelContext;
-
   @MockBean TakCache takCache;
-
-  @MockBean
-  VagvalCache vagvalCache;
-
-  @MockBean
-  BehorigheterCache behorigheterCache;
-
+  @MockBean VagvalCache vagvalCache;
+  @MockBean BehorigheterCache behorigheterCache;
   @Autowired TimeoutConfiguration timeoutConfiguration;
-
   @Autowired TakCacheService takCacheService;
-
   @Value("${" + PropertyConstants.VP_INSTANCE_NAME + "}")
   private String vpInstance;
 

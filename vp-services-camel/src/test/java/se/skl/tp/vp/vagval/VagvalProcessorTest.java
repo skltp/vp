@@ -68,8 +68,6 @@ public class VagvalProcessorTest {
   {
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(ADDRESS_1, RIV20));
-//    Mockito.when(takCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
-
     Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, RECEIVER_1)).thenReturn(list);
 
     Exchange ex = createExchangeWithProperties(NAMNRYMD_1, RECEIVER_1);
