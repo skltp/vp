@@ -42,7 +42,6 @@ public class TakCacheServiceImpl implements TakCacheService {
 
     behorighetHandler = new BehorighetHandlerImpl(hsaCache, behorigheterCacheToSet, defaultRoutingProperties);
     vagvalHandler = new VagvalHandlerImpl(hsaCache, vagvalCacheToSet, defaultRoutingProperties);
-    takCache.refresh();
   }
 
   @Override
