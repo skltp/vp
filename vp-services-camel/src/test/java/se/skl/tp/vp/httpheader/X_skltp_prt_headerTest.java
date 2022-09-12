@@ -28,8 +28,10 @@ import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.service.TakCacheService;
+import se.skltp.takcache.BehorigheterCache;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
+import se.skltp.takcache.VagvalCache;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
@@ -39,6 +41,12 @@ public class X_skltp_prt_headerTest {
 
     @MockBean
     TakCache takCache;
+
+    @MockBean
+    VagvalCache vagvalCache;
+
+    @MockBean
+    BehorigheterCache behorigheterCache;
 
     @Produce(uri = "direct:start")
     protected ProducerTemplate template;
@@ -65,8 +73,8 @@ public class X_skltp_prt_headerTest {
     public void headerTest() {
         List<RoutingInfo> list = new ArrayList<>();
         list.add(createRoutingInfo("http://localhost:11111/vp",RIV20));
-        Mockito.when(takCache.getRoutingInfo("urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest")).thenReturn(list);
-        Mockito.when(takCache.isAuthorized("UnitTest", "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest")).thenReturn(true);
+        Mockito.when(vagvalCache.getRoutingInfo("urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest")).thenReturn(list);
+        Mockito.when(behorigheterCache.isAuthorized("UnitTest", "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest")).thenReturn(true);
 
         template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
 

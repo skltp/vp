@@ -41,8 +41,10 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
+import se.skltp.takcache.BehorigheterCache;
 import se.skltp.takcache.RoutingInfo;
 import se.skltp.takcache.TakCache;
+import se.skltp.takcache.VagvalCache;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = TestBeanConfiguration.class)
@@ -57,15 +59,12 @@ public class ProducerTimeoutTest extends CamelTestSupport {
   protected ProducerTemplate template;
 
   @Autowired SenderIpExtractor senderIpExtractor;
-
   @Autowired CamelContext camelContext;
-
   @MockBean TakCache takCache;
-
+  @MockBean VagvalCache vagvalCache;
+  @MockBean BehorigheterCache behorigheterCache;
   @Autowired TimeoutConfiguration timeoutConfiguration;
-
   @Autowired TakCacheService takCacheService;
-
   @Value("${" + PropertyConstants.VP_INSTANCE_NAME + "}")
   private String vpInstance;
 
@@ -110,9 +109,9 @@ public class ProducerTimeoutTest extends CamelTestSupport {
     timeoutConfiguration.setMapOnTjansteKontrakt(getConfigMap(onlyDefaultTimeoutInConfig));
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo("http://localhost:12123/vp", RIV20));
-    Mockito.when(takCache.getRoutingInfo("urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1",
+    Mockito.when(vagvalCache.getRoutingInfo("urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1",
             "UnitTest")).thenReturn(list);
-    Mockito.when(takCache.isAuthorized("UnitTest","urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1",
+    Mockito.when(behorigheterCache.isAuthorized("UnitTest","urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1",
                 "UnitTest")).thenReturn(true);
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
 

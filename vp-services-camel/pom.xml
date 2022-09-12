@@ -30,6 +30,7 @@
           <artifactId>spring-boot-starter-logging</artifactId>
         </exclusion>
       </exclusions>
+
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -221,5 +222,4 @@
 
     </plugins>
   </build>
-
 </project>
