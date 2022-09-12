@@ -1,55 +1,65 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    JDK_PATH = tool name: 'openjdk-11'
-    JAVA_HOME = "${JDK_PATH}"
-    MAVEN_DOCKER_IMAGE = 'maven:3.8.4-jdk-11'
-  }
-
-  stages {
-    stage('Preparation') { // for display purposes
-      steps {
-          checkout([$class: 'GitSCM', branches: [[name: CHECKOUT ]],
-              userRemoteConfigs: [[url: 'https://github.com/skltp/vp.git']]])
-      }
-    }
-    stage('Build') {
-      agent {
-        docker {
-          image "${MAVEN_DOCKER_IMAGE}"
-          args "-v ${JDK_PATH}:${JDK_PATH}"
-          reuseNode true
-        }
-      }
-      steps {
-        configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
-          sh 'mvn --global-settings ${MAVEN_SETTINGS} clean install'
-        }
-      }
+    environment{
+        JDK_PATH = tool name: 'openjdk-11'
+        JAVA_HOME = "${env.JDK_PATH}"
+        MAVEN_IMAGE = 'maven:3.8.4-jdk-11'
     }
 
-    stage('Results'){
-      steps{
-        junit '**/target/surefire-reports/TEST-*.xml'
-        archiveArtifacts '**/target/*.jar'
-      }
+    stages {
+        stage('Build') {
+            agent {
+                docker {
+                    image "${env.MAVEN_IMAGE}"
+                    args "-v ${env.JDK_PATH}:${env.JDK_PATH}"
+                    reuseNode true
+                }
+            }
+            steps {
+                echo 'Since we are running a develop build, we use the byggReleaseConfig for Maven'
+                configFileProvider([configFile(fileId: "byggReleaseConfig", variable: 'MAVEN_SETTINGS')]) {
+                    sh 'pwd'
+                    echo 'Compiling and building...'
+                    sh 'mvn --no-transfer-progress --global-settings ${MAVEN_SETTINGS} -P clean install'
+                    script {
+                        pomVersion = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+                    }
+                }
+            }
+        }
 
+        stage('Results') {
+          steps {
+            script {
+                echo 'Starting results handling...'
+                junit '**/target/surefire-reports/TEST-*.xml'
+                archiveArtifacts '**/target/*.jar'
+            }
+          }
+        }
+
+        stage('Nexus') {
+          agent {
+            docker {
+              image "${MAVEN_IMAGE}"
+              args "-v ${JDK_PATH}:${JDK_PATH}"
+              reuseNode true
+            }
+          }
+          steps {
+            configFileProvider([configFile(fileId: "byggReleaseConfig", variable: 'MAVEN_SETTINGS')]) {
+              echo 'Deploying snapshot to Nexus...'
+              sh 'mvn --no-transfer-progress --global-settings ${MAVEN_SETTINGS} -Pskltp -DskipTests=true deploy'
+            }
+          }
+        }
     }
 
-    stage('Nexus') {
-      agent {
-        docker {
-          image "${MAVEN_DOCKER_IMAGE}"
-          args "-v ${JDK_PATH}:${JDK_PATH}"
-          reuseNode true
+    post {
+        cleanup {
+            echo 'Cleaning workspace...'
+            cleanWs()
         }
-      }
-      steps {
-        configFileProvider([configFile(fileId: "${params.CONFIG_FILE_ID}", variable: 'MAVEN_SETTINGS')]) {
-          sh 'mvn --global-settings ${MAVEN_SETTINGS} -Pskltp -DskipTests=true deploy'
-        }
-      }
     }
-  }
 }
