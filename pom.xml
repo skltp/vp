@@ -23,8 +23,7 @@
     <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
     <netty.version>4.1.63.Final</netty.version>
 
-<!--    <takdatahandler.version>1.0.1</takdatahandler.version>-->
-    <takdatahandler.version>2.1.0-RC1</takdatahandler.version>
+    <takdatahandler.version>2.1.0</takdatahandler.version>
 
     <maven.javadoc.skip>true</maven.javadoc.skip>
 
