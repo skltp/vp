@@ -1,7 +1,1 @@
 sonar-projectkey: 'ntjp-vp'                                              # The project key for the project.
-sonar-tokenid: 'ntjp-sonarqube-token'                                    # The SonarQube access token ID.
-sonar-env: 'inera-sonarqube'                                             # The SonarQube environment to use when scanning.
-sonar-java-binaries: '**/target/classes'                                 # What binaries to scan.
-sonar-jacoco-reports: './report/target/site/jacoco-aggregate/jacoco.xml' # Where the jacoco coverage report is stored.
-sonar-test-inclusions: '**/src/test/**/*.java'                           # What tests to include in the scan.
-email-recipients: 'fd8ba3ec.inera.se@emea.teams.ms'                      # The email addresses to send build status to.
