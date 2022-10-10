@@ -1,10 +1,9 @@
 FROM openjdk:11-oraclelinux8
-ARG JARFILE
 
 ENV BASE_DIR=/opt/skltp/ \
     USER=ind-app \
     LOG_DIR=/var/log/ \
-    JARFILE=${JARFILE}
+    JARFILE=target/vp-services-camel-4.3.1-SNAPSHOT.jar
 
 ADD ${JARFILE} ${BASE_DIR}/app.jar
 RUN mkdir -p ${LOG_DIR} \
