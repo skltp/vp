@@ -104,12 +104,12 @@ Default Spring-boot property fil (Kräver att Spring profilen 'security' är akt
     "producertimeout": 30000
   },  
   {
-    "tjanstekontrakt": "urn.riv.processdevelopment.infections.DeleteActivityResponder.1",
+    "tjanstekontrakt": "urn:riv.processdevelopment:infections:DeleteActivityResponder:1",
     "routetimeout": 5000,
     "producertimeout": 5000
   },
   {
-    "tjanstekontrakt": "urn.riv.processdevelopment.infections.DeleteCareEncounterResponder.1",
+    "tjanstekontrakt": "urn:riv:processdevelopment:infections:DeleteCareEncounterResponder:1",
     "routetimeout": 4000,
     "producertimeout": 4000
   }
