@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.skl.tp.vp.constants.HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID;
-import static se.skl.tp.vp.constants.HttpHeaders.X_SKLTP_CORRELATION_ID;
+import static se.skl.tp.vp.constants.HttpHeaders.*;
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_CONSUMER;
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_CORRELATION_ID;
 import static se.skl.tp.vp.integrationtests.httpheader.HeadersUtil.TEST_SENDER;
@@ -139,6 +138,16 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
     assertEquals(TEST_CONSUMER, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
     assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", LogExtraInfoBuilder.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "=" + TEST_CONSUMER);
     assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "=" + TEST_CONSUMER);
+  }
+
+  @Test
+  public void checkActingOnBehalfOfHeaderPropagatedAndLoggedWhenIncomingHeaderSetTest() {
+    Map<String, Object> headers = new HashMap<>();
+    headers.put("x-rivta-acting-on-behalf-of-hsaid", "TEST_PRINCIPAL_ID");
+    template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeadersWithXRivta(headers));
+    assertEquals("TEST_PRINCIPAL_ID", resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID));
+    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in",  LogExtraInfoBuilder.ACTING_ON_BEHALF_OF_HSA_ID + "=TEST_PRINCIPAL_ID");
+    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID + "=TEST_PRINCIPAL_ID");
   }
 
   @Test
