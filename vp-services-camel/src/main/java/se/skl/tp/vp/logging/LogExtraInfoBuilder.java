@@ -25,6 +25,7 @@ public class LogExtraInfoBuilder {
   public static final String ANROPSBEHORIGHET_TRACE = VPExchangeProperties.ANROPSBEHORIGHET_TRACE;
   public static final String OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid";
   public static final String IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid_in";
+  public static final String ACTING_ON_BEHALF_OF_HSA_ID = "actingOnBehalfOfHsaid";
   public static final String TIME_ELAPSED = "time.elapsed";
   public static final String TIME_PRODUCER = "time.producer";
   public static final String MESSAGE_LENGTH = "message.length";
@@ -54,6 +55,8 @@ public class LogExtraInfoBuilder {
     extraInfo.putNotEmpty(IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID,
         nullValue2Blank(exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class)));
     extraInfo.put(SENDER_IP_ADRESS, exchange.getProperty(VPExchangeProperties.SENDER_IP_ADRESS, String.class));
+    extraInfo.putNotNull(ACTING_ON_BEHALF_OF_HSA_ID,
+        exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID, String.class));
 
     String serviceContractNS = exchange.getProperty(VPExchangeProperties.SERVICECONTRACT_NAMESPACE, String.class);
     String rivVersion = exchange.getProperty(VPExchangeProperties.RIV_VERSION, String.class);

@@ -72,4 +72,5 @@ public class HttpHeaders {
 	
 	public static final String X_RIVTA_ROUTING_HISTORY = "x-rivta-routing-history";
 
+	public static final String X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID = "x-rivta-acting-on-behalf-of-hsaid";
 }
