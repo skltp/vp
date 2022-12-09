@@ -1,2 +1,2 @@
 # VP
-Virtualiserings Plattformen (VP) byggd med Apache Camel
+VirtualiseringsPlattformen (VP) byggd med Apache Camel
