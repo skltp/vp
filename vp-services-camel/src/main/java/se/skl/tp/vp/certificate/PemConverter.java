@@ -3,6 +3,8 @@ package se.skl.tp.vp.certificate;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -47,10 +49,28 @@ public class PemConverter {
 
   private static BufferedInputStream extractCerticate(String pemCertString) {
 
+    StringBuilder formattedCert = new StringBuilder();
+
+    if (pemCertString.startsWith("MII")) {
+      String decoded = null;
+      try {
+        decoded = URLDecoder.decode(pemCertString, "utf8");
+
+        formattedCert.append(BEGIN_HEADER);
+        formattedCert.append("\n");
+        formattedCert.append(decoded.split(",", 2)[0]);
+        formattedCert.append("\n");
+        formattedCert.append(END_HEADER);
+        InputStream is = new ByteArrayInputStream(formattedCert.toString().getBytes());
+        return new BufferedInputStream(is);
+      } catch (UnsupportedEncodingException e) {
+        return null;
+      }
+    }
+
     int beginHeader = pemCertString.indexOf(BEGIN_HEADER) + BEGIN_HEADER.length();
     int endHeader = pemCertString.indexOf(END_HEADER);
 
-    StringBuilder formattedCert = new StringBuilder();
     formattedCert.append(BEGIN_HEADER);
     formattedCert.append("\n");
     formattedCert.append(pemCertString.substring(beginHeader, endHeader).replaceAll("\\s+", ""));
@@ -74,7 +94,16 @@ public class PemConverter {
   private static boolean containsCorrectPemHeaders(String pemCertString) {
     int beginHeader = pemCertString.indexOf(BEGIN_HEADER);
     int endHeader = pemCertString.indexOf(END_HEADER);
-    return beginHeader != -1 && endHeader != -1;
+    if (beginHeader != -1 && endHeader != -1) {
+      return true;
+    }
+    else {
+      if (pemCertString.startsWith("MII")) {
+        return true;
+      }
+    }
+    return false;
+
   }
 
 }
