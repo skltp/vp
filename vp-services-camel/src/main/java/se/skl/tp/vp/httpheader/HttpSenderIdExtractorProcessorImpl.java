@@ -47,6 +47,12 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
   @Value("${http.forwarded.header.auth_cert}")
   String authCertHeaderName;
 
+  @Value("${http.forwarded.header.useTraefikPassTLSInfoHeader: false}")
+  String useTraefikPassTLSInfo;
+
+  @Value("${http.forwarded.header.useVPAuthDNHeader: false}")
+  String useVPAuthDN;
+
   @Override
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -67,7 +73,10 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
           HttpHeaders.X_VP_SENDER_ID, senderId);
       checkCallerOnWhitelist(forwardedForIpAdress, senderIpExtractor.getForwardForHeaderName());
       exchange.setProperty(VPExchangeProperties.SENDER_ID, senderId);
-    } else {
+    } else if (Boolean.parseBoolean(useVPAuthDN) || Boolean.parseBoolean(useTraefikPassTLSInfo)) {
+      log.debug("Try extract senderId from provided certificate info in header");
+      exchange.setProperty(VPExchangeProperties.SENDER_ID, getSenderIdFromHeader(message));
+    }else {
       log.debug("Try extract senderId from provided certificate");
       exchange.setProperty(VPExchangeProperties.SENDER_ID, getSenderIdFromCertificate(message));
       if (useRoutingHistory) {
@@ -97,6 +106,9 @@ public class HttpSenderIdExtractorProcessorImpl implements HttpSenderIdExtractor
     Object certificate = message.getHeader(authCertHeaderName);
 
     return headerCertificateHelper.getSenderIDFromHeaderCertificate(certificate);
+  }
+  private String getSenderIdFromHeader(Message message) {
+    return headerCertificateHelper.getSenderIDFromHeader(message);
   }
 
   private void checkCallerOnWhitelist(String senderIpAdress, String header) {

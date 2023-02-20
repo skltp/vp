@@ -2,33 +2,71 @@ package se.skl.tp.vp.certificate;
 
 
 import io.undertow.util.FileUtils;
+import org.apache.camel.Message;
+import org.apache.camel.impl.lw.LightweightCamelContext;
+import org.apache.camel.support.DefaultMessage;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import se.skl.tp.vp.exceptions.VpSemanticException;
+
+import javax.security.auth.x500.X500Principal;
+import java.security.cert.X509Certificate;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import java.security.cert.X509Certificate;
-import javax.security.auth.x500.X500Principal;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Value;
-import se.skl.tp.vp.exceptions.VpSemanticException;
 
 public class HeaderCertificateHelperImplTest {
 
   public static final String PRINCIPAL_OK = "CN=Hermione Granger, O=Apache Software Foundation, OU=Harmony, L=Hogwarts, ST=Hants, C=GB";
   public static final String PRINCIPAL_HEX_OU = "OU=#00074861726d6f6e79";
   public static final String PRINCIPAL_MISSING_OU = "CN=Hermione Granger, O=Apache Software Foundation, L=Hogwarts, ST=Hants, C=GB";
-  final String pattern = "(?:OU|2.5.4.5|SERIALNUMBER)=([^,]+)";
+  final String pattern = "(?:OU|2.5.4.5|SERIALNUMBER|serialNumber|SN)=([^,^\"^ ]+)";
   final String vpInstance = "NTjP Develop";
-  HeaderCertificateHelperImpl headerCertificateHelper = new HeaderCertificateHelperImpl(pattern, vpInstance);
+  final private String authCertName = "x-vp-auth-certificate";
+  final private HeaderCertificateHelperImpl headerCertificateHelper = new HeaderCertificateHelperImpl(pattern, vpInstance,
+          authCertName, true, true);
 
-  @Value("${http.forwarded.header.auth_cert}")
-  private String authCertName;
 
   @Test
   public void getSenderIDFromHeaderCertificate() {
     String senderId = headerCertificateHelper.getSenderIDFromHeaderCertificate(mockCert(PRINCIPAL_OK));
     assertEquals("Harmony", senderId);
+  }
+
+  @Test
+  void getSenderIDFromTraefikHeader() {
+
+    Message msg = mockMessageWithHeader("X-Forwarded-Tls-Client-Cert-Info", "Subject%3D%22C%3DSE%2CSN%3DTSTNMT2321000156-B02%2CCN%3Dtest.nordicmedtest.se%22%2CSubject%3D%22C%3DSE%2CCN%3DTEST+SITHS+e-id+Function+CA+v1%22%2CSubject%3D%22C%3DSE%2CCN%3DTEST+SITHS+e-id+Root+CA+v2%22");
+    String senderId = headerCertificateHelper.getSenderIDFromHeader(msg);
+    assertEquals("TSTNMT2321000156-B02", senderId);
+
+    msg = mockMessageWithHeader("X-Forwarded-Tls-Client-Cert-Info", "Subject%3D%22C%3DSE%2CSN%3DTSTNMT2321000156-B02%22");
+    senderId = headerCertificateHelper.getSenderIDFromHeader(msg);
+    assertEquals("TSTNMT2321000156-B02", senderId);
+
+    msg = mockMessageWithHeader("X-Forwarded-Tls-Client-Cert-Info", "Subject=\"C=SE,SN=TSTNMT2321000156-B02,CN=test.nordicmedtest.se\",Subject=\"C=SE,CN=TEST SITHS e-id Function CA v1\",Subject=\"C=SE,CN=TEST SITHS e-id Root CA v2\"");
+    senderId = headerCertificateHelper.getSenderIDFromHeader(msg);
+    assertEquals("TSTNMT2321000156-B02", senderId);
+
+
+  }
+
+  @Test
+  void getSenderIDFromApacheHeader() {
+    Message msg = mockMessageWithHeader("x-vp-auth-DN", "serialNumber=SE162321000255-F26860");
+
+    String senderId = headerCertificateHelper.getSenderIDFromHeader(msg);
+    assertEquals("SE162321000255-F26860", senderId);
+
+    msg = mockMessageWithHeader("x-vp-auth-DN", "Subject%3D%22C%3DSE%2CSN%3DTSTNMT2321000156-B02%22");
+    senderId = headerCertificateHelper.getSenderIDFromHeader(msg);
+    assertEquals("TSTNMT2321000156-B02", senderId);
+
+    msg = mockMessageWithHeader("x-vp-auth-DN", "Subject=\"C=SE,SN=TSTNMT2321000156-B02,CN=test.nordicmedtest.se\",Subject=\"C=SE,CN=TEST SITHS e-id Function CA v1\",Subject=\"C=SE,CN=TEST SITHS e-id Root CA v2\"");
+    senderId = headerCertificateHelper.getSenderIDFromHeader(msg);
+    assertEquals("TSTNMT2321000156-B02", senderId);
+
   }
 
   @Test
@@ -42,7 +80,7 @@ public class HeaderCertificateHelperImplTest {
   public void getSenderIDFromTraefikHeaderCertificateNoClientCertFail() {
     String traefikCertHeader = "MIIGfDCCBGSgAwIBAgIPAWnYKuVOwSlU2yGmZXExMA0GCSqGSIb3DQEBDQUAMEUxCzAJBgNVBAYTAlNFMREwDwYDVQQKDAhJbmVyYSBBQjEjMCEGA1UEAwwaVEVTVCBTSVRIUyBlLWlkIFJvb3QgQ0EgdjIwHhcNMTkwNDAxMDkxMDQxWhcNNDkwOTE1MTgwMDAwWjBJMQswCQYDVQQGEwJTRTERMA8GA1UECgwISW5lcmEgQUIxJzAlBgNVBAMMHlRFU1QgU0lUSFMgZS1pZCBGdW5jdGlvbiBDQSB2MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAMlbA%2FhZP1RbkUYnIVbo7pily%2FfegOPRb0tU17FIm8lM%2Bz8n01ty725%2B%2F4hyKwL1cJIo2lCO95WL0Zp%2FxNIdLzFO0k%2Bcej7cc42vZjdfk95QfMfVsx7%2FYtGUx%2BMVpsYOB0y07H1Gl%2B6KgdlEmjzzYcpkexsu7D%2B7bBkIOpTA5reQhGAx%2F8v2gPQ6CBw2eg5%2BdUAx%2FVcNpEJIABq1Xht1MddlTttP6jhdShPLkK88j8qA7dVi%2BHwJgC9OCz8kcglcFSnGYU89a8BkFlbAbWoVPUpnjyVF4VC7p1JuxuKWAxjZyWOmNBPf74v5cpOanoqLKD5Lum0nszoonHUk2n8LqXuwXgqkpL%2F6vZBi1WeOFJ3gi%2FqL8mpkAHX9lNelkmalCApSLunlAGte7519cyw1QQa8Jy3ObfaoMmS4ZQGpZE47%2FVtpRXykhhb7jCfArRyte%2BsY9h1QCsHYR%2F9nxdQM%2F2BAXYr6YozXWLeOxKKM%2F76h5vbokN2W2N2OEkznen4lt3pND03iNKyPacEvkCBg6yXWmsHJw1BbqOcIHRI%2FdqFPQTkWX7WSDp6Y9YklMfO053U7sTg91CDh5iORKkWQvNKdZH3GcuMUk6QfTRIJ%2BoUg1j30V2XxokkAMvoKV71%2FOlr6YIDUF9gWVZiaTJq2cDwTGJ9YsbFOuRDGO8tEEV6bAgMBAAGjggFjMIIBXzAfBgNVHSMEGDAWgBS8tooRggWeIGERN%2BDdsdwCL3%2BbxDAdBgNVHQ4EFgQUKrqTwdFNZ8SWXM%2FB7ePDCTkYFB8wDgYDVR0PAQH%2FBAQDAgEGMEYGA1UdIAQ%2FMD0wOwYEVR0gADAzMDEGCCsGAQUFBwIBFiVodHRwczovL3d3dy5pbmVyYS5zZS9zaXRocy9yZXBvc2l0b3J5MBIGA1UdEwEB%2FwQIMAYBAf8CAQAwQAYDVR0fBDkwNzA1oDOgMYYvaHR0cDovL2NybDFwcC5zaXRocy5zZS90ZXN0c2l0aHNlaWRyb290Y2F2Mi5jcmwwbwYIKwYBBQUHAQEEYzBhMCMGCCsGAQUFBzABhhdodHRwOi8vb2NzcDFwcC5zaXRocy5zZTA6BggrBgEFBQcwAoYuaHR0cDovL2FpYXBwLnNpdGhzLnNlL3Rlc3RzaXRoc2VpZHJvb3RjYXYyLmNlcjANBgkqhkiG9w0BAQ0FAAOCAgEADFVLZJwNHcPsc1s0wAHJ9NJxvCm2knQSKYnO9eIkAjkKmIdbyKLLt5ztF6Pr%2FK8%2B9aQwXYZ4aZYKnR7ZUs5lf1Jkcf9oHDX47tOLj5Q%2BRPBgNwppkcPVZRHGApAvjdOtkq3p17Oaq1vK5GC0m7dtgjlQ70KMXO1AzL%2FaBQjedGiGkbTz7RISpD7Lid7s2ec8FHKIJ2xpPnemmzq3N2ksSpSWnKx9vrIQi4KqMt3yCKj%2B%2Fhwd4tdLug6JVcsUTbr%2Fstx9LD00drqxaEqaUjRRnD20PFfrwsUGrSFPxLydR%2FUq4vKAh%2BYxWbhDzongP%2FPo7F8ocfczkBspF0fph4WDpBHUPC%2BNVvRJTkoRF5zyn7lleSBUUSqyr4%2Bhxl%2FAcu%2BsgreGXUAxWfgSClUHjnMtFy5geS2dXrGOz%2F%2BDgnhkgHg4Et%2B2w61p5ZBcNsc%2Bbw8LcKxwaXqvMrAC5MdJBy3D0i%2FoO%2Ftt9PmAFNYRsiolwW6kf41erO39F5fsgxhjWVCQLpm3SvqNuBI79Cj5BgGKVdFgL9O2G4l04SfhUjlih0VMLrj60Y4FY3Sqd7VZKU7%2FTqnAZex3xkKs35AZ9zuz%2FmBy1vJHZYmeOL%2FQX11jX%2Fpyuil5E0Jzi7Z8%2BB2k8By71rghXJ266u1qMZyqFavUf1Bpuj4GQL9VFwDmC3%2Fi%2B4Y%3D,MIIFdjCCA16gAwIBAgIPAWnYIw%2FJjncEZcIdSRTfMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNVBAYTAlNFMREwDwYDVQQKDAhJbmVyYSBBQjEjMCEGA1UEAwwaVEVTVCBTSVRIUyBlLWlkIFJvb3QgQ0EgdjIwHhcNMTkwNDAxMDkwMjUzWhcNNDkwOTE1MTgwMDAwWjBFMQswCQYDVQQGEwJTRTERMA8GA1UECgwISW5lcmEgQUIxIzAhBgNVBAMMGlRFU1QgU0lUSFMgZS1pZCBSb290IENBIHYyMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAz86dte1yqq66WPttOXXqAlkpqU2Uo2WaFmE8qyc0kc107HXEVbI7LTqpf7aFyOF8QfgUBZH2BmplfX6sIaM%2FHOZDWHNfvaBonGhl7WSBhSrxuu%2BWRrNIy4ounauN4PGeuaHIY85aQ3yhNPwUXkH669oyB5PYXcGKkCPbZzGgxEFmhW49vlprxYk3OxszMsB4xqcqsQLh1zBDd9ToJg3vj%2B2nENq1tGlJabcl6cYZZvUxVUECTxeOUyJfABG4diNkTsMbLS71EVu79CTuzYVoGXSpZYxChqr9dMcv6Y359WCDT3j46Ww2fH%2B9Sk4N25APk%2BOV4GmUptpBRJT4PXOWirYlf34WlU1bz8vp5b1xdD9TyqaNq%2FeKRHKmR5Cwl2kVvgMiIll8VHqq%2BGitASJZyEU2UMjgqZ4uFgdbgc7FQ76ENTnOEbbHqsaw0FMrAXCNAKoVxXFNZ0vFN1bIq3%2F%2FQSppfbrc2O8zq%2BAs2vwmqGx3ZjYlbflsP5O3lkUldzKjAVAJNlYdf6BJkShz4iE0T%2BsWnn%2BIDzA%2B0HMis%2BQc5zQmNjkiTAnLs3teXjkyXm%2FYlfzgMxP4fbvzTXNPx2NhK20s7pyI9XVFgIRA%2F6OPvGATR4%2F%2FT1zyhT0R8r9Z0GzXkJal8pBTsj4WdJ8QGJy9v8O29A0t3USzZioS8VMOlbMCAwEAAaNjMGEwHwYDVR0jBBgwFoAUvLaKEYIFniBhETfg3bHcAi9%2Fm8QwHQYDVR0OBBYEFLy2ihGCBZ4gYRE34N2x3AIvf5vEMA4GA1UdDwEB%2FwQEAwIBBjAPBgNVHRMBAf8EBTADAQH%2FMA0GCSqGSIb3DQEBCwUAA4ICAQCT2BCoj4PMeBnnO%2FEEFniD3qn%2BQOt92T3Q4ttp9kY9Pmtc0civ4UY7NPyXUaUUBO8SO0zFpbL6DXLLLfil4LDdlOZTazEpTREIg25n3frs0F7X4Hm76Ul8leHMhELRo4J6R%2B73fK0JX6nLJjNVWmh6aZgquF2k9o8oRetCG9SGqW%2BI2fnAozyy5JHOzKQWbqVNxwsHnvny0sw1pbRRbeiKXsi0h6nPfi89CGXpNjFnpAks077TtbxJcoKHS1rtXu5oq9KbMLRVxg1VNZf%2FZJBU8m49t5t9Hpnb%2BVk70Vo9Ji33sb9CVYNtfpFYCk4FhV0UFFQkjjWL3wyCdUJRHwXVE%2BHTgzEvf4R4wkwlCifPctFZIkriPVko3s2UDQOHPTcGha6NsO%2B1wrVVSP0n5wV2J%2FcXrWYu5rO5kljOL0Pc8c4%2B6nxti03DpJFu%2FQapFiSBt7KqmySALlJ1emrYgZDMZH2Fno2p0SX3SPiHKhG7Mj8ZUkvigUVuE%2BqsDk7ycDy0t10abuJEXX2cxSiRG8PMyDt2pWUAl9YCKtDTVPLJ2m5xoRh1aOkKjQIqrsIQX97%2FkUFqk0uReny93Yh0SAMl3Y3WuQ7N%2BAKFo95JHQpE3QhE4bY%2BPvu8UMImNhPVgqlfdMhZytrH%2BbOujYSSPiwrGP94%2Fq%2BJhkKLErzocw0t%2Bg%3D%3D";
     try {
-      String senderId = headerCertificateHelper.getSenderIDFromHeaderCertificate(traefikCertHeader);
+      headerCertificateHelper.getSenderIDFromHeaderCertificate(traefikCertHeader);
       fail("Expected an exception for missing client certificate");
     } catch (final VpSemanticException e) {
       assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
@@ -59,7 +97,7 @@ public class HeaderCertificateHelperImplTest {
 
   @Test
   public void getSenderIDFromPemCertificate() {
-    String pemCert = FileUtils.readFile(getClass().getClassLoader().getResource("certs/cert_ou_is_tp.pem"));
+    String pemCert = FileUtils.readFile(Objects.requireNonNull(getClass().getClassLoader().getResource("certs/cert_ou_is_tp.pem")));
     String senderId = headerCertificateHelper.getSenderIDFromHeaderCertificate(pemCert);
     assertEquals("tp", senderId);
   }
@@ -111,6 +149,12 @@ public class HeaderCertificateHelperImplTest {
       assertEquals("No senderId found in Certificate", e.getMessageDetails());
       assertEquals("VP002 [NTjP Develop] Fel i klientcertifikat. Saknas, är av felaktig typ, eller är felaktigt utformad.", e.getMessage());
     }
+  }
+
+  private Message mockMessageWithHeader(String headerName, String headerValue) {
+    Message msg = new DefaultMessage(new LightweightCamelContext());
+    msg.setHeader(headerName, headerValue);
+    return msg;
   }
 
   private Object mockCert(String dnString) {

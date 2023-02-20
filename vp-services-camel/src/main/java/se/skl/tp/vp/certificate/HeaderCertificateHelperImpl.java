@@ -1,8 +1,7 @@
 package se.skl.tp.vp.certificate;
 
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import lombok.extern.log4j.Log4j2;
+import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,24 +10,62 @@ import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+
 @Service
 @Log4j2
 public class HeaderCertificateHelperImpl implements HeaderCertificateHelper {
 
-  private SenderIdExtractor senderIdExtractor;
-  private String vpInstance;
+  final private SenderIdExtractor senderIdExtractor;
+  private final String vpInstance;
+
   private static final String PATTERN_PROPERTY = "${" + PropertyConstants.CERTIFICATE_SENDERID_SUBJECT_PATTERN + "}";
   private static final String VP_INSTANCE = "${" + PropertyConstants.VP_INSTANCE_NAME + "}";
 
+  private static final String USE_TREAFIK_SUBJECT_DN = "${" + PropertyConstants.VP_HEADER_AUTH_DN_TRAEFIK + "}";
+
+  private static final String USE_APACHE_SUBJECT_DN =  "${" + PropertyConstants.VP_HEADER_AUTH_DN_APACHE + "}";
+
+  private static final String AUTH_CERT_HEADER_NAME =  "${" + PropertyConstants.VP_HEADER_AUTH_CERTIFICATE + "}";
+
+  private final String authCertHeaderName;
+  private final boolean useTraefikPassTLSInfo;
+  private final boolean useVPAuthDN;
+
+
+
   @Autowired
-  public HeaderCertificateHelperImpl(@Value(PATTERN_PROPERTY) String certificateSenderId, @Value(VP_INSTANCE) String vpInstance) {
+  public HeaderCertificateHelperImpl(@Value(PATTERN_PROPERTY) String certificateSenderId,
+                                     @Value(VP_INSTANCE) String vpInstance,
+                                     @Value(AUTH_CERT_HEADER_NAME) String authCertHeaderName,
+                                     @Value(USE_APACHE_SUBJECT_DN) boolean useApacheSubjDN,
+                                     @Value(USE_TREAFIK_SUBJECT_DN) boolean useTraefikSubjectDN) {
     senderIdExtractor = new SenderIdExtractor(certificateSenderId);
     this.vpInstance = vpInstance;
+    this.authCertHeaderName = authCertHeaderName;
+    this.useVPAuthDN = useApacheSubjDN;
+    this.useTraefikPassTLSInfo = useTraefikSubjectDN;
   }
 
-  @Value("${http.forwarded.header.auth_cert}")
-  String authCertHeaderName;
 
+  public String getSenderIDFromHeader(Message message) {
+    String senderId = null;
+    if (useVPAuthDN) {
+      String header = message.getHeader(HttpHeaders.X_VP_AUTH_DN, String.class);
+      if (header != null) {
+        senderId = senderIdExtractor.extractSenderFromPrincipal(header);
+      }
+    }
+    if (useTraefikPassTLSInfo) {
+      String header = message.getHeader(HttpHeaders.X_FORWARDED_TLS_CLIENT_CERT_INFO, String.class);
+      if (header != null) {
+        senderId = senderIdExtractor.extractSenderFromPrincipal(header);
+      }
+    }
+    return senderId;
+  }
   public String getSenderIDFromHeaderCertificate(Object certificate) {
     String senderId = null;
     boolean isUnknownCertificateType = false;

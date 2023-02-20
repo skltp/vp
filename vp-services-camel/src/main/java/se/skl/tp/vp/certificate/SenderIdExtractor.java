@@ -1,19 +1,23 @@
 package se.skl.tp.vp.certificate;
 
+import lombok.extern.log4j.Log4j2;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class SenderIdExtractor {
 
-  private Pattern certificateSenderIDPattern;
+  private final Pattern certificateSenderIDPattern;
 
   public SenderIdExtractor(String certificateSenderIDPattern) {
     this.certificateSenderIDPattern = Pattern.compile(certificateSenderIDPattern);
   }
 
   public String extractSenderFromPrincipal(String principalName) {
+    principalName = URLDecoder.decode(principalName, StandardCharsets.UTF_8);
     final Matcher matcher = certificateSenderIDPattern.matcher(principalName);
 
     if (matcher.find()) {

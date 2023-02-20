@@ -36,4 +36,9 @@ public class PropertyConstants {
     public static final String HAWTIO_EXTERNAL_LOGINFILE = "hawtio.external.loginfile";
 
     public static final String MEMORY_LOG_PERIOD = "memory.logger.period.seconds";
+
+    public static final String VP_HEADER_AUTH_CERTIFICATE = "http.forwarded.header.auth_cert";
+    public static final String VP_HEADER_AUTH_DN_APACHE = "http.forwarded.header.useVPAuthDNHeader";
+    public static final String VP_HEADER_AUTH_DN_TRAEFIK = "http.forwarded.header.useTraefikPassTLSInfoHeader";
+
 }

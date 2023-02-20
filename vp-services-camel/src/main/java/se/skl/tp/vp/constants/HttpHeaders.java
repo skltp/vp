@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2013 Center for eHalsa i samverkan (CeHis).
  * 							<http://cehis.se/>
- *
+ * <p>
  * This file is part of SKLTP.
- *
+ * <p>
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -73,4 +73,13 @@ public class HttpHeaders {
 	public static final String X_RIVTA_ROUTING_HISTORY = "x-rivta-routing-history";
 
 	public static final String X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID = "x-rivta-acting-on-behalf-of-hsaid";
+	/**
+	 * HTTP header X-Forwarded-Tls-Client-Cert-Info, header from traefik middleware passTLSClientCert with
+	 * certificate information such as Subject="SN=<HSA-ID>,CN=<CommonName>..."
+	 */
+	public static final String X_FORWARDED_TLS_CLIENT_CERT_INFO = "X-Forwarded-Tls-Client-Cert-Info";
+	/**
+	 * HTTP header x-vp-auth-dn, header from apache with the distinguished name data (i.e. Subject)
+	 */
+	public static final String X_VP_AUTH_DN = "x-vp-auth-DN";
 }
