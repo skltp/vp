@@ -22,3 +22,5 @@ tak:
   cache_endpoint: http://tak-tomcat:8085/tak-services/SokVagvalsInfo/v2
 host:
   name: TMP
+pod:
+  hostAliases: {}
