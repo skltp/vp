@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vp
+spec:
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: port-1
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: {{ .Values.app.vp.name }}
+  sessionAffinity: None 
+  type: ClusterIP
+status:
+  loadBalancer: {}

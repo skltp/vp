@@ -1,0 +1,24 @@
+
+namespace: dtjp
+
+deployment:
+  name: vp
+
+container:
+  name: vp
+  image:
+    repository: docker.drift.inera.se/ntjp/vp-services-camel
+    version: 4.3.1-SNAPSHOT
+
+app:
+  vp:
+    name: vp
+
+service:
+  vp:
+    name: vp
+
+tak:
+  cache_endpoint: http://tak-tomcat:8085/tak-services/SokVagvalsInfo/v2
+host:
+  name: TMP
