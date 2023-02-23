@@ -21,10 +21,6 @@ spec:
       labels:
         app: {{ .Values.app.vp.name }}
     spec:
-      volumes:
-        - name: config-volume
-          configMap:
-            name: {{ .Values.config.files }}
       {{- with .Values.pod.hostAliases }}
       hostAliases:
 {{ toYaml . | indent 8 }}
@@ -65,15 +61,6 @@ spec:
               memory: 401Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          envFrom:
-            {{- range $.Values.environment.variables.config_maps }}
-            - configMapRef:
-                name: {{ . }}
-            {{- end }}
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/vp/config
-              readOnly: true
 
       dnsPolicy: ClusterFirst
       imagePullSecrets:
