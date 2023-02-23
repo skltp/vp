@@ -64,7 +64,7 @@ spec:
 
       dnsPolicy: ClusterFirst
       imagePullSecrets:
-        - name: secret/regcred
+        - name: regcred
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
