@@ -1,5 +1,6 @@
 deployment:
   name: vp
+  namespace: ntjp-local
 
 container:
   name: vp
