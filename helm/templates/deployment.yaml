@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
   name: {{ .Values.deployment.name }}
-  namespace: {{ .Values.deployment.namespace }}
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -27,7 +27,6 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Values.container.name }}
-          namespace: {{ .Values.deployment.namespace }}
           image: {{ .Values.container.image.repository }}:{{ .Values.container.image.version }}
           imagePullPolicy: Always
           livenessProbe:

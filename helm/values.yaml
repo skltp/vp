@@ -1,11 +1,10 @@
 deployment:
   name: vp
-  namespace: ntjp-local
 
 container:
   name: vp
   image:
-    repository: docker.drift.inera.se/ntjp/vp-services-camel
+    repository: ntjp/vp-services-camel
     version: 4.3.1-SNAPSHOT
 
 app:
