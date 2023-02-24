@@ -4,6 +4,7 @@ metadata:
   annotations:
   name: {{ .Values.deployment.name }}
 spec:
+  namespace: {{ .Values.deployment.namespace }}
   progressDeadlineSeconds: 600
   replicas: 1
   revisionHistoryLimit: 10
