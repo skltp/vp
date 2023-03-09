@@ -29,29 +29,9 @@ spec:
         - name: {{ .Values.container.name }}
           image: {{ .Values.container.image.repository }}:{{ .Values.container.image.version }}
           imagePullPolicy: Always
-          livenessProbe:
-            failureThreshold: 15
-            httpGet:
-              path: status
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            successThreshold: 1
-            timeoutSeconds: 5
           ports:
             - containerPort: 8080
               protocol: TCP
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: status
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 2
           resources:
             limits:
               cpu: "801m"
