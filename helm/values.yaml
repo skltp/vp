@@ -6,7 +6,7 @@ deployment:
 
 container:
   image:
-    name: vp
+    name: vp-services-camel
     pullPolicy: Always
 
 service:
