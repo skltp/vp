@@ -21,6 +21,8 @@ spec:
       labels:
         app: {{ .Values.deployment.name }}
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: {{ .Values.container.image.name }}
           image: "{{ .Values.container.repository }}{{ .Values.container.image.name }}:{{ .Values.container.image.tag | default $.Chart.AppVersion }}"
