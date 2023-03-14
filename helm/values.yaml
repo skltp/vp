@@ -1,23 +1,24 @@
+namespace: ntjp
+
 deployment:
   name: vp
+  replicaCount: 1
 
 container:
-  name: vp
   image:
-    repository: docker.drift.inera.se/ntjp/vp-services-camel
-    version: 4.3.1-SNAPSHOT
-
-app:
-  vp:
     name: vp
+    pullPolicy: Always
 
 service:
-  vp:
-    name: vp
+  name: vp
+  type: ClusterIP
+  port: 8080
 
-tak:
-  cache_endpoint: http://tak-tomcat:8085/tak-services/SokVagvalsInfo/v2
-host:
-  name: TMP
-pod:
-  hostAliases: {}
+environment:
+  variables:
+    _default_config_maps:
+      - vp-configmap-default
+    config_maps:
+      # Nothing yet. Override to supply your own maps.
+    secrets:
+      # Nothing yet. Override to supply your own secrets.
