@@ -29,7 +29,7 @@ data:
   SERVER_UNDERTOW_ACCESSLOG_PREFIX: access_log
   SERVER_UNDERTOW_ACCESSLOG_ROTATE: "true"
   SERVER_UNDERTOW_ACCESSLOG_SUFFIX: .log
-  TAKCACHE_ENDPOINT_ADDRESS: {{ .Values.tak.cache_endpoint }}
+  TAKCACHE_ENDPOINT_ADDRESS: http://tak-services-svc:8080/tak-services/SokVagvalsInfo/v2
   TAKCACHE_PERSISTENT_FILE_NAME: ${data.path}/localCache
   TAKCACHE_USE_BEHORIGHET_CACHE: "true"
   TAKCACHE_USE_VAGVAL_CACHE: "true"
