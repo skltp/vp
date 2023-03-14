@@ -21,9 +21,6 @@ spec:
       labels:
         app: {{ .Values.deployment.name }}
     spec:
-      {{- with .Values.pod.hostAliases }}
-      hostAliases: {{ toYaml . | nindent 8 }}
-      {{- end }}
       containers:
         - name: {{ .Values.container.image.name }}
           image: "{{ .Values.container.repository }}{{ .Values.container.image.name }}:{{ .Values.container.image.tag | default $.Chart.AppVersion }}"
