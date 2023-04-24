@@ -1,125 +1,24 @@
-replicaCount: 1
+namespace: ntjp
 
-imagePullSecrets: regcred
-nameOverride: "vp"
-fullnameOverride: "skltp-vp"
+deployment:
+  name: vp
+  replicaCount: 1
 
-
-image:
-  name: vp-services-camel
-  pullPolicy: Always
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
+container:
+  image:
+    name: vp-services-camel
+    pullPolicy: Always
 
 service:
   name: vp
   type: ClusterIP
-  port: 
-    src: 8080
-    dst: 8080
-
-container:
-  repository: docker.drift.inera.se/ntjp/
-
-tls:
-  certsDir: /etc/vp/certs
-  certsSecret: 
-  keyStore:
-    file: private/function_cert.p12
-    type: PKCS12
-    password: password
-  truststore:
-    file: trust/trustruststore.p12
-    password: password
-    type: PKCS12
-  allowedOutgoingCipherSuites: [TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_DHE_DSS_WITH_AES_256_GCM_SHA384,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_DSS_WITH_AES_128_GCM_SHA256,TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_DSS_WITH_AES_256_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_DSS_WITH_AES_128_CBC_SHA256,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA]
-
-ingress:
-  enabled: true
-  host: vp.local
-  tls: 
-    secretName: esb-tls-secret
-    defaultSecret:
-      enabled: true
-      name: default-tls-secret
-    serverCertificateSecret: false
-    passClientCert:
-      middleware:
-        enabled: true
-        name: pass-client-cert
-    option:
-      name: mtls-option
-      spec:
-          clientAuth:
-            clientAuthType: RequireAndVerifyClientCert
-            secretNames:
-              - siths-certificate-authority
-          maxVersion: VersionTLS13
-          minVersion: VersionTLS12
-
-
-deployment:
-  probes:
-    liveness:
-      path: /status
-    rediness:
-      path: /status
-
+  port: 8080
 
 environment:
   variables:
     _default_config_maps:
       - vp-configmap-default
-    config_maps: {}
+    config_maps:
       # Nothing yet. Override to supply your own maps.
-    secrets: {}
+    secrets:
       # Nothing yet. Override to supply your own secrets.
-
-
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-
-resources: {}
-  # If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
