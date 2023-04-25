@@ -9,8 +9,8 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>certGeneratorUtility</artifactId>
+    <artifactId>cert-generator-utility</artifactId>
     <packaging>pom</packaging>
-    <name>certGeneratorUtility</name>
+    <name>cert-generator-utility</name>
 
 </project>
