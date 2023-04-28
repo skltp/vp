@@ -9,6 +9,10 @@ container:
     name: vp-services-camel
     pullPolicy: Always
 
+initContainer:
+  certGen:
+    pemCertSecret: tak.dev.ntjp.se-letsencrypt
+
 service:
   name: vp
   type: ClusterIP
