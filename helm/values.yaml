@@ -12,6 +12,8 @@ container:
 initContainer:
   certGen:
     pemCertSecret: tak.dev.ntjp.se-letsencrypt
+    image:
+      name: vp-cert-gen-ic
 
 service:
   name: vp

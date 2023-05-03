@@ -41,22 +41,19 @@ spec:
       volumes: 
         - name: pemCertsVolume
           secret:
-            secretName: {{ .Values.initContainer.certGen.pemCertSecret | default tjp-function-cert }}
+            secretName: {{ .Values.initContainer.certGen.pemCertSecret | default "tjp-function-cert" }}
             items:
-              - key: {{ .Values.initContainer.certGen.pemCertSecretKeyItem | default tls.key }}
+              - key: {{ .Values.initContainer.certGen.pemCertSecretKeyItem | default "tls.key" }}
                 path: key.pem
-              - key: {{ .Values.initContainer.certGen.pemCertSecretCertChainItem | default tls.crt }}
+              - key: {{ .Values.initContainer.certGen.pemCertSecretCertChainItem | default "tls.crt" }}
                 path: cert.pem
             optional: true
         - name: pkcs12Volume
 
-
-
-
       initContainers:
         - name: {{ .Values.initContainer.certGen.image.name }}
           image: "{{ .Values.repository }}{{ .Values.initContainer.certGen.image.name }}:{{ .Values.initContainer.certGen.image.tag | default $.Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy | default Always }}
+          imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy | default "Always" }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}          
           volumeMounts:
