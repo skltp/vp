@@ -68,17 +68,7 @@ spec:
             - "-c"
             - "--"
           args: 
-            - "openssl"
-            - "pkcs12"
-            - "-export"
-            - "-in"
-            - "/opt/certs/pem/cert.pem"
-            - "-inkey"
-            - "/opt/certs/pem/cert.key"
-            - "-out"
-            - "/opt/certs/pkcs12/function_cert.pfx"
-            - "-passout"
-            - "pass:password"
+            - "openssl pkcs12 -export -in /opt/certs/pem/cert.pem -inkey /opt/certs/pem/key.pem -out /opt/certs/pkcs12/function_cert.pfx -passout pass:password"
 
       containers:
         - name: {{ .Values.container.image.name }}
