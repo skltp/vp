@@ -72,11 +72,11 @@ spec:
             - "pkcs12"
             - "export"
             - "-in"
-            - "/opt/certs/opt/certs/pem/cert.pem"
+            - "/opt/certs/pem/cert.pem"
             - "-inkey"
-            - "/opt/certs/opt/certs/pem/cert.key"
+            - "/opt/certs/pem/cert.key"
             - "-out"
-            - "/opt/certs/opt/certs/pkcs12/function_cert.pfx"
+            - "/opt/certs/pkcs12/function_cert.pfx"
             - "-passout"
             - "pass:password"
 
@@ -119,7 +119,7 @@ spec:
             - name: TP_TLS_STORE_CONSUMER_PASSWORD
               value: password
             - name: TP_TLS_STORE_LOCATION
-              value: "file://opt/certs/opt/certs/pkcs12/"
+              value: "file://opt/certs/pkcs12/"
             - name: TP_TLS_STORE_TRUSTSTORE_FILE
               value: truststore.pfx
             - name: TP_TLS_STORE_TRUSTSTORE_TYPE
