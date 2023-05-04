@@ -39,7 +39,7 @@ spec:
         - name: regcred
 
       volumes: 
-        - name: pemCertsVolume
+        - name: pem-certs-volume
           secret:
             secretName: {{ .Values.initContainer.certGen.pemCertSecret | default "tjp-function-cert" }}
             items:
@@ -48,7 +48,7 @@ spec:
               - key: {{ .Values.initContainer.certGen.pemCertSecretCertChainItem | default "tls.crt" }}
                 path: cert.pem
             optional: true
-        - name: pkcs12Volume
+        - name: pkcs12-volume
 
       initContainers:
         - name: {{ .Values.initContainer.certGen.image.name }}
@@ -57,10 +57,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}          
           volumeMounts:
-            - name: pemCertsVolume
+            - name: pem-certs-volume
               mountPath: /opt/certs/pem
               readonly: true
-            - name: pkcs12Volume
+            - name: pkcs12-volume
               mountPath: /opt/certs/pkcs12
               readonly: false
           command: 
