@@ -70,7 +70,7 @@ spec:
           args: 
             - "openssl"
             - "pkcs12"
-            - "export"
+            - "-export"
             - "-in"
             - "/opt/certs/pem/cert.pem"
             - "-inkey"
