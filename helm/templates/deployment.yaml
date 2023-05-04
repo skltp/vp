@@ -109,7 +109,7 @@ spec:
             - name: TP_TLS_STORE_CONSUMER_PASSWORD
               value: password
             - name: TP_TLS_STORE_LOCATION
-              value: "file://opt/certs/pkcs12/"
+              value: "file:/opt/certs/pkcs12/"
             - name: TP_TLS_STORE_TRUSTSTORE_FILE
               value: truststore.pfx
             - name: TP_TLS_STORE_TRUSTSTORE_TYPE
