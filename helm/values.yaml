@@ -13,7 +13,7 @@ initContainer:
   certGen:
     pemCertSecret: tak.dev.ntjp.se-letsencrypt
     image:
-      name: vp-cert-gen-ic
+      name: cert-generator-utility
 
 service:
   name: vp
@@ -28,3 +28,5 @@ environment:
       # Nothing yet. Override to supply your own maps.
     secrets:
       # Nothing yet. Override to supply your own secrets.
+
+resources: {}
