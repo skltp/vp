@@ -11,7 +11,7 @@ container:
 
 initContainer:
   certGen:
-    pemCertSecret: tak.dev.ntjp.se-letsencrypt
+    pemCertSecret: esb-function-cert
     image:
       name: cert-generator-utility
 
