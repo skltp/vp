@@ -1,0 +1,10 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+    name: pass-client-cert
+spec:
+    passTLSClientCert:
+        pem: true
+        info:
+            subject:
+                serialNumber: true

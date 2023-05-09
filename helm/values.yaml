@@ -23,6 +23,15 @@ ingress:
   tls:
     secret:
       name: esb-function-cert
+    version:
+      min: VersionTLS12
+      max: VersionTLS13
+    mtls:
+      clientAuth:
+        secretNames:
+          - esb-function-cert
+        clientAuthType: RequireAndVerifyClientCert
+
   host:
     name:  # change to value to override the derived hostname
 

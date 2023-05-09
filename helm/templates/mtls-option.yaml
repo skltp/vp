@@ -1,0 +1,9 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: TLSOption
+metadata:
+    name: mtls-option
+
+spec:
+  minVersion: {{ .Values.ingress.tls.version.min }}
+  maxVersion: {{ .Values.ingress.tls.version.max }}
+  clientAuth: {{ .Values.ingress.tls.mtls.clientAuth | toYaml | nindent 4 }}
