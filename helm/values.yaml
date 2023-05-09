@@ -3,6 +3,9 @@ namespace: ntjp
 deployment:
   name: vp
   replicaCount: 1
+  environment:
+    name: dev
+    domain: ntjp.se
 
 container:
   image:
@@ -14,6 +17,14 @@ initContainer:
     pemCertSecret: esb-function-cert
     image:
       name: cert-generator-utility
+
+ingress:
+  enabled: true
+  tls:
+    secret:
+      name: esb-function-cert
+  host:
+    name:  # change to value to override the derived hostname
 
 service:
   name: vp
