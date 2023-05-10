@@ -59,11 +59,9 @@ spec:
           volumeMounts:
             - name: pkcs12-volume
               mountPath: /opt/certs/pkcs12
-              readonly: false
             - name: pem-certs-volume
               mountPath: /opt/certs/pem
-              readonly: true
-          command: 
+          command:
             - "/bin/sh"
             - "-c"
             - "--"
