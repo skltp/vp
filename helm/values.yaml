@@ -49,4 +49,7 @@ environment:
     secrets:
       # Nothing yet. Override to supply your own secrets.
 
+imagePullSecrets:
+  - name: regcred
+
 resources: {}

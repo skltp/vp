@@ -34,9 +34,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      
-      imagePullSecrets:
-        - name: regcred
+
+      {{ if .Values.imagePullSecrets -}}
+      imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 6 }}
+      {{- end -}}
 
       volumes: 
         - name: pem-certs-volume
