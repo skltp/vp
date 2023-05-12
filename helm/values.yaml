@@ -41,6 +41,10 @@ service:
   port: 8080
 
 environment:
+  config_files:
+    - config_map: vp-config-files
+      path: /etc/vp
+      volume_name: default-config-files-from-cm
   variables:
     _default_config_maps:
       - vp-configmap-default

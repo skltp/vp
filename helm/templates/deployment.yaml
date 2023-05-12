@@ -37,7 +37,7 @@ spec:
 
       {{ if .Values.imagePullSecrets -}}
       imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 6 }}
-      {{- end -}}
+      {{- end }}
 
       volumes: 
         - name: pem-certs-volume
@@ -50,6 +50,11 @@ spec:
                 path: cert.pem
             optional: true
         - name: pkcs12-volume
+        {{- range .Values.environment.config_files }}
+        - name: {{ .volume_name }}
+          configMap:
+            name: {{ .config_map }}
+        {{- end }}
 
       initContainers:
         - name: {{ .Values.initContainer.certGen.image.name }}
@@ -118,5 +123,9 @@ spec:
           volumeMounts:
             - name: pkcs12-volume
               mountPath: /opt/certs/pkcs12
+            {{- range .Values.environment.config_files }}
+            - name: {{ .volume_name }}
+              mountPath: {{ .path }}
+            {{- end }}
 
 
