@@ -3,15 +3,15 @@ kind: ConfigMap
 metadata:
   name: vp-configmap-default
 data:
-  BASE_PATH: /etc/vp
-  DATA_PATH: /var/run/vp/data
-  CONFIGURATION_VERSION_FILE: ${base.path}/config/config.version
+  BASE_PATH: {{ tpl .Values.paths.base . }}
+  DATA_PATH: {{ tpl .Values.paths.data . }}
+  CONFIGURATION_VERSION_FILE: {{ tpl .Values.paths.config . }}/config.version
   DEFAULTROUTING_ALLOWEDCONTRACTS: urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateQuestionResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateAnswerResponder:1
   DEFAULTROUTING_ALLOWEDSENDERIDS: a b c
   HAWTIO_AUTHENTICATION_ENABLED: "true"
-  HAWTIO_EXTERNAL_LOGINFILE: ${base.path}/config/users.properties
+  HAWTIO_EXTERNAL_LOGINFILE: {{ tpl .Values.paths.config . }}/users.properties
   HEADERS_REG_EXP_REQUESTHEADERSTOREMOVE: (?i)x-vp.*|PEER_CERTIFICATES|X-Forwarded.*|MULE_.*|X-MULE_.*|Connection|accept-encoding
-  HSA_FILES: ${base.path}/config/hsacachecomplementary.xml,${data.path}/hsaunits.xml
+  HSA_FILES: {{ tpl .Values.paths.config . }}/hsacachecomplementary.xml,{{ tpl .Values.paths.data . }}/hsaunits.xml
   IP_WHITELIST: 127.0.0.1,10.
   MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: hawtio,jolokia
   MEMORY_LOGGER_PERIOD_SECONDS: "1800"
@@ -23,18 +23,18 @@ data:
   SENDER_ID_ALLOWED_LIST: TSTNMT2321000156-B02
   SERVER_FORWARDHEADERSSTRATEGY: NONE
   SERVER_PORT: "8089"
-  SERVER_UNDERTOW_ACCESSLOG_DIR: /var/log/camel
+  SERVER_UNDERTOW_ACCESSLOG_DIR: {{ tpl .Values.paths.log . }}
   SERVER_UNDERTOW_ACCESSLOG_ENABLED: "true"
   SERVER_UNDERTOW_ACCESSLOG_PATTERN: common
   SERVER_UNDERTOW_ACCESSLOG_PREFIX: access_log
   SERVER_UNDERTOW_ACCESSLOG_ROTATE: "true"
   SERVER_UNDERTOW_ACCESSLOG_SUFFIX: .log
   TAKCACHE_ENDPOINT_ADDRESS: http://tak-services-svc:8080/tak-services/SokVagvalsInfo/v2
-  TAKCACHE_PERSISTENT_FILE_NAME: ${data.path}/localCache
+  TAKCACHE_PERSISTENT_FILE_NAME: {{ tpl .Values.paths.data . }}/localCache
   TAKCACHE_USE_BEHORIGHET_CACHE: "true"
   TAKCACHE_USE_VAGVAL_CACHE: "true"
   THROW_VP013_WHEN_ORIGINALCONSUMER_NOT_ALLOWED: "false"
-  TIMEOUT_JSON_FILE: ${base.path}/config/timeoutconfig.json
+  TIMEOUT_JSON_FILE: {{ tpl .Values.paths.config . }}/timeoutconfig.json
   TIMEOUT_JSON_FILE_DEFAULT_TJANSTEKONTRAKT_NAME: default_timeouts
   VAGVALROUTER_DEFAULT_ROUTING_ADDRESS_DELIMITER: '#'
   VP_HOST: 0.0.0.0
@@ -47,8 +47,8 @@ data:
   VP_RESET_CACHE_URL: http://${vp.host}:23000/resetcache
   VP_STATUS_URL: http://${vp.host}:8080/status
   VP_USE_ROUTING_HISTORY: "true"
-  WSDL_JSON_FILE: ${base.path}/config/wsdlconfig.json
-  WSDLFILES_DIRECTORY: ${base.path}/wsdl/
+  WSDL_JSON_FILE: {{ tpl .Values.paths.config . }}/wsdlconfig.json
+  WSDLFILES_DIRECTORY: {{ tpl .Values.paths.base . }}/wsdl/
   HTTP_FORWARDED_HEADER_AUTH_CERT: X-Forwarded-Tls-Client-Cert
   JAVA_OPTS:  -Dlog4j2.formatMsgNoLookups=true
               -Dfile.encoding=UTF-8
@@ -56,7 +56,7 @@ data:
               -Duser.language=sv
               -Dspring.profiles.active=custom
               -Xms512m -Xmx1536m -XX:MaxDirectMemorySize=4096m
-              -Dlog4j.configurationFile=file://${base.path}/config/log4j2.xml
+              -Dlog4j.configurationFile=file://{{ tpl .Values.paths.config . }}/log4j2.xml
               -Dcom.sun.management.jmxremote
               -Dcom.sun.management.jmxremote.port=8084
               -Dcom.sun.management.jmxremote.rmi.port=8084
@@ -69,7 +69,7 @@ data:
   TP_TLS_ALLOWEDOUTGOINGPROTOCOLS: TLSv1.2
   TP_TLS_STORE_CONSUMER_FILE: function_cert.p12
   TP_TLS_STORE_CONSUMER_TYPE: PKCS12
-  TP_TLS_STORE_LOCATION: file://${base.path}/certs/
+  TP_TLS_STORE_LOCATION: file://{{ tpl .Values.paths.base . }}/certs/
   TP_TLS_STORE_PRODUCER_FILE: function_cert.p12
   TP_TLS_STORE_PRODUCER_TYPE: PKCS12
   TP_TLS_STORE_TRUSTSTORE_FILE: truststore.p12

@@ -40,10 +40,17 @@ service:
   type: ClusterIP
   port: 8080
 
+paths:
+  base: /etc/vp
+  data: "/var/run/vp/data"
+  config: "{{ .Values.paths.base }}/config"
+  log: /var/log/camel
+
 environment:
   config_files:
     - config_map: vp-config-files
-      path: /etc/vp
+      path: "{{ .Values.paths.base }}/config"
+      path_relative_to_base: true
       volume_name: default-config-files-from-cm
   variables:
     _default_config_maps:
