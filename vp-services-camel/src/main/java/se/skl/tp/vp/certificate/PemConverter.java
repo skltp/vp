@@ -51,35 +51,17 @@ public class PemConverter {
 
     StringBuilder formattedCert = new StringBuilder();
 
-    if (pemCertString.startsWith("MII")) {
-      String decoded = null;
-      try {
-        decoded = URLDecoder.decode(pemCertString, "utf8");
-
-        formattedCert.append(BEGIN_HEADER);
-        formattedCert.append("\n");
-        formattedCert.append(decoded.split(",", 2)[0]);
-        formattedCert.append("\n");
-        formattedCert.append(END_HEADER);
-        InputStream is = new ByteArrayInputStream(formattedCert.toString().getBytes());
-        return new BufferedInputStream(is);
-      } catch (UnsupportedEncodingException e) {
-        return null;
-      }
+    if (pemCertString.startsWith("MII")) {  // if the header contains cert without -----BEGIN and -----END
+      pemCertString = pemCertString.split(",", 2)[0];
+    } else {
+      int beginHeader = pemCertString.indexOf(BEGIN_HEADER) + BEGIN_HEADER.length();
+      int endHeader = pemCertString.indexOf(END_HEADER);
+      pemCertString = pemCertString.substring(beginHeader, endHeader).replaceAll("\\s+", "");
     }
 
-    int beginHeader = pemCertString.indexOf(BEGIN_HEADER) + BEGIN_HEADER.length();
-    int endHeader = pemCertString.indexOf(END_HEADER);
+    formattedCert.append(BEGIN_HEADER).append("\n").append(pemCertString).append("\n").append(END_HEADER);
 
-    formattedCert.append(BEGIN_HEADER);
-    formattedCert.append("\n");
-    formattedCert.append(pemCertString.substring(beginHeader, endHeader).replaceAll("\\s+", ""));
-    formattedCert.append("\n");
-    formattedCert.append(END_HEADER);
-
-    pemCertString = formattedCert.toString();
-
-    InputStream is = new ByteArrayInputStream((pemCertString).getBytes());
+    InputStream is = new ByteArrayInputStream(formattedCert.toString().getBytes());
     return new BufferedInputStream(is);
   }
 
