@@ -14,9 +14,10 @@ TRUST_PEMD=$(mktemp -d)
 
 openssl pkcs12 -export -in ${CLIENT_CRT} -inkey ${CLIENT_KEY} -out ${CLIENT_TMP} -passin pass:${CLIENT_PWD}
 
-keytool -importkeystore -srcstoretype PKCS12  -deststoretype PKCS12 \
+keytool -importkeystore -srcstoretype PKCS12  -deststoretype PKCS12 -noprompt \
         -srckeystore   ${CLIENT_TMP} -destkeystore ${CLIENT_PFX} \
-        -deststorepass ${CLIENT_PWD} -destkeypass  ${CLIENT_PWD} -srcstorepass ${CLIENT_PWD} -s
+        -deststorepass ${CLIENT_PWD} -destkeypass  ${CLIENT_PWD} -srcstorepass ${CLIENT_PWD} -srckeypass ${CLIENT_PWD}
+
 
 cat ${TRUST_PEM} | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="'${TRUST_PEMD}'/cert"a".pem"; print >out}'
 for crt in ${TRUST_PEMD}
