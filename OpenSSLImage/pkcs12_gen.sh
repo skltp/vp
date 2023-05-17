@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 CLIENT_CRT="/opt/certs/pem/cert.pem"
 CLIENT_KEY="/opt/certs/pem/key.pem"
@@ -16,7 +16,7 @@ openssl pkcs12 -export -in ${CLIENT_CRT} -inkey ${CLIENT_KEY} -out ${CLIENT_TMP}
 
 keytool -importkeystore -srcstoretype PKCS12  -deststoretype PKCS12 \
         -srckeystore   ${CLIENT_TMP} -destkeystore ${CLIENT_PFX} \
-        -deststorepass ${CLIENT_PWD} -destkeypass  ${CLIENT_PWD} -srcstorepass ${CLIENT_PWD}
+        -deststorepass ${CLIENT_PWD} -destkeypass  ${CLIENT_PWD} -srcstorepass ${CLIENT_PWD} -s
 
 cat ${TRUST_PEM} | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="'${TRUST_PEMD}'/cert"a".pem"; print >out}'
 for crt in ${TRUST_PEMD}
