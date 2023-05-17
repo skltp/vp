@@ -35,7 +35,7 @@ ingress:
           - esb-function-cert
         clientAuthType: RequireAndVerifyClientCert
   host:
-    name: # set this value to override the default hostname
+    name: # set this value to override the default hostname, which is esb.{ingressroute.hostUrl}
 
 service:
   name: vp
