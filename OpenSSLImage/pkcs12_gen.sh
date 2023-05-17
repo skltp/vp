@@ -16,11 +16,11 @@ openssl pkcs12 -export -in ${CLIENT_CRT} -inkey ${CLIENT_KEY} -out ${CLIENT_TMP}
 
 keytool -importkeystore -srcstoretype PKCS12  -deststoretype PKCS12 -noprompt \
         -srckeystore   ${CLIENT_TMP} -destkeystore ${CLIENT_PFX} \
-        -deststorepass ${CLIENT_PWD} -destkeypass  ${CLIENT_PWD} -srcstorepass ${CLIENT_PWD} -srckeypass ${CLIENT_PWD}
+        -deststorepass ${CLIENT_PWD} -srcstorepass ${CLIENT_PWD}
 
 
 cat ${TRUST_PEM} | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="'${TRUST_PEMD}'/cert"a".pem"; print >out}'
-for crt in ${TRUST_PEMD}
+for crt in ${TRUST_PEMD}/*.pem
 do
   keytool -import -alias ${crt} -noprompt -file ${crt} -keystore ${TRUST_PFX} -storetype PKCS12 -storepass ${TRUST_PWD}
 done
