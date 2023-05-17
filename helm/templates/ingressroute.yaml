@@ -9,19 +9,19 @@ metadata:
   labels:
     {{- include "vp_services.labels" . | nindent 4 }}
 spec:
-    routes:
-        - kind: Rule
-          match: "Host(`{{ $hostName }}`) && PathPrefix(`/vp`)"
-          middlewares:
-              - name: pass-client-cert
-          services:
-              - kind: Service
-                name: vp
-                port: 8080
-                scheme: http
-    tls:
-        secretName: {{ .Values.ingress.tls.secret.name }}
-        options:
-            name: mtls-option
+  routes:
+    - kind: Rule
+      match: "Host(`{{ $hostName }}`) && PathPrefix(`/vp`)"
+      middlewares:
+        - name: pass-client-cert
+      services:
+        - kind: Service
+          name: vp
+          port: 8080
+          scheme: http
+  tls:
+    secretName: {{ .Values.ingress.tls.secret.name }}
+    options:
+      name: mtls-option
 
 {{- end }}

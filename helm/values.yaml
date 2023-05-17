@@ -18,6 +18,9 @@ initContainer:
     image:
       name: cert-generator-utility
 
+ingressroute:
+  hostUrl: base.env.url # This should be overridden and set to your environment's base URL.
+
 ingress:
   enabled: true
   tls:
@@ -31,9 +34,8 @@ ingress:
         secretNames:
           - esb-function-cert
         clientAuthType: RequireAndVerifyClientCert
-
   host:
-    name:  # change to value to override the derived hostname
+    name: # set this value to override the default hostname
 
 service:
   name: vp
