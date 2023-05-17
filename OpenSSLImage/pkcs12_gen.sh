@@ -12,7 +12,7 @@ TRUST_PWD="password"
 CLIENT_TMP=$(mktemp -u)
 TRUST_PEMD=$(mktemp -d)
 
-openssl pkcs12 -export -in ${CLIENT_CRT} -inkey ${CLIENT_KEY} -out ${CLIENT_TMP} -passin pass:${CLIENT_PWD}
+openssl pkcs12 -export -in ${CLIENT_CRT} -inkey ${CLIENT_KEY} -out ${CLIENT_TMP} -passout pass:${CLIENT_PWD}
 
 keytool -importkeystore -srcstoretype PKCS12  -deststoretype PKCS12 -noprompt \
         -srckeystore   ${CLIENT_TMP} -destkeystore ${CLIENT_PFX} \
