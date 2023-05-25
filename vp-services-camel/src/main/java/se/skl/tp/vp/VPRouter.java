@@ -189,6 +189,7 @@ public class VPRouter extends RouteBuilder {
             .routeId(TO_PRODUCER_ROUTE)
 
             .onException(SocketException.class)
+                .asyncDelayedRedelivery()
                 .redeliveryDelay("{{vp.producer.retry.delay}}")
                 .maximumRedeliveries("{{vp.producer.retry.attempts}}")
                     .logRetryAttempted(true)
