@@ -14,7 +14,6 @@ spec:
       match: "Host(`{{ $hostName }}`) && PathPrefix(`/vp`)"
       middlewares:
         - name: pass-client-cert
-        - name: de-capitalization-vp
       services:
         - kind: Service
           name: vp
