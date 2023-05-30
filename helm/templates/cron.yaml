@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-hsa-cache
+spec:
+  schedule: {{ .Values.hsaContainer.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: certs-volume
+              secret:
+                secretName: {{ .Values.hsaContainer.certSecret | default "tjp-function-cert" }}
+            #- name: data-volume
+            #  persistentVolumeClaim:
+            #    claimName: {{ .Values.data_volume.claim }}
+          containers:
+            - name: {{ .Values.hsaContainer.image.name }}
+              image: "{{ .Values.repository }}{{ .Values.hsaContainer.image.name }}:{{ .Values.hsaContainer.image.tag }}"
+              imagePullPolicy: Always
+              envFrom:
+                {{- range $.Values.environment.variables.config_maps }}
+                - configMapRef:
+                    name: {{ . }}
+                {{- end }}
+                {{- range $.Values.environment.variables.secrets }}
+                - secretRef:
+                    name: {{ . }}
+                {{- end }}
+              volumeMounts:
+                - name: certs-volume
+                  mountPath: /etc/vp/certs
+                  readOnly: true
+                #- name: data-volume
+                #  mountPath: /var/run/vp/data
+                #  readOnly: false
+              command:
+                - /bin/bash
+                - -c
+                - date; sleep 3600
+          imagePullSecrets:
+            - name: regcred
+
+          restartPolicy: OnFailure
