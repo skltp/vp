@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: update-hsa-cache
 spec:
-  schedule: {{ .Values.hsaContainer.schedule }}
+  schedule: "{{ .Values.hsaContainer.schedule }}"
   jobTemplate:
     spec:
       template:
