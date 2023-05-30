@@ -12,9 +12,6 @@ spec:
             - name: certs-volume
               secret:
                 secretName: {{ .Values.hsaContainer.certSecret | default "tjp-function-cert" }}
-            #- name: data-volume
-            #  persistentVolumeClaim:
-            #    claimName: {{ .Values.data_volume.claim }}
           containers:
             - name: {{ .Values.hsaContainer.image.name }}
               image: "{{ .Values.repository }}{{ .Values.hsaContainer.image.name }}:{{ .Values.hsaContainer.image.tag }}"
@@ -32,9 +29,6 @@ spec:
                 - name: certs-volume
                   mountPath: /etc/vp/certs
                   readOnly: true
-                #- name: data-volume
-                #  mountPath: /var/run/vp/data
-                #  readOnly: false
               command:
                 - /bin/bash
                 - -c
