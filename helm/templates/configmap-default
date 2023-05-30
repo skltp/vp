@@ -41,7 +41,7 @@ data:
   VP_HSA_RESET_CACHE_URL: http://${vp.host}:24000/resethsacache
   VP_HTTP_ROUTE_URL: http://${vp.host}:8080/vp
   VP_HTTPS_ROUTE_URL: https://${vp.host}:20000/vp
-  VP_INSTANCE_ID: NTjP_T_SERVICES_SE165565594230-10BR
+  VP_INSTANCE_ID: {{ .Values.skltp.instanceId }}
   VP_INSTANCE_NAME: NTJP-DEV
   VP_MAX_RECEIVE_LENGTH: "52428800"
   VP_RESET_CACHE_URL: http://${vp.host}:23000/resetcache
