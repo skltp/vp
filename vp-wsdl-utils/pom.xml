@@ -6,7 +6,7 @@
   <parent>
     <artifactId>vp-parent-camel</artifactId>
     <groupId>se.skltp.vp</groupId>
-    <version>4.3.1-SNAPSHOT</version>
+    <version>4.3.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>vp-wsdl-utils</artifactId>
@@ -31,7 +31,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.2.1</version>
+      <version>2.13.4.2</version>
     </dependency>
 
     <dependency>
