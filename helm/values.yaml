@@ -83,7 +83,7 @@ pem_to_pfx:
     path: /opt/certs/pem
   pfx:
     path: /opt/certs/pkcs12
-  trusts:
+  trust:
     secretName: esb-function-cert
     pemFile: ca.pem
     pfxFile: truststore.pfx
