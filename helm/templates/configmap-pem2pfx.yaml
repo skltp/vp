@@ -1,0 +1,28 @@
+{{ if .Values.pem_to_pfx }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pem2pfx
+data:
+
+  {{- with .Values.pem_to_pfx }}
+    {{- if .trust }}
+  PEM2PFX_TRUST_PEM_PATH: {{ .pem.path }}/{{ .trust.pemFile }}
+  PEM2PFX_TRUST_PFX_PATH: {{ .pfx.path }}
+  PEM2PFX_TRUST_PFX_PASSWORD: {{ .trust.password }}
+    {{- end }}
+    {{- if .producer }}
+  PEM2PFX_PRODUCER_PEM_PATH: {{ .pem.path }}/{{ .pem.certFile }}
+  PEM2PFX_PRODUCER_KEY_PATH: {{ .pem.path }}/{{ .producer.pemKeyFile }}
+  PEM2PFX_PRODUCER_PFX_PATH: {{ .pfx.path }}/{{ .producer.pfxFile }}
+  PEM2PFX_PRODUCER_PFX_PASSWORD: {{ .producer.password }}
+    {{- end }}
+    {{- if .consumer }}
+  PEM2PFX_CONSUMER_PEM_PATH: {{ .pem.path }}/{{ .consumer.pemCertFile }}
+  PEM2PFX_CONSUMER_KEY_PATH: {{ .pem.path }}/{{ .consumer.pemKeyFile }}
+  PEM2PFX_CONSUMER_PFX_PATH: {{ .pfx.path }}/{{ .consumer.pfxFile }}
+  PEM2PFX_CONSUMER_PFX_PASSWORD: {{ .consumer.password }}
+    {{- end }}
+  {{- end }}
+{{- end }}

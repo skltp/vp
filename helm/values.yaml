@@ -7,16 +7,14 @@ deployment:
     name: dev
     domain: ntjp.se
 
+skltp:
+  instanceId: default_instance
+
 container:
   image:
     name: vp-services-camel
     pullPolicy: Always
 
-initContainer:
-  certGen:
-    pemCertSecret: esb-function-cert
-    image:
-      name: cert-generator-utility
 
 hsaContainer:
   schedule: "@daily"
@@ -71,5 +69,37 @@ environment:
 
 imagePullSecrets:
   - name: regcred
+
+
+initContainer:
+  certGen:
+    pemCertSecret: esb-function-cert
+    image:
+      name: cert-generator-utility
+
+pem_to_pfx:
+  envPrefix: PEM2PFX
+  pem:
+    path: /opt/certs/pem
+  pfx:
+    path: /opt/certs/pkcs12
+  trusts:
+    secretName: esb-function-cert
+    pemFile: ca.pem
+    pfxFile: truststore.pfx
+    password: password
+  producer:
+    secretName: esb-function-cert
+    pemCertFile: producer.crt
+    pemKeyFile: producer.key
+    pfxFile: producer.pfx
+    password: password
+  consumer:
+    secretName: esb-function-cert
+    pemCertFile: consumer.crt
+    pemKeyFile: consumer.key
+    pfxFile: consumer.pfx
+    password: password
+
 
 resources: {}

@@ -40,17 +40,17 @@ spec:
       {{- end }}
 
       volumes: 
-        - name: pem-certs-volume
+        - name: trust-cert-vol
           secret:
-            secretName: {{ .Values.initContainer.certGen.pemCertSecret | default "tjp-function-cert" }}
-            items:
-              - key: {{ .Values.initContainer.certGen.pemCertSecretKeyItem | default "tls.key" }}
-                path: key.pem
-              - key: {{ .Values.initContainer.certGen.pemCertSecretCertItem | default "tls.crt" }}
-                path: cert.pem
-              - key: {{ .Values.initContainer.certGen.pemCertSecretChainItem | default "ca.crt" }}
-                path: ca.pem
-            optional: true
+            secretName: {{ .Values.pem_to_pfx.trust.secretName }}
+        - name: producer-cert-vol
+          secret:
+            secretName: {{ .Values.pem_to_pfx.producer.secretName }}
+        {{ if .Values.pem_to_pfx.consumer }}
+        - name: consumer-cert-vol
+          secret:
+            secretName: {{ .Values.pem_to_pfx.consumer.secretName }}
+        {{- end }}
         - name: pkcs12-volume
         - name: data-volume
         {{- range .Values.environment.config_files }}
@@ -64,18 +64,37 @@ spec:
           image: "{{ .Values.repository }}{{ .Values.initContainer.certGen.image.name }}:{{ .Values.initContainer.certGen.image.tag | default $.Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy | default "Always" }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}          
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: pkcs12-volume
               mountPath: /opt/certs/pkcs12
-            - name: pem-certs-volume
-              mountPath: /opt/certs/pem
-          command:
-            - "/bin/sh"
-            - "-c"
-            - "--"
-          args: 
-            - 'sh /usr/bin/pkcs12gen; chmod 444 /opt/certs/pkcs12/*.pfx'
+              {{- with .Values.pem_to_pfx }}
+            - name: trust-pem-vol
+              mountPath: {{ .pem.path }}/{{ .trust.pemFile }}
+              subPath: ca.crt
+              readonly: true
+            - name: producer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .producer.pemKeyFile }}
+              subPath: tls.key
+              readonly: true
+            - name: producer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .producer.pemCertFile }}
+              subPath: tls.crt
+              readonly: true
+              {{ if .consumer }}
+            - name: consumer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .consumer.pemKeyFile }}
+              subPath: tls.key
+              readonly: true
+            - name: consumer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .consumer.pemCertFile }}
+              subPath: tls.crt
+              readonly: true
+              {{- end }}
+              {{- end }}
+          envFrom:
+            - configMapRef:
+                name: pem2pfx
 
       containers:
         - name: {{ .Values.container.image.name }}
@@ -102,35 +121,16 @@ spec:
             - secretRef:
                 name: {{ . }}
             {{- end }}
-          env:
-            - name: TP_TLS_STORE_PRODUCER_FILE
-              value: "function_cert.pfx"
-            - name: TP_TLS_STORE_PRODUCER_TYPE
-              value: PKCS12
-            - name: TP_TLS_STORE_PRODUCER_PASSWORD
-              value: password
-            - name: TP_TLS_STORE_CONSUMER_FILE
-              value: "function_cert.pfx"
-            - name: TP_TLS_STORE_CONSUMER_TYPE
-              value: PKCS12
-            - name: TP_TLS_STORE_CONSUMER_PASSWORD
-              value: password
-            - name: TP_TLS_STORE_LOCATION
-              value: "file:/opt/certs/pkcs12/"
-            - name: TP_TLS_STORE_TRUSTSTORE_FILE
-              value: truststore.pfx
-            - name: TP_TLS_STORE_TRUSTSTORE_TYPE
-              value: PKCS12
-            - name: TP_TLS_STORE_TRUSTSTORE_PASSWORD
-              value: password
+            {{ if .Values.pem_to_pfx }}
+            - configMapRef:
+                name: generated_pfx_values
+            {{- end }}
           volumeMounts:
             - name: data-volume
               mountPath: {{ tpl .Values.paths.data . }}
             - name: pkcs12-volume
-              mountPath: /opt/certs/pkcs12
+              mountPath: {{ .Values.pem_to_pfx.pfx.path }}
             {{- range .Values.environment.config_files }}
             - name: {{ .volume_name }}
               mountPath: {{ tpl .path $ }}
             {{- end }}
-
-
