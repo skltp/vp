@@ -13,7 +13,7 @@ data:
   PEM2PFX_TRUST_PFX_PASSWORD: {{ .trust.password }}
     {{- end }}
     {{- if .producer }}
-  PEM2PFX_PRODUCER_PEM_PATH: {{ .pem.path }}/{{ .pem.certFile }}
+  PEM2PFX_PRODUCER_PEM_PATH: {{ .pem.path }}/{{ .producer.pemCertFile }}
   PEM2PFX_PRODUCER_KEY_PATH: {{ .pem.path }}/{{ .producer.pemKeyFile }}
   PEM2PFX_PRODUCER_PFX_PATH: {{ .pfx.path }}/{{ .producer.pfxFile }}
   PEM2PFX_PRODUCER_PFX_PASSWORD: {{ .producer.password }}
