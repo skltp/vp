@@ -72,24 +72,19 @@ spec:
             - name: trust-pem-vol
               mountPath: {{ .pem.path }}/{{ .trust.pemFile }}
               subPath: ca.crt
-              readonly: true
             - name: producer-pem-vol
               mountPath: {{ .pem.path }}/{{ .producer.pemKeyFile }}
               subPath: tls.key
-              readonly: true
             - name: producer-pem-vol
               mountPath: {{ .pem.path }}/{{ .producer.pemCertFile }}
               subPath: tls.crt
-              readonly: true
               {{ if .consumer }}
             - name: consumer-pem-vol
               mountPath: {{ .pem.path }}/{{ .consumer.pemKeyFile }}
               subPath: tls.key
-              readonly: true
             - name: consumer-pem-vol
               mountPath: {{ .pem.path }}/{{ .consumer.pemCertFile }}
               subPath: tls.crt
-              readonly: true
               {{- end }}
               {{- end }}
           envFrom:
