@@ -40,14 +40,14 @@ spec:
       {{- end }}
 
       volumes: 
-        - name: trust-cert-vol
+        - name: trust-pem-vol
           secret:
             secretName: {{ .Values.pem_to_pfx.trust.secretName }}
-        - name: producer-cert-vol
+        - name: producer-pem-vol
           secret:
             secretName: {{ .Values.pem_to_pfx.producer.secretName }}
         {{ if .Values.pem_to_pfx.consumer }}
-        - name: consumer-cert-vol
+        - name: consumer-pem-vol
           secret:
             secretName: {{ .Values.pem_to_pfx.consumer.secretName }}
         {{- end }}
