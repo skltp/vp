@@ -9,7 +9,7 @@ data:
   {{- with .Values.pem_to_pfx }}
     {{- if .trust }}
   PEM2PFX_TRUST_PEM_PATH: {{ .pem.path }}/{{ .trust.pemFile }}
-  PEM2PFX_TRUST_PFX_PATH: {{ .pfx.path }}
+  PEM2PFX_TRUST_PFX_PATH: {{ .pfx.path }}/{{ .trust.pfxFile}}
   PEM2PFX_TRUST_PFX_PASSWORD: {{ .trust.password }}
     {{- end }}
     {{- if .producer }}
