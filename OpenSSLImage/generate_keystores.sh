@@ -7,7 +7,9 @@ function mk_keystore_from_pem() {
     PFX_PATH=$3
     PFX_PASSWORD=$4
     INTERMEDIATE=$(mktemp -u)
-    echo "Creating private keystore from ${PEM_CRT_PATH} and ${PEM_KEY_PATH} into PKCS12 file: ${PFX_PATH}"
+    echo
+    echo "Creating private keystore from ${PEM_CRT_PATH} and ${PEM_KEY_PATH} into intermediate PKCS12 file: ${INTERMEDIATE}"
+    openssl x509 -in ${PEM_CRT_PATH} -noout -subject -issuer| sed -r ':begin;$!N;s/\n/; /;tbegin;s/ = /=/g;s/(subject|issuer)=/\1: /g'
     openssl pkcs12 -export -in ${PEM_CRT_PATH} -inkey ${PEM_KEY_PATH} -out ${INTERMEDIATE} -passout pass:${PFX_PASSWORD}
     keytool -importkeystore -srcstoretype PKCS12  -deststoretype PKCS12 -noprompt \
             -srckeystore   ${INTERMEDIATE} -destkeystore ${PFX_PATH} \
@@ -21,6 +23,7 @@ if [ -n "$PEM2PFX_TRUST_PEM_PATH" ]
 then
   TRUST_TMP_DIR=$(mktemp -d)
   cat ${PEM2PFX_TRUST_PEM_PATH} | awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="'${TRUST_TMP_DIR}'/cert"a".pem"; print >out}'
+  echo "Create truststore ${PEM2PFX_TRUST_PFX_PATH}"
   for crt in ${TRUST_TMP_DIR}/*.pem
   do
     alias=$(openssl x509 -in $crt -noout -subject -enddate| tr -d '\n'| tr '[:upper:]' '[:lower:]' | \
