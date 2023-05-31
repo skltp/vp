@@ -6,7 +6,7 @@ metadata:
 data:
 
   {{ with .Values.pem_to_pfx -}}
-  TP_TLS_STORE_LOCATION: "file:{{ .pfx.path }}"
+  TP_TLS_STORE_LOCATION: "file:{{ .pfx.path }}/"
 
   TP_TLS_STORE_TRUSTSTORE_FILE: {{ .trust.pfxFile }}
   TP_TLS_STORE_TRUSTSTORE_TYPE: PKCS12
