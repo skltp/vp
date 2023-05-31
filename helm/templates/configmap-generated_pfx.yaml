@@ -12,7 +12,7 @@ data:
   TP_TLS_STORE_TRUSTSTORE_TYPE: PKCS12
   TP_TLS_STORE_TRUSTSTORE_PASSWORD: {{ .trust.password }}
 
-  TP_TLS_STORE_PRODUCER_FILE: {{ .producer.file }}
+  TP_TLS_STORE_PRODUCER_FILE: {{ .producer.pfxFile }}
   TP_TLS_STORE_PRODUCER_TYPE: PKCS12
   TP_TLS_STORE_PRODUCER_PASSWORD: {{ .producer.password }}
 
