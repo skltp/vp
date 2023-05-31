@@ -118,7 +118,7 @@ spec:
             {{- end }}
             {{ if .Values.pem_to_pfx }}
             - configMapRef:
-                name: generated_pfx_values
+                name: generated-pfx-values
             {{- end }}
           volumeMounts:
             - name: data-volume

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: generated_pfx_values
+  name: generated-pfx-values
 data:
 
   {{ with .Values.pem_to_pfx -}}
