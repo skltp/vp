@@ -73,7 +73,6 @@ imagePullSecrets:
 
 initContainer:
   certGen:
-    pemCertSecret: esb-function-cert
     image:
       name: cert-generator-utility
 
@@ -95,7 +94,7 @@ pem_to_pfx:
     pfxFile: producer.pfx
     password: password
   consumer:
-    secretName: esb-function-cert
+    secretName: test.esb.ntjp.se
     pemCertFile: consumer.crt
     pemKeyFile: consumer.key
     pfxFile: consumer.pfx
