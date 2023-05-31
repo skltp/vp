@@ -94,7 +94,7 @@ pem_to_pfx:
     pfxFile: producer.pfx
     password: password
   consumer:
-    secretName: test.esb.ntjp.se
+    secretName: test.esb.ntjp.sjunet.org
     pemCertFile: consumer.crt
     pemKeyFile: consumer.key
     pfxFile: consumer.pfx
