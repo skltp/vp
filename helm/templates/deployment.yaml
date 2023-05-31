@@ -18,6 +18,7 @@ spec:
   template:
     metadata:
       annotations:
+        skltp-hsa-cache-reset-url: "http://$(POD_IP):24000/resethsacache"
       labels:
         app: {{ .Values.deployment.name }}
     spec:
@@ -123,6 +124,10 @@ spec:
               value: PKCS12
             - name: TP_TLS_STORE_TRUSTSTORE_PASSWORD
               value: password
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           volumeMounts:
             - name: data-volume
               mountPath: {{ tpl .Values.paths.data . }}
