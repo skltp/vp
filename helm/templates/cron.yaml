@@ -8,6 +8,7 @@ spec:
     spec:
       template:
         spec:
+          serviceAccountName: serviceaccount-vp-cron
           volumes:
             - name: certs-volume
               secret:
