@@ -10,9 +10,12 @@ spec:
         spec:
           serviceAccountName: serviceaccount-vp-cron
           volumes:
-            - name: certs-volume
+            - name: cert-volume
               secret:
-                secretName: {{ .Values.hsaContainer.certSecret | default "tjp-function-cert" }}
+                secretName: {{ .Values.hsaContainer.certSecret }}
+            - name: trust-volume
+              secret:
+                secretName: {{ .Values.hsaContainer.trustSecret }}
           containers:
             - name: {{ .Values.hsaContainer.image.name }}
               image: "{{ .Values.repository }}{{ .Values.hsaContainer.image.name }}:{{ .Values.hsaContainer.image.tag }}"
@@ -27,9 +30,15 @@ spec:
                     name: {{ . }}
                 {{- end }}
               volumeMounts:
-                - name: certs-volume
-                  mountPath: /etc/vp/certs
-                  readOnly: true
+                - name: cert-volume
+                  mountPath: /opt/cert/tls.crt
+                  subPath: tls.crt
+                - name: cert-volume
+                  mountPath: /opt/cert/tls.key
+                  subPath: tls.key
+                - name: trust-volume
+                  mountPath: /opt/cert/ca.crt
+                  subPath: ca.crt
               command:
                 - /bin/bash
                 - -c
