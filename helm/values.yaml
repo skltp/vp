@@ -21,7 +21,7 @@ hsaContainer:
   image:
     name: hsa-cache
     tag: 1.0.4-SNAPSHOT
-  certSecret: esb-function-cert
+  certSecret: test.esb.ntjp.sjunet.org
 
 ingressroute:
   hostUrl: base.env.url # This should be overridden and set to your environment's base URL.
