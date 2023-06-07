@@ -46,7 +46,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - date; sleep 3600
+                - groovy uppdateraHsaCacheK8s.groovy
           imagePullSecrets:
             - name: regcred
 
