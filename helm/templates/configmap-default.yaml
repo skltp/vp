@@ -11,7 +11,7 @@ data:
   HAWTIO_AUTHENTICATION_ENABLED: "true"
   HAWTIO_EXTERNAL_LOGINFILE: {{ tpl .Values.paths.config . }}/users.properties
   HEADERS_REG_EXP_REQUESTHEADERSTOREMOVE: (?i)x-vp.*|PEER_CERTIFICATES|X-Forwarded.*|MULE_.*|X-MULE_.*|Connection|accept-encoding
-  HSA_FILES: {{ tpl .Values.paths.config . }}/hsacachecomplementary.xml,{{ tpl .Values.paths.data . }}/hsaunits.xml
+  HSA_FILES: {{ tpl .Values.paths.config . }}/hsacachecomplementary.xml,{{ tpl .Values.paths.hsafiles . }}/hsacache.xml
   IP_WHITELIST: 127.0.0.1,10.
   MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: hawtio,jolokia
   MEMORY_LOGGER_PERIOD_SECONDS: "1800"
