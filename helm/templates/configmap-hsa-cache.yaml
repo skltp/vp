@@ -3,8 +3,8 @@ kind: ConfigMap
 metadata:
   name: vp-configmap-hsa-cache
 data:
-  HSA_SYMLINK_FILE: /tmp/hsacache.xml
-  HSA_FILES_DIR: /tmp
+  HSA_SYMLINK_FILE: /var/run/hsafiles/hsacache.xml
+  HSA_FILES_DIR: /var/run/hsafiles
   HSA_FILE_NAME: hsaunits.zip
   HSA_FILE_URL: https://wstest.hsa.sjunet.org/hsafileservice/informationlist/hsaunits.zip
 

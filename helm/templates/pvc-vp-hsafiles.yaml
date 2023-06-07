@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: vp-data-pvc
+  name: vp-hsafiles-pvc
   namespace: ntjp-dev
 spec:
   accessModes:

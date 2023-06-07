@@ -10,6 +10,9 @@ spec:
         spec:
           serviceAccountName: serviceaccount-vp-cron
           volumes:
+            - name: hsafiles-volume
+              persistentVolumeClaim:
+                claimName: vp-hsafiles-pvc
             - name: cert-volume
               secret:
                 secretName: {{ .Values.hsaContainer.certSecret }}
@@ -28,6 +31,9 @@ spec:
                     name: {{ . }}
                 {{- end }}
               volumeMounts:
+                - name: hsafiles-volume
+                  mountPath: /var/run/hsafiles
+                  readOnly: false
                 - name: cert-volume
                   mountPath: /opt/cert/tls.crt
                   subPath: tls.crt
