@@ -12,5 +12,5 @@ data:
   HSA_TLS_CERT: /opt/cert/tls.crt
   HSA_TLS_KEY: /opt/cert/tls.key
 
-  HSA_FILE_ALLOWABLE_DIFF: 100000
-  HSA_SEND_ALERT_MAIL: false
+  HSA_FILE_ALLOWABLE_DIFF: "100000"
+  HSA_SEND_ALERT_MAIL: "false"
