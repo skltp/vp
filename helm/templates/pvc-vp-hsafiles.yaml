@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: vp-hsafiles-pvc
-  namespace: ntjp-dev
+  namespace: {{ $.Release.Namespace }}
 spec:
   accessModes:
     - ReadWriteMany
