@@ -32,7 +32,7 @@ spec:
                 {{- end }}
               volumeMounts:
                 - name: hsafiles-volume
-                  mountPath: /var/run/hsafiles
+                  mountPath: {{ tpl .Values.paths.hsafiles . }}
                   readOnly: false
                 - name: cert-volume
                   mountPath: /opt/cert/tls.crt
