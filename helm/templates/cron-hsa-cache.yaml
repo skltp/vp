@@ -21,10 +21,8 @@ spec:
               image: "{{ .Values.repository }}{{ .Values.hsaContainer.image.name }}:{{ .Values.hsaContainer.image.tag }}"
               imagePullPolicy: Always
               envFrom:
-                {{- range $.Values.environment.variables.config_maps }}
                 - configMapRef:
-                    name: {{ . }}
-                {{- end }}
+                    name: vp-configmap-hsa-cache
                 {{- range $.Values.environment.variables.secrets }}
                 - secretRef:
                     name: {{ . }}

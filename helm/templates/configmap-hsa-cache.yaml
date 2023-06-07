@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vp-configmap-hsa-cache
+data:
+  HSA_SYMLINK_FILE: /tmp/hsacache.xml
+  HSA_FILES_DIR: /tmp
+  HSA_FILE_NAME: hsaunits.zip
+  HSA_FILE_URL: https://wstest.hsa.sjunet.org/hsafileservice/informationlist/hsaunits.zip
+
+  HSA_CA_CERT: /opt/cert/ca.crt
+  HSA_TLS_CERT: /opt/cert/tls.crt
+  HSA_TLS_KEY: /opt/cert/tls.key
+
+  HSA_FILE_ALLOWABLE_DIFF: 100000
+  HSA_SEND_ALERT_MAIL: false
