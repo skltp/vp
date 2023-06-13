@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vp-configmap-hsa-cache
+  name: vp-hsacache-configmap-default
 data:
   HSA_SYMLINK_FILE: {{ tpl .Values.paths.hsafiles . }}/hsacache.xml
   HSA_FILES_DIR: {{ tpl .Values.paths.hsafiles . }}

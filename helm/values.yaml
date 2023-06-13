@@ -16,7 +16,7 @@ container:
     pullPolicy: Always
 
 
-hsaContainer:
+hsaCacheCronJob:
   schedule: "@daily"
   image:
     name: hsa-cache
