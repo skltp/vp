@@ -1,7 +1,6 @@
 package se.skl.tp.vp.errorhandling;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.util.soaprequests.RoutingInfoUtil.createRoutingInfo;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
@@ -183,7 +182,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   public void soapFaultPropagatedToCustomerTest() throws InterruptedException {
     mockProducer.setResponseHttpStatus(500);
     mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT, VPFaultCodeEnum.Client));
- 
+
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
     setTakCacheMockResult(list);
@@ -205,6 +204,58 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(respOutLogMsg.contains("VP011"));
     assertTrue(respOutLogMsg.contains("Anrop har gjorts"));
   }
+
+  @Test // If a producer sends soap fault, we shall return with ResponseCode 500, with the fault embedded in the body.
+  public void malformedSoapRequestThrowsVP015() throws InterruptedException {
+    mockProducer.setResponseHttpStatus(500);
+    mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT, VPFaultCodeEnum.Client));
+
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
+    setTakCacheMockResult(list);
+    String body = "<Soap";
+    template.sendBody(body);
+
+    String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class)
+            .replace("\n", "").replace("\r", "");
+
+
+    resultEndpoint.assertIsSatisfied();
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0)
+            .replace("\n", "").replace("\r", "");
+
+
+    List<String> expected = new ArrayList<String>();
+    List<String> actual = new ArrayList<String>();
+
+    // Add SOAP Body content matches
+    expected.add(".*<faultcode>SOAP-ENV:Client</faultcode>.*");
+    expected.add(".*VP015.*");
+
+    // add the body once per match in "expected" list
+    while( expected.size() > actual.size() )
+      actual.add(resultBody);
+
+    // Add log content matches
+    expected.add(".*-sessionErrorTechnicalDescription=se.skl.tp.vp.exceptions.VpTechnicalException.*");
+    expected.add(".*CamelHttpResponseCode=500,.*");
+    expected.add(".*-errorCode=VP015.*");
+    expected.add(".*-statusCode=500 Internal Server Error.*");
+    expected.add(".*Payload=<SOAP-ENV:Envelope.*");
+    expected.add(".*<faultstring>VP015 .*?</faultstring>.*");
+
+    // add the log content once per match in "expected" list
+    while( expected.size() > actual.size() )
+      actual.add(respOutLogMsg);
+
+    assertLinesMatch(expected, actual);
+
+
+  }
+
 
   private void setTakCacheMockResult(List<RoutingInfo> list) {
     Mockito.when(vagvalCache.getRoutingInfo("urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", "UnitTest"))

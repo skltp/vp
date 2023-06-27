@@ -18,7 +18,8 @@ public enum VpSemanticErrorCodeEnum {
     VP011("VP011", Client),
     VP012("VP012", Server),
     VP013("VP013", Client),
-    VP014("VP014", Server);
+    VP014("VP014", Server),
+    VP015("VP015", Client);
 
 
     private String vpDigitErrorCode;
