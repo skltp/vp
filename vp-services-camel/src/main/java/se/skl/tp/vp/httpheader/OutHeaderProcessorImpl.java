@@ -3,7 +3,9 @@ package se.skl.tp.vp.httpheader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
@@ -33,12 +35,16 @@ public class OutHeaderProcessorImpl implements OutHeaderProcessor {
     this.propagateCorrelationIdForHttps = propagate;
   }
 
+  @Autowired
+  BuildProperties buildProperties;
+
+
   @Override
   public void process(Exchange exchange) throws Exception {
     propagateOriginalConsumerId(exchange);
     propagateCorrelationIdToProducer(exchange);
     propagateSenderIdAndVpInstanceIdToProducer(exchange);
-    exchange.getIn().getHeaders().put(HttpHeaders.HEADER_USER_AGENT, vpHeaderUserAgent);
+    exchange.getIn().getHeaders().put(HttpHeaders.HEADER_USER_AGENT, "skltp-vp/" + buildProperties.getVersion());
     exchange.getIn().getHeaders().put( Exchange.CONTENT_TYPE, headerContentType);
   }
 
