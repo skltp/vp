@@ -42,7 +42,7 @@ data:
   VP_HTTP_ROUTE_URL: http://${vp.host}:8080/vp
   VP_HTTPS_ROUTE_URL: https://${vp.host}:20000/vp
   VP_INSTANCE_ID: {{ .Values.skltp.instanceId }}
-  VP_INSTANCE_NAME: NTJP-DEV
+  VP_INSTANCE_NAME: SKLTP-DEFAULT
   VP_MAX_RECEIVE_LENGTH: "52428800"
   VP_RESET_CACHE_URL: http://${vp.host}:23000/resetcache
   VP_STATUS_URL: http://${vp.host}:8080/status
