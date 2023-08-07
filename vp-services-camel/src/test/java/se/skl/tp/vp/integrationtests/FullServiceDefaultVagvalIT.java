@@ -2,8 +2,8 @@ package se.skl.tp.vp.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static se.skl.tp.vp.util.JunitUtil.assertMatchRegexGroup;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv21Request;
-import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +20,7 @@ import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TakMockWebService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
 import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.util.JunitUtil;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
@@ -102,12 +103,12 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
 
   private void assertLogMessage(String receiver, String trace) {
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "-senderid=SenderWithDefaultBehorighet");
-    assertStringContains(respOutLogMsg, "-endpoint_url=http://localhost:1900/default/GetActivitiesResponder");
-    assertStringContains(respOutLogMsg, "-receiverid=" + receiver);
-    assertStringContains(respOutLogMsg, "-routerVagvalTrace=(leaf)" + trace);
-    assertStringContains(respOutLogMsg, "-routerBehorighetTrace=(leaf)" + trace);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", "resp-out", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", "SenderWithDefaultBehorighet", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", "http://localhost:1900/default/GetActivitiesResponder", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)",  receiver, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", "(leaf)," + trace, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", "(leaf),"+ trace, 1);
   }
 
 }

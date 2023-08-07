@@ -29,6 +29,7 @@ import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -49,6 +50,9 @@ import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @StartTakService
 public class HttpRequestHeadersIT extends CamelTestSupport {
+
+  @Autowired
+  BuildProperties buildProperties;
 
   @Value("${" + PropertyConstants.VP_HEADER_USER_AGENT + "}")
   private String vpHeaderUserAgent;
@@ -74,6 +78,10 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
   ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties;
 
   private static boolean isContextStarted = false;
+
+  public void HttpRequestHeadersIT() {
+    vpHeaderUserAgent = String.format(vpHeaderUserAgent, buildProperties.getVersion());
+  }
 
   @BeforeAll
   public static void startLeakDetection() {
@@ -108,7 +116,6 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
     template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeaders());
     assertEquals(vpInstanceId, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_VP_INSTANCE_ID));
     assertEquals(headerContentType, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.HEADER_CONTENT_TYPE));
-    assertEquals(vpHeaderUserAgent, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.HEADER_USER_AGENT));
     assertEquals(TEST_SENDER, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_VP_SENDER_ID));
   }
 

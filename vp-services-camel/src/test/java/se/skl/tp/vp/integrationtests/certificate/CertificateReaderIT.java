@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.TestBeanConfiguration;
@@ -24,6 +25,9 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 @ContextConfiguration(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 public class  CertificateReaderIT  extends CamelTestSupport {
+
+  @Autowired
+  BuildProperties buildProperties;
 
   @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;

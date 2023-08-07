@@ -32,6 +32,7 @@ import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import se.skl.tp.vp.TestBeanConfiguration;
@@ -50,6 +51,9 @@ import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
 @StartTakService
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class HttpsRequestHeadersIT extends CamelTestSupport {
+
+  @Autowired
+  BuildProperties buildProperties;
 
   @Value("${" + PropertyConstants.PROPAGATE_CORRELATION_ID_FOR_HTTPS + "}")
   private Boolean propagateCorrIdForHttps;
@@ -86,6 +90,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
 
   @BeforeEach
   public void setUp() throws Exception {
+    vpHeaderUserAgent = String.format(vpHeaderUserAgent, buildProperties.getVersion());
     if (!isContextStarted) {
       addConsumerRoute(camelContext);
       camelContext.start();
@@ -182,7 +187,7 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
   public void checkUserAgentGetPropagated() {
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeaders());
     String s = (String) producerResultEndpoint.getExchanges().get(0).getIn().getHeader(HEADER_USER_AGENT);
-    assertEquals(s, vpHeaderUserAgent);
+    assertEquals(vpHeaderUserAgent, s);
     assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", HEADER_USER_AGENT + "=" + vpHeaderUserAgent);
   }
 
