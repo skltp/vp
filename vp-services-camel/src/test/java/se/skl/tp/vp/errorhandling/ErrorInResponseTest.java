@@ -89,6 +89,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     takCacheService.refresh();
 
     mockProducer.setResponseHttpStatus(200);
+    TestLogAppender.clearEvents();
   }
 
   @Test //Test för när ett SOAP-fault kommer från Producenten

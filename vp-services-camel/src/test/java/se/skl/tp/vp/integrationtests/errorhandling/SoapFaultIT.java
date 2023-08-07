@@ -66,7 +66,8 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
     assertNotNull(soapBody, "Expected a SOAP message");
     assertNotNull(soapBody.hasFault(), "Expected a SOAPFault");
 
-    assertStringContains(soapBody.getFault().getFaultString(), TEST_EXCEPTION_MESSAGE);
+    String faultString = soapBody.getFault().getFaultString();
+    assertStringContains(faultString, TEST_EXCEPTION_MESSAGE);
     assertNumLogMessages();
     assertCorrelationIdIsSameInAllLogs();
   }
@@ -93,7 +94,7 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
 
 	  AdviceWith.adviceWith(camelContext, VAGVAL_ROUTE, a -> {
 		  a.weaveById(VAGVAL_PROCESSOR_ID)
-          .replace().to("mock:vagvalprocessor");		  
+          .replace().to("mock:vagvalprocessor");
 		  
 		}
 	  );  

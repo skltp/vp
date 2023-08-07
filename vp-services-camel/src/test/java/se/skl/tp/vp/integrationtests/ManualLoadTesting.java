@@ -122,7 +122,7 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
   }
 
 
-  @Test
+  //@Test
   public void justLoad() throws InterruptedException {
 
     startResetByPeerServer();

@@ -49,7 +49,6 @@ public class NettyHttpClientExpectContinueTest extends BaseNettyTest {
     System.out.println("Port:"+ getPort());
     String url = String.format("netty-http:http://localhost:%s/foo", getPort());
     Exchange result = template.send(url, exchange);
-
     assertFalse(result.isFailed());
     assertEquals("Bye World", result.getIn().getBody(String.class));
 
