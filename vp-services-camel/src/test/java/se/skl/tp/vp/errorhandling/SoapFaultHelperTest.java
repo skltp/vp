@@ -1,6 +1,7 @@
 package se.skl.tp.vp.errorhandling;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.camel.CamelContext;
@@ -21,12 +22,12 @@ public class SoapFaultHelperTest {
     assertTrue( body.contains("http://schemas.xmlsoap.org/soap/envelope/"), body);
     assertTrue( body.contains("Server"), body);
     assertTrue( body.contains("Something wrong"), body);
-    assertTrue((int)exchange.getMessage().getHeader(Exchange.HTTP_RESPONSE_CODE)==500);
+    assertEquals(500, (int) exchange.getMessage().getHeader(Exchange.HTTP_RESPONSE_CODE));
     assertTrue( body.contains("Fail details"), body);
 
-    assertTrue((int)exchange.getMessage().getHeader(Exchange.HTTP_RESPONSE_CODE)==500);
+    assertEquals(500, (int) exchange.getMessage().getHeader(Exchange.HTTP_RESPONSE_CODE));
     assertTrue((Boolean)exchange.getProperty(VPExchangeProperties.SESSION_ERROR));
-    assertTrue(exchange.getProperty(VPExchangeProperties.SESSION_ERROR_CODE).equals(VpSemanticErrorCodeEnum.VP009.toString()));
+    assertEquals(exchange.getProperty(VPExchangeProperties.SESSION_ERROR_CODE), VpSemanticErrorCodeEnum.VP009.toString());
 
   }
 
@@ -40,9 +41,9 @@ public class SoapFaultHelperTest {
     assertTrue( body.contains("Client"), body);
     assertTrue( body.contains("Something wrong"), body);
     assertTrue( body.contains("Fail details"), body);
-    assertTrue((int)exchange.getMessage().getHeader(Exchange.HTTP_RESPONSE_CODE)==500);
+    assertEquals(500, (int) exchange.getMessage().getHeader(Exchange.HTTP_RESPONSE_CODE));
     assertTrue((Boolean)exchange.getProperty(VPExchangeProperties.SESSION_ERROR));
-    assertTrue(exchange.getProperty(VPExchangeProperties.SESSION_ERROR_CODE).equals(VpSemanticErrorCodeEnum.VP001.toString()));
+    assertEquals(exchange.getProperty(VPExchangeProperties.SESSION_ERROR_CODE), VpSemanticErrorCodeEnum.VP001.toString());
 
   }
   private Exchange createExchange() {

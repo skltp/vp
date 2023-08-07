@@ -68,9 +68,9 @@ public class RivTaProfilProcessor implements Processor {
         
         try {
             return transformXml(msg.getIn().getBody(XMLStreamReader.class), fromNs, toNs, fromElem, toElem);
-        } catch (Exception e) {
+        } catch (XMLStreamException e) {
             log.error("RIV transformation failed", e);
-            throw new VpTechnicalException(e);
+            throw new VpTechnicalException(VpSemanticErrorCodeEnum.VP012, "Kan inte transformera mellan riv-versionerna.", e.getMessage(), e);
         }
     }
 

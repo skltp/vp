@@ -30,7 +30,7 @@ public class MemoryUtil {
 
   public static String getVMMaxMemory() {
     try {
-      String rawValue = hotSpotDiagnostic.getVMOption("MaxDirectMemorySize").getValue();
+      String rawValue = ""; // hotSpotDiagnostic.getVMOption("MaxDirectMemorySize").getValue();
       return bytesReadable(Long.parseLong(rawValue));
     }
     catch (Exception e) {

@@ -14,6 +14,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.converter.jaxp.StaxConverter;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.VPExchangeProperties;
+import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpTechnicalException;
 import se.skl.tp.vp.requestreader.PayloadInfoParser.PayloadInfo;
 
@@ -46,7 +47,7 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
       String msg = String.format("Failed parsing payload.\nCorrelationId: %s\nContent-Type: %s\nSoapAction: %s",
           corrId, contentType, soapAction);
       log.error(msg, e);
-      throw new VpTechnicalException(e);
+      throw new VpTechnicalException(VpSemanticErrorCodeEnum.VP015, "Inkommande begäran är ej korrekt utformat och kan därför inte behandlas.", e.getMessage(), e);
     }
   }
 
@@ -70,7 +71,7 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
       log.debug("XML extracted from MTOM msg:\n{}", xmlPayload);
       return xmlPayload;
     } else {
-      throw new VpTechnicalException(String.format("Failed to extract XML part from MTOM message"));
+      throw new VpTechnicalException(VpSemanticErrorCodeEnum.VP015,String.format("Failed to extract XML part from MTOM message"),  "Inkommande begäran är ej korrekt utformat och kan därför inte behandlas.");
     }
   }
 

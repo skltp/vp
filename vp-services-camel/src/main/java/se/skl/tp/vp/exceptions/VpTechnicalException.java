@@ -1,22 +1,16 @@
 package se.skl.tp.vp.exceptions;
 
-public class VpTechnicalException extends RuntimeException {
+import javax.xml.stream.XMLStreamException;
+
+public class VpTechnicalException extends VpRuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public VpTechnicalException() {
+	public VpTechnicalException(VpSemanticErrorCodeEnum errorCode, String message, String messageDetails) {
+		super(errorCode, message, messageDetails);
 	}
 
-	public VpTechnicalException(String message) {
-		super(message);
+	public VpTechnicalException(VpSemanticErrorCodeEnum errorCode, String message, String messageDetails, Throwable cause) {
+		super(errorCode, message, messageDetails, cause);
 	}
-
-	public VpTechnicalException(Throwable cause) {
-		super(cause);
-	}
-
-	public VpTechnicalException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
 }
