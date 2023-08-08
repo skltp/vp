@@ -1,0 +1,106 @@
+namespace: ntjp
+
+deployment:
+  name: vp
+  replicaCount: 1
+  environment:
+    name: dev
+    domain: ntjp.se
+
+skltp:
+  instanceId: default_instance
+
+container:
+  image:
+    name: vp-services-camel
+    pullPolicy: Always
+
+
+hsaCacheCronJob:
+  schedule: "@daily"
+  image:
+    name: hsa-cache
+    tag: 1.0.4-SNAPSHOT
+  certSecret: test.esb.ntjp.sjunet.org
+  trustSecret: esb-function-cert
+
+ingressroute:
+  hostUrl: base.env.url # This should be overridden and set to your environment's base URL.
+
+ingress:
+  enabled: true
+  tls:
+    secret:
+      name: esb-function-cert
+    version:
+      min: VersionTLS12
+      max: VersionTLS13
+    mtls:
+      clientAuth:
+        secretNames:
+          - esb-function-cert
+        clientAuthType: RequireAndVerifyClientCert
+  host:
+    name: # set this value to override the default hostname, which is esb.{ingressroute.hostUrl}
+
+service:
+  name: vp
+  type: ClusterIP
+  port: 8080
+
+paths:
+  base: /etc/vp
+  data: "/var/run/vp/data"
+  hsafiles: "/var/run/vp/hsafiles"
+  config: "{{ .Values.paths.base }}/config"
+  log: /var/log/camel
+
+environment:
+  config_files:
+    - config_map: vp-config-files
+      path: "{{ .Values.paths.base }}/config"
+      path_relative_to_base: true
+      volume_name: default-config-files-from-cm
+  variables:
+    _default_config_maps:
+      - vp-configmap-default
+    config_maps:
+      # Nothing yet. Override to supply your own maps.
+    secrets:
+      # Nothing yet. Override to supply your own secrets.
+
+imagePullSecrets:
+  - name: regcred
+
+
+initContainer:
+  certGen:
+    image:
+      name: cert-generator-utility
+
+pem_to_pfx:
+  envPrefix: PEM2PFX
+  pem:
+    path: /opt/certs/pem
+  pfx:
+    path: /opt/certs/pkcs12
+  trust:
+    secretName: esb-function-cert
+    pemFile: ca.pem
+    pfxFile: truststore.pfx
+    password: password
+  producer:
+    secretName: esb-function-cert
+    pemCertFile: producer.crt
+    pemKeyFile: producer.key
+    pfxFile: producer.pfx
+    password: password
+  consumer:
+    secretName: test.esb.ntjp.sjunet.org
+    pemCertFile: consumer.crt
+    pemKeyFile: consumer.key
+    pfxFile: consumer.pfx
+    password: password
+
+
+resources: {}

@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: vp-config-files
+data:
+    hsacachecomplementary.xml: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <FileGetHsaUnitsResponse xmlns="urn:riv:hsa:HsaWsResponder:3">
+        <startDate>2013-03-15T15:38:42.597+01:00</startDate>
+        <endDate>2013-03-15T15:38:45.721+01:00</endDate>
+        <hsaUnits>
+        <hsaUnit>
+        <hsaIdentity>SE</hsaIdentity>
+        <DN>c=SE</DN>
+        <name>Sverige</name>
+        </hsaUnit>
+        </hsaUnits>
+        </FileGetHsaUnitsResponse>
+    log4j2.xml: |
+        <Configuration status="WARN" monitorInterval="30">
+        <Properties>
+        <Property name="LOG_PATTERN">
+        %d %-5p [%t] %-30c - %X{corr.id} %m%n
+        </Property>
+        </Properties>
+
+        <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+          <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+        </Appenders>
+
+        <Loggers>
+
+          <AsyncLogger name="se.skl.tp" level="DEBUG"/>
+          <AsyncLogger name="se.skl.tp.vp.logging.req.in" level="DEBUG"/>
+          <AsyncLogger name="se.skl.tp.vp.logging.req.out" level="INFO"/>
+          <AsyncLogger name="se.skl.tp.vp.logging.resp.in" level="INFO"/>
+          <AsyncLogger name="se.skl.tp.vp.logging.resp.out" level="DEBUG"/>
+          <AsyncRoot level="INFO">
+            <AppenderRef ref="Console"/>
+          </AsyncRoot>
+
+        </Loggers>
+        </Configuration>
+    timeoutconfig.json: |
+        [
+        ]
+    users.properties: |
+        hawtio: MD5:2d3c8a35f1d0c2a1a6ff1dc4ba221476, user, admin
+    wsdlconfig.json: |
+        [
+        ]

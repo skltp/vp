@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  name: {{ .Values.deployment.name }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.deployment.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: {{ .Values.deployment.name }}
+    spec:
+      
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{ if .Values.imagePullSecrets -}}
+      imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 6 }}
+      {{- end }}
+
+      volumes: 
+        - name: trust-pem-vol
+          secret:
+            secretName: {{ .Values.pem_to_pfx.trust.secretName }}
+        - name: producer-pem-vol
+          secret:
+            secretName: {{ .Values.pem_to_pfx.producer.secretName }}
+        {{ if .Values.pem_to_pfx.consumer }}
+        - name: consumer-pem-vol
+          secret:
+            secretName: {{ .Values.pem_to_pfx.consumer.secretName }}
+        {{- end }}
+        - name: pkcs12-volume
+        - name: data-volume
+        - name: hsafiles-volume
+          persistentVolumeClaim:
+            claimName: vp-hsafiles-pvc
+        {{- range .Values.environment.config_files }}
+        - name: {{ .volume_name }}
+          configMap:
+            name: {{ .config_map }}
+        {{- end }}
+
+      initContainers:
+        - name: {{ .Values.initContainer.certGen.image.name }}
+          image: "{{ .Values.repository }}{{ .Values.initContainer.certGen.image.name }}:{{ .Values.initContainer.certGen.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy | default "Always" }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: pkcs12-volume
+              mountPath: /opt/certs/pkcs12
+              {{- with .Values.pem_to_pfx }}
+            - name: trust-pem-vol
+              mountPath: {{ .pem.path }}/{{ .trust.pemFile }}
+              subPath: ca.crt
+            - name: producer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .producer.pemKeyFile }}
+              subPath: tls.key
+            - name: producer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .producer.pemCertFile }}
+              subPath: tls.crt
+              {{ if .consumer }}
+            - name: consumer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .consumer.pemKeyFile }}
+              subPath: tls.key
+            - name: consumer-pem-vol
+              mountPath: {{ .pem.path }}/{{ .consumer.pemCertFile }}
+              subPath: tls.crt
+              {{- end }}
+              {{- end }}
+          envFrom:
+            - configMapRef:
+                name: pem2pfx
+
+      containers:
+        - name: {{ .Values.container.image.name }}
+          image: "{{ .Values.repository }}{{ .Values.container.image.name }}:{{ .Values.container.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.container.image.pullPolicy }}
+          ports:
+            - name: {{ .Values.deployment.name }}
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          envFrom:
+            {{- range $.Values.environment.variables._default_config_maps }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+            {{- range $.Values.environment.variables.config_maps }}
+            - configMapRef:
+                name: {{ . }}
+            {{- end }}
+            {{- range $.Values.environment.variables.secrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{ if .Values.pem_to_pfx }}
+            - configMapRef:
+                name: generated-pfx-values
+            {{- end }}
+          volumeMounts:
+            - name: data-volume
+              mountPath: {{ tpl .Values.paths.data . }}
+            - name: pkcs12-volume
+              mountPath: {{ .Values.pem_to_pfx.pfx.path }}
+            - name: hsafiles-volume
+              mountPath: {{ tpl .Values.paths.hsafiles . }}
+            {{- range .Values.environment.config_files }}
+            - name: {{ .volume_name }}
+              mountPath: {{ tpl .path $ }}
+            {{- end }}

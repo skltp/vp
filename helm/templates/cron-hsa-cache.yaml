@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-hsa-cache
+spec:
+  schedule: "{{ .Values.hsaCacheCronJob.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: serviceaccount-vp-cron
+          volumes:
+            - name: hsafiles-volume
+              persistentVolumeClaim:
+                claimName: vp-hsafiles-pvc
+            - name: cert-volume
+              secret:
+                secretName: {{ .Values.hsaCacheCronJob.certSecret }}
+            - name: trust-volume
+              secret:
+                secretName: {{ .Values.hsaCacheCronJob.trustSecret }}
+          containers:
+            - name: {{ .Values.hsaCacheCronJob.image.name }}
+              image: "{{ .Values.repository }}{{ .Values.hsaCacheCronJob.image.name }}:{{ .Values.hsaCacheCronJob.image.tag }}"
+              imagePullPolicy: Always
+              envFrom:
+                - configMapRef:
+                    name: vp-hsacache-configmap-default
+                {{- range $.Values.environment.variables.config_maps }}
+                - configMapRef:
+                    name: {{ . }}
+                {{- end }}
+                {{- range $.Values.environment.variables.secrets }}
+                - secretRef:
+                    name: {{ . }}
+                {{- end }}
+              volumeMounts:
+                - name: hsafiles-volume
+                  mountPath: {{ tpl .Values.paths.hsafiles . }}
+                  readOnly: false
+                - name: cert-volume
+                  mountPath: /opt/cert/tls.crt
+                  subPath: tls.crt
+                - name: cert-volume
+                  mountPath: /opt/cert/tls.key
+                  subPath: tls.key
+                - name: trust-volume
+                  mountPath: /opt/cert/ca.crt
+                  subPath: ca.crt
+              command:
+                - /bin/bash
+                - -c
+                - groovy uppdateraHsaCacheK8s.groovy
+          imagePullSecrets:
+            - name: regcred
+
+          restartPolicy: OnFailure

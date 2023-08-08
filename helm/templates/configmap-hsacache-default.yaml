@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vp-hsacache-configmap-default
+data:
+  HSA_SYMLINK_FILE: {{ tpl .Values.paths.hsafiles . }}/hsacache.xml
+  HSA_FILES_DIR: {{ tpl .Values.paths.hsafiles . }}
+  HSA_FILE_NAME: hsaunits.zip
+  HSA_FILE_URL: https://wstest.hsa.sjunet.org/hsafileservice/informationlist/hsaunits.zip
+
+  HSA_CA_CERT: /opt/cert/ca.crt
+  HSA_TLS_CERT: /opt/cert/tls.crt
+  HSA_TLS_KEY: /opt/cert/tls.key
+
+  HSA_RESET_POD_NAMESPACE: {{ $.Release.Namespace }}
+  HSA_RESET_LABEL_SELECTOR: "app=vp"
+  HSA_RESET_URL_FORMAT: "http://%s:24000/resethsacache"
+
+  HSA_FILE_ALLOWABLE_DIFF: "100000"
+  HSA_SEND_ALERT_MAIL: "false"
