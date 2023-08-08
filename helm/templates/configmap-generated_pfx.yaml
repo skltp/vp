@@ -1,0 +1,23 @@
+{{ if .Values.pem_to_pfx }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: generated-pfx-values
+data:
+
+  {{ with .Values.pem_to_pfx -}}
+  TP_TLS_STORE_LOCATION: "file:{{ .pfx.path }}/"
+
+  TP_TLS_STORE_TRUSTSTORE_FILE: {{ .trust.pfxFile }}
+  TP_TLS_STORE_TRUSTSTORE_TYPE: PKCS12
+  TP_TLS_STORE_TRUSTSTORE_PASSWORD: {{ .trust.password }}
+
+  TP_TLS_STORE_PRODUCER_FILE: {{ .producer.pfxFile }}
+  TP_TLS_STORE_PRODUCER_TYPE: PKCS12
+  TP_TLS_STORE_PRODUCER_PASSWORD: {{ .producer.password }}
+
+  TP_TLS_STORE_CONSUMER_FILE: {{ if .consumer }}{{ .consumer.pfxFile }}{{ else }}{{ .producer.pfxFile }}{{ end }}
+  TP_TLS_STORE_CONSUMER_TYPE: PKCS12
+  TP_TLS_STORE_CONSUMER_PASSWORD: {{ if .consumer }}{{ .consumer.password }}{{ else }}{{ .producer.password }}{{ end }}
+  {{ end }}
+{{ end }}

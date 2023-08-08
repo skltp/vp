@@ -65,6 +65,7 @@
     <module>vp-wsdl-utils</module>
     <module>vp-services-camel</module>
     <module>report</module>
+    <module>cert-generator-utility</module>
   </modules>
 
   <dependencyManagement>

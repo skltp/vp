@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rolebinding-vp-cron
+  namespace: {{ $.Release.Namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: serviceaccount-vp-cron
+    namespace: {{ $.Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io
