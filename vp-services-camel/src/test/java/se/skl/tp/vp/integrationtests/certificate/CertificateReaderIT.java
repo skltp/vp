@@ -26,9 +26,6 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 @TestPropertySource("classpath:application.properties")
 public class  CertificateReaderIT  extends CamelTestSupport {
 
-  @Autowired
-  BuildProperties buildProperties;
-
   @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;
 
