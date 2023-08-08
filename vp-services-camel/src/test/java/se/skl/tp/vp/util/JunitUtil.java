@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class JunitUtil {
 
 	public static void assertStringContains(String a, String b) {
-		assertTrue(a.contains(b));
+		assertTrue(a.contains(b), "Expected the string \"" + a + "\" to contain \"" + b + "\"");
 	}
 
 	public static void assertMatchRegexGroup(String actual, String pattern, String expected) {

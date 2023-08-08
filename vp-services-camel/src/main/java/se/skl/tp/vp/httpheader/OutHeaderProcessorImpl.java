@@ -44,7 +44,7 @@ public class OutHeaderProcessorImpl implements OutHeaderProcessor {
     propagateOriginalConsumerId(exchange);
     propagateCorrelationIdToProducer(exchange);
     propagateSenderIdAndVpInstanceIdToProducer(exchange);
-    exchange.getIn().getHeaders().put(HttpHeaders.HEADER_USER_AGENT, "skltp-vp/" + buildProperties.getVersion());
+    exchange.getIn().getHeaders().put(HttpHeaders.HEADER_USER_AGENT, String.format(vpHeaderUserAgent, buildProperties.getVersion()));
     exchange.getIn().getHeaders().put( Exchange.CONTENT_TYPE, headerContentType);
   }
 

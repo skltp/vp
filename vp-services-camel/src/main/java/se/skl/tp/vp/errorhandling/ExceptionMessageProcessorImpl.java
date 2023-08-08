@@ -24,17 +24,18 @@ public class ExceptionMessageProcessorImpl implements ExceptionMessageProcessor 
     Throwable throwable = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
 
     VpSemanticErrorCodeEnum errorCode = VpSemanticErrorCodeEnum.getDefault();
-    //String message = throwable.getMessage();
-    String vpMsg = "";
+
+    String message = throwable.getMessage();
+    String messageDetails = throwable.toString();
 
     if (throwable instanceof VpRuntimeException) {
       VpRuntimeException exception = (VpRuntimeException) throwable;
-      vpMsg = exception.getMessageDetails();
       errorCode = exception.getErrorCode();
+      messageDetails = exceptionUtil.createDetailsMessage(errorCode, exception.getMessageDetails());
+      message = exceptionUtil.createMessage(errorCode);
     }
 
-    String message = exceptionUtil.createMessage(errorCode);
-    String messageDetails = exceptionUtil.createDetailsMessage(errorCode, vpMsg);
+
     SoapFaultHelper.setSoapFaultInResponse(exchange, message, messageDetails, errorCode);
     exchange.getIn().setHeader("Content-Type", "text/xml");
 
