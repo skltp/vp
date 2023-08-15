@@ -25,7 +25,13 @@ Spring-boot property fil som ligger under resources i jaren. Inställningarna ka
 |server.undertow.accesslog.suffix|.log|Konfiguration för undertow accesslog: Suffix på logg-filen|
 |spring.profiles.include|security|Sätt vilka Spring profiler som skall användas|
 |camel.springboot.name|vp-services|Namn på Spring-boot applikationen|
-|management.endpoints.web.exposure.include|hawtio,jolokia|Default aktivera övervakning via Hawtio|
+| management.endpoints.web.exposure.include | hawtio,jolokia,health | Default exponera Hawtio och health-indicators |
+| management.endpoint.health.probes.enabled | true | Exponera liveness/readiness probes |
+| management.endpoint.health.show-details | always | Visa detaljer om health indicators |
+| management.health.livenessState.enabled | true | Aktivera inbyggd livess-indikator |
+| management.health.readinessState.enabled | true | Aktivera inbyggd readiness-indikator |
+| management.endpoint.health.group.liveness.include | livenessState | Anger vilka indikatorer som ingår i liveness-proben |
+| management.endpoint.health.group.readiness.include | readinessState,takCache,hsaCache | Anger vilka indikatorer som ingår i readiness-proben. Default ingår kontroll att TAK Cache och HSA Cache är initierade |
 |hawtio.authentication.enabled|false|Aktivera/Avaktivera autentisering för att använda Hawtio. Defaultvärde false.|
 |hawtio.external.loginfile|\<path>/realm-custom.properties|Sökväg till extern login-fil. Se [Detaljerad konfiguration]
 |vp.instance.id|dev_env|Identifierare för den installerade VP:n|
