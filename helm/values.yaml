@@ -25,7 +25,7 @@ hsaCacheCronJob:
   trustSecret: esb-function-cert
 
 ingressroute:
-  hostUrl: base.env.url # This should be overridden and set to your environment's base URL.
+  hostName: base.env.url # This should be overridden and set to your environment's base hostname.
 
 ingress:
   enabled: true
@@ -41,7 +41,7 @@ ingress:
           - esb-function-cert
         clientAuthType: RequireAndVerifyClientCert
   host:
-    name: # set this value to override the default hostname, which is esb.{ingressroute.hostUrl}
+    name: # set this value to override the default hostname, which is esb.{ingressroute.hostName}
 
 service:
   name: vp
