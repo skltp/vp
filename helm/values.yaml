@@ -2,7 +2,7 @@ namespace: ntjp
 
 deployment:
   name: vp
-  replicaCount: 1
+  replicaCount: 2
   environment:
     name: dev
     domain: ntjp.se
