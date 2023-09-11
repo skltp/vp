@@ -20,7 +20,7 @@ spec:
       annotations:
       labels:
         app: {{ .Values.deployment.name }}
-        elastic.grok.filter: {{ .Values.deployment.elasticGrokFilter }}
+        elasticGrokFilter: {{ .Values.deployment.elasticGrokFilter }}
     spec:
       
       {{- with .Values.nodeSelector }}
