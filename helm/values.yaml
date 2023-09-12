@@ -18,6 +18,7 @@ container:
 
 
 hsaCacheCronJob:
+  elasticGrokFilter: cronJob
   schedule: "@daily"
   image:
     name: hsa-cache
