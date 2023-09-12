@@ -65,6 +65,6 @@ Create the name of the service account to use
 {{- if .Values.ingress.host.name }}
 {{-   printf "%s" .Values.ingress.host.name }}
 {{- else }}
-{{-   printf "esb.%s" .Values.ingressroute.hostUrl }}
+{{-   printf "esb.%s" .Values.ingressroute.hostName }}
 {{- end }}
 {{- end }}
