@@ -7,6 +7,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            elasticGrokFilter: {{ .Values.hsaCacheCronJob.elasticGrokFilter }}
         spec:
           serviceAccountName: serviceaccount-vp-cron
           volumes:
