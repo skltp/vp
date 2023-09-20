@@ -10,7 +10,7 @@ metadata:
 spec:
   routes:
     - kind: Rule
-      match: "Host(`{{ Values.ingressroute.bksHostName }}`, `{{ Values.ingressroute.esbHostName }}`) && PathPrefix(`/vp`)"
+      match: "Host(`{{ .Values.ingressroute.bksHostName }}`, `{{ .Values.ingressroute.esbHostName }}`) && PathPrefix(`/vp`)"
       middlewares:
         - name: pass-client-cert
       services:
