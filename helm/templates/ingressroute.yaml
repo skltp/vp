@@ -1,6 +1,5 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "vp_services.fullname" . -}}
-{{- $hostName := include "vp_services.hostname" . -}}
 
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -11,7 +10,7 @@ metadata:
 spec:
   routes:
     - kind: Rule
-      match: "Host(`{{ $hostName }}`) && PathPrefix(`/vp`)"
+      match: "Host(`{{ Values.ingressroute.bksHostName }}`, `{{ Values.ingressroute.esbHostName }}`) && PathPrefix(`/vp`)"
       middlewares:
         - name: pass-client-cert
       services:
@@ -23,21 +22,4 @@ spec:
     secretName: {{ .Values.ingress.tls.secret.name }}
     options:
       name: mtls-option
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: {{ $fullName }}-http
-  labels:
-    {{- include "vp_services.labels" . | nindent 4 }}
-spec:
-  routes:
-    - kind: Rule
-      match: "Host(`{{ $hostName }}`) && PathPrefix(`/vp`)"
-      services:
-        - kind: Service
-          name: vp
-          port: 8080
-          scheme: http
-
 {{- end }}

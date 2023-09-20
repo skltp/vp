@@ -60,11 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{- define "vp_services.hostname" -}}
-{{- if .Values.ingress.host.name }}
-{{-   printf "%s" .Values.ingress.host.name }}
-{{- else }}
-{{-   printf "esb.%s" .Values.ingressroute.hostName }}
-{{- end }}
-{{- end }}
