@@ -49,7 +49,6 @@ data:
   VP_USE_ROUTING_HISTORY: "true"
   WSDL_JSON_FILE: {{ tpl .Values.paths.config . }}/wsdlconfig.json
   WSDLFILES_DIRECTORY: {{ tpl .Values.paths.base . }}/wsdl/
-  HTTP_FORWARDED_HEADER_AUTH_CERT: X-Forwarded-Tls-Client-Cert
   JAVA_OPTS:  -Dlog4j2.formatMsgNoLookups=true
               -Dfile.encoding=UTF-8
               -Duser.country=SE
