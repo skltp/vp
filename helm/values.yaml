@@ -28,6 +28,7 @@ hsaCacheCronJob:
 
 ingressroute:
   esbHostName: base.env.url # This should be overridden and set to your environment's base hostname.
+  sjunetHostName: base.sjunet.env.url
 
 ingress:
   enabled: true
