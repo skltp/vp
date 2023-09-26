@@ -7,7 +7,6 @@ data:
   DATA_PATH: {{ tpl .Values.paths.data . }}
   CONFIGURATION_VERSION_FILE: {{ tpl .Values.paths.config . }}/config.version
   DEFAULTROUTING_ALLOWEDCONTRACTS: urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateQuestionResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateAnswerResponder:1
-  DEFAULTROUTING_ALLOWEDSENDERIDS: a b c
   HAWTIO_AUTHENTICATION_ENABLED: "true"
   HAWTIO_EXTERNAL_LOGINFILE: {{ tpl .Values.paths.config . }}/users.properties
   HEADERS_REG_EXP_REQUESTHEADERSTOREMOVE: (?i)x-vp.*|PEER_CERTIFICATES|X-Forwarded.*|MULE_.*|X-MULE_.*|Connection|accept-encoding
