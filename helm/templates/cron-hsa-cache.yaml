@@ -4,6 +4,7 @@ metadata:
   name: update-hsa-cache
 spec:
   schedule: "{{ .Values.hsaCacheCronJob.schedule }}"
+  timeZone: "{{ .Values.hsaCacheCronJob.timeZone }}"
   jobTemplate:
     spec:
       template:
