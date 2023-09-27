@@ -40,6 +40,14 @@ spec:
       imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 6 }}
       {{- end }}
 
+      {{ if .Values.certProxy }}
+      hostAliases:
+      - ip: {{ .Values.certProxy.proxyIp }}
+        hostnames:
+          - {{ .Values.certProxy.targetServer }}
+          - {{ .Values.certProxy.proxyServer }}
+      {{- end }}
+
       volumes: 
         - name: trust-pem-vol
           secret:
