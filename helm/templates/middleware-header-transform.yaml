@@ -3,12 +3,12 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-    name: middleware-header-transform
+    name: middleware-header-rename
 spec:    
   plugin:
     htransformation:
       Rules:
-        - Name: Header transformation
+        - Name: Header renaming
           Type: Rename
           Header: X-Forwarded-Tls-Client-Cert
           Value: x-vp-auth-cert
