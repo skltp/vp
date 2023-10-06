@@ -8,7 +8,6 @@ spec:
   plugin:
     htransformation:
       Rules:
-        - Name: Header renaming
+        - Header: X-Forwarded-Tls-Client-Cert
           Type: Rename
-          Header: X-Forwarded-Tls-Client-Cert
           Value: x-vp-auth-cert
