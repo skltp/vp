@@ -18,15 +18,10 @@ data:
         </FileGetHsaUnitsResponse>
     log4j2.xml: |
         <Configuration status="WARN" monitorInterval="30">
-        <Properties>
-        <Property name="LOG_PATTERN">
-        %d %-5p [%t] %-30c - %X{corr.id} %m%n
-        </Property>
-        </Properties>
 
         <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-          <PatternLayout pattern="${LOG_PATTERN}"/>
+          <EcsLayout/>
         </Console>
         </Appenders>
 
