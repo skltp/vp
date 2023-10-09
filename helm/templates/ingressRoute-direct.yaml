@@ -12,7 +12,6 @@ spec:
     - kind: Rule
       match: "Host(`{{ .Values.ingressroute.bksHostName }}`) && PathPrefix(`/vp`)"
       middlewares:
-        - name: middleware-header-rename
         - name: pass-client-cert
       services:
         - kind: Service
