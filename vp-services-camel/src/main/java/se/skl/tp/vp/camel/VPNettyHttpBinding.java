@@ -70,7 +70,7 @@ public class VPNettyHttpBinding extends DefaultNettyHttpBinding {
     String correlationId = exchange.getProperty(VPExchangeProperties.SKLTP_CORRELATION_ID, String.class);
     ThreadContext.put("corr.id", String.format("[%s]", correlationId ));
     if(log.isDebugEnabled()){
-      log.debug("Incomming response headers:\n{}", response.headers().toString());
+      log.debug("Incoming response headers:\n{}", response.headers().toString());
     }
     return msg;
   }
@@ -83,7 +83,7 @@ public class VPNettyHttpBinding extends DefaultNettyHttpBinding {
     exchange.setProperty(VPExchangeProperties.SKLTP_CORRELATION_ID, correlationId);
     ThreadContext.put("corr.id", String.format("[%s]", correlationId ));
     if(log.isDebugEnabled()){
-      log.debug("Incomming request headers:\n{}", request.headers().toString());
+      log.debug("Incoming request headers:\n{}", request.headers().toString());
     }
     return msg;
   }
