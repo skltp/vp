@@ -134,6 +134,12 @@
       <artifactId>log4j-layout-template-json</artifactId>
       <version>${log4j.version}</version>
     </dependency>
+    <dependency>
+      <groupId>co.elastic.logging</groupId>
+      <artifactId>log4j2-ecs-layout</artifactId>
+      <version>${ecs-logging-java.version}</version>
+    </dependency>
+
     <!-- for async logging -->
     <dependency>
       <groupId>com.lmax</groupId>
