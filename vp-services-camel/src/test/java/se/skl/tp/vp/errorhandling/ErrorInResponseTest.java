@@ -28,6 +28,7 @@ import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
+import se.skl.tp.vp.integrationtests.utils.RandomCollection;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skl.tp.vp.util.TestLogAppender;
@@ -124,6 +125,27 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
     assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
     assertTrue(respOutLogMsg.contains("-sessionErrorTechnicalDescription=java.net.ConnectException: Cannot connect to localhost:12100"));
+    assertTrue(respOutLogMsg.contains("-sessionErrorDescription=Cannot connect to localhost:12100"));
+  }
+
+  @Test //Test för när en Producent svarar inom timeout-tiden (satt till 4s i testerna)
+  public void producerTimeoutTest() throws Exception {
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
+    setTakCacheMockResult(list);
+    mockProducer.setWeightedTimeouts(new RandomCollection<Integer>().add(1, 5000));
+
+    template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
+    String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
+    assertTrue(resultBody.contains("VP009"));
+    assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten."));
+    assertTrue(resultBody.contains("Error connecting to service producer at address " + MOCK_PRODUCER_ADDRESS));
+    resultEndpoint.assertIsSatisfied();
+    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
+    assertTrue(respOutLogMsg.contains("-sessionErrorTechnicalDescription=io.netty.handler.timeout.ReadTimeoutException"));
+    assertTrue(respOutLogMsg.contains("-sessionErrorDescription=Fel vid kontakt med tjänsteproducenten."));
   }
 
   @Test //Test för när en Producent svarar med ett tomt svar
