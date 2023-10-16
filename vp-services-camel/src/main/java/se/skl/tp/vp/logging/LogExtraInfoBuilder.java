@@ -12,6 +12,7 @@ import org.apache.camel.Exchange;
 import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.VPExchangeProperties;
+import se.skl.tp.vp.errorhandling.VpCodeMessages;
 
 public class LogExtraInfoBuilder {
 
@@ -35,11 +36,10 @@ public class LogExtraInfoBuilder {
   public static final String VP_X_FORWARDED_HOST = VPExchangeProperties.VP_X_FORWARDED_HOST;
   public static final String VP_X_FORWARDED_PROTO = VPExchangeProperties.VP_X_FORWARDED_PROTO;
   public static final String VP_X_FORWARDED_PORT = VPExchangeProperties.VP_X_FORWARDED_PORT;
-
+  public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
   private static final ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties = new ProxyHttpForwardedHeaderProperties();
   protected static final List<String> HEADERS_TO_FILTER = Arrays.asList(proxyHttpForwardedHeaderProperties.getAuth_cert(), "x-fk-auth-cert");
   protected static final String FILTERED_TEXT = "<filtered>";
-
 
   private LogExtraInfoBuilder() {
     // Static utility class
@@ -127,7 +127,8 @@ public class LogExtraInfoBuilder {
 
   private static void addErrorInfo(Exchange exchange, ExtraInfoMap<String, String> extraInfo) {
     Exception exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
-    String errorDescription = exception!=null ? exception.getMessage() : "";
+    String errorMessage = exception!=null ? exception.getMessage() : null;
+    String errorDescription = errorMessage!=null ? errorMessage : DEFAULT_ERROR_DESCRIPTION;
     String technicalDescription = exception!=null ? exception.toString() : "";
     String errorCode = exchange.getProperty(VPExchangeProperties.SESSION_ERROR_CODE, String.class);
     String htmlStatus = exchange.getProperty(VPExchangeProperties.SESSION_HTML_STATUS, String.class);

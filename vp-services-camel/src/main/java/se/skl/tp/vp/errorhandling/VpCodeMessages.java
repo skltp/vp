@@ -33,4 +33,8 @@ public class VpCodeMessages {
     return env.getProperty(key+ "_DETAILS");
   }
 
+  // For use in static contexts
+  public static String getDefaultMessage() {
+    return "Fel vid kontakt med tjänsteproducenten.";
+  }
 }
