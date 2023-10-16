@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit4.SpringRunner;
 import se.skl.tp.vp.errorhandling.VpCodeMessages;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 
@@ -42,6 +41,13 @@ public class VpCodeMessagesTest {
   public void messageDetailsByErrorCodeTest() throws Exception {
     String result = vpCodeMessages.getMessageDetails(VpSemanticErrorCodeEnum.VP001);
     assertEquals("No RIV version configured", result);
+  }
+
+  @Test
+  public void defaultMessageTest() throws Exception {
+    String getMessageForDefault = vpCodeMessages.getMessage(VpSemanticErrorCodeEnum.getDefault());
+    String staticDefaultMessage = VpCodeMessages.getDefaultMessage();
+    assertEquals(getMessageForDefault, staticDefaultMessage);
   }
 
   @Configuration

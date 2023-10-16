@@ -39,7 +39,7 @@ public class LogExtraInfoBuilder {
   private static final ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties = new ProxyHttpForwardedHeaderProperties();
   protected static final List<String> HEADERS_TO_FILTER = Arrays.asList(proxyHttpForwardedHeaderProperties.getAuth_cert(), "x-fk-auth-cert");
   protected static final String FILTERED_TEXT = "<filtered>";
-  public static final String DEFAULT_ERROR_DESCRIPTION = "Fel vid kontakt med tjänsteproducenten.";
+  public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
 
   private LogExtraInfoBuilder() {
     // Static utility class
