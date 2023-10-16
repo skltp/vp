@@ -54,7 +54,7 @@ public class TestLogAppender extends AbstractAppender {
   @Override
   public void append(final LogEvent event) {
 
-    // Clear events if start if new incomming message to VP
+    // Clear events if start if new incmming message to VP
     if(event.getLoggerName().equalsIgnoreCase(MessageInfoLogger.REQ_IN)) {
       clearEvents();
     }
