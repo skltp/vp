@@ -36,10 +36,10 @@ public class LogExtraInfoBuilder {
   public static final String VP_X_FORWARDED_HOST = VPExchangeProperties.VP_X_FORWARDED_HOST;
   public static final String VP_X_FORWARDED_PROTO = VPExchangeProperties.VP_X_FORWARDED_PROTO;
   public static final String VP_X_FORWARDED_PORT = VPExchangeProperties.VP_X_FORWARDED_PORT;
+  public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
   private static final ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties = new ProxyHttpForwardedHeaderProperties();
   protected static final List<String> HEADERS_TO_FILTER = Arrays.asList(proxyHttpForwardedHeaderProperties.getAuth_cert(), "x-fk-auth-cert");
   protected static final String FILTERED_TEXT = "<filtered>";
-  public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
 
   private LogExtraInfoBuilder() {
     // Static utility class

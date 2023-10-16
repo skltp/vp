@@ -128,7 +128,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(respOutLogMsg.contains("-sessionErrorDescription=Cannot connect to localhost:12100"));
   }
 
-  @Test //Test för när en Producent svarar inom timeout-tiden (satt till 4s i testerna)
+  @Test //Test för när en Producent inte svarar inom timeout-tiden (satt till 4s i testerna)
   public void producerTimeoutTest() throws Exception {
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
