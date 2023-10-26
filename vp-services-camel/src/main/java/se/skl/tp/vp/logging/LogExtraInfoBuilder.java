@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
-import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.errorhandling.VpCodeMessages;
@@ -37,16 +36,15 @@ public class LogExtraInfoBuilder {
   public static final String VP_X_FORWARDED_PROTO = VPExchangeProperties.VP_X_FORWARDED_PROTO;
   public static final String VP_X_FORWARDED_PORT = VPExchangeProperties.VP_X_FORWARDED_PORT;
   public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
-  private static final ProxyHttpForwardedHeaderProperties proxyHttpForwardedHeaderProperties = new ProxyHttpForwardedHeaderProperties();
-  protected static final List<String> HEADERS_TO_FILTER = Arrays.asList(proxyHttpForwardedHeaderProperties.getAuth_cert(), "x-fk-auth-cert");
+  protected static final List<String> HEADERS_TO_FILTER = Arrays.asList("X-Forwarded-Tls-Client-Cert", "x-vp-auth-cert", "x-fk-auth-cert");
   protected static final String FILTERED_TEXT = "<filtered>";
 
   private LogExtraInfoBuilder() {
     // Static utility class
   }
 
-  public static Map<String, String> createExtraInfo(Exchange exchange) {
-    ExtraInfoMap<String, String> extraInfo = new ExtraInfoMap<>();
+  public static Map<String, Object> createExtraInfo(Exchange exchange, boolean keepObjects, List<String> headerFilter) {
+    ExtraInfoMap<String, Object> extraInfo = new ExtraInfoMap<>();
 
     extraInfo.put(SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class));
     extraInfo.put(RECEIVER_ID, exchange.getProperty(VPExchangeProperties.RECEIVER_ID, String.class));
@@ -64,7 +62,13 @@ public class LogExtraInfoBuilder {
     extraInfo.put(RIV_VERSION, rivVersion);
     extraInfo.put(WSDL_NAMESPACE, createWsdlNamespace(serviceContractNS, rivVersion));
 
-    extraInfo.put(HEADERS, getHeadersAsString(exchange.getIn().getHeaders()));
+    Map<String, String> headers = new HashMap<>();
+    filterHeaders(exchange.getIn().getHeaders(), headerFilter, headers);
+    if (keepObjects) {
+      extraInfo.put(HEADERS, headers);
+    } else {
+      extraInfo.put(HEADERS, getHeadersAsString(headers));
+    }
 
     extraInfo.put(TIME_ELAPSED, getElapsedTime(exchange).toString());
 
@@ -87,7 +91,7 @@ public class LogExtraInfoBuilder {
     return extraInfo;
   }
 
-  private static void addHttpForwardHeaders(Exchange exchange, ExtraInfoMap<String, String> extraInfo) {
+    private static void addHttpForwardHeaders(Exchange exchange, ExtraInfoMap<String, Object> extraInfo) {
     // Following should be logged only once
 
     String httpXForwardedProto = exchange.getProperty(VPExchangeProperties.VP_X_FORWARDED_PROTO, String.class);
@@ -125,7 +129,7 @@ public class LogExtraInfoBuilder {
     return new Date().getTime() - created.getTime();
   }
 
-  private static void addErrorInfo(Exchange exchange, ExtraInfoMap<String, String> extraInfo) {
+  private static void addErrorInfo(Exchange exchange, ExtraInfoMap<String, Object> extraInfo) {
     Exception exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
     String errorMessage = exception!=null ? exception.getMessage() : null;
     String errorDescription = errorMessage!=null ? errorMessage : DEFAULT_ERROR_DESCRIPTION;
@@ -145,14 +149,12 @@ public class LogExtraInfoBuilder {
     return (s == null) ? "" : s;
   }
 
-  private static String getHeadersAsString(Map<String, ?> headersMap) {
-    return headersMap.keySet().stream()
-        .map(key -> key + "=" + filterHeaderValue(key , headersMap))
-        .collect(Collectors.joining(", ", "{", "}"));
+  private static void filterHeaders(Map<String, Object> headers, List<String> headerFilter, Map<String, String> res) {
+    headers.forEach((s, o) -> {res.put(s, headerFilter.contains(s) ? FILTERED_TEXT : String.valueOf(o));});
   }
-
-  private static String filterHeaderValue(String key,  Map<String, ?> headersMap) {
-     return HEADERS_TO_FILTER.contains(key) ? FILTERED_TEXT : ""+headersMap.get(key);
+  private static String getHeadersAsString(Map<String, ?> headersMap) {
+    return headersMap.keySet().stream().map(key -> key + "=" + headersMap.get(key))
+            .collect(Collectors.joining(", ", "{", "}"));
   }
 
   private static class ExtraInfoMap<K, V> extends HashMap<K, V> {

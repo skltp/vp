@@ -1,5 +1,7 @@
 package se.skl.tp.vp.logging;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
 import se.skl.tp.vp.constants.VPExchangeProperties;
@@ -11,13 +13,16 @@ import se.skl.tp.vp.logging.logentry.LogRuntimeInfoType;
 
 public class LogEntryBuilder {
 
+  // TODO: use property http.forwarded.header.auth_cert
+  protected static final List<String> HEADERS_TO_FILTER = Arrays.asList("X-Forwarded-Tls-Client-Cert", "x-vp-auth-cert", "x-fk-auth-cert");
   private LogEntryBuilder() {
     // Static utility class
   }
 
   public static LogEntry createLogEntry(
-      String logMessageType,
-      Exchange exchange) {
+          String logMessageType,
+          Exchange exchange,
+          boolean keepObjects) {
 
     LogRuntimeInfoType lri = createRunTimeInfo(exchange);
     LogMetadataInfoType lmi = createMetadataInfo(exchange);
@@ -29,7 +34,7 @@ public class LogEntryBuilder {
     logEntry.setRuntimeInfo(lri);
     logEntry.setMessageInfo(lm);
 
-    Map<String, String> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange);
+    Map<String, Object> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange, keepObjects, HEADERS_TO_FILTER);
     logEntry.setExtraInfo(extraInfo);
 
     return logEntry;
