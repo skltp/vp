@@ -33,6 +33,7 @@ public class MessageInfoLogger {
     private static final String MSG_TYPE_LOG_RESP_IN = "resp-in";
     private static final String MSG_TYPE_LOG_RESP_OUT = "resp-out";
     private static final String MSG_TYPE_ERROR = "error";
+    public static final String FAILED_LOG_MESSAGE = "Failed log message: {}";
 
 
     public void logReqIn(Exchange exchange) { log(LOGGER_REQ_IN, exchange, MSG_TYPE_LOG_REQ_IN); }
@@ -58,7 +59,7 @@ public class MessageInfoLogger {
             LOGGER_ERROR.error(LogMessageFormatter.format(LOG_EVENT_ERROR, logEntry));
 
         } catch (Exception e) {
-            LOGGER_ERROR.error("Failed log message: {}", MSG_TYPE_ERROR, e);
+            LOGGER_ERROR.error(FAILED_LOG_MESSAGE, MSG_TYPE_ERROR, e);
         }
     }
 
@@ -81,12 +82,12 @@ public class MessageInfoLogger {
             LogEntry logEntry = LogEntryBuilder.createLogEntry(MSG_TYPE_ERROR, exchange, true);
             logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOURCE, getClass().getName());
             logEntry.getMessageInfo().setException(LogEntryBuilder.createMessageException(exchange, stackTrace));
-            HashMap<String, Object> msgMap = new HashMap<String, Object>();
+            HashMap<String, Object> msgMap = new HashMap<>();
             LogMessageFormatter.format(LOG_EVENT_ERROR, logEntry, msgMap);
             LOGGER_ERROR.error(new ObjectMessage(msgMap));
 
         } catch (Exception e) {
-            LOGGER_ERROR.error("Failed log message: {}", MSG_TYPE_ERROR, e);
+            LOGGER_ERROR.error(FAILED_LOG_MESSAGE, MSG_TYPE_ERROR, e);
         }
     }
 
@@ -104,13 +105,13 @@ public class MessageInfoLogger {
             }
 
         } catch (Exception e) {
-            log.error("Failed log message: {}", messageType, e);
+            log.error(FAILED_LOG_MESSAGE, messageType, e);
         }
     }
 
     public void objLog(Logger log, Exchange exchange, String messageType) {
         try {
-            HashMap<String, Object> msgMap = new HashMap<String, Object>();
+            HashMap<String, Object> msgMap = new HashMap<>();
             LogEntry logEntry = LogEntryBuilder.createLogEntry(messageType, exchange, true);
             logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOURCE, getClass().getName());
             if (log.isDebugEnabled()) {
@@ -123,7 +124,7 @@ public class MessageInfoLogger {
             }
 
         } catch (Exception e) {
-            log.error("Failed log message: {}", messageType, e);
+            log.error(FAILED_LOG_MESSAGE, messageType, e);
         }
     }
 
