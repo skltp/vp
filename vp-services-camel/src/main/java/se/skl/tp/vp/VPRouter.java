@@ -129,7 +129,7 @@ public class VPRouter extends RouteBuilder {
     @Autowired
     private ConvertResponseCharset convertResponseCharset;
 
-    @Value("${message.logger.method}")
+    @Value("${message.logger.method:classic}")
     private String messageLoggerMethod;
 
     public void setLogMethods() {
