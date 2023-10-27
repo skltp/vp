@@ -13,6 +13,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.apache.logging.log4j.message.Message;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 
 // note: class name need not match the @Plugin name.
@@ -86,6 +87,15 @@ public class TestLogAppender extends AbstractAppender {
       return null;
 
     return newEvents.get(index).getMessage().getFormattedMessage();
+  }
+  public static Message getEventMessageObject(String loggerName, int index) {
+
+    List<LogEvent> newEvents = getEvents(loggerName);
+
+    if(newEvents.size() < index)
+      return null;
+
+    return newEvents.get(index).getMessage();
   }
 
   public static LogEvent getEvent(String loggerName, int index) {

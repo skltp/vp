@@ -111,7 +111,7 @@ public class MessageInfoLogger {
     public void objLog(Logger log, Exchange exchange, String messageType) {
         try {
             HashMap<String, Object> msgMap = new HashMap<String, Object>();
-            LogEntry logEntry = LogEntryBuilder.createLogEntry(messageType, exchange, false);
+            LogEntry logEntry = LogEntryBuilder.createLogEntry(messageType, exchange, true);
             logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOURCE, getClass().getName());
             if (log.isDebugEnabled()) {
                 logEntry.setPayload(exchange.getIn().getBody(String.class));
