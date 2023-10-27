@@ -46,6 +46,7 @@ public class LogMessageFormatter {
         LogMetadataInfoType metadataInfo = logEntry.getMetadataInfo();
         LogRuntimeInfoType runtimeInfo = logEntry.getRuntimeInfo();
 
+        messageMap.put("logEventType", logEventName);
         messageMap.put("messageInfo", messageInfo);
         messageMap.put("service", metadataInfo);
         messageMap.put("runtimeInfo", runtimeInfo);
