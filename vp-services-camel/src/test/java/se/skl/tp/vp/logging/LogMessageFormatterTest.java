@@ -6,14 +6,14 @@ import org.apache.camel.Message;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import se.skl.tp.vp.constants.VPExchangeProperties;
-import se.skl.tp.vp.logging.logentry.LogEntry;
-import se.skl.tp.vp.logging.logentry.LogMessageType;
-import se.skl.tp.vp.logging.logentry.LogMetadataInfoType;
+import se.skl.tp.vp.logging.logentry.*;
+import se.skl.tp.vp.util.JunitUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -31,34 +31,32 @@ import static org.wildfly.common.Assert.assertNotNull;
 @DirtiesContext
 public class LogMessageFormatterTest {
 
-    @Test
-    public void testFormatWithObject() throws Exception {
+    private Exchange exchange;
+    private Logger infoLogger;
+    private Logger debugLogger;
+    private String logEventName;
+    private String payload;
+    private String stackTrace;
+    private String messageType;
+    private LogEntry logEntry;
+    private MessageInfoLogger messageInfoLogger;
 
-        String logEventType = "testObjectMessage";
-        String payload = "<Payload/>";
-
-        LogEntry logEntry = new LogEntry();
+    @BeforeEach
+    public void beforeEach() {
+        infoLogger = mock(Logger.class);
+        debugLogger = mock(Logger.class);
+        exchange = mock(Exchange.class);
+        messageInfoLogger = new MessageInfoLogger();
+        logEventName = "logEvent-test";
+        payload = "<Payload/>";
+        stackTrace = "<testException/>";
+        messageType = "testObjectLogger";
+        logEntry = new LogEntry();
         logEntry.setMessageInfo(new LogMessageType());
         logEntry.setMetadataInfo(new LogMetadataInfoType());
         logEntry.setExtraInfo(new HashMap<>());
-        logEntry.setPayload(null);
-        HashMap<String, Object> messageMap = new HashMap<>();
-        LogMessageFormatter.format(logEventType, logEntry, messageMap);
+        logEntry.setRuntimeInfo(new LogRuntimeInfoType());
 
-        assertNotNull(messageMap);
-        assertEquals(logEventType, messageMap.get("logEventType"));
-        assertNull("payload should be null", messageMap.get("payload"));
-
-        logEntry.setPayload(payload);
-        LogMessageFormatter.format(logEventType, logEntry, messageMap);
-        assertEquals(payload, messageMap.get("payload"));
-
-    }
-
-    @Test
-    public void testObjectMessageLog() throws Exception {
-        Logger logger = mock(Logger.class);
-        Exchange exchange = mock(Exchange.class);
         Message in = mock(Message.class);
         CamelContext ctx = mock(CamelContext.class);
 
@@ -67,26 +65,76 @@ public class LogMessageFormatterTest {
         Mockito.when(exchange.getMessage()).thenReturn(in);
         Mockito.when(exchange.getIn()).thenReturn(in);
         Mockito.when(exchange.getContext()).thenReturn(ctx);
-        Mockito.when(logger.isDebugEnabled()).thenReturn(false);
+        Mockito.when(infoLogger.isDebugEnabled()).thenReturn(false);
+        Mockito.when(debugLogger.isDebugEnabled()).thenReturn(true);
 
-        MessageInfoLogger mil = new MessageInfoLogger();
+
+    }
+
+    @Test
+    public void testFormatWithObject() throws Exception {
+        HashMap<String, Object> messageMap = new HashMap<>();
+        LogMessageFormatter.format(logEventName, logEntry, messageMap);
+
+        assertNotNull(messageMap);
+        assertEquals(logEventName, messageMap.get("logEventType"));
+        assertNull("payload should be null", messageMap.get("payload"));
+
+    }
+    @Test
+    public void testFormatWithString() throws Exception {
+        HashMap<String, Object> messageMap = new HashMap<>();
+        logEntry.getMessageInfo().setException(new LogMessageExceptionType());
+        logEntry.getMessageInfo().getException().setStackTrace(stackTrace);
+        String logString = LogMessageFormatter.format(logEventName, logEntry);
+        logEntry.setPayload(payload);
+        String logStringWithPayload = LogMessageFormatter.format(logEventName, logEntry);
+
+        assertNotNull(logString);
+        assertNotNull(logStringWithPayload);
+        JunitUtil.assertMatchRegexGroup(logString, "LogMessage=(.*)", "null", 1);
+        JunitUtil.assertMatchRegexGroup(logString, "Stacktrace=(.*)", stackTrace, 1);
+
+        JunitUtil.assertMatchRegexGroup(logStringWithPayload, "LogMessage=(.*)", "null", 1);
+        JunitUtil.assertMatchRegexGroup(logStringWithPayload, "Stacktrace=(.*)", stackTrace, 1);
+        JunitUtil.assertMatchRegexGroup(logStringWithPayload, "Payload=(.*)", payload, 1);
+
+        logEntry.setExtraInfo(null);
+        String logStringWithoutExtra = LogMessageFormatter.format(logEventName, logEntry);
+        JunitUtil.assertMatchRegexGroup(logStringWithPayload, "ExtraInfo=(.*)", "", 1);
+
+    }
+
+    @Test
+    public void testObjectMessageLog_() throws Exception {
+        HashMap<String, Object> messageMap = new HashMap<>();
+        logEntry.setPayload(payload);
+        logEntry.getMessageInfo().setException(new LogMessageExceptionType());
+        logEntry.getMessageInfo().getException().setStackTrace(stackTrace);
+        LogMessageFormatter.format(logEventName, logEntry, messageMap);
+        assertEquals(payload, messageMap.get("payload"));
+        assertEquals(stackTrace, messageMap.get("Stacktrace"));
+
+    }
+
+    @Test
+    public void testObjectMessageLogNullLoggerThrowsException() throws Exception {
         Assertions.assertThrows(Exception.class, () -> {
-            mil.objLog(null, exchange, null);
+            messageInfoLogger.objLog(null, exchange, null);
         });
-        mil.objLog(logger, null, "testObjectLogger");
-        Logger logger2 = mock(Logger.class);
-        Mockito.when(logger2.isDebugEnabled()).thenReturn(true);
-        mil.objLog(logger2, exchange, "testObjectLogger");
-        assertNotNull(logger2);
+    }
+    @Test
+    public void testObjectMessageLog2() throws Exception {
+        messageInfoLogger.objLog(debugLogger, exchange, messageType);
 
         LogEntry logEntry = new LogEntry();
-        logEntry.setPayload(exchange.getIn().getBody(String.class));
+        logEntry.setPayload(payload);
         Map<String, Object> msgMap = new HashMap<>();
         logEntry.setMessageInfo(new LogMessageType());
-        LogMessageFormatter.format("logEvent-test", logEntry, msgMap);
+        LogMessageFormatter.format(logEventName, logEntry, msgMap);
 
         assertNotNull(msgMap);
-        assertEquals("logEvent-test", msgMap.get("logEventType"));
+        assertEquals(logEventName, msgMap.get("logEventType"));
         LogMessageType lmt = (LogMessageType) msgMap.get("messageInfo");
         assertNull("messageinfo.message should be null", lmt.getMessage());
         assertNull("messageinfo.exception should be null", lmt.getException());
