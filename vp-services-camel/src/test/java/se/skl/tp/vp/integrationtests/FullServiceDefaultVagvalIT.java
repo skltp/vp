@@ -2,7 +2,7 @@ package se.skl.tp.vp.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static se.skl.tp.vp.util.JunitUtil.assertMatchRegexGroup;
+import static se.skl.tp.vp.util.TestLogAppender.assertLogMessage;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetActivitiesRiv21Request;
 
 import java.util.HashMap;
@@ -20,7 +20,6 @@ import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TakMockWebService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
 import se.skl.tp.vp.logging.MessageInfoLogger;
-import se.skl.tp.vp.util.JunitUtil;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
@@ -65,7 +64,7 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request("FirstReceiverRiv21#SecondReceiverRiv21"), headers);
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
-    assertLogMessage("FirstReceiverRiv21#SecondReceiverRiv21", "SecondReceiverRiv21");
+    assertLogMessage(MessageInfoLogger.RESP_OUT,"(leaf),FirstReceiverRiv21#SecondReceiverRiv21", "SecondReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
   }
 
   @Test
@@ -76,7 +75,7 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request("SecondReceiverRiv21#FirstReceiverRiv21"), headers);
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
-    assertLogMessage("SecondReceiverRiv21#FirstReceiverRiv21", "FirstReceiverRiv21");
+    assertLogMessage(MessageInfoLogger.RESP_OUT, "(leaf),SecondReceiverRiv21#FirstReceiverRiv21", "FirstReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
   }
 
   @Test
@@ -87,7 +86,7 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request("SecondReceiverRiv21#NotValidReceiver"), headers);
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
-    assertLogMessage("SecondReceiverRiv21#NotValidReceiver", "NotValidReceiver,SecondReceiverRiv21");
+    assertLogMessage(MessageInfoLogger.RESP_OUT,"(leaf),SecondReceiverRiv21#NotValidReceiver", "NotValidReceiver,SecondReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
   }
 
   @Test
@@ -101,14 +100,5 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     assertTrue(response.contains("Tjänstekonsumenten saknar behörighet att anropa den logiska adressaten via detta tjänstekontrakt. Kontrollera uppgifterna och vid behov, tillse att det beställs konfiguration i aktuell tjänsteplattform."));
   }
 
-  private void assertLogMessage(String receiver, String trace) {
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", "resp-out", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", "SenderWithDefaultBehorighet", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", "http://localhost:1900/default/GetActivitiesResponder", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)",  receiver, 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", "(leaf)," + trace, 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", "(leaf),"+ trace, 1);
-  }
 
 }

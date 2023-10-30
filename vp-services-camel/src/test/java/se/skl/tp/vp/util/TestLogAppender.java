@@ -138,4 +138,15 @@ public class TestLogAppender extends AbstractAppender {
 
     return getInstance(name, filter, layout, true);
   }
+
+  public static void assertLogMessage(String loggerName, String receiver, String trace, String logMessage, String endpointUrl, String senderId) {
+    String respOutLogMsg = TestLogAppender.getEventMessage(loggerName, 0);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", logMessage, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", senderId, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", endpointUrl, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)",  receiver, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", trace, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", trace, 1);
+  }
+
 }
