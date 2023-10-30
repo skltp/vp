@@ -217,7 +217,7 @@ public class LogMessageFormatterTest {
     }
 
     @Test
-    public void testObjectMessageLog_() throws Exception {
+    public void testObjectMessageLogPayloadAndStacktrace() throws Exception {
         HashMap<String, Object> messageMap = new HashMap<>();
         LogEntry logEntry = getLogEntry();
         logEntry.setPayload(payload);
@@ -236,7 +236,7 @@ public class LogMessageFormatterTest {
         });
     }
     @Test
-    public void testObjectMessageLog2() throws Exception {
+    public void testObjectMessageLogNullException() throws Exception {
         messageInfoLogger.objLog(debugLogger, exchange, messageType);
 
         LogEntry logEntry = new LogEntry();

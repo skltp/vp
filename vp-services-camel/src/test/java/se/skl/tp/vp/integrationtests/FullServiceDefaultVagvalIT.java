@@ -64,7 +64,7 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request("FirstReceiverRiv21#SecondReceiverRiv21"), headers);
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
-    assertLogMessage(MessageInfoLogger.RESP_OUT,"(leaf),FirstReceiverRiv21#SecondReceiverRiv21", "SecondReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
+    assertLogMessage(MessageInfoLogger.RESP_OUT,"FirstReceiverRiv21#SecondReceiverRiv21", "(leaf),SecondReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
   }
 
   @Test
@@ -75,7 +75,7 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request("SecondReceiverRiv21#FirstReceiverRiv21"), headers);
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
-    assertLogMessage(MessageInfoLogger.RESP_OUT, "(leaf),SecondReceiverRiv21#FirstReceiverRiv21", "FirstReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
+    assertLogMessage(MessageInfoLogger.RESP_OUT, "SecondReceiverRiv21#FirstReceiverRiv21", "(leaf),FirstReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
   }
 
   @Test
@@ -86,7 +86,7 @@ public class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request("SecondReceiverRiv21#NotValidReceiver"), headers);
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
-    assertLogMessage(MessageInfoLogger.RESP_OUT,"(leaf),SecondReceiverRiv21#NotValidReceiver", "NotValidReceiver,SecondReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
+    assertLogMessage(MessageInfoLogger.RESP_OUT,"SecondReceiverRiv21#NotValidReceiver", "(leaf),NotValidReceiver,SecondReceiverRiv21", "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
   }
 
   @Test
