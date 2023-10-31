@@ -169,7 +169,13 @@ public class LogExtraInfoBuilder {
     }
 
     public V putNotEmpty(K key, V value) {
-      return (value == null || ((String) value).isEmpty()) ? null : put(key, value);
+      if (value == null) {
+        return null;
+      }
+      if (((String)value).isEmpty()) {
+        return null;
+      }
+      return put(key, value);
     }
   }
 }
