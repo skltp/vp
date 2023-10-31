@@ -75,6 +75,7 @@ public class LogMessageFormatterTest {
         Mockito.when(debugLogger.isInfoEnabled()).thenReturn(false);
         Mockito.when(debugLogger.isDebugEnabled()).thenReturn(true);
 
+        TestLogAppender.clearEvents();
     }
 
     private LogEntry getLogEntry() {
@@ -264,7 +265,74 @@ public class LogMessageFormatterTest {
         messageInfoLogger.objLogError(null, stackTrace);
         org.apache.logging.log4j.message.Message respOutLogMsg = TestLogAppender.getEventMessageObject(MessageInfoLogger.REQ_ERROR, 0);
         assertNotNull(respOutLogMsg);
-
     }
 
+    @Test
+    public void testLogReqAndResp() throws Exception {
+        messageInfoLogger.logReqIn(exchange);
+        messageInfoLogger.logReqOut(exchange);
+        messageInfoLogger.logRespIn(exchange);
+        messageInfoLogger.logRespOut(exchange);
+        String reqInLog = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+        assertNotNull(reqInLog);
+        String reqOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
+        assertNotNull(reqOutLog);
+        String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+        assertNotNull(respInLog);
+        String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+        assertNotNull(respOutLog);
+        assertLogMessage(MessageInfoLogger.RESP_OUT,
+                "mockedString",
+                "mockedString",
+                "resp-out",
+                "mockedString",
+                "mockedString");
+    }
+
+    private String getWaypoint(org.apache.logging.log4j.message.Message message) {
+        HashMap<Object, Object> messageMap = (HashMap<Object, Object>) ((Object[])message.getParameters())[0];
+        return ((LogMessageType)messageMap.get("messageInfo")).getMessage();
+    }
+
+
+    @Test
+    public void testObjLogReqAndResp() throws Exception {
+        messageInfoLogger.objLogReqIn(exchange);
+        messageInfoLogger.objLogReqOut(exchange);
+        messageInfoLogger.objLogRespIn(exchange);
+        messageInfoLogger.objLogRespOut(exchange);
+        org.apache.logging.log4j.message.Message reqInLog = TestLogAppender.getEventMessageObject(MessageInfoLogger.REQ_IN, 0);
+        org.apache.logging.log4j.message.Message reqOutLog = TestLogAppender.getEventMessageObject(MessageInfoLogger.REQ_OUT, 0);
+        org.apache.logging.log4j.message.Message respInLog = TestLogAppender.getEventMessageObject(MessageInfoLogger.RESP_IN, 0);
+        org.apache.logging.log4j.message.Message respOutLog = TestLogAppender.getEventMessageObject(MessageInfoLogger.RESP_OUT, 0);
+        assertNotNull(reqInLog);
+        assertNotNull(reqOutLog);
+        assertNotNull(respInLog);
+        assertNotNull(respOutLog);
+        assertEquals("req-in", getWaypoint(reqInLog));
+        assertEquals("req-out", getWaypoint(reqOutLog));
+        assertEquals("resp-in", getWaypoint(respInLog));
+        assertEquals("resp-out", getWaypoint(respOutLog));
+    }
+
+    @Test
+    public void testAddErrorInfo() throws Exception {
+        Mockito.when(exchange.getProperty(VPExchangeProperties.SESSION_ERROR, Boolean.class)).thenReturn(true);
+        Map<String, Object> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange, false, null);
+        assertEquals("true", extraInfo.get(VPExchangeProperties.SESSION_ERROR));
+    }
+
+    @Test
+    public void testCreateMessageException() throws Exception {
+        Mockito.when(exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class)).thenReturn(new Throwable());
+        LogMessageExceptionType lme = LogEntryBuilder.createMessageException(exchange, stackTrace);
+        assertEquals(stackTrace, lme.getStackTrace());
+    }
+
+    @Test
+    public void testObjLogError() throws Exception {
+        messageInfoLogger.objLogError(exchange, stackTrace);
+        org.apache.logging.log4j.message.Message message = TestLogAppender.getEventMessageObject(MessageInfoLogger.REQ_ERROR, 0);
+        assertEquals("error", getWaypoint(message));
+    }
 }
