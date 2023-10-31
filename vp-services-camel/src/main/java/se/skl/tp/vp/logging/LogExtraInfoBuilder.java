@@ -155,7 +155,7 @@ public class LogExtraInfoBuilder {
   }
 
   private static void filterHeaders(Map<String, Object> headers, List<String> headerFilter, Map<String, String> res) {
-    headers.forEach((s, o) -> {res.put(s, headerFilter.contains(s) ? FILTERED_TEXT : String.valueOf(o));});
+    headers.forEach((s, o) -> res.put(s, headerFilter.contains(s) ? FILTERED_TEXT : String.valueOf(o)));
   }
   private static String getHeadersAsString(Map<String, ?> headersMap) {
     return headersMap.keySet().stream().map(key -> key + "=" + headersMap.get(key))
