@@ -9,7 +9,6 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.netty.http.NettyHttpOperationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import se.skl.tp.vp.certificate.CertificateExtractorProcessor;
 import se.skl.tp.vp.charset.ConvertRequestCharset;
@@ -74,12 +73,11 @@ public class VPRouter extends RouteBuilder {
 
     public static final String VAGVAL_PROCESSOR_ID = "VagvalProcessor";
     public static final String BEHORIGHET_PROCESSOR_ID = "BehorighetProcessor";
-    public String LOG_ERROR_METHOD = "logError(*,${exception.stacktrace})";
-    public String LOG_RESP_OUT_METHOD = "logRespOut(*)";
-    public String LOG_REQ_IN_METHOD = "logReqIn(*)";
-    public String LOG_REQ_OUT_METHOD = "logReqOut(*)";
-    public String LOG_RESP_IN_METHOD = "logRespIn(*)";
-
+    public static final String LOG_ERROR_METHOD = "logError(*,${exception.stacktrace})";
+    public static final String LOG_RESP_OUT_METHOD = "logRespOut(*)";
+    public static final String LOG_REQ_IN_METHOD = "logReqIn(*)";
+    public static final String LOG_REQ_OUT_METHOD = "logReqOut(*)";
+    public static final String LOG_RESP_IN_METHOD = "logRespIn(*)";
 
     @Autowired
     OriginalConsumerIdProcessor originalConsumerIdProcessor;
@@ -129,31 +127,9 @@ public class VPRouter extends RouteBuilder {
     @Autowired
     private ConvertResponseCharset convertResponseCharset;
 
-    @Value("${message.logger.method}")
-    private String messageLoggerMethod;
-
-    public void setLogMethods() {
-        if (messageLoggerMethod.equalsIgnoreCase("classic")) {
-            LOG_RESP_OUT_METHOD = "logRespOut(*)";
-            LOG_REQ_IN_METHOD = "logReqIn(*)";
-            LOG_REQ_OUT_METHOD = "logReqOut(*)";
-            LOG_RESP_IN_METHOD = "logRespIn(*)";
-            LOG_ERROR_METHOD = "logError(*,${exception.stacktrace})";
-        }
-        else {
-            LOG_RESP_OUT_METHOD = "objLogRespOut(*)";
-            LOG_REQ_IN_METHOD = "objLogReqIn(*)";
-            LOG_REQ_OUT_METHOD = "objLogReqOut(*)";
-            LOG_RESP_IN_METHOD = "objLogRespIn(*)";
-            LOG_ERROR_METHOD = "objLogError(*,${exception.stacktrace})";
-        }
-    }
-
     @Override
     @SuppressWarnings("unchecked") // Caused by Camel's onException method
     public void configure() throws Exception {
-
-        setLogMethods();
 
         onException(Exception.class)
             .process(exceptionMessageProcessor)
