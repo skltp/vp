@@ -73,8 +73,14 @@ public class LogExtraInfoBuilder {
     extraInfo.put(TIME_ELAPSED, getElapsedTime(exchange).toString());
 
     if (keepObjects) {
-      extraInfo.putNotNull(VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class).split(","));
-      extraInfo.putNotNull(ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class).split(","));
+      String vvTrace = exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class);
+      String abTrace = exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class);
+      if (vvTrace != null) {
+        extraInfo.put(VAGVAL_TRACE, vvTrace.split(","));
+      }
+      if (abTrace != null) {
+        extraInfo.put(ANROPSBEHORIGHET_TRACE, abTrace.split(","));
+      }
     } else {
       extraInfo.putNotNull(VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class));
       extraInfo.putNotNull(ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class));
