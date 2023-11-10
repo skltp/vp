@@ -123,10 +123,8 @@ public class LogExtraInfoBuilder {
   }
 
   private static String createWsdlNamespace(String serviceContractNS, String profile) {
-    //  Convert from interaction target namespace
-    //    urn:${domänPrefix}:${tjänsteDomän}:${tjänsteInteraktion}${roll}:${m}
-    //  to wsdl target namespace
-    //    urn:riv:${tjänsteDomän}:${tjänsteInteraktion}:m:${profilKortnamn}
+    //  Convert from interaction target namespace: urn:${domänPrefix}:${tjänsteDomän}:${tjänsteInteraktion}${roll}:${m}
+    //  to wsdl target namespace: urn:riv:${tjänsteDomän}:${tjänsteInteraktion}:m:${profilKortnamn}
     // See https://riv-ta.atlassian.net/wiki/spaces/RTA/pages/99593635/RIV+Tekniska+Anvisningar+Tj+nsteschema
     //   and https://riv-ta.atlassian.net/wiki/spaces/RTA/pages/77856888/RIV+Tekniska+Anvisningar+Basic+Profile+2.1
     if (serviceContractNS == null || profile == null) {
