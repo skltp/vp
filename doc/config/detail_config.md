@@ -25,6 +25,7 @@ Om SSL/TLS trafik termineras framför VP, i t ex en reverse-proxy, behöver dess
      - `http.forwarded.header.port=X-VP-Forwarded-Port`
      - `http.forwarded.header.proto=X-VP-Forwarded-Proto`
      - `http.forwarded.header.xfor=X-Forwarded-For`
+     - `http.forwarded.header.auth_cert=x-vp-auth-cert`
    
  2. Lägga till IP-nr (inre) för reverse-proxy’n till VP Camel's whitelist property (i `application-custom.properties`): 
      - `ip.whitelist=proxy inre ip-adress`
@@ -189,8 +190,8 @@ tp.tls.allowedOutgoingCipherSuites=*
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
 
-   [SKLTP - Lastbalanserare / Reverse-proxy]: <https://skl-tp.atlassian.net/wiki/spaces/SKLTP/pages/22773796/SKLTP+-+Lastbalanserare+Reverse-proxy>
+   [SKLTP - Lastbalanserare / Reverse-proxy]: <https://inera.atlassian.net/wiki/spaces/SKLTP/pages/3187858102/SKLTP+-+Lastbalanserare+Reverse-proxy>
    [Loggning konfigurering]: <logging_configuration.md>
    [VP Camel konfigurering]: <configuration.md>
-   [Arkitekturella krav]: <https://skl-tp.atlassian.net/wiki/spaces/SKLTP/pages/44892313/SKLTP+VP+SAD+-+Arkitekturella+krav#SKLTPVPSAD-Arkitekturellakrav-Arkitekturellakrav-FK-5,Ursprungligavs%C3%A4ndare>
-   [RIV-TA]: <http://rivta.se/documents/ARK_0001/RIV_Tekniska_Anvisningar_Oversikt_revE.pdf>
+   [Arkitekturella krav]: <https://inera.atlassian.net/wiki/spaces/SKLTP/pages/3187837519/SKLTP+VP+SAD+-+Arkitekturella+krav#SKLTPVPSAD-Arkitekturellakrav-FK-5%2CUrsprungligavs%C3%A4ndare>
+   [RIV-TA]: <https://rivta.se/documents/ARK_0001/>
