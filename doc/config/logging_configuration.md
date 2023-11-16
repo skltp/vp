@@ -4,6 +4,7 @@ Denna sida handlar om loggning. För allmän information om konfiguration av VP 
 ### Allmänt
 Som logg-ramverk används Log4j2, se [log4j2s dokumentation] för mer information.
 En grundkonfigurering finns i projektet under `resources/log4j2.xml` som default loggar till konsollen.
+Det är möjligt att konfigurera json-formaterade loggar med hjälp av log4j2-ecs-layout, se [ecs-logging dokumentation] för mer information.
 
 ### Extern konfiguration
 För att använda en extern log4j2.xml konfigurationsfil kan man starta applikationen med parametern `-Dlog4j.configurationFile`, 
@@ -95,4 +96,5 @@ Payload=<test answer from testproducer/>
 
 
    [log4j2s dokumentation]: <https://logging.apache.org/log4j/2.x/>
+   [ecs-logging dokumentation]: <https://www.elastic.co/guide/en/ecs-logging/java/1.x/intro.html>
    [VP Camel konfigurering]: <configuration.md>
