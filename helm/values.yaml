@@ -23,7 +23,7 @@ hsaCacheCronJob:
   timeZone: "Europe/Stockholm"
   image:
     name: hsa-cache
-    tag: 1.1.0-RC3
+    tag: 1.1.0
   certSecret: test.esb.ntjp.sjunet.org
   trustSecret: esb-function-cert
 
