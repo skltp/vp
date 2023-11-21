@@ -18,7 +18,7 @@ container:
 
 
 hsaCacheCronJob:
-  elasticGrokFilter: cronJob
+  elasticGrokFilter: cronjob
   schedule: "25 1 * * *"
   timeZone: "Europe/Stockholm"
   image:
