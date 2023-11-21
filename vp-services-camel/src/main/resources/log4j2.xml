@@ -4,11 +4,15 @@
     <Property name="LOG_PATTERN">
       %d %-5p [%t] %-30c - %X{corr.id} %m%n
     </Property>
+    <Property name="consoleAppenderRef">${env:MESSAGE_LOGGER_METHOD:-classic}</Property>
   </Properties>
 
   <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
+    <Console name="classic" target="SYSTEM_OUT">
       <PatternLayout pattern="${LOG_PATTERN}"/>
+    </Console>
+    <Console name="ecs" target="SYSTEM_OUT">
+      <EcsLayout/>
     </Console>
   </Appenders>
 
@@ -40,8 +44,7 @@
 
 
     <AsyncRoot level="WARN">
-      <!--<AppenderRef ref="RollingRandomAccessFile"/>-->
-      <AppenderRef ref="Console"/>
+      <AppenderRef ref="${consoleAppenderRef}"/>
     </AsyncRoot>
 
   </Loggers>

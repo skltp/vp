@@ -37,7 +37,7 @@ data:
   TIMEOUT_JSON_FILE: {{ tpl .Values.paths.config . }}/timeoutconfig.json
   TIMEOUT_JSON_FILE_DEFAULT_TJANSTEKONTRAKT_NAME: default_timeouts
   VAGVALROUTER_DEFAULT_ROUTING_ADDRESS_DELIMITER: '#'
-  MESSAGE_LOGGER_METHOD: object
+  MESSAGE_LOGGER_METHOD: ecs
   VP_HOST: 0.0.0.0
   VP_HSA_RESET_CACHE_URL: http://${vp.host}:24000/resethsacache
   VP_HTTP_ROUTE_URL: http://${vp.host}:8080/vp
