@@ -83,12 +83,12 @@ log4j:
     - name: se.skl.tp.vp.logging.req.in
       level: DEBUG
     - name: se.skl.tp.vp.logging.req.out
-      level: WARN
+      level: "OFF"
     - name: se.skl.tp.vp.logging.resp.in
-      level: WARN
+      level: "OFF"
     - name: se.skl.tp.vp.logging.resp.out
       level: DEBUG
-  rootLoggerLevel: ERROR
+  rootLoggerLevel: WARN
 
 initContainer:
   certGen:
