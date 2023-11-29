@@ -26,16 +26,13 @@ data:
         </Appenders>
 
         <Loggers>
-
-          <AsyncLogger name="se.skl.tp" level="DEBUG"/>
-          <AsyncLogger name="se.skl.tp.vp.logging.req.in" level="DEBUG"/>
-          <AsyncLogger name="se.skl.tp.vp.logging.req.out" level="INFO"/>
-          <AsyncLogger name="se.skl.tp.vp.logging.resp.in" level="INFO"/>
-          <AsyncLogger name="se.skl.tp.vp.logging.resp.out" level="DEBUG"/>
-          <AsyncRoot level="INFO">
+          {{- range .Values.log4j.loggers }}
+          <AsyncLogger name="{{ .name }}" level="{{ .level }}"/>
+          {{- end }}
+        
+          <AsyncRoot level="{{ .Values.log4j.rootLoggerLevel }}">
             <AppenderRef ref="Console"/>
           </AsyncRoot>
-
         </Loggers>
         </Configuration>
     timeoutconfig.json: |
