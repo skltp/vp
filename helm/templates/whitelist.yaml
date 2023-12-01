@@ -3,7 +3,7 @@ kind: Middleware
 metadata:
   labels:
     app.kubernetes.io/instance: {{ .Chart.Name }}
-  name: {{.Chart.Name }}-direct-ipwhitelist
+  name: vp-direct-ipwhitelist
 spec:
   ipWhiteList:
     sourceRange:

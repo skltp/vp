@@ -13,6 +13,7 @@ spec:
       match: "Host(`{{ .Values.ingressroute.bksVpHostName }}`) && PathPrefix(`/vp`)"
       middlewares:
         - name: pass-client-cert
+        - name: vp-direct-ipwhitelist
       services:
         - kind: Service
           name: vp
