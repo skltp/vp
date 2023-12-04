@@ -1,7 +1,7 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ $fullName }}-liveness
+  name: vp-liveness
   labels:
     {{- include "vp_services.labels" . | nindent 4 }}
 spec:
