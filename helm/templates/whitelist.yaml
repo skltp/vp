@@ -9,3 +9,16 @@ spec:
     sourceRange:
       - 10.6.3.0/24 # Orange-VPN
       - 185.144.144.144/28 # NMT-VPN
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: {{ .Chart.Name }}
+  name: vp-liveness-ipwhitelist
+spec:
+  ipWhiteList:
+    sourceRange:
+      - 10.6.3.0/24 # Orange-VPN TODO: Only the F5 load balancer should be able to access this ingress.

@@ -11,5 +11,9 @@ spec:
       targetPort:  {{ .Values.service.port }}
       protocol: TCP
       name: http
+    - port:  8089
+      targetPort:  8089
+      protocol: TCP
+      name: liveness
 status:
   loadBalancer: {}
