@@ -3,6 +3,7 @@ namespace: ntjp
 deployment:
   name: vp
   elasticGrokFilter: vp
+  memory: 2Gi
   replicaCount: 2
   environment:
     name: dev

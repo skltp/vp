@@ -138,10 +138,10 @@ spec:
             timeoutSeconds: 5
           resources:
             requests:
-              memory: 2Gi
+              memory: {{ .Values.deployment.memory }}
               cpu: 250m
             limits:
-              memory: 2Gi
+              memory: {{ .Values.deployment.memory }}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           envFrom:
