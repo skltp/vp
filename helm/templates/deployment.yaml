@@ -139,7 +139,7 @@ spec:
           resources:
             requests:
               memory: {{ .Values.deployment.memory }}
-              cpu: 250m
+              cpu: 125m
             limits:
               memory: {{ .Values.deployment.memory }}
           terminationMessagePath: /dev/termination-log
