@@ -5,10 +5,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Chart.Name }}
   name: vp-direct-ipwhitelist
 spec:
-  ipWhiteList:
-    sourceRange:
-      - 10.6.3.0/24 # Orange-VPN
-      - 185.144.144.144/28 # NMT-VPN
+  ipWhiteList: {{ .Values.ipWhiteList-direct | toYaml | nindent 8 }}
 
 ---
 
@@ -19,9 +16,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Chart.Name }}
   name: vp-liveness-ipwhitelist
 spec:
-  ipWhiteList:
-    sourceRange:
-      - 10.6.3.0/24 # Orange-VPN TODO: Only the F5 load balancer should be able to access this ingress.
+  ipWhiteList: {{ .Values.ipWhiteList-liveness | toYaml | nindent 8 }}
 
 ---
 
@@ -32,8 +27,4 @@ metadata:
     app.kubernetes.io/instance: {{ .Chart.Name }}
   name: vp-http-ipwhitelist
 spec:
-  ipWhiteList:
-    sourceRange:
-      - 10.252.0.0/16 # TBD
-    ipStrategy:
-      depth: 1
+  ipWhiteList: {{ .Values.ipWhiteList-http | toYaml | nindent 8 }}
