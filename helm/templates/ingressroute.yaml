@@ -12,7 +12,7 @@ spec:
     - kind: Rule
       match: "Host(`{{ .Values.ingressroute.esbHostName }}`, `{{ .Values.ingressroute.sjunetHostName }}`) && PathPrefix(`/vp`)"
       middlewares:
-        - name: pass-client-cert
+        - name: vp-http-ipwhitelist
       services:
         - kind: Service
           name: vp
