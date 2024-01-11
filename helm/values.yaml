@@ -48,19 +48,19 @@ ingress:
           - esb-function-cert
         clientAuthType: RequireAndVerifyClientCert
 
-ipWhitelist_http: # Override to specify proxy ip(s)
+ipWhiteList_http: # Override to specify proxy ip(s)
   sourceRange:
     - 10.0.0.0/8
   ipStrategy:
     depth: 1
 
-ipWhitelist_liveness: # Override to specify loadbalancer ip(s)
+ipWhiteList_liveness: # Override to specify loadbalancer ip(s)
   sourceRange:
     - 10.0.0.0/8
   ipStrategy:
     depth: 1
 
-ipWhitelist_direct: # Override to restrict direct https access
+ipWhiteList_direct: # Override to restrict direct https access
   sourceRange:
     - 0.0.0.0/0
 
