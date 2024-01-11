@@ -1,4 +1,4 @@
-FROM eclipse-temurin:11
+FROM openjdk:11-oraclelinux8
 
 ENV BASE_DIR=/opt/skltp/ \
     USER=ind-app \
