@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Chart.Name }}
   name: vp-direct-ipwhitelist
 spec:
-  ipWhiteList: {{ .Values.ipWhiteList_direct | toYaml | nindent 8 }}
+  ipWhiteList: {{ .Values.ipWhiteList_direct }}
 
 ---
 
@@ -16,7 +16,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Chart.Name }}
   name: vp-liveness-ipwhitelist
 spec:
-  ipWhiteList: {{ .Values.ipWhiteList_liveness | toYaml | nindent 8 }}
+  ipWhiteList: {{ .Values.ipWhiteList_liveness }}
 
 ---
 
@@ -27,4 +27,4 @@ metadata:
     app.kubernetes.io/instance: {{ .Chart.Name }}
   name: vp-http-ipwhitelist
 spec:
-  ipWhiteList: {{ .Values.ipWhiteList_http | toYaml | nindent 8 }}
+  ipWhiteList: {{ .Values.ipWhiteList_http }}
