@@ -22,3 +22,18 @@ spec:
   ipWhiteList:
     sourceRange:
       - 10.6.3.0/24 # Orange-VPN TODO: Only the F5 load balancer should be able to access this ingress.
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: {{ .Chart.Name }}
+  name: vp-http-ipwhitelist
+spec:
+  ipWhiteList:
+    sourceRange:
+      - 10.252.0.0/16 # TBD
+    ipStrategy:
+      depth: 1
