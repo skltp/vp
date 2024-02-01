@@ -10,6 +10,6 @@ public class LogEntry {
   protected LogRuntimeInfoType runtimeInfo;
   protected LogMessageType messageInfo;
   protected String payload;
-  protected Map<String, Object> extraInfo;
+  protected Map<String, String> extraInfo;
 
 }

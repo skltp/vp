@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
+import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.errorhandling.VpCodeMessages;
@@ -43,8 +44,8 @@ public class LogExtraInfoBuilder {
     // Static utility class
   }
 
-  public static Map<String, Object> createExtraInfo(Exchange exchange, boolean keepObjects, List<String> headerFilter) {
-    ExtraInfoMap<String, Object> extraInfo = new ExtraInfoMap<>();
+  public static Map<String, String> createExtraInfo(Exchange exchange) {
+    ExtraInfoMap<String, String> extraInfo = new ExtraInfoMap<>();
 
     extraInfo.put(SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class));
     extraInfo.put(RECEIVER_ID, exchange.getProperty(VPExchangeProperties.RECEIVER_ID, String.class));
@@ -63,28 +64,12 @@ public class LogExtraInfoBuilder {
     extraInfo.put(WSDL_NAMESPACE, createWsdlNamespace(serviceContractNS, rivVersion));
 
     Map<String, String> headers = new HashMap<>();
-    filterHeaders(exchange.getIn().getHeaders(), headerFilter, headers);
-    if (keepObjects) {
-      extraInfo.put(HEADERS, headers);
-    } else {
-      extraInfo.put(HEADERS, getHeadersAsString(headers));
-    }
-
+    filterHeaders(exchange.getIn().getHeaders(), HEADERS_TO_FILTER, headers);
+    extraInfo.put(HEADERS, getHeadersAsString(headers));
     extraInfo.put(TIME_ELAPSED, getElapsedTime(exchange).toString());
 
-    if (keepObjects) {
-      String vvTrace = exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class);
-      String abTrace = exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class);
-      if (vvTrace != null) {
-        extraInfo.put(VAGVAL_TRACE, vvTrace.split(","));
-      }
-      if (abTrace != null) {
-        extraInfo.put(ANROPSBEHORIGHET_TRACE, abTrace.split(","));
-      }
-    } else {
-      extraInfo.putNotNull(VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class));
-      extraInfo.putNotNull(ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class));
-    }
+    extraInfo.putNotNull(VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class));
+    extraInfo.putNotNull(ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class));
     extraInfo.putNotNull(ENDPOINT_URL, exchange.getProperty(VPExchangeProperties.VAGVAL, String.class));
 
     String timeProducer = exchange.getIn().getHeader(HttpHeaders.X_SKLTP_PRODUCER_RESPONSETIME, String.class);
@@ -102,7 +87,7 @@ public class LogExtraInfoBuilder {
     return extraInfo;
   }
 
-    private static void addHttpForwardHeaders(Exchange exchange, ExtraInfoMap<String, Object> extraInfo) {
+  private static void addHttpForwardHeaders(Exchange exchange, ExtraInfoMap<String, String> extraInfo) {
     // Following should be logged only once
 
     String httpXForwardedProto = exchange.getProperty(VPExchangeProperties.VP_X_FORWARDED_PROTO, String.class);
@@ -123,8 +108,10 @@ public class LogExtraInfoBuilder {
   }
 
   private static String createWsdlNamespace(String serviceContractNS, String profile) {
-    //  Convert from interaction target namespace: 'urn:${domänPrefix}:${tjänsteDomän}:${tjänsteInteraktion}${roll}:${m}'
-    //  to wsdl target namespace: 'urn:riv:${tjänsteDomän}:${tjänsteInteraktion}:m:${profilKortnamn}'
+    //  Convert from interaction target namespace
+    //    urn:${domänPrefix}:${tjänsteDomän}:${tjänsteInteraktion}${roll}:${m}
+    //  to wsdl target namespace
+    //    urn:riv:${tjänsteDomän}:${tjänsteInteraktion}:m:${profilKortnamn}
     // See https://riv-ta.atlassian.net/wiki/spaces/RTA/pages/99593635/RIV+Tekniska+Anvisningar+Tj+nsteschema
     //   and https://riv-ta.atlassian.net/wiki/spaces/RTA/pages/77856888/RIV+Tekniska+Anvisningar+Basic+Profile+2.1
     if (serviceContractNS == null || profile == null) {
@@ -138,7 +125,7 @@ public class LogExtraInfoBuilder {
     return new Date().getTime() - created.getTime();
   }
 
-  private static void addErrorInfo(Exchange exchange, ExtraInfoMap<String, Object> extraInfo) {
+  private static void addErrorInfo(Exchange exchange, ExtraInfoMap<String, String> extraInfo) {
     Exception exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
     String errorMessage = exception!=null ? exception.getMessage() : null;
     String errorDescription = errorMessage!=null ? errorMessage : DEFAULT_ERROR_DESCRIPTION;
@@ -173,13 +160,7 @@ public class LogExtraInfoBuilder {
     }
 
     public V putNotEmpty(K key, V value) {
-      if (value == null) {
-        return null;
-      }
-      if (((String)value).isEmpty()) {
-        return null;
-      }
-      return put(key, value);
+      return (value == null || ((String) value).isEmpty()) ? null : put(key, value);
     }
   }
 }
