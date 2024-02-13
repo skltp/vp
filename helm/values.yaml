@@ -3,11 +3,16 @@ namespace: ntjp
 deployment:
   name: vp
   elasticGrokFilter: vp
-  memory: 2Gi
   replicaCount: 2
   environment:
     name: dev
     domain: ntjp.se
+  resources: #{} # The no-op curly-braces can optionally replace below sub-resources.
+    limits:
+      memory: 2Gi
+    requests:
+      cpu: 125m
+      memory: 2Gi
 
 skltp:
   instanceId: default_instance
