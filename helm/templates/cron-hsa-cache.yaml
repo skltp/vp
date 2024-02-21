@@ -55,6 +55,15 @@ spec:
                 - /bin/bash
                 - -c
                 - groovy uppdateraHsaCacheK8s.groovy
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsNonRoot: true
+                runAsUser: 1000 # groovy user
+                seccompProfile:
+                  type: RuntimeDefault
           imagePullSecrets:
             - name: regcred
 

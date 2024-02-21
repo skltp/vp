@@ -76,6 +76,15 @@ spec:
         - name: {{ .Values.initContainer.certGen.image.name }}
           image: "{{ .Values.repository }}{{ .Values.initContainer.certGen.image.name }}:{{ .Values.initContainer.certGen.image.tag | default $.Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy | default "Always" }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000 # usr1
+            seccompProfile:
+              type: RuntimeDefault
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -136,6 +145,15 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 556559423 # ind-app
+            seccompProfile:
+              type: RuntimeDefault
           resources: # Block-templated memory and CPU resources.
             {{- toYaml .Values.deployment.resources | nindent 12 }}
           terminationMessagePath: /dev/termination-log
