@@ -1,4 +1,4 @@
-FROM openjdk:11-oraclelinux8
+FROM eclipse-temurin:11-jre-alpine
 
 ENV BASE_DIR=/opt/skltp/ \
     USER=ind-app \
@@ -7,7 +7,7 @@ ENV BASE_DIR=/opt/skltp/ \
 
 ADD ${JARFILE} ${BASE_DIR}/app.jar
 RUN mkdir -p ${LOG_DIR} \
-  && useradd -Ms /bin/bash -b ${BASE_DIR} -u 556559423 ${USER} \
+  && adduser -HD -h ${BASE_DIR} ${USER} \
   && chown ${USER}:${USER} -R ${BASE_DIR} ${LOG_DIR}
 
 WORKDIR ${BASE_DIR}
