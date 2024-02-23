@@ -7,7 +7,7 @@ ENV BASE_DIR=/opt/skltp/ \
 
 ADD ${JARFILE} ${BASE_DIR}/app.jar
 RUN mkdir -p ${LOG_DIR} \
-  && adduser -HD -h ${BASE_DIR} ${USER} \
+  && adduser -HD -u 1000 -h ${BASE_DIR} ${USER} \
   && chown ${USER}:${USER} -R ${BASE_DIR} ${LOG_DIR}
 
 WORKDIR ${BASE_DIR}
