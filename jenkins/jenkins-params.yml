@@ -1,1 +1,2 @@
 sonar-projectkey: 'ntjp-vp'                                              # The project key for the project.
+maven-docker-image: 'maven:3.9-eclipse-temurin-11'
