@@ -38,7 +38,7 @@ public class LogExtraInfoBuilder {
   public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
   // Case insensitive regex to match what headers to filter out. This should of course be loaded through conf, but alas, we have static fields.
   // This class may be a good candidate for refactoring!
-  public static String FILTERHEADER_REGEX = "(?i)X-Forwarded-Tls-Client-Cert|x-vp-auth-cert|x-fk-auth-cert";
+  public static final String FILTERHEADER_REGEX = "(?i)X-Forwarded-Tls-Client-Cert|x-vp-auth-cert|x-fk-auth-cert";
   
   protected static final String FILTERED_TEXT = "<filtered>";
 
