@@ -2,14 +2,13 @@ package se.skl.tp.vp.logging;
 
 
 import io.netty.handler.codec.http.HttpHeaderNames;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
-import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
+import org.springframework.beans.factory.annotation.Value;
+
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.errorhandling.VpCodeMessages;
@@ -37,7 +36,10 @@ public class LogExtraInfoBuilder {
   public static final String VP_X_FORWARDED_PROTO = VPExchangeProperties.VP_X_FORWARDED_PROTO;
   public static final String VP_X_FORWARDED_PORT = VPExchangeProperties.VP_X_FORWARDED_PORT;
   public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
-  protected static final List<String> HEADERS_TO_FILTER = Arrays.asList("X-Forwarded-Tls-Client-Cert", "x-vp-auth-cert", "x-fk-auth-cert");
+  // Case insensitive regex to match what headers to filter out. This should of course be loaded through conf, but alas, we have static fields.
+  // This class may be a good candidate for refactoring!
+  public static String FILTERHEADER_REGEX = "(?i)X-Forwarded-Tls-Client-Cert|x-vp-auth-cert|x-fk-auth-cert";
+  
   protected static final String FILTERED_TEXT = "<filtered>";
 
   private LogExtraInfoBuilder() {
@@ -64,7 +66,7 @@ public class LogExtraInfoBuilder {
     extraInfo.put(WSDL_NAMESPACE, createWsdlNamespace(serviceContractNS, rivVersion));
 
     Map<String, String> headers = new HashMap<>();
-    filterHeaders(exchange.getIn().getHeaders(), HEADERS_TO_FILTER, headers);
+    filterHeaders(exchange.getIn().getHeaders(), FILTERHEADER_REGEX, headers);
     extraInfo.put(HEADERS, getHeadersAsString(headers));
     extraInfo.put(TIME_ELAPSED, getElapsedTime(exchange).toString());
 
@@ -145,9 +147,10 @@ public class LogExtraInfoBuilder {
     return (s == null) ? "" : s;
   }
 
-  private static void filterHeaders(Map<String, Object> headers, List<String> headerFilter, Map<String, String> res) {
-    headers.forEach((s, o) -> res.put(s, headerFilter.contains(s) ? FILTERED_TEXT : String.valueOf(o)));
+  static void filterHeaders(Map<String, Object> headers, String filterRegex, Map<String, String> res) {
+    headers.forEach((s, o) -> res.put(s, s.matches(filterRegex) ? FILTERED_TEXT : String.valueOf(o)));
   }
+
   private static String getHeadersAsString(Map<String, ?> headersMap) {
     return headersMap.keySet().stream().map(key -> key + "=" + headersMap.get(key))
             .collect(Collectors.joining(", ", "{", "}"));
