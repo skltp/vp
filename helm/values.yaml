@@ -7,10 +7,7 @@ deployment:
   environment:
     name: dev
     domain: ntjp.se
-  resources: #{} # The no-op curly-braces can optionally replace below sub-resources.
-    requests:
-      cpu: 125m
-      memory: 1Gi
+  resources: {} # The no-op curly-braces can optionally replace below sub-resources.
 
 skltp:
   instanceId: default_instance
