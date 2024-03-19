@@ -7,13 +7,11 @@ data:
   DATA_PATH: {{ tpl .Values.paths.data . }}
   CONFIGURATION_VERSION_FILE: {{ tpl .Values.paths.config . }}/config.version
   DEFAULTROUTING_ALLOWEDCONTRACTS: urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateQuestionResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateAnswerResponder:1
-  HAWTIO_AUTHENTICATION_ENABLED: "true"
-  HAWTIO_EXTERNAL_LOGINFILE: {{ tpl .Values.paths.config . }}/users.properties
   HEADERS_REG_EXP_REQUESTHEADERSTOREMOVE: (?i)x-vp.*|PEER_CERTIFICATES|X-Forwarded.*|MULE_.*|X-MULE_.*|Connection|accept-encoding|X-Forwarded-Tls-Client-Cert
   HSA_FILES: {{ tpl .Values.paths.config . }}/hsacachecomplementary.xml,{{ tpl .Values.paths.hsafiles . }}/hsacache.xml
   IP_WHITELIST: 127.0.0.1,10.
   HTTP_FORWARDED_HEADER_AUTH_CERT: X-Forwarded-Tls-Client-Cert
-  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: hawtio,jolokia,health
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health
   MEMORY_LOGGER_PERIOD_SECONDS: "1800"
   PRODUCER_HTTP_KEEPALIVE: "true"
   PRODUCER_HTTP_WORKERS: "0"
