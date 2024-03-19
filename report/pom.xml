@@ -3,7 +3,7 @@
   <parent>
     <artifactId>vp-parent-camel</artifactId>
     <groupId>se.skltp.vp</groupId>
-    <version>4.4.2-RC1</version>
+    <version>4.4.2-RC2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
