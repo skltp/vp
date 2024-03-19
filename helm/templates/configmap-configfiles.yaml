@@ -38,8 +38,6 @@ data:
     timeoutconfig.json: |
         [
         ]
-    users.properties: |
-        hawtio: MD5:2d3c8a35f1d0c2a1a6ff1dc4ba221476, user, admin
     wsdlconfig.json: |
         [
         ]
