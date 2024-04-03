@@ -8,6 +8,13 @@ deployment:
     name: dev
     domain: ntjp.se
   resources: {} # The no-op curly-braces can optionally replace below sub-resources.
+  topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app: vp
+      maxSkew: 2
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
 
 skltp:
   instanceId: default_instance

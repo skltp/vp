@@ -72,6 +72,10 @@ spec:
             name: {{ .config_map }}
         {{- end }}
 
+      {{- with .Values.deployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
         - name: {{ .Values.initContainer.certGen.image.name }}
           image: "{{ .Values.repository }}{{ .Values.initContainer.certGen.image.name }}:{{ .Values.initContainer.certGen.image.tag | default $.Chart.AppVersion }}"
