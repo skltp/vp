@@ -26,7 +26,7 @@ spec:
           containers:
             - name: {{ .Values.hsaCacheCronJob.image.name }}
               image: "{{ .Values.repository }}{{ .Values.hsaCacheCronJob.image.name }}:{{ .Values.hsaCacheCronJob.image.tag }}"
-              imagePullPolicy: Always
+              imagePullPolicy: {{ .Values.hsaCacheCronJob.image.pullPolicy }}
               envFrom:
                 - configMapRef:
                     name: vp-hsacache-configmap-default

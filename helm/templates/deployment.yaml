@@ -79,7 +79,7 @@ spec:
       initContainers:
         - name: {{ .Values.initContainer.certGen.image.name }}
           image: "{{ .Values.repository }}{{ .Values.initContainer.certGen.image.name }}:{{ .Values.initContainer.certGen.image.tag | default $.Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy | default "Always" }}
+          imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

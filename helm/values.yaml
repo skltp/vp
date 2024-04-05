@@ -32,6 +32,7 @@ hsaCacheCronJob:
   image:
     name: hsa-cache
     tag: 1.1.0
+    pullPolicy: Always
   certSecret: test.esb.ntjp.sjunet.org
   trustSecret: esb-function-cert
 
@@ -118,6 +119,7 @@ initContainer:
   certGen:
     image:
       name: cert-generator-utility
+      pullPolicy: Always
 
 pem_to_pfx:
   envPrefix: PEM2PFX
