@@ -145,5 +145,26 @@ pem_to_pfx:
     pfxFile: consumer.pfx
     password: password
 
+probes:
+  startupProbe:
+    httpGet:
+      path: actuator/health/readiness
+      port: 8089
+      scheme: HTTP
+    initialDelaySeconds: 20
+    failureThreshold: 10
+    periodSeconds: 4  # 20s + 10 * 4s = 1 minute max startup time
+    successThreshold: 1
+    timeoutSeconds: 1
+  livenessProbe:
+    httpGet:
+      path: actuator/health/liveness
+      port: 8089
+      scheme: HTTP
+    initialDelaySeconds: 0
+    failureThreshold: 3
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 2
 
 resources: {}
