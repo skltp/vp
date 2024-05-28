@@ -63,6 +63,7 @@ public class VPRouter extends RouteBuilder {
     public static final String NETTY_HTTPS_OUTGOING_TOD = "netty-http:https://${exchangeProperty.vagvalHost}?"
         + "sslContextParameters=#outgoingSSLContextParameters&"
         + "ssl=true&"
+        + "clientInitializerFactory=#httpsClientInitializerFactory&"
         + "hostnameVerification={{producer.https.hostnameVerification}}&"
         + "useRelativePath=true&"
         + "nettyHttpBinding=#VPNettyHttpBinding&"
