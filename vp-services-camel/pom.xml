@@ -196,6 +196,11 @@
             <artifactId>cxf-rt-wsdl</artifactId>
         </dependency>
 
+        <!-- JVM metrics to prometheus -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
