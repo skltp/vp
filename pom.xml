@@ -228,6 +228,13 @@
         <artifactId>jaxws-rt</artifactId>
         <version>2.3.2</version>
       </dependency>
+
+      <!-- JVM metrics to prometheus -->
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-registry-prometheus</artifactId>
+        <version>1.12.3</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
