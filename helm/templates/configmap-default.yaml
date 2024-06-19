@@ -11,9 +11,8 @@ data:
   HSA_FILES: {{ tpl .Values.paths.config . }}/hsacachecomplementary.xml,{{ tpl .Values.paths.hsafiles . }}/hsacache.xml
   IP_WHITELIST: 127.0.0.1,10.
   HTTP_FORWARDED_HEADER_AUTH_CERT: X-Forwarded-Tls-Client-Cert
-  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health, metrics
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health, metrics, prometheus
   MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED: "true"
-  MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: "true"
   MEMORY_LOGGER_PERIOD_SECONDS: "1800"
   PRODUCER_HTTP_KEEPALIVE: "true"
   PRODUCER_HTTP_WORKERS: "0"

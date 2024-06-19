@@ -149,7 +149,7 @@ probes:
   startupProbe:
     httpGet:
       path: actuator/health/readiness
-      port: 8089
+      port: actuators
       scheme: HTTP
     initialDelaySeconds: 20
     failureThreshold: 10
@@ -159,7 +159,7 @@ probes:
   livenessProbe:
     httpGet:
       path: actuator/health/liveness
-      port: 8089
+      port: actuators
       scheme: HTTP
     initialDelaySeconds: 0
     failureThreshold: 3
