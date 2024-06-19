@@ -126,6 +126,9 @@ spec:
             - name: {{ .Values.deployment.name }}
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            - containerPort: 8089
+              name: actuators
+              protocol: TCP
           lifecycle:
             preStop:
               exec:
