@@ -22,7 +22,7 @@ spec:
         app.kubernetes.io/name: vp
         app: {{ .Values.deployment.name }}
         elasticGrokFilter: {{ .Values.deployment.elasticGrokFilter }}
-        prometheusMonitored: 'true'
+        monitoring: prometheus
     spec:
       
       {{- with .Values.nodeSelector }}
