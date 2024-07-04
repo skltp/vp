@@ -6,7 +6,7 @@ metadata:
 spec:
   progressDeadlineSeconds: 600
   replicas: {{ .Values.deployment.replicaCount }}
-  revisionHistoryLimit: 10
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: {{ .Values.deployment.name }}
