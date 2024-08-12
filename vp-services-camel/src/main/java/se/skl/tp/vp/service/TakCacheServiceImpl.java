@@ -33,6 +33,8 @@ public class TakCacheServiceImpl implements TakCacheService {
    * @param behorigheterCache
    * @param vagvalCache
    * @param defaultRoutingProperties
+   * @param hsaLookupBehorighetProperties
+   * @param hsaLookupVagvalProperties
    */
   @Autowired
   public TakCacheServiceImpl(HsaCache hsaCache, TakCache takCache, BehorigheterCache behorigheterCache, VagvalCache vagvalCache, DefaultRoutingProperties defaultRoutingProperties,

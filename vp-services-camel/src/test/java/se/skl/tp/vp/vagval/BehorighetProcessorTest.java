@@ -12,13 +12,7 @@ import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP007;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP008;
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogFailed;
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogOk;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.AUTHORIZED_RECEIVER_IN_HSA_TREE;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.NAMNRYMD_1;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RECEIVER_1;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RECEIVER_1_DEFAULT_RECEIVER_2;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RECEIVER_2;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.SENDER_1;
+import static se.skl.tp.vp.util.takcache.TestTakDataDefines.*;
 
 import java.net.URL;
 import org.apache.camel.CamelContext;
@@ -91,6 +85,26 @@ public class BehorighetProcessorTest  {
         assertFalse(isVpSemanticExceptionThrownWhenProcessed(ex), 
         		"testAuthorizonByClimbingHsaTree behorighetProcessor.process should not throw exception");
 
+    }
+
+    @Test
+    public void testAuthorizonByClimbingHsaTreeForDisabledNamespace() throws Exception {
+
+        Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), eq(AUTHORIZED_RECEIVER_IN_HSA_TREE) )).thenReturn(true);
+        Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), AdditionalMatchers.not(eq(AUTHORIZED_RECEIVER_IN_HSA_TREE)) )).thenReturn(false);
+
+        try {
+            Exchange ex = createExchangeWithProperties(SENDER_1, NAMNRYMD_2, CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE);
+            behorighetProcessor.process(ex);
+            fail("Förväntade ett VP007 SemanticException");
+        } catch(VpSemanticException vpSemanticException) {
+            assertEquals(VP007, vpSemanticException.getErrorCode());
+            assertTrue(vpSemanticException.getMessage().contains( "Tjänstekonsumenten saknar behörighet att anropa den logiska adressaten via detta tjänstekontrakt. Kontrollera uppgifterna och vid behov, tillse att det beställs konfiguration i aktuell tjänsteplattform."));
+            assertTrue(vpSemanticException.getMessageDetails().contains( "Authorization missing for"));
+            assertTrue(vpSemanticException.getMessageDetails().contains( NAMNRYMD_2));
+            assertTrue(vpSemanticException.getMessageDetails().contains( SENDER_1));
+            assertTrue(vpSemanticException.getMessageDetails().contains( CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE));
+        }
     }
 
     @Test
