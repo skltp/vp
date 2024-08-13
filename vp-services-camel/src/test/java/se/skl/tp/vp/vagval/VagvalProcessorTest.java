@@ -11,11 +11,7 @@ import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP010;
 import static se.skl.tp.vp.util.soaprequests.RoutingInfoUtil.createRoutingInfo;
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogFailed;
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogOk;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.ADDRESS_1;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.NAMNRYMD_1;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RECEIVER_1;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV20;
-import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV21;
+import static se.skl.tp.vp.util.takcache.TestTakDataDefines.*;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -200,6 +196,40 @@ public class VagvalProcessorTest {
       assertTrue(vpSemanticException.getMessageDetails().contains("Physical Address field is empty in Service Producer for"));
       assertTrue(vpSemanticException.getMessageDetails().contains(NAMNRYMD_1));
       assertTrue(vpSemanticException.getMessageDetails().contains(RECEIVER_1));
+    }
+  }
+
+  @Test
+  public void testHsaVagvalFound() throws Exception
+  {
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo(ADDRESS_1, RIV20));
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_1, AUTHORIZED_RECEIVER_IN_HSA_TREE)).thenReturn(list);
+
+    Exchange ex = createExchangeWithProperties(NAMNRYMD_1, CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE);
+    vagvalProcessor.process(ex);
+
+    assertEquals(ADDRESS_1, ex.getProperty(VPExchangeProperties.VAGVAL));
+    assertEquals(RIV20, ex.getProperty(VPExchangeProperties.RIV_VERSION_OUT));
+  }
+
+  @Test
+  public void testHsaVagvalDisabledForNamespace() throws Exception
+  {
+    List<RoutingInfo> list = new ArrayList<>();
+    list.add(createRoutingInfo(ADDRESS_1, RIV20));
+    Mockito.when(vagvalCache.getRoutingInfo(NAMNRYMD_2, AUTHORIZED_RECEIVER_IN_HSA_TREE)).thenReturn(list);
+
+    try {
+      Exchange ex = createExchangeWithProperties(NAMNRYMD_2, CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE);
+      vagvalProcessor.process(ex);
+      fail("Förväntade ett VP004 SemanticException");
+    } catch (VpSemanticException vpSemanticException) {
+      assertEquals(VP004, vpSemanticException.getErrorCode());
+      assertTrue(vpSemanticException.getMessage().contains("Det finns inget vägval i tjänsteadresseringskatalogen som matchar anropets logiska adressat (ReceiverId) och tjänstekontrakt. Kontrollera uppgifterna i anropet och vid behov, beställ konfigurering i aktuell tjänsteplattform."));
+      assertTrue(vpSemanticException.getMessageDetails().contains("No receiverId (logical address) found for"));
+      assertTrue(vpSemanticException.getMessageDetails().contains(NAMNRYMD_2));
+      assertTrue(vpSemanticException.getMessageDetails().contains(CHILD_OF_AUTHORIZED_RECEIVER_IN_HSA_TREE));
     }
   }
 

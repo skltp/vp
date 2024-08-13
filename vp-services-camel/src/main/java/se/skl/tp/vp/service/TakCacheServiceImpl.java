@@ -10,6 +10,8 @@ import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vagval.VagvalHandler;
 import se.skl.tp.vagval.VagvalHandlerImpl;
 import se.skl.tp.vp.config.DefaultRoutingProperties;
+import se.skl.tp.vp.config.HsaLookupBehorighetProperties;
+import se.skl.tp.vp.config.HsaLookupVagvalProperties;
 import se.skltp.takcache.*;
 import se.skltp.takcache.TakCacheLog.RefreshStatus;
 
@@ -31,17 +33,20 @@ public class TakCacheServiceImpl implements TakCacheService {
    * @param behorigheterCache
    * @param vagvalCache
    * @param defaultRoutingProperties
+   * @param hsaLookupBehorighetProperties
+   * @param hsaLookupVagvalProperties
    */
   @Autowired
-  public TakCacheServiceImpl(HsaCache hsaCache, TakCache takCache, BehorigheterCache behorigheterCache, VagvalCache vagvalCache, DefaultRoutingProperties defaultRoutingProperties) {
+  public TakCacheServiceImpl(HsaCache hsaCache, TakCache takCache, BehorigheterCache behorigheterCache, VagvalCache vagvalCache, DefaultRoutingProperties defaultRoutingProperties,
+                             HsaLookupBehorighetProperties hsaLookupBehorighetProperties, HsaLookupVagvalProperties hsaLookupVagvalProperties) {
     this.takCache = takCache;
 
     // The below if-then-else clauses are used to select a suitable cache depending on if we're executing unit or integration tests, or are in "production".
     BehorigheterCache behorigheterCacheToSet = (takCache.getBehorigeterCache() != null ? takCache.getBehorigeterCache() : behorigheterCache);
     VagvalCache vagvalCacheToSet = (takCache.getVagvalCache() != null ? takCache.getVagvalCache() : vagvalCache);
 
-    behorighetHandler = new BehorighetHandlerImpl(hsaCache, behorigheterCacheToSet, defaultRoutingProperties);
-    vagvalHandler = new VagvalHandlerImpl(hsaCache, vagvalCacheToSet, defaultRoutingProperties);
+    behorighetHandler = new BehorighetHandlerImpl(hsaCache, behorigheterCacheToSet, defaultRoutingProperties, hsaLookupBehorighetProperties);
+    vagvalHandler = new VagvalHandlerImpl(hsaCache, vagvalCacheToSet, defaultRoutingProperties, hsaLookupVagvalProperties);
   }
 
   @Override
