@@ -124,8 +124,6 @@ defaultrouting.allowedContracts=urn:riv:ehr:accesscontrol:AssertCareEngagementRe
 defaultrouting.allowedSenderIds=
 
 # TAK configuration
-takcache.use.behorighet.cache=true
-takcache.use.vagval.cache=true
 takcache.persistent.file.name=${base.path}/data/localCache
 takcache.endpoint.address=http://<server>:<portnumber>/tak-services/SokVagvalsInfo/v2
 
