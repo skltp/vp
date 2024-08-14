@@ -52,7 +52,8 @@ data:
               -Duser.country=SE
               -Duser.language=sv
               -Dspring.profiles.active=custom
-              -Xms512m -XX:MaxDirectMemorySize=4096m
+              -Xms512m
+              -XX:MaxRAMPercentage=65
               -Dlog4j.configurationFile=file://{{ tpl .Values.paths.config . }}/log4j2.xml
               -Dcom.sun.management.jmxremote
               -Dcom.sun.management.jmxremote.port=8084
