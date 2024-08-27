@@ -34,6 +34,7 @@ public class SSLContextParametersConfig  {
 
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedIncomingProtocols());
         sslContextParameters.setSecureSocketProtocols(sspp);
+        sslContextParameters.setSecureSocketProtocol(sspp.getSecureSocketProtocol().get(0));
         
         // Set cipher suites
         if(!useAllCiphers(securityProperies.getAllowedIncomingCipherSuites())) {
@@ -60,6 +61,7 @@ public class SSLContextParametersConfig  {
         
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedOutgoingProtocols());
         sslContextParameters.setSecureSocketProtocols(sspp);
+        sslContextParameters.setSecureSocketProtocol(securityProperies.getPreferredOutgoingProtocol());
 
         // Set cipher suites
         if(!useAllCiphers(securityProperies.getAllowedOutgoingCipherSuites())) {

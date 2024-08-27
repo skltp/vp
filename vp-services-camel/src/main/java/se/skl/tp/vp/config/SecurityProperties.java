@@ -13,6 +13,7 @@ public class SecurityProperties {
 
   private String allowedIncomingProtocols;
   private String allowedOutgoingProtocols;
+  private String preferredOutgoingProtocol;
   private String allowedIncomingCipherSuites;
   private String allowedOutgoingCipherSuites;
   private Store store;
