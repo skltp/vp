@@ -97,7 +97,6 @@ public class SSLContextParametersConfig  {
         log.info("::: Allowed protocols, final: " + allowedProtocols);
         sspp.setSecureSocketProtocol(allowedProtocols);
 
-        SecureSocketProtocols s = new SecureSocketProtocols();
         return sspp;
     }
 
