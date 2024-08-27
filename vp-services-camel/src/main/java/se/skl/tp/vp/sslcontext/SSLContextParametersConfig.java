@@ -1,15 +1,18 @@
 package se.skl.tp.vp.sslcontext;
 
 import org.apache.camel.support.jsse.*;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import se.skl.tp.vp.config.SecurityProperties;
 
+@Log4j2
 @Configuration
 public class SSLContextParametersConfig  {
 
@@ -80,12 +83,21 @@ public class SSLContextParametersConfig  {
     private SecureSocketProtocolsParameters createSecureProtocolParameters(String allowedProtocolsString) {
         SecureSocketProtocolsParameters sspp = new SecureSocketProtocolsParameters();
         List<String> allowedProtocols = new ArrayList<>();
+        log.info("::: Allowed protocols, base: " + allowedProtocolsString);
+        String[] protocols = allowedProtocolsString.split(DELIMITER);
+        log.info("::: Allowed protocols, split: " + protocols);
+        Arrays.sort(protocols);
+        log.info("::: Allowed protocols, sorted: " + protocols);
+
         for (String protocol: allowedProtocolsString.split(DELIMITER)) {
             if(!protocol.trim().isEmpty()){
                 allowedProtocols.add(protocol);
             }
         }
+        log.info("::: Allowed protocols, final: " + allowedProtocols);
         sspp.setSecureSocketProtocol(allowedProtocols);
+
+        SecureSocketProtocols s = new SecureSocketProtocols();
         return sspp;
     }
 
