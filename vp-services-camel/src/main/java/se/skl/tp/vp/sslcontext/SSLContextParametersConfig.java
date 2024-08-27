@@ -1,6 +1,7 @@
 package se.skl.tp.vp.sslcontext;
 
 import org.apache.camel.support.jsse.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,7 +62,7 @@ public class SSLContextParametersConfig  {
         
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedOutgoingProtocols());
         sslContextParameters.setSecureSocketProtocols(sspp);
-        if(!securityProperies.getPreferredOutgoingProtocol().isBlank())
+        if(securityProperies.getPreferredOutgoingProtocol() != null && !securityProperies.getPreferredOutgoingProtocol().isBlank())
             sslContextParameters.setSecureSocketProtocol(securityProperies.getPreferredOutgoingProtocol());
 
         // Set cipher suites
