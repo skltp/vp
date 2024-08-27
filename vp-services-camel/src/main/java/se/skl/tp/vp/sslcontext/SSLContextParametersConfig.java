@@ -65,8 +65,7 @@ public class SSLContextParametersConfig  {
         
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedOutgoingProtocols());
         sslContextParameters.setSecureSocketProtocols(sspp);
-        if(securityProperies.getPreferredOutgoingProtocol() != null && !securityProperies.getPreferredOutgoingProtocol().isBlank())
-            sslContextParameters.setSecureSocketProtocol(securityProperies.getPreferredOutgoingProtocol());
+        sslContextParameters.setSecureSocketProtocol(securityProperies.getPreferredOutgoingProtocol());
 
         // Set cipher suites
         if(!useAllCiphers(securityProperies.getAllowedOutgoingCipherSuites())) {
@@ -83,20 +82,13 @@ public class SSLContextParametersConfig  {
     private SecureSocketProtocolsParameters createSecureProtocolParameters(String allowedProtocolsString) {
         SecureSocketProtocolsParameters sspp = new SecureSocketProtocolsParameters();
         List<String> allowedProtocols = new ArrayList<>();
-        log.info("::: Allowed protocols, base: " + allowedProtocolsString);
-        String[] protocols = allowedProtocolsString.split(DELIMITER);
-        log.info("::: Allowed protocols, split: " + protocols);
-        Arrays.sort(protocols);
-        log.info("::: Allowed protocols, sorted: " + protocols);
-
         for (String protocol: allowedProtocolsString.split(DELIMITER)) {
             if(!protocol.trim().isEmpty()){
                 allowedProtocols.add(protocol);
             }
         }
-        log.info("::: Allowed protocols, final: " + allowedProtocols);
         sspp.setSecureSocketProtocol(allowedProtocols);
-
+        
         return sspp;
     }
 
