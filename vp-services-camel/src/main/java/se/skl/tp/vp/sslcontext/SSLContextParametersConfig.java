@@ -64,8 +64,12 @@ public class SSLContextParametersConfig  {
         sslContextParameters.setTrustManagers(trustManagersParameters);
         
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedOutgoingProtocols());
-        sslContextParameters.setSecureSocketProtocols(sspp);
+        // sslContextParameters.setSecureSocketProtocols(sspp);
         // sslContextParameters.setSecureSocketProtocol(securityProperies.getPreferredOutgoingProtocol());
+
+        SSLContextClientParameters clientParams = new SSLContextClientParameters();
+        clientParams.setSecureSocketProtocols(sspp);
+        sslContextParameters.setClientParameters(clientParams);
 
         // Set cipher suites
         if(!useAllCiphers(securityProperies.getAllowedOutgoingCipherSuites())) {
