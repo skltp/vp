@@ -5,10 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import se.skl.tp.vp.config.SecurityProperties;
 
+@Log4j2
 @Configuration
 public class SSLContextParametersConfig  {
 
@@ -34,6 +38,7 @@ public class SSLContextParametersConfig  {
 
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedIncomingProtocols());
         sslContextParameters.setSecureSocketProtocols(sspp);
+        sslContextParameters.setSecureSocketProtocol(sspp.getSecureSocketProtocol().get(0));
         
         // Set cipher suites
         if(!useAllCiphers(securityProperies.getAllowedIncomingCipherSuites())) {
@@ -75,13 +80,12 @@ public class SSLContextParametersConfig  {
     
     private SecureSocketProtocolsParameters createSecureProtocolParameters(String allowedProtocolsString) {
         SecureSocketProtocolsParameters sspp = new SecureSocketProtocolsParameters();
-        List<String> allowedProtocols = new ArrayList<>();
         for (String protocol: allowedProtocolsString.split(DELIMITER)) {
-            if(!protocol.trim().isEmpty()){
-                allowedProtocols.add(protocol);
+            protocol = protocol.trim();
+            if(!protocol.isEmpty()){
+                sspp.getSecureSocketProtocol().add(protocol);
             }
         }
-        sspp.setSecureSocketProtocol(allowedProtocols);
         return sspp;
     }
 
@@ -89,7 +93,8 @@ public class SSLContextParametersConfig  {
         CipherSuitesParameters cipherSuites = new CipherSuitesParameters();
         List<String> allowedCipherSuites = new ArrayList<>();
         for (String protocol: cipherSuiteString.split(DELIMITER)) {
-            if(!protocol.trim().isEmpty()){
+            protocol = protocol.trim();
+            if(!protocol.isEmpty()){
             	allowedCipherSuites.add(protocol);
             }
         }
@@ -105,6 +110,4 @@ public class SSLContextParametersConfig  {
         tmp.setKeyStore(tsp);
         return tmp;
     }
-
-
 }
