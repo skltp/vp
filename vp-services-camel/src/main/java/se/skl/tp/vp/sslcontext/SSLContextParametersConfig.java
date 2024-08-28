@@ -81,7 +81,7 @@ public class SSLContextParametersConfig  {
     private SecureSocketProtocolsParameters createSecureProtocolParameters(String allowedProtocolsString) {
         SecureSocketProtocolsParameters sspp = new SecureSocketProtocolsParameters();
         for (String protocol: allowedProtocolsString.split(DELIMITER)) {
-            protocol.trim();
+            protocol = protocol.trim();
             if(!protocol.isEmpty()){
                 sspp.getSecureSocketProtocol().add(protocol);
             }
@@ -93,7 +93,7 @@ public class SSLContextParametersConfig  {
         CipherSuitesParameters cipherSuites = new CipherSuitesParameters();
         List<String> allowedCipherSuites = new ArrayList<>();
         for (String protocol: cipherSuiteString.split(DELIMITER)) {
-            protocol.trim();
+            protocol = protocol.trim();
             if(!protocol.isEmpty()){
             	allowedCipherSuites.add(protocol);
             }
