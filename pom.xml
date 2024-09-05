@@ -30,10 +30,10 @@
     <maven.javadoc.skip>true</maven.javadoc.skip>
 
     <argLine.leak>-D_</argLine.leak> <!-- Overridden when 'leak' profile is active -->
-    
-    <!-- ************************-->
+
+    <!-- ************************ -->
     <!-- Sonar/Reporting settings -->
-    <!-- ************************-->
+    <!-- ************************ -->
     <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
 
     <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
