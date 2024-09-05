@@ -11,9 +11,9 @@
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
   <properties>
-    <java.version>11</java.version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -34,7 +34,7 @@
     <!-- ************************-->
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
-    <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
+    <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
 
     <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
     <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
