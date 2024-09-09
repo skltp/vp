@@ -25,7 +25,7 @@
     <log4j.version>2.23.1</log4j.version>
     <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
 
-    <takdatahandler.version>3.1.0-RC1</takdatahandler.version>
+    <takdatahandler.version>3.1.0</takdatahandler.version>
 
     <maven.javadoc.skip>true</maven.javadoc.skip>
 
