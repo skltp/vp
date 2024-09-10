@@ -1,5 +1,6 @@
 package se.skl.tp.vp.camel;
 
+import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -52,7 +53,7 @@ public class NettyHttpClientExpectContinueTest extends BaseNettyTest {
     assertFalse(result.isFailed());
     assertEquals("Bye World", result.getIn().getBody(String.class));
 
-    assertMockEndpointsSatisfied();
+    assertIsSatisfied(context);
   }
 
   @Override
