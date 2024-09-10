@@ -81,7 +81,10 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
         testConsumer.sendHttpRequestToVP(request, headers);
 
         assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-        assertStringContains(TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0), "java.io.IOException");
+        String msg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+        assertStringContains(msg, "logEvent-error.start");
+        assertStringContains(msg, "java.net.SocketException: Connection reset");
+        assertStringContains(msg, "errorCode=VP009");
 
         ResetByPeerServer.stopServer();
     }
