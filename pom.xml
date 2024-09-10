@@ -11,21 +11,21 @@
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
 
   <properties>
-    <java.version>11</java.version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring.boot-version>2.7.18</spring.boot-version>
     <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
-    <camel.version>3.7.7</camel.version>
+    <camel.version>3.17.0</camel.version>
     <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
     <netty.version>4.1.111.Final</netty.version>
     <log4j.version>2.23.1</log4j.version>
     <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
 
-    <takdatahandler.version>3.1.0-RC1</takdatahandler.version>
+    <takdatahandler.version>3.2.0-RC1</takdatahandler.version>
 
     <maven.javadoc.skip>true</maven.javadoc.skip>
 
@@ -34,7 +34,7 @@
     <!-- ************************-->
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
-    <jacoco.plugin.version>0.8.5</jacoco.plugin.version>
+    <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
 
     <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
     <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
@@ -297,7 +297,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>2.1.5.RELEASE</version>
+        <version>2.7.18</version>
         <executions>
           <execution>
             <goals>
