@@ -64,8 +64,7 @@ public class VPNettyHttpBinding extends DefaultNettyHttpBinding {
   }
 
   @Override
-  public Message toCamelMessage(FullHttpResponse response, Exchange exchange, NettyHttpConfiguration configuration)
-      throws Exception {
+  public Message toCamelMessage(FullHttpResponse response, Exchange exchange, NettyHttpConfiguration configuration) {
     Message msg = super.toCamelMessage(response, exchange, configuration);
     String correlationId = exchange.getProperty(VPExchangeProperties.SKLTP_CORRELATION_ID, String.class);
     ThreadContext.put("corr.id", String.format("[%s]", correlationId ));
