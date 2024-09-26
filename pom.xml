@@ -393,7 +393,7 @@
                   <goal>prepare-agent</goal>
                 </goals>
                 <configuration>
-                  <destFile>${sonar.jacoco.itReportPath}</destFile>
+                  <destFile>${jacoco.reportPath}</destFile>
                   <propertyName>failsafeArgLine</propertyName>
                 </configuration>
               </execution>
