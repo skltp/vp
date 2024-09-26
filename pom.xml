@@ -35,11 +35,6 @@
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
     <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
-
-    <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
-    <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-    <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-    <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
   </properties>
 
   <distributionManagement>
@@ -66,8 +61,8 @@
   <modules>
     <module>vp-wsdl-utils</module>
     <module>vp-services-camel</module>
-    <module>report</module>
     <module>cert-generator-utility</module>
+    <module>report</module>
   </modules>
 
   <dependencyManagement>
@@ -382,7 +377,6 @@
                   <goal>prepare-agent</goal>
                 </goals>
                 <configuration>
-                  <destFile>${jacoco.reportPath}</destFile>
                   <propertyName>surefireArgLine</propertyName>
                 </configuration>
               </execution>
@@ -393,7 +387,6 @@
                   <goal>prepare-agent</goal>
                 </goals>
                 <configuration>
-                  <destFile>${jacoco.reportPath}</destFile>
                   <propertyName>failsafeArgLine</propertyName>
                 </configuration>
               </execution>
@@ -403,10 +396,6 @@
                 <goals>
                   <goal>report</goal>
                 </goals>
-                <configuration>
-                  <dataFile>${jacoco.reportPath}</dataFile>
-                  <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-                </configuration>
               </execution>
               <execution>
                 <id>default-report</id>
@@ -414,10 +403,6 @@
                 <goals>
                   <goal>report</goal>
                 </goals>
-                <configuration>
-                  <dataFile>${jacoco.reportPath}</dataFile>
-                  <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-                </configuration>
               </execution>
             </executions>
           </plugin>
