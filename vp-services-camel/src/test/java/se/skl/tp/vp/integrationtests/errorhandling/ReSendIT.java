@@ -54,10 +54,10 @@ public class ReSendIT extends LeakDetectionBaseTest {
 
   @Autowired private CamelContext camelContext;
 
-  @EndpointInject(uri = URL_MOCK_ENDPOINT)
+  @EndpointInject(URL_MOCK_ENDPOINT)
   protected MockEndpoint resultEndpoint;
 
-  @Produce(uri = "direct:start")
+  @Produce("direct:start")
   protected ProducerTemplate template;
 
   @BeforeEach

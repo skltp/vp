@@ -48,10 +48,10 @@ public class X_skltp_prt_headerTest {
     @MockBean
     BehorigheterCache behorigheterCache;
 
-    @Produce(uri = "direct:start")
+    @Produce("direct:start")
     protected ProducerTemplate template;
 
-    @EndpointInject(uri = "mock:result")
+    @EndpointInject("mock:result")
     protected MockEndpoint resultEndpoint;
 
     @Autowired
