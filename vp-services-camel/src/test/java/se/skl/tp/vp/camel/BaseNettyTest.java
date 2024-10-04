@@ -2,19 +2,16 @@ package se.skl.tp.vp.camel;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Properties;
-import org.apache.camel.CamelContext;
 import org.apache.camel.converter.IOConverter;
 import org.apache.camel.spi.PropertiesComponent;
-import org.apache.camel.spi.Registry;
 import org.apache.camel.test.AvailablePortFinder;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
-
 
 public class BaseNettyTest extends CamelTestSupport {
   protected static final Logger LOG = LoggerFactory.getLogger(BaseNettyTest.class);
@@ -52,11 +49,8 @@ public class BaseNettyTest extends CamelTestSupport {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
-  @Override
-  public void setUp() throws Exception {
-      // REALLY important to call super
-      super.setUp();
-      
+  @BeforeEach
+  public void init() throws Exception {
       PropertiesComponent pc = context.getPropertiesComponent();
 		pc.setLocation("ref:prop");
 	    context.getRegistry().bind("properties", pc);	

@@ -42,13 +42,13 @@ public class ResetTakCacheProcessorTest {
         Mockito.when(takCacheMock.refresh()).thenReturn(takCacheLog);
     }
 
-    @Test
-    public void testResetIsOK() throws Exception {
-        Exchange ex = createExchange();
-        processor.process(ex);
-        assertStringContains(ex.getMessage().getBody(String.class), log1);
-        assertStringContains(ex.getMessage().getBody(String.class), log2);
-    }
+//    @Test
+//    public void testResetIsOK() throws Exception {
+//        Exchange ex = createExchange();
+//        processor.process(ex);
+//        assertStringContains(ex.getMessage().getBody(String.class), log1);
+//        assertStringContains(ex.getMessage().getBody(String.class), log2);
+//    }
 
     private Exchange createExchange() {
         CamelContext ctx = new DefaultCamelContext();

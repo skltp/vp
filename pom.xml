@@ -17,15 +17,16 @@
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>2.7.18</spring.boot-version>
+    <spring.boot-version>3.3.4</spring.boot-version>
     <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
-    <camel.version>3.22.2</camel.version>
+    <camel.version>4.8.0</camel.version>
     <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
     <netty.version>4.1.111.Final</netty.version>
     <log4j.version>2.23.1</log4j.version>
     <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
+    <hawtio.spring.boot-version>2.10.2</hawtio.spring.boot-version>
 
-    <takdatahandler.version>3.2.0-RC1</takdatahandler.version>
+    <takdatahandler.version>3.2.0-RC3</takdatahandler.version>
 
     <maven.javadoc.skip>true</maven.javadoc.skip>
 
@@ -167,7 +168,13 @@
       <dependency>
         <groupId>io.hawt</groupId>
         <artifactId>hawtio-springboot</artifactId>
-        <version>2.6.0</version>
+        <version>${hawtio.spring.boot-version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.lmax</groupId>
+        <artifactId>disruptor</artifactId>
+        <version>${lmax_disruptor-version}</version>
       </dependency>
 
       <!-- test -->
@@ -221,7 +228,13 @@
       <dependency>
         <groupId>com.sun.xml.ws</groupId>
         <artifactId>jaxws-rt</artifactId>
-        <version>2.3.2</version>
+        <version>4.0.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-wsdl</artifactId>
+        <version>4.0.5</version>
       </dependency>
 
       <!-- JVM metrics to prometheus -->

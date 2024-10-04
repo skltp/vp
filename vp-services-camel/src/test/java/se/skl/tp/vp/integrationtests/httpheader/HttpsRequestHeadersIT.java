@@ -28,14 +28,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import se.skl.tp.vp.TestBeanConfiguration;
-import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.httpheader.OutHeaderProcessorImpl;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
@@ -49,7 +47,7 @@ import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @StartTakService
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class HttpsRequestHeadersIT extends CamelTestSupport {
+public class HttpsRequestHeadersIT {
 
 
   @Value("${" + PropertyConstants.PROPAGATE_CORRELATION_ID_FOR_HTTPS + "}")
@@ -61,10 +59,10 @@ public class HttpsRequestHeadersIT extends CamelTestSupport {
   @Value("${" + PropertyConstants.VP_HEADER_USER_AGENT + "}")
   private String vpHeaderUserAgent;
 
-  @EndpointInject(uri = "mock:result")
+  @EndpointInject("mock:result")
   protected MockEndpoint producerResultEndpoint;
 
-  @Produce(uri = "direct:start")
+  @Produce("direct:start")
   protected ProducerTemplate template;
 
   @Autowired private OutHeaderProcessorImpl headerProcessor;

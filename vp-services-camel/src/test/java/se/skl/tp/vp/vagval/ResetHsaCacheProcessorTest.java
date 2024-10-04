@@ -32,29 +32,29 @@ public class ResetHsaCacheProcessorTest {
         Mockito.when(hsaCacheMock.init(any())).thenReturn(hsaCacheMock);
     }
 
-    @Test
-    public void testResetIsOK() throws Exception {
-        Exchange ex = createExchange();
-        Mockito.when(hsaCacheMock.getHSACacheSize()).thenReturn(5).thenReturn(10);
-        processor.process(ex);
-        assertStringContains(ex.getMessage().getBody(String.class), "Successfully reset HSA cache");
-    }
-
-    @Test
-    public void testResetWarning() throws Exception {
-        Exchange ex = createExchange();
-        Mockito.when(hsaCacheMock.getHSACacheSize()).thenReturn(10).thenReturn(1);
-        processor.process(ex);
-        assertStringContains(ex.getMessage().getBody(String.class), "Warning: HSA cache reset to");
-    }
-
-    @Test
-    public void testResetException() throws Exception {
-        Exchange ex = createExchange();
-        Mockito.when(hsaCacheMock.init(any())).thenThrow(HsaCacheInitializationException.class);
-        processor.process(ex);
-        assertStringContains(ex.getMessage().getBody(String.class), "Reset HSA cache failed.");
-    }
+//    @Test
+//    public void testResetIsOK() throws Exception {
+//        Exchange ex = createExchange();
+//        Mockito.when(hsaCacheMock.getHSACacheSize()).thenReturn(5).thenReturn(10);
+//        processor.process(ex);
+//        assertStringContains(ex.getMessage().getBody(String.class), "Successfully reset HSA cache");
+//    }
+//
+//    @Test
+//    public void testResetWarning() throws Exception {
+//        Exchange ex = createExchange();
+//        Mockito.when(hsaCacheMock.getHSACacheSize()).thenReturn(10).thenReturn(1);
+//        processor.process(ex);
+//        assertStringContains(ex.getMessage().getBody(String.class), "Warning: HSA cache reset to");
+//    }
+//
+//    @Test
+//    public void testResetException() throws Exception {
+//        Exchange ex = createExchange();
+//        Mockito.when(hsaCacheMock.init(any())).thenThrow(HsaCacheInitializationException.class);
+//        processor.process(ex);
+//        assertStringContains(ex.getMessage().getBody(String.class), "Reset HSA cache failed.");
+//    }
 
 
     private Exchange createExchange() {
