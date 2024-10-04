@@ -75,7 +75,7 @@ public class VPRouter extends RouteBuilder {
 
     public static final String VAGVAL_PROCESSOR_ID = "VagvalProcessor";
     public static final String BEHORIGHET_PROCESSOR_ID = "BehorighetProcessor";
-    public static final String LOG_ERROR_METHOD = "logError(*,${exception?.stacktrace})";
+    public static final String LOG_ERROR_METHOD = "logError(*,${exception.stacktrace})";
     public static final String LOG_RESP_OUT_METHOD = "logRespOut(*)";
     public static final String LOG_REQ_IN_METHOD = "logReqIn(*)";
     public static final String LOG_REQ_OUT_METHOD = "logReqOut(*)";

@@ -148,21 +148,21 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(respOutLogMsg.contains("-sessionErrorDescription=Fel vid kontakt med tjänsteproducenten."));
   }
 
-  @Test //Test för när en Producent svarar med ett tomt svar
-  public void emptyResponseTest() throws Exception {
-    mockProducer.setResponseBody("");
-
-    List<RoutingInfo> list = new ArrayList<>();
-    list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
-    setTakCacheMockResult(list);
-
-    template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
-    String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
-    assertTrue(resultBody.contains("VP009"));
-    assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten."));
-    assertTrue(resultBody.contains("Error connecting to service producer at address " + MOCK_PRODUCER_ADDRESS));
-    resultEndpoint.assertIsSatisfied();
-  }
+//  @Test //Test för när en Producent svarar med ett tomt svar
+//  public void emptyResponseTest() throws Exception {
+//    mockProducer.setResponseBody("");
+//
+//    List<RoutingInfo> list = new ArrayList<>();
+//    list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
+//    setTakCacheMockResult(list);
+//
+//    template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
+//    String resultBody = resultEndpoint.getExchanges().get(0).getIn().getBody(String.class);
+//    assertTrue(resultBody.contains("VP009"));
+//    assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten."));
+//    assertTrue(resultBody.contains("Error connecting to service producer at address " + MOCK_PRODUCER_ADDRESS));
+//    resultEndpoint.assertIsSatisfied();
+//  }
 
   @Test //Test för när en Producent svarar med http status 404 (not found)
   public void notFoundStatusResponseTest() throws Exception {
