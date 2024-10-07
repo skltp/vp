@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import se.skl.tp.vp.httpsclient.HttpsClientInitializerFactory;
 
 @Configuration
 @ComponentScan(basePackages = {"se.skltp.takcache", "se.skl.tp.hsa.cache", "se.skl.tp.behorighet", "se.skl.tp.vagval", "se.skl.tp.vp"})
@@ -26,10 +25,5 @@ public class BeansConfiguration {
   @Bean
   public EventLoopGroup sharedClientHttpsPool(){
     return new NettyWorkerPoolBuilder().withWorkerCount(httpsWorkers).withName("NettyHttpsClient").build();
-  }
-
-  @Bean
-  public HttpsClientInitializerFactory httpsClientInitializerFactory() {
-    return new HttpsClientInitializerFactory();
   }
 }
