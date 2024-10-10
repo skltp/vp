@@ -35,15 +35,14 @@ data:
   TIMEOUT_JSON_FILE_DEFAULT_TJANSTEKONTRAKT_NAME: default_timeouts
   VAGVALROUTER_DEFAULT_ROUTING_ADDRESS_DELIMITER: '#'
   MESSAGE_LOGGER_METHOD: ecs
-  VP_HOST: 0.0.0.0
-  VP_HSA_RESET_CACHE_URL: http://${vp.host}:24000/resethsacache
-  VP_HTTP_ROUTE_URL: http://${vp.host}:8080/vp
-  VP_HTTPS_ROUTE_URL: https://${vp.host}:20000/vp
+  VP_HSA_RESET_CACHE_URL: http://0.0.0.0:24000/resethsacache
+  VP_HTTP_ROUTE_URL: http://0.0.0.0:8080/vp
+  VP_HTTPS_ROUTE_URL: https://0.0.0.0:20000/vp
   VP_INSTANCE_ID: {{ .Values.skltp.instanceId }}
   VP_INSTANCE_NAME: SKLTP-DEFAULT
   VP_MAX_RECEIVE_LENGTH: "52428800"
-  VP_RESET_CACHE_URL: http://${vp.host}:23000/resetcache
-  VP_STATUS_URL: http://${vp.host}:8080/status
+  VP_RESET_CACHE_URL: http://0.0.0.0:23000/resetcache
+  VP_STATUS_URL: http://0.0.0.0:8080/status
   VP_USE_ROUTING_HISTORY: "true"
   WSDL_JSON_FILE: {{ tpl .Values.paths.config . }}/wsdlconfig.json
   WSDLFILES_DIRECTORY: {{ tpl .Values.paths.base . }}/wsdl/
