@@ -29,8 +29,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.xml.soap.DetailEntry;
-import javax.xml.soap.SOAPBody;
+import jakarta.xml.soap.DetailEntry;
+import jakarta.xml.soap.SOAPBody;
 
 import io.undertow.util.FileUtils;
 import org.junit.jupiter.api.BeforeEach;

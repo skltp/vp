@@ -20,7 +20,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalMatchers;
@@ -34,7 +33,6 @@ import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skltp.takcache.BehorigheterCache;
 import se.skltp.takcache.TakCache;
-import se.skltp.takcache.VagvalCache;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)

@@ -13,7 +13,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.netty.NettyConstants;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
-import org.eclipse.jetty.http.HttpHeader;
 import org.junit.jupiter.api.Test;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;

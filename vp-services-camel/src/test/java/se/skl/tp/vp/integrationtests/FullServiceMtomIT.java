@@ -2,16 +2,15 @@ package se.skl.tp.vp.integrationtests;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.requestreader.RequestReaderProcessorXMLEventReaderTest.MTOM_TEXT_1;
 import static se.skl.tp.vp.requestreader.RequestReaderProcessorXMLEventReaderTest.MTOM_TEXT_2;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;

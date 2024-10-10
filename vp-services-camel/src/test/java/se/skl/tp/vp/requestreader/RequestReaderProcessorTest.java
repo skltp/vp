@@ -24,10 +24,10 @@ import se.skl.tp.vp.constants.VPExchangeProperties;
 @TestPropertySource("classpath:application.properties")
 public class RequestReaderProcessorTest extends CamelTestSupport {
 
-  @EndpointInject(uri = "mock:result")
+  @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;
 
-  @Produce(uri = "direct:start")
+  @Produce("direct:start")
   protected ProducerTemplate template;
 
   @Autowired

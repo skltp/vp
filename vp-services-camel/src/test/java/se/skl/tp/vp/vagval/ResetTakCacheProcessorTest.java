@@ -25,7 +25,7 @@ public class ResetTakCacheProcessorTest {
     @Autowired
     private ResetTakCacheProcessor processor;
 
-    @MockBean(name = "takCache")
+    @MockBean(name = "takCacheImpl")
     private TakCache takCacheMock;
 
     private List<String> testLog = new ArrayList<>();
