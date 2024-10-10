@@ -7,7 +7,7 @@
     <parent>
         <groupId>se.skltp.vp</groupId>
         <artifactId>vp-parent-camel</artifactId>
-        <version>4.5.0-SNAPSHOT</version>
+        <version>4.6.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>vp-services-camel</artifactId>
