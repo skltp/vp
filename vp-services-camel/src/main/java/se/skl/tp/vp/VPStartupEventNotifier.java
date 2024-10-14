@@ -35,15 +35,6 @@ public class VPStartupEventNotifier extends EventNotifierSupport {
         setIgnoreExchangeRedeliveryEvents(true);
     }
 
-    /*
-    @Override
-    public void notify(EventObject event) {
-         if (event instanceof CamelContextStartedEvent) {
-            initTakCache();
-            initHSACache();
-        }
-    }
-*/
     private void initHSACache() {
         hsaCacheService.resetCache();
     }

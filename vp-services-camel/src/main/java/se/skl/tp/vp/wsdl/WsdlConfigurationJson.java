@@ -137,6 +137,8 @@ public class WsdlConfigurationJson implements WsdlConfiguration {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setNamespaceAware(true);
       dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+      dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document document = db.parse(is);
       Node node = document.getDocumentElement();

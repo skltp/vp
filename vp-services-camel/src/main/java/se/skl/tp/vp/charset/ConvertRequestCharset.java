@@ -40,6 +40,8 @@ public class ConvertRequestCharset implements Processor {
 
     TransformerFactory factory = TransformerFactory.newInstance();
     factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
     factory.newTransformer().transform(source, streamResult);
 
     exchange.getIn().setBody(stringWriter.getBuffer().toString());
