@@ -5,7 +5,7 @@ ENV BASE_DIR=/opt/skltp/ \
     LOG_DIR=/var/log/ \
     JARFILE=target/vp-services-camel-*.jar
 
-RUN apk add --no-cache jattach --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/
+RUN apk add --no-cache jattach --repository https://dl-cdn.alpinelinux.org/alpine/edge/community/
 
 ADD ${JARFILE} ${BASE_DIR}/app.jar
 RUN mkdir -p ${LOG_DIR} \
