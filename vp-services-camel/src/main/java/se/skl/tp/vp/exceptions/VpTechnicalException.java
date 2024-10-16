@@ -1,7 +1,5 @@
 package se.skl.tp.vp.exceptions;
 
-import javax.xml.stream.XMLStreamException;
-
 public class VpTechnicalException extends VpRuntimeException {
 
 	private static final long serialVersionUID = 1L;

@@ -1,16 +1,15 @@
 package se.skl.tp.vp.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTP;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
-import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;

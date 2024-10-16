@@ -1,12 +1,12 @@
 package se.skl.tp.vp.timeout;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 import static se.skl.tp.vp.util.soaprequests.RoutingInfoUtil.createRoutingInfo;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.takcache.TakCacheMockUtil.createTakCacheLogOk;
 import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV20;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +17,9 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.apache.camel.test.junit5.CamelTestSupport;
-import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,8 +27,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
 import se.skl.tp.vp.logging.MessageInfoLogger;
@@ -46,12 +43,12 @@ import se.skltp.takcache.VagvalCache;
 })
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-public class ProducerTimeoutWithoutConfigTest extends CamelTestSupport {
+public class ProducerTimeoutWithoutConfigTest {
 
-  @EndpointInject(uri = "mock:result")
+  @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;
 
-  @Produce(uri = "direct:start")
+  @Produce("direct:start")
   protected ProducerTemplate template;
 
   @Autowired SenderIpExtractor senderIpExtractor;

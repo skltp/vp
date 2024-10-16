@@ -17,15 +17,13 @@
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>2.7.18</spring.boot-version>
+    <spring.boot-version>3.3.4</spring.boot-version>
     <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
-    <camel.version>3.22.2</camel.version>
-    <javax.servlet-api-version>4.0.1</javax.servlet-api-version>
-    <netty.version>4.1.111.Final</netty.version>
-    <log4j.version>2.23.1</log4j.version>
+    <camel.version>4.8.0</camel.version>
     <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
+    <hawtio.spring.boot-version>2.10.2</hawtio.spring.boot-version>
 
-    <takdatahandler.version>3.2.0-RC1</takdatahandler.version>
+    <takdatahandler.version>3.2.0-RC3</takdatahandler.version>
 
     <maven.javadoc.skip>true</maven.javadoc.skip>
 
@@ -35,11 +33,6 @@
     <!-- Sonar/Reporting settings -->
     <!-- ************************-->
     <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
-
-    <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
-    <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-    <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-    <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
   </properties>
 
   <distributionManagement>
@@ -66,21 +59,12 @@
   <modules>
     <module>vp-wsdl-utils</module>
     <module>vp-services-camel</module>
-    <module>report</module>
     <module>cert-generator-utility</module>
+    <module>report</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
-      <!-- Log4J BOM placed first to override version -->
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-bom</artifactId>
-        <version>${log4j.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-
       <dependency>
         <groupId>se.skltp.vp</groupId>
         <artifactId>utility</artifactId>
@@ -161,18 +145,17 @@
         <version>${camel.version}</version>
       </dependency>
 
-      <!--Netty-->
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-all</artifactId>
-        <version>${netty.version}</version>
-      </dependency>
-
       <!--hawt.io-->
       <dependency>
         <groupId>io.hawt</groupId>
         <artifactId>hawtio-springboot</artifactId>
-        <version>2.6.0</version>
+        <version>${hawtio.spring.boot-version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.lmax</groupId>
+        <artifactId>disruptor</artifactId>
+        <version>${lmax_disruptor-version}</version>
       </dependency>
 
       <!-- test -->
@@ -226,7 +209,13 @@
       <dependency>
         <groupId>com.sun.xml.ws</groupId>
         <artifactId>jaxws-rt</artifactId>
-        <version>2.3.2</version>
+        <version>4.0.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-wsdl</artifactId>
+        <version>4.0.5</version>
       </dependency>
 
       <!-- JVM metrics to prometheus -->
@@ -382,7 +371,6 @@
                   <goal>prepare-agent</goal>
                 </goals>
                 <configuration>
-                  <destFile>${sonar.jacoco.reportPath}</destFile>
                   <propertyName>surefireArgLine</propertyName>
                 </configuration>
               </execution>
@@ -393,7 +381,6 @@
                   <goal>prepare-agent</goal>
                 </goals>
                 <configuration>
-                  <destFile>${sonar.jacoco.itReportPath}</destFile>
                   <propertyName>failsafeArgLine</propertyName>
                 </configuration>
               </execution>
@@ -403,10 +390,6 @@
                 <goals>
                   <goal>report</goal>
                 </goals>
-                <configuration>
-                  <dataFile>${jacoco.reportPath}</dataFile>
-                  <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-                </configuration>
               </execution>
               <execution>
                 <id>default-report</id>
@@ -414,10 +397,6 @@
                 <goals>
                   <goal>report</goal>
                 </goals>
-                <configuration>
-                  <dataFile>${jacoco.reportPath}</dataFile>
-                  <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-                </configuration>
               </execution>
             </executions>
           </plugin>

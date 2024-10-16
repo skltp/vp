@@ -8,7 +8,7 @@ import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.*;
+import jakarta.xml.soap.*;
 
 public class SoapFaultHelper {
 

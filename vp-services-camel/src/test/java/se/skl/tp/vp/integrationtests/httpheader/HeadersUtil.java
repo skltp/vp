@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.undertow.util.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 
 public class HeadersUtil {

@@ -4,16 +4,11 @@ import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.util.Properties;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.spi.PropertiesComponent;
-import org.apache.camel.spi.Registry;
 import org.apache.camel.support.DefaultExchange;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
@@ -27,13 +22,6 @@ public class NettyHttpClientExpectContinueTest extends BaseNettyTest {
   @AfterAll
   public static void verifyNoLeaks() throws Exception {
     LeakDetectionBaseTest.verifyNoLeaks();
-  }
-
-  @BeforeEach
-  @Override
-  public void setUp() throws Exception {
-      // REALLY important to call super
-      super.setUp();
   }
   
   @Test

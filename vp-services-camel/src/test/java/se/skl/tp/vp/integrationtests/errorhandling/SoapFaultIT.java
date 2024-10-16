@@ -10,7 +10,7 @@ import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPBody;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -40,7 +40,7 @@ import se.skl.tp.vp.util.soaprequests.SoapUtils;
 public class SoapFaultIT extends LeakDetectionBaseTest {
 
   public static final String TEST_EXCEPTION_MESSAGE = "Test exception message!";
-  @EndpointInject(uri = "mock:vagvalprocessor")
+  @EndpointInject("mock:vagvalprocessor")
   protected MockEndpoint resultEndpoint;
 
   @Autowired

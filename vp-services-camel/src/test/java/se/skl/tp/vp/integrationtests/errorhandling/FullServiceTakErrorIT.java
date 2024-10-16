@@ -2,7 +2,6 @@ package se.skl.tp.vp.integrationtests.errorhandling;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP008;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_NOT_AUHORIZED;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
@@ -10,7 +9,7 @@ import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPBody;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

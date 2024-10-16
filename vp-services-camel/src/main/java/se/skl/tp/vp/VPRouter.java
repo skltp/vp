@@ -63,7 +63,6 @@ public class VPRouter extends RouteBuilder {
     public static final String NETTY_HTTPS_OUTGOING_TOD = "netty-http:https://${exchangeProperty.vagvalHost}?"
         + "sslContextParameters=#outgoingSSLContextParameters&"
         + "ssl=true&"
-        + "clientInitializerFactory=#httpsClientInitializerFactory&"
         + "hostnameVerification={{producer.https.hostnameVerification}}&"
         + "useRelativePath=true&"
         + "nettyHttpBinding=#VPNettyHttpBinding&"
@@ -76,6 +75,7 @@ public class VPRouter extends RouteBuilder {
     public static final String VAGVAL_PROCESSOR_ID = "VagvalProcessor";
     public static final String BEHORIGHET_PROCESSOR_ID = "BehorighetProcessor";
     public static final String LOG_ERROR_METHOD = "logError(*,${exception.stacktrace})";
+    public static final String LOG_EMPTY_METHOD = "logError(*,${null})";
     public static final String LOG_RESP_OUT_METHOD = "logRespOut(*)";
     public static final String LOG_REQ_IN_METHOD = "logReqIn(*)";
     public static final String LOG_REQ_OUT_METHOD = "logReqOut(*)";
@@ -184,7 +184,7 @@ public class VPRouter extends RouteBuilder {
             .choice().when(or(body().isNull(), body().isEqualTo("")))
                 .log(LoggingLevel.WARN, "Response from producer is empty")
                 .process(handleEmptyResponseProcessor)
-                .bean(MessageInfoLogger.class, LOG_ERROR_METHOD)
+                .bean(MessageInfoLogger.class, LOG_EMPTY_METHOD)
             .end();
 
         from(DIRECT_PRODUCER_ROUTE)
@@ -209,10 +209,10 @@ public class VPRouter extends RouteBuilder {
             .removeHeaders(headerFilter.getRequestHeadersToRemove(), headerFilter.getRequestHeadersToKeep())
             .bean(MessageInfoLogger.class, LOG_REQ_OUT_METHOD)
             .choice().when(exchangeProperty(VPExchangeProperties.VAGVAL).contains("https://"))
-                    .recipientList(simple(NETTY_HTTPS_OUTGOING_TOD))
+                    .toD(NETTY_HTTPS_OUTGOING_TOD)
                     .endChoice()
                 .otherwise()
-                    .recipientList(simple(NETTY_HTTP_OUTGOING_TOD))
+                    .toD(NETTY_HTTP_OUTGOING_TOD)
                     .endChoice()
             .end()
             .bean(MessageInfoLogger.class, LOG_RESP_IN_METHOD)

@@ -47,7 +47,6 @@ public class GetStatusProcessor implements Processor {
   public static final String KEY_JVM_MAX_MEMORY = "JvmMaxMemory";
   public static final String KEY_DIRECT_MEMORY = "DirectMemBufferPool";
   public static final String KEY_NON_HEAP_MEMORY = "NonHeapMemory";
-  public static final String KEY_VM_MAX_DIRECT_MEMORY = "MaxDirectMemory";
   public static final String KEY_NETTY_DIRECT_MEMORY = "NettyDirectMemory";
   public static final String KEY_ENDPOINTS = "Endpoints";
   @Autowired
@@ -108,7 +107,6 @@ public class GetStatusProcessor implements Processor {
     map.put(KEY_JVM_MAX_MEMORY, "" + MemoryUtil.bytesReadable(instance.maxMemory()));
     if (showMemory) {
       map.put(KEY_DIRECT_MEMORY, "" + getDirectMemoryString());
-      map.put(KEY_VM_MAX_DIRECT_MEMORY, "" + MemoryUtil.getVMMaxMemory());
       map.put(KEY_NON_HEAP_MEMORY, "" + getNonHeapMemory());
       map.put(KEY_NETTY_DIRECT_MEMORY, "" + getNettyDirectMemory());
     }

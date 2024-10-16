@@ -20,7 +20,7 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
   @Autowired
   ExceptionUtil exceptionUtil;
 
-  @Value("#{T(java.util.Arrays).asList('${" + PropertyConstants.SENDER_ID_ALLOWED_LIST + ":}')}")
+  @Value("#{'${" + PropertyConstants.SENDER_ID_ALLOWED_LIST + "}'.split(',')}")
   protected List<String> allowedSenderIds;
 
   @Value("${" + PropertyConstants.THROW_VP013_WHEN_ORIGNALCONSUMER_NOT_ALLOWED + ":#{false}}")

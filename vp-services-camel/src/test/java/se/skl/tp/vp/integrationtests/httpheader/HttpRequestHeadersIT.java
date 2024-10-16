@@ -25,7 +25,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +47,7 @@ import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @StartTakService
-public class HttpRequestHeadersIT extends CamelTestSupport {
+public class HttpRequestHeadersIT {
   @Value("${" + PropertyConstants.VP_HEADER_USER_AGENT + "}")
   private String vpHeaderUserAgent;
 
@@ -61,10 +60,10 @@ public class HttpRequestHeadersIT extends CamelTestSupport {
   @Value("${" + PropertyConstants.VP_HTTP_ROUTE_URL + "}")
   private String httpRoute;
 
-  @EndpointInject(uri = "mock:result")
+  @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;
 
-  @Produce(uri = "direct:start")
+  @Produce("direct:start")
   protected ProducerTemplate template;
 
   @Autowired private CamelContext camelContext;

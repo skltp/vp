@@ -26,10 +26,10 @@ import se.skl.tp.vp.util.LeakDetectionBaseTest;
 @TestPropertySource("classpath:application.properties")
 public class SenderIpExtractorIT extends CamelTestSupport {
 
-    @EndpointInject(uri = "mock:result")
+    @EndpointInject("mock:result")
     protected MockEndpoint resultEndpoint;
 
-    @Produce(uri = "direct:start")
+    @Produce("direct:start")
     protected ProducerTemplate template;
 
     @Autowired
