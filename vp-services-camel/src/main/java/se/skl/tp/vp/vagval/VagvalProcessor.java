@@ -27,7 +27,7 @@ public class VagvalProcessor implements Processor {
         String receiverId = (String) exchange.getProperty(VPExchangeProperties.RECEIVER_ID);
         String servicecontractNamespace = (String) exchange.getProperty(VPExchangeProperties.SERVICECONTRACT_NAMESPACE);
 
-        validateRequest(servicecontractNamespace, receiverId);
+        validateRequest(receiverId);
 
         List<RoutingInfo> routingInfos = takService.getRoutingInfo(servicecontractNamespace, receiverId);
         exchange.setProperty(VPExchangeProperties.VAGVAL_TRACE, ThreadContextLogTrace.get(ThreadContextLogTrace.ROUTER_RESOLVE_VAGVAL_TRACE) );
@@ -75,12 +75,10 @@ public class VagvalProcessor implements Processor {
         return routingInfo;
     }
 
-    private void validateRequest(String servicecontractNamespace, String receiverId) {
+    private void validateRequest(String receiverId) {
         if (!takService.isInitalized()) {
             throw exceptionUtil.createVpSemanticException(VpSemanticErrorCodeEnum.VP008);
         }
-
-        //TODO Kontrollera servicecontractNamespace ?
 
         // No receiver ID (to_address) found in message
         if(receiverId == null){

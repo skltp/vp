@@ -1,6 +1,5 @@
 package se.skl.tp.vp.utils;
 
-import com.sun.management.HotSpotDiagnosticMXBean;
 import io.netty.buffer.PoolArenaMetric;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocatorMetric;
@@ -17,7 +16,6 @@ public class MemoryUtil {
   }
 
   private static final BufferPoolMXBean directBufferPool = getDirectBufferPool();
-  private static final HotSpotDiagnosticMXBean hotSpotDiagnostic = getHotSpotDiagnostic();
   private static final MemoryMXBean mbean = ManagementFactory.getMemoryMXBean();
 
   public static String getMemoryUsed() {
@@ -26,16 +24,6 @@ public class MemoryUtil {
 
   public static String getTotalCapacity() {
     return bytesReadable(directBufferPool.getTotalCapacity());
-  }
-
-  public static String getVMMaxMemory() {
-    try {
-      String rawValue = ""; // hotSpotDiagnostic.getVMOption("MaxDirectMemorySize").getValue();
-      return bytesReadable(Long.parseLong(rawValue));
-    }
-    catch (Exception e) {
-      return "";
-    }
   }
 
   public static long getCount() {
@@ -107,13 +95,5 @@ public class MemoryUtil {
       }
     }
     throw new RuntimeException("Could not find direct BufferPoolMXBean");
-  }
-
-  private static HotSpotDiagnosticMXBean getHotSpotDiagnostic() {
-    HotSpotDiagnosticMXBean hsdiag = ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class);
-    if (hsdiag == null) {
-      throw new RuntimeException("Could not find HotSpotDiagnosticMXBean");
-    }
-    return hsdiag;
   }
 }
