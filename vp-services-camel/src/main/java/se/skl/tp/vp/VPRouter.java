@@ -167,7 +167,6 @@ public class VPRouter extends RouteBuilder {
             .end();
 
         from(DIRECT_VP).routeId(VAGVAL_ROUTE)
-            .streamCaching()
             .setProperty(VPExchangeProperties.HTTP_URL_IN,  header(Exchange.HTTP_URL))
             .setProperty(VPExchangeProperties.VP_X_FORWARDED_HOST,  header("{{http.forwarded.header.host}}"))
             .setProperty(VPExchangeProperties.VP_X_FORWARDED_PORT,  header("{{http.forwarded.header.port}}"))
