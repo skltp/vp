@@ -3,6 +3,8 @@ package se.skl.tp.vp;
 import static org.apache.camel.builder.PredicateBuilder.or;
 
 import io.netty.handler.timeout.ReadTimeoutException;
+import javax.net.ssl.SSLHandshakeException;
+import java.io.IOException;
 import java.net.SocketException;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
@@ -199,7 +201,10 @@ public class VPRouter extends RouteBuilder {
                 .to(DIRECT_PRODUCER_ERROR)
                 .handled(true)
             .end()
-            .onException(ReadTimeoutException.class, NettyHttpOperationFailedException.class)
+            .onException(ReadTimeoutException.class,
+                    NettyHttpOperationFailedException.class,
+                    SSLHandshakeException.class,
+                    IOException.class)
                 .to(DIRECT_PRODUCER_ERROR)
                 .handled(true)
             .end()
