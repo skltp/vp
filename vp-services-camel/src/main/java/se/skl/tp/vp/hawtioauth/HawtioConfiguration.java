@@ -1,46 +1,39 @@
 package se.skl.tp.vp.hawtioauth;
 
-import io.hawt.config.ConfigFacade;
+import io.hawt.springboot.ConditionalOnExposedEndpoint;
 import io.hawt.web.auth.AuthenticationConfiguration;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import se.skl.tp.vp.constants.PropertyConstants;
 
 @Log4j2
 @Configuration
+@ConditionalOnExposedEndpoint(name = "hawtio")
 public class HawtioConfiguration {
 
   private static final String JAVA_SECURITY_AUTH_LOGIN_CONFIG = "java.security.auth.login.config";
 
-  @Value("${" + PropertyConstants.HAWTIO_AUTHENTICATION_ENABLED + ":#{false}}")
+  @Value("${" + AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED + ":#{false}}")
   private Boolean hawtioAuthenticationEnabled;
 
   @Value("${" + PropertyConstants.HAWTIO_EXTERNAL_LOGINFILE + ":#{null}}")
   private String externalLoginFile;
 
   /**
-   * Configure facade to use/not use authentication.
-   *
-   * @return config
-   * @throws Exception if an error occurs
+   * Configure hawtio authentication.
    */
-  @Bean(initMethod = "init")
-  public ConfigFacade configFacade() {
-    //If key is set in custom.properties, but no value: true default value above only applies if the key is missing, not value..
-    if (hawtioAuthenticationEnabled == null) {
-      hawtioAuthenticationEnabled = false;
-    }
+  @PostConstruct
+  public void init() {
     log.info("Configuring authentication for Hawtio: hawtioAuthenticationEnabled is " + hawtioAuthenticationEnabled);
     if (!hawtioAuthenticationEnabled) {
-      System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "false");
       log.warn("Authentication set to false for Hawtio. NOT recommended.");
     } else {
-      System.setProperty(AuthenticationConfiguration.HAWTIO_AUTHENTICATION_ENABLED, "true");
       final URL loginResource = this.getClass().getClassLoader().getResource("login.conf");
       if (loginResource != null) {
         setSystemPropertyIfNotSet(JAVA_SECURITY_AUTH_LOGIN_CONFIG, loginResource.toExternalForm());
@@ -51,7 +44,6 @@ public class HawtioConfiguration {
         log.error("Hawtio: Login resource (login.conf) for setting system property " + JAVA_SECURITY_AUTH_LOGIN_CONFIG + " was null!");
       }
     }
-    return new ConfigFacade();
   }
 
   private void setLoginFile() {

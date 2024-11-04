@@ -21,7 +21,7 @@
     <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
     <camel.version>4.8.0</camel.version>
     <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
-    <hawtio.spring.boot-version>2.10.2</hawtio.spring.boot-version>
+    <hawtio.spring.boot-version>4.2.0</hawtio.spring.boot-version>
 
     <takdatahandler.version>3.2.0-RC3</takdatahandler.version>
 
@@ -151,6 +151,11 @@
         <artifactId>hawtio-springboot</artifactId>
         <version>${hawtio.spring.boot-version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-security</artifactId>
+        <version>12.0.14</version>
+      </dependency>
 
       <dependency>
         <groupId>com.lmax</groupId>
@@ -223,6 +228,13 @@
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-registry-prometheus</artifactId>
         <version>1.12.3</version>
+      </dependency>
+
+      <!-- JSON for status processor -->
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20240303</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
