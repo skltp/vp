@@ -161,6 +161,10 @@
             <groupId>io.hawt</groupId>
             <artifactId>hawtio-springboot</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.xmlunit</groupId>
@@ -194,6 +198,12 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <!-- JSON for status processor -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
         </dependency>
     </dependencies>
 
