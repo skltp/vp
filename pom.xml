@@ -1,40 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>se.skltp.vp</groupId>
   <artifactId>vp-parent-camel</artifactId>
-  <name>vp-parent-camel</name>
-  <version>4.6.0-SNAPSHOT</version>
+  <version>4.6.0</version>
   <packaging>pom</packaging>
+  <name>vp-parent-camel</name>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
-
-  <properties>
-    <java.version>17</java.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>3.3.4</spring.boot-version>
-    <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
-    <camel.version>4.8.0</camel.version>
-    <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
-    <hawtio.spring.boot-version>4.2.0</hawtio.spring.boot-version>
-
-    <takdatahandler.version>3.2.0-RC3</takdatahandler.version>
-
-    <maven.javadoc.skip>true</maven.javadoc.skip>
-
-    <argLine.leak>-D_</argLine.leak> <!-- Overridden when 'leak' profile is active -->
-    
-    <!-- ************************-->
-    <!-- Sonar/Reporting settings -->
-    <!-- ************************-->
-    <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
-  </properties>
-
+  <modules>
+    <module>vp-wsdl-utils</module>
+    <module>vp-services-camel</module>
+    <module>cert-generator-utility</module>
+    <module>report</module>
+  </modules>
+  <scm>
+    <connection>scm:git:https://github.com:443/skltp/vp.git</connection>
+    <developerConnection>scm:git:https://github.com:443/skltp/vp.git</developerConnection>
+    <url>https://github.com/skltp/vp.git</url>
+  </scm>
   <distributionManagement>
     <repository>
       <id>release-nexus</id>
@@ -47,29 +31,28 @@
       <url>${snapshot-nexus-url}</url>
     </snapshotRepository>
   </distributionManagement>
-
-  <scm>
-    <url>https://github.com/skltp/vp.git</url>
-    <connection>scm:git:https://github.com:443/skltp/vp.git</connection>
-    <developerConnection>scm:git:https://github.com:443/skltp/vp.git
-    </developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <modules>
-    <module>vp-wsdl-utils</module>
-    <module>vp-services-camel</module>
-    <module>cert-generator-utility</module>
-    <module>report</module>
-  </modules>
-
+  <properties>
+    <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
+    <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <argLine.leak>-D_</argLine.leak>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <spring.boot-version>3.3.4</spring.boot-version>
+    <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <takdatahandler.version>3.2.0-RC3</takdatahandler.version>
+    <maven.compiler.target>17</maven.compiler.target>
+    <hawtio.spring.boot-version>4.2.0</hawtio.spring.boot-version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <camel.version>4.8.0</camel.version>
+  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>se.skltp.vp</groupId>
         <artifactId>utility</artifactId>
       </dependency>
-      <!-- Spring Boot BOM -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -77,7 +60,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- Camel BOM -->
       <dependency>
         <groupId>org.apache.camel.springboot</groupId>
         <artifactId>camel-spring-boot-dependencies</artifactId>
@@ -85,7 +67,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>
@@ -112,8 +93,6 @@
         <artifactId>spring-boot-configuration-processor</artifactId>
         <version>${spring.boot-version}</version>
       </dependency>
-
-      <!-- Camel -->
       <dependency>
         <groupId>org.apache.camel.springboot</groupId>
         <artifactId>camel-spring-boot-starter</artifactId>
@@ -144,8 +123,6 @@
         <artifactId>camel-netty-http-starter</artifactId>
         <version>${camel.version}</version>
       </dependency>
-
-      <!--hawt.io-->
       <dependency>
         <groupId>io.hawt</groupId>
         <artifactId>hawtio-springboot</artifactId>
@@ -156,14 +133,11 @@
         <artifactId>jetty-security</artifactId>
         <version>12.0.14</version>
       </dependency>
-
       <dependency>
         <groupId>com.lmax</groupId>
         <artifactId>disruptor</artifactId>
         <version>${lmax_disruptor-version}</version>
       </dependency>
-
-      <!-- test -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
@@ -199,7 +173,6 @@
         <version>1.78.1</version>
         <scope>test</scope>
       </dependency>
-
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-stax</artifactId>
@@ -210,27 +183,21 @@
         <artifactId>camel-core</artifactId>
         <version>${camel.version}</version>
       </dependency>
-
       <dependency>
         <groupId>com.sun.xml.ws</groupId>
         <artifactId>jaxws-rt</artifactId>
         <version>4.0.3</version>
       </dependency>
-
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-wsdl</artifactId>
         <version>4.0.5</version>
       </dependency>
-
-      <!-- JVM metrics to prometheus -->
       <dependency>
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-registry-prometheus</artifactId>
         <version>1.12.3</version>
       </dependency>
-
-      <!-- JSON for status processor -->
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
@@ -238,11 +205,9 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5.1</version>
         <configuration>
@@ -252,39 +217,21 @@
           <localCheckout>true</localCheckout>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-maven-plugin</artifactId>
         <version>${camel.version}</version>
       </plugin>
-
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
         <configuration>
           <argLine>-Dfile.encoding=UTF-8 ${argLine.leak}</argLine>
         </configuration>
       </plugin>
-
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>2.22.2</version>
-        <configuration>
-          <!-- Seems to be som kind of conflict with JAXB camel dependencies and JDK8 Jaxb impl.
-          https://stackoverflow.com/questions/42499436/classcastexception-cannot-be-cast-to-com-sun-xml-internal-bind-v2-runtime-refle -->
-          <systemPropertyVariables>
-            <com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize>true
-            </com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize>
-          </systemPropertyVariables>
-
-          <!--Make failsafe and spring-boot repackage play nice together
-          https://github.com/spring-projects/spring-boot/issues/6254-->
-          <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-          <argLine>-Dfile.encoding=UTF-8 ${argLine.leak}</argLine>
-        </configuration>
         <executions>
           <execution>
             <goals>
@@ -293,8 +240,14 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <systemPropertyVariables>
+            <com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize>true</com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize>
+          </systemPropertyVariables>
+          <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+          <argLine>-Dfile.encoding=UTF-8 ${argLine.leak}</argLine>
+        </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -317,13 +270,9 @@
       </plugin>
     </plugins>
   </build>
-
   <profiles>
     <profile>
       <id>lint</id>
-      <properties>
-        <argLine.lint>-Xlint:deprecation</argLine.lint>
-      </properties>
       <build>
         <plugins>
           <plugin>
@@ -333,6 +282,9 @@
           </plugin>
         </plugins>
       </build>
+      <properties>
+        <argLine.lint>-Xlint:deprecation</argLine.lint>
+      </properties>
     </profile>
     <profile>
       <id>leak</id>
@@ -345,14 +297,12 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <argLine>-Dfile.encoding=UTF-8 @{surefireArgLine}</argLine>
             </configuration>
           </plugin>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <executions>
               <execution>
