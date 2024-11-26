@@ -167,8 +167,11 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
         new String[]{"Det finns inget vägval i tjänsteadresseringskatalogen som matchar anropets logiska adressat"},
         new String[]{"No receiverId (logical address) found for", RECEIVER_WITH_NO_VAGVAL,
             TJANSTEKONTRAKT_GET_CERTIFICATE_KEY}
-
     );
+    String expectedFaultDetails = String.format("No receiverId (logical address) found for serviceNamespace: %s, receiverId: %s",
+            TJANSTEKONTRAKT_GET_CERTIFICATE_KEY, RECEIVER_WITH_NO_VAGVAL);
+    assertExactSoapFaultDetails(soapBody, expectedFaultDetails);
+
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
 
@@ -176,8 +179,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
     String VP004_error = env.getProperty("VP004");
     assertRespOutLog("VP004 [" + instanceName + "] " + VP004_error);
-    assertRespOutLog("No receiverId (logical address) found for serviceNamespace: " +
-            "urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1, receiverId: NoVagvalReceiver");
+    assertRespOutLog(expectedFaultDetails);
   }
 
   @Test
@@ -260,6 +262,9 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
         new String[]{"Tjänstekonsumenten saknar behörighet att anropa den logiska adressaten via detta tjänstekontrakt."},
         new String[]{"Authorization missing for", RECEIVER_NOT_AUHORIZED,
             TJANSTEKONTRAKT_GET_CERTIFICATE_KEY} );
+    String expectedFaultDetails = String.format("Authorization missing for serviceNamespace: %s, receiverId: %s, senderId: tp",
+            TJANSTEKONTRAKT_GET_CERTIFICATE_KEY, RECEIVER_NOT_AUHORIZED);
+    assertExactSoapFaultDetails(soapBody, expectedFaultDetails);
 
     System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
@@ -268,7 +273,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
 
     String VP007error = env.getProperty("VP007");
     assertRespOutLog("VP007 [" + instanceName + "] " + VP007error);
-    assertRespOutLog("Authorization missing for serviceNamespace: urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1");
+    assertRespOutLog(expectedFaultDetails);
   }
 
   @Test
@@ -371,6 +376,11 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
         assertStringContains(text, detail);
       }
     }
+  }
+
+  private void assertExactSoapFaultDetails(SOAPBody soapBody, String expectedDetails) {
+    String details = soapBody.getFault().getDetail().getChildElements().next().getValue();
+    assertEquals(expectedDetails, details);
   }
 
   private void assertErrorLog(String code, String message) {
