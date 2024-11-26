@@ -31,7 +31,7 @@ public class ExceptionMessageProcessorImpl implements ExceptionMessageProcessor 
     if (throwable instanceof VpRuntimeException) {
       VpRuntimeException exception = (VpRuntimeException) throwable;
       errorCode = exception.getErrorCode();
-      messageDetails = exceptionUtil.createDetailsMessage(errorCode, exception.getMessageDetails());
+      messageDetails = exception.getMessageDetails();
       message = exceptionUtil.createMessage(errorCode);
     }
 
