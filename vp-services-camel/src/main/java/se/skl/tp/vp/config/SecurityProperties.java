@@ -20,22 +20,16 @@ public class SecurityProperties {
   @Data
   public static class Store {
     private String location;
-    private Producer producer;
-    private Consumer consumer;
+    private SSLConfig producer;
+    private SSLConfig consumer;
     private Truststore truststore;
 
     @Data
-    public static class Producer {
+    public static class SSLConfig {
       private String file;
       private String password;
       private String keyPassword;
-    }
-
-    @Data
-    public static class Consumer {
-      private String file;
-      private String password;
-      private String keyPassword;
+      private String bundle;
     }
 
     @Data
@@ -43,7 +37,6 @@ public class SecurityProperties {
       private String file;
       private String password;
     }
-
   }
 
 }

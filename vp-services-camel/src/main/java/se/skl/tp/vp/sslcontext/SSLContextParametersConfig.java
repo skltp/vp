@@ -2,15 +2,20 @@ package se.skl.tp.vp.sslcontext;
 
 import org.apache.camel.support.jsse.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ssl.SslBundle;
+import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import se.skl.tp.vp.config.SecurityProperties;
+
+
+import javax.net.ssl.*;
 
 @Log4j2
 @Configuration
@@ -22,19 +27,13 @@ public class SSLContextParametersConfig  {
     SecurityProperties securityProperies;
 
     @Bean
-    public SSLContextParameters incomingSSLContextParameters() {
-        KeyStoreParameters ksp = new KeyStoreParameters();
-        ksp.setResource(securityProperies.getStore().getLocation() + securityProperies.getStore().getProducer().getFile());
-        ksp.setPassword(securityProperies.getStore().getProducer().getPassword());
-        KeyManagersParameters kmp = new KeyManagersParameters();
-        kmp.setKeyPassword(securityProperies.getStore().getProducer().getKeyPassword());
-        kmp.setKeyStore(ksp);
-
-        SSLContextParameters sslContextParameters = new SSLContextParameters();
-        sslContextParameters.setKeyManagers(kmp);
-
-        TrustManagersParameters trustManagersParameters = createTrustManagerParameters();
-        sslContextParameters.setTrustManagers(trustManagersParameters);
+    public SSLContextParameters incomingSSLContextParameters(SslBundles sslBundles, @Value("${tp.tls.store.consumer.bundle:}") String bundle) {
+        SSLContextParameters sslContextParameters;
+        if (bundle.isBlank()) { // no bundle, lets do it legacy style
+            sslContextParameters = getSslContextParameters(securityProperies.getStore().getProducer());
+        } else {
+            sslContextParameters = getBundleBasedParameters(sslBundles, bundle);
+        }
 
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedIncomingProtocols());
         sslContextParameters.setSecureSocketProtocols(sspp);
@@ -49,20 +48,13 @@ public class SSLContextParametersConfig  {
     }
 
     @Bean
-    public SSLContextParameters outgoingSSLContextParameters() {
-        KeyStoreParameters ksp = new KeyStoreParameters();
-        ksp.setResource(securityProperies.getStore().getLocation() + securityProperies.getStore().getConsumer().getFile());
-        ksp.setPassword(securityProperies.getStore().getConsumer().getPassword());
-        KeyManagersParameters kmp = new KeyManagersParameters();
-        kmp.setKeyPassword(securityProperies.getStore().getConsumer().getKeyPassword());
-        kmp.setKeyStore(ksp);
-
-        SSLContextParameters sslContextParameters = new SSLContextParameters();
-        sslContextParameters.setKeyManagers(kmp);
-        
-        TrustManagersParameters trustManagersParameters = createTrustManagerParameters();
-        sslContextParameters.setTrustManagers(trustManagersParameters);
-        
+    public SSLContextParameters outgoingSSLContextParameters(SslBundles sslBundles, @Value("${tp.tls.store.consumer.bundle:}") String bundle) {
+        SSLContextParameters sslContextParameters;
+        if (bundle.isBlank()) {
+            sslContextParameters = getSslContextParameters(securityProperies.getStore().getConsumer());
+        } else {
+            sslContextParameters = getBundleBasedParameters(sslBundles, bundle);
+        }
         SecureSocketProtocolsParameters sspp = createSecureProtocolParameters(securityProperies.getAllowedOutgoingProtocols());
         sslContextParameters.setSecureSocketProtocols(sspp);
 
@@ -71,6 +63,43 @@ public class SSLContextParametersConfig  {
 	        CipherSuitesParameters cipherSuites = createCipherSuiteParameters(securityProperies.getAllowedOutgoingCipherSuites());
 			sslContextParameters.setCipherSuites(cipherSuites);
         }
+        return sslContextParameters;
+    }
+
+    private SSLContextParameters getSslContextParameters(SecurityProperties.Store.SSLConfig store) {
+        SSLContextParameters sslContextParameters;
+        sslContextParameters = new SSLContextParameters();
+        KeyStoreParameters ksp = new KeyStoreParameters();
+        ksp.setResource(securityProperies.getStore().getLocation() + store.getFile());
+        ksp.setPassword(store.getPassword());
+        KeyManagersParameters kmp = new KeyManagersParameters();
+        kmp.setKeyPassword(store.getKeyPassword());
+        kmp.setKeyStore(ksp);
+
+        sslContextParameters.setKeyManagers(kmp);
+
+        TrustManagersParameters trustManagersParameters = createTrustManagerParameters();
+        sslContextParameters.setTrustManagers(trustManagersParameters);
+        return sslContextParameters;
+    }
+
+    public static SSLContextParameters getBundleBasedParameters(SslBundles sslBundles, @Value("${tp.tls.store.consumer.bundle}") String bundle) {
+        SslBundle sslBundle = sslBundles.getBundle(bundle);
+        SSLContextParameters sslContextParameters = new SSLContextParameters();
+        sslContextParameters.setKeyManagers(new KeyManagersParameters() {
+            @Override
+            public KeyManager[] createKeyManagers() {
+                return sslBundle.getManagers().getKeyManagers();
+            }
+        });
+
+        sslContextParameters.setTrustManagers(new TrustManagersParameters() {
+            @Override
+            public TrustManager[] createTrustManagers() {
+                return sslBundle.getManagers().getTrustManagers();
+            }
+        });
+
         return sslContextParameters;
     }
 
