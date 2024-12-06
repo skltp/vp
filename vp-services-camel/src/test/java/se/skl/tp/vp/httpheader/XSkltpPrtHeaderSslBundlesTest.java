@@ -37,7 +37,7 @@ import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV20;
         "tp.tls.allowedOutgoingCipherSuites=*"})
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class XSkltpPrtHeaderTestSslBundles {
+class XSkltpPrtHeaderSslBundlesTest {
 
     @MockitoBean
     TakCache takCache;
