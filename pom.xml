@@ -343,7 +343,9 @@
                   <goal>prepare-agent</goal>
                 </goals>
                 <configuration>
+                  <destFile>${project.basedir}/target/jacoco.exec</destFile>
                   <propertyName>failsafeArgLine</propertyName>
+                  <append>true</append>
                 </configuration>
               </execution>
               <execution>
