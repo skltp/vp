@@ -24,6 +24,11 @@ public class SecurityProperties {
     private SSLConfig consumer;
     private Truststore truststore;
 
+    public String getLocation() {
+      // Set file scheme if not specified (for backwards compatibility)
+      return location.contains(":") ? location : "file:" + location;
+    }
+
     @Data
     public static class SSLConfig {
       private String file;
