@@ -3,6 +3,7 @@ package se.skl.tp.vp.status;
 import io.netty.buffer.PooledByteBufAllocatorMetric;
 import java.lang.management.MemoryUsage;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -87,7 +88,7 @@ public class GetStatusProcessor implements Processor {
 
     ServiceStatus serviceStatus = camelContext.getStatus();
     map.put(KEY_SERVICE_STATUS, "" + serviceStatus);
-    map.put(KEY_UPTIME, camelContext.getUptime());
+    map.put(KEY_UPTIME, getFormattedDuration(camelContext.getUptime()));
     map.put(KEY_MANAGEMENT_NAME, camelContext.getManagementName());
     map.put(KEY_JAVA_VERSION, System.getProperties().get("java.version"));
     map.put(KEY_CAMEL_VERSION, camelContext.getVersion());
@@ -184,5 +185,13 @@ public class GetStatusProcessor implements Processor {
   private String getFormattedDate(Date date) {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
     return date == null ? "" : dateFormat.format(date);
+  }
+
+  private String getFormattedDuration(Duration duration) {
+    return String.format("%d days, %d hours, %d minutes, %d seconds",
+            duration.toDaysPart(),
+            duration.toHoursPart(),
+            duration.toMinutesPart(),
+            duration.toSecondsPart());
   }
 }
