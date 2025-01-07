@@ -26,8 +26,8 @@ public class LogExtraInfoBuilder {
   public static final String OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid";
   public static final String IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid_in";
   public static final String ACTING_ON_BEHALF_OF_HSA_ID = "actingOnBehalfOfHsaid";
-  public static final String TIME_ELAPSED = "time.elapsed";
-  public static final String TIME_PRODUCER = "time.producer";
+  public static final String TIME_ELAPSED = "time_elapsed";
+  public static final String TIME_PRODUCER = "time_producer";
   public static final String MESSAGE_LENGTH = "message.length";
   public static final String HEADERS = "Headers";
   public static final String ENDPOINT_URL = "endpoint_url";
