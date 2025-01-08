@@ -415,7 +415,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg, "-routerVagvalTrace=" + expectedReceiverId);
     assertStringContains(respOutLogMsg, "-wsdl_namespace=urn:riv:insuranceprocess:healthreporting:GetCertificate:1:rivtabp20");
     assertStringContains(respOutLogMsg, "-rivversion=rivtabp20");
-    assertStringContains(respOutLogMsg, "-time.producer=");
+    assertStringContains(respOutLogMsg, "-time_producer=");
     assertStringContains(respOutLogMsg, "-routerBehorighetTrace=" + expectedReceiverId);
   }
 

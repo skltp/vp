@@ -78,7 +78,7 @@ ExtraInfo=
 -servicecontract_namespace=urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
 -Headers={CamelHttpResponseCode=200, CamelHttpResponseText=OK, connection=keep-alive, content-length=16, x-skltp-prt=192}
 -routerVagvalTrace==hsa-id-for-a-producer
--time.elapsed=4794
+-time_elapsed=4794
 -originalServiceconsumerHsaid=tp
 -source=se.skl.tp.vp.logging.MessageInfoLogger
 -routerBehorighetTrace==hsa-id-for-a-producer
@@ -88,7 +88,7 @@ ExtraInfo=
 -endpoint_url=https://localhost:19001/vardgivare-b/tjanst2
 -wsdl_namespace=urn:riv:insuranceprocess:healthreporting:GetCertificate:1:rivtabp20
 -rivversion=rivtabp20
--time.producer=192
+-time_producer=192
 Payload=<test answer from testproducer/>
 ```
 
