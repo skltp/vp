@@ -60,13 +60,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.apache.camel.springboot</groupId>
-        <artifactId>camel-spring-boot-dependencies</artifactId>
-        <version>${camel.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>
@@ -77,6 +71,20 @@
             <artifactId>spring-boot-starter-tomcat</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+
+
+
+
+
+
+      <dependency>
+        <groupId>org.apache.camel.springboot</groupId>
+        <artifactId>camel-spring-boot-dependencies</artifactId>
+        <version>${camel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -98,6 +106,8 @@
         <artifactId>camel-spring-boot-starter</artifactId>
         <version>${camel.version}</version>
       </dependency>
+
+      <!-- This is a block comment -->
       <dependency>
         <groupId>org.apache.camel.springboot</groupId>
         <artifactId>camel-spring-boot</artifactId>
@@ -296,12 +306,7 @@
       <id>test-coverage</id>
       <build>
         <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <argLine>-Dfile.encoding=UTF-8 @{surefireArgLine}</argLine>
-            </configuration>
-          </plugin>
+          <!-- This is a block comment -->
           <plugin>
             <artifactId>maven-failsafe-plugin</artifactId>
             <executions>
@@ -320,6 +325,12 @@
             </executions>
             <configuration>
               <argLine>-Dfile.encoding=UTF-8 @{failsafeArgLine}</argLine>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>-Dfile.encoding=UTF-8 @{surefireArgLine}</argLine>
             </configuration>
           </plugin>
           <plugin>
