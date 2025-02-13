@@ -36,8 +36,6 @@ data:
         </Loggers>
         </Configuration>
     timeoutconfig.json: |
-        [
-        ]
+        {{ toJson .Values.timeoutConfig }}
     wsdlconfig.json: |
-        [
-        ]
+        {{ toJson .Values.wsdlConfig }}
