@@ -115,6 +115,11 @@ log4j:
       level: DEBUG
   rootLoggerLevel: WARN
 
+timeoutConfig:
+  - tjanstekontrakt: default_timeouts
+    routetimeout: 35000
+    producertimeout: 35000
+
 initContainer:
   certGen:
     image:
