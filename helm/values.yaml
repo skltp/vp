@@ -120,8 +120,6 @@ timeoutConfig:
     routetimeout: 35000
     producertimeout: 35000
 
-wsdlConfig: []
-
 initContainer:
   certGen:
     image:
