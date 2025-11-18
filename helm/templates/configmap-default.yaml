@@ -52,6 +52,7 @@ data:
               -Duser.language=sv
               -Dspring.profiles.active=custom
               -Xms512m
+              -Xmx1536m
               -XX:MaxRAMPercentage=65
               -Dlog4j.configurationFile=file://{{ tpl .Values.paths.config . }}/log4j2.xml
               -Dcom.sun.management.jmxremote
