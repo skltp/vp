@@ -1,11 +1,9 @@
 package se.skl.tp.vp.httpheader;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -26,10 +24,12 @@ import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.exceptions.VpSemanticException;
 import se.skl.tp.vp.util.TestLogAppender;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @CamelSpringBootTest
 @ContextConfiguration(classes = {OriginalConsumerIdProcessorImpl.class, ExceptionUtil.class, VpCodeMessages.class})
 @TestPropertySource("classpath:application.properties")
-public class OriginalConsumerIdProcessorTest {
+class OriginalConsumerIdProcessorTest {
 
   private static final String A_TEST_CONSUMER_ID = "aTestConsumerId";
   private static final String APPROVED_SENDER_ID = "SENDER1";
@@ -37,7 +37,7 @@ public class OriginalConsumerIdProcessorTest {
   private static final String VP_INSTANCE_ID = "dev_env";
 
   private boolean originalThrowExceptionIfNotAllowed;
-  private List<String> originalAllowedSenderIds;
+  private Set<String> originalAllowedSenderIds;
 
   private static final String LOG_CLASS = "se.skl.tp.vp.httpheader.OriginalConsumerIdProcessorImpl";
 
@@ -45,7 +45,7 @@ public class OriginalConsumerIdProcessorTest {
   OriginalConsumerIdProcessorImpl originalConsumerIdProcessor;
 
   @BeforeEach
-  public void beforeTest() {
+  void beforeTest() {
     originalThrowExceptionIfNotAllowed = originalConsumerIdProcessor.throwExceptionIfNotAllowed;
     originalAllowedSenderIds = originalConsumerIdProcessor.allowedSenderIds;
     TestLogAppender.clearEvents();
@@ -53,13 +53,13 @@ public class OriginalConsumerIdProcessorTest {
   }
 
   @AfterEach
-  public void after() {
+  void after() {
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = originalThrowExceptionIfNotAllowed;
     originalConsumerIdProcessor.allowedSenderIds = originalAllowedSenderIds;
   }
 
   @Test
-  public void senderIsApprovedTest() {
+  void senderIsApprovedTest() {
     Exchange exchange = createExchange();
 
     exchange.setProperty(VPExchangeProperties.SENDER_ID, APPROVED_SENDER_ID);
@@ -72,7 +72,7 @@ public class OriginalConsumerIdProcessorTest {
   }
 
   @Test
-  public void senderNotApprovedNoVP013Test() {
+  void senderNotApprovedNoVP013Test() {
     Exchange exchange = createExchange();
     exchange.setProperty(VPExchangeProperties.SENDER_ID, NOT_APPROVED_SENDER_ID);
     exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, A_TEST_CONSUMER_ID);
@@ -83,19 +83,20 @@ public class OriginalConsumerIdProcessorTest {
     assertEquals(Level.WARN, TestLogAppender.getEvents(LOG_CLASS).get(0).getLevel() );
 
     final String eventMessage = TestLogAppender.getEventMessage(LOG_CLASS, 0);
+    assertNotNull(eventMessage);
     assertTrue(eventMessage.contains(originalConsumerIdProcessor.allowedSenderIds.toString()) );
     assertTrue(eventMessage.contains(NOT_APPROVED_SENDER_ID));
   }
 
   @Test
-  public void senderNotApprovedExpectVP013Test() {
+  void senderNotApprovedExpectVP013Test() {
     Exchange exchange = createExchange();
     exchange.setProperty(VPExchangeProperties.SENDER_ID, NOT_APPROVED_SENDER_ID);
     exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, A_TEST_CONSUMER_ID);
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = true;
     try {
       originalConsumerIdProcessor.process(exchange);
-      assertTrue(false, "Expected a VP013 exception");
+      fail("Expected a VP013 exception");
     } catch (VpSemanticException vpSemanticException) {
       assertEquals(VpSemanticErrorCodeEnum.VP013, vpSemanticException.getErrorCode());
     }
@@ -103,18 +104,18 @@ public class OriginalConsumerIdProcessorTest {
   }
 
   @Test
-  public void senderNotApprovedButIsNotSettingHeaderShouldBeOKTest() {
+  void senderNotApprovedButIsNotSettingHeaderShouldBeOKTest() {
     Exchange exchange = createExchange();
     exchange.setProperty(VPExchangeProperties.SENDER_ID, NOT_APPROVED_SENDER_ID);
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = true;
     originalConsumerIdProcessor.process(exchange);
-    assertEquals(null, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
+    assertNull(exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
     assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
 
   }
 
   @Test
-  public void senderNotApprovedButCallFromAgpWithHeaderShouldBeOKTest() {
+  void senderNotApprovedButCallFromAgpWithHeaderShouldBeOKTest() {
     Exchange exchange = createExchange();
     exchange.setProperty(VPExchangeProperties.SENDER_ID, NOT_APPROVED_SENDER_ID);
     exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, NOT_APPROVED_SENDER_ID);
@@ -126,19 +127,19 @@ public class OriginalConsumerIdProcessorTest {
   }
 
   @Test
-  public void allSendersApprovedTest() {
+  void allSendersApprovedTest() {
     Exchange exchange = createExchange();
     exchange.setProperty(VPExchangeProperties.SENDER_ID, NOT_APPROVED_SENDER_ID);
     exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, A_TEST_CONSUMER_ID);
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = true;
-    originalConsumerIdProcessor.allowedSenderIds = Collections.emptyList();
+    originalConsumerIdProcessor.allowedSenderIds = Collections.emptySet();
     originalConsumerIdProcessor.process(exchange);
     assertEquals(A_TEST_CONSUMER_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
     assertEquals(0, TestLogAppender.getNumEvents(LOG_CLASS));
   }
 
   @Test
-  public void emptySenderIdNotApprovedTest() {
+  void emptySenderIdNotApprovedTest() {
     Exchange exchange = createExchange();
     exchange.getIn().setHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, A_TEST_CONSUMER_ID);
     originalConsumerIdProcessor.throwExceptionIfNotAllowed = false;

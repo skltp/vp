@@ -2,10 +2,11 @@ package se.skl.tp.vp.httpheader;
 
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP013;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Set;
+
 import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Exchange;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.constants.HttpHeaders;
@@ -17,11 +18,9 @@ import se.skl.tp.vp.errorhandling.ExceptionUtil;
 @Log4j2
 public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProcessor {
 
-  @Autowired
-  ExceptionUtil exceptionUtil;
+  private final ExceptionUtil exceptionUtil;
 
-  @Value("#{'${" + PropertyConstants.SENDER_ID_ALLOWED_LIST + "}'.split(',')}")
-  protected List<String> allowedSenderIds;
+  protected Set<String> allowedSenderIds;
 
   @Value("${" + PropertyConstants.THROW_VP013_WHEN_ORIGNALCONSUMER_NOT_ALLOWED + ":#{false}}")
   protected boolean throwExceptionIfNotAllowed;
@@ -31,6 +30,21 @@ public class OriginalConsumerIdProcessorImpl implements OriginalConsumerIdProces
 
   private static final String MSG_SENDER_NOT_ALLOWED_SET_HEADER = "Sender '{}' not allowed to set header {}, accepted senderId's in '{}': [{}]";
 
+  public OriginalConsumerIdProcessorImpl(@Value("${" + PropertyConstants.SENDER_ID_ALLOWED_LIST + "}") String senderIdAllowedList, ExceptionUtil exceptionUtil) {
+    this.exceptionUtil = exceptionUtil;
+    setAllowedSenderIds(senderIdAllowedList);
+  }
+
+  private void setAllowedSenderIds(String senderIdAllowedList) {
+    if (senderIdAllowedList == null || senderIdAllowedList.isBlank()) {
+      this.allowedSenderIds = Set.of();
+    } else {
+      this.allowedSenderIds = Arrays.stream(senderIdAllowedList.split(","))
+          .map(String::trim)
+          .filter(s -> !s.isEmpty())
+          .collect(java.util.stream.Collectors.toSet());
+    }
+  }
 
   public void process(Exchange exchange) {
     String originalConsumer = exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class);
