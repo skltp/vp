@@ -21,7 +21,7 @@ public class TestConsumer {
   public static final String DIRECT_START_HTTP = "direct:start_http";
   public static final String DIRECT_START_HTTPS = "direct:start_https";
   private static final String NETTY_PREFIX = "netty-http:";
-  public static final String HTTPS_NETTY_OPTIONS = "sslContextParameters=#outgoingSSLContextParameters&ssl=true&throwExceptionOnFailure=false";
+  public static final String HTTPS_NETTY_OPTIONS = "sslContextParameters=#SSLContext-default&ssl=true&throwExceptionOnFailure=false";
   public static final String HTTP_NETTY_OPTIONS = "throwExceptionOnFailure=false";
 
   private String httpConsumerRouteUrl;

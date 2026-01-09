@@ -227,7 +227,7 @@ public class HttpsRequestHeadersIT {
                         + "?sslContextParameters=#incomingSSLContextParameters&ssl=true&"
                         + "sslClientCertHeaders=true&needClientAuth=true&matchOnUriPrefix=true");
             // Address below from tak-vagval-test.xml
-            from("netty-http:https://localhost:19001/vardgivare-b/tjanst2?sslContextParameters=#outgoingSSLContextParameters&ssl=true")
+            from("netty-http:https://localhost:19001/vardgivare-b/tjanst2?sslContextParameters=#SSLContext-default&ssl=true")
                 .to("mock:result");
           }
         });

@@ -6,11 +6,12 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
+
+import lombok.AllArgsConstructor;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.netty.http.NettyHttpOperationFailedException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.skl.tp.vp.certificate.CertificateExtractorProcessor;
 import se.skl.tp.vp.charset.ConvertRequestCharset;
@@ -25,6 +26,7 @@ import se.skl.tp.vp.httpheader.OriginalConsumerIdProcessor;
 import se.skl.tp.vp.httpheader.OutHeaderProcessor;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.requestreader.RequestReaderProcessor;
+import se.skl.tp.vp.sslcontext.SelectSslContextProcessor;
 import se.skl.tp.vp.timeout.RequestTimoutProcessor;
 import se.skl.tp.vp.vagval.BehorighetProcessor;
 import se.skl.tp.vp.vagval.RivTaProfilProcessor;
@@ -32,6 +34,7 @@ import se.skl.tp.vp.vagval.VagvalProcessor;
 import se.skl.tp.vp.wsdl.WsdlProcessor;
 
 @Component
+@AllArgsConstructor
 public class VPRouter extends RouteBuilder {
 
     public static final String VP_HTTP_ROUTE = "vp-http-route";
@@ -63,7 +66,7 @@ public class VPRouter extends RouteBuilder {
         + "workerGroup=#sharedClientHttpPool&"
         + "connectTimeout={{producer.http.connect.timeout}}";
     public static final String NETTY_HTTPS_OUTGOING_TOD = "netty-http:https://${exchangeProperty.vagvalHost}?"
-        + "sslContextParameters=#outgoingSSLContextParameters&"
+        + "sslContextParameters=#${exchangeProperty.sslContextId}&"
         + "ssl=true&"
         + "hostnameVerification={{producer.https.hostnameVerification}}&"
         + "useRelativePath=true&"
@@ -83,56 +86,43 @@ public class VPRouter extends RouteBuilder {
     public static final String LOG_REQ_OUT_METHOD = "logReqOut(*)";
     public static final String LOG_RESP_IN_METHOD = "logRespIn(*)";
 
-    @Autowired
-    OriginalConsumerIdProcessor originalConsumerIdProcessor;
+    private final OriginalConsumerIdProcessor originalConsumerIdProcessor;
 
-    @Autowired
-    OutHeaderProcessor setOutHeadersProcessor;
+    private final OutHeaderProcessor setOutHeadersProcessor;
 
-    @Autowired
-    VagvalProcessor vagvalProcessor;
+    private final VagvalProcessor vagvalProcessor;
 
-    @Autowired
-    BehorighetProcessor behorighetProcessor;
+    private final BehorighetProcessor behorighetProcessor;
 
-    @Autowired
-    CertificateExtractorProcessor certificateExtractorProcessor;
+    private final CertificateExtractorProcessor certificateExtractorProcessor;
 
-    @Autowired
-    HttpSenderIdExtractorProcessor httpSenderIdExtractorProcessor;
+    private final HttpSenderIdExtractorProcessor httpSenderIdExtractorProcessor;
 
-    @Autowired
-    RequestReaderProcessor requestReaderProcessor;
+    private final RequestReaderProcessor requestReaderProcessor;
 
-    @Autowired
-    ExceptionMessageProcessor exceptionMessageProcessor;
+    private final ExceptionMessageProcessor exceptionMessageProcessor;
 
-    @Autowired
-    HandleEmptyResponseProcessor handleEmptyResponseProcessor;
+    private final HandleEmptyResponseProcessor handleEmptyResponseProcessor;
 
-    @Autowired
-    RivTaProfilProcessor rivTaProfilProcessor;
+    private final RivTaProfilProcessor rivTaProfilProcessor;
 
-    @Autowired
-    WsdlProcessor wsdlProcessor;
+    private final WsdlProcessor wsdlProcessor;
 
-    @Autowired
-    RequestTimoutProcessor requestTimoutProcessor;
+    private final RequestTimoutProcessor requestTimoutProcessor;
 
-    @Autowired
-    HandleProducerExceptionProcessor handleProducerExceptionProcessor;
+    private final HandleProducerExceptionProcessor handleProducerExceptionProcessor;
 
-    @Autowired
-    private HttpHeaderFilterProperties headerFilter;
+    private final HttpHeaderFilterProperties headerFilter;
 
-    @Autowired
-    private ConvertRequestCharset convertRequestCharset;
+    private final ConvertRequestCharset convertRequestCharset;
 
-    @Autowired
-    private ConvertResponseCharset convertResponseCharset;
+    private final ConvertResponseCharset convertResponseCharset;
+
+    private final SelectSslContextProcessor selectSslContextProcessor;
+
+
 
     @Override
-    @SuppressWarnings("unchecked") // Caused by Camel's onException method
     public void configure() throws Exception {
 
         onException(Exception.class)
@@ -213,6 +203,7 @@ public class VPRouter extends RouteBuilder {
             .removeHeaders(headerFilter.getRequestHeadersToRemove(), headerFilter.getRequestHeadersToKeep())
             .bean(MessageInfoLogger.class, LOG_REQ_OUT_METHOD)
             .choice().when(exchangeProperty(VPExchangeProperties.VAGVAL).contains("https://"))
+                    .process(selectSslContextProcessor)
                     .toD(NETTY_HTTPS_OUTGOING_TOD)
                     .endChoice()
                 .otherwise()
