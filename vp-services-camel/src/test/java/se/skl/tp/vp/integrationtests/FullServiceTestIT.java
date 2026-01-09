@@ -13,8 +13,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,26 +68,20 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   String forwardedHeaderProto;
 
   @BeforeEach
-  public void before() {
-    try {
-      mockProducer.start(HTTP_PRODUCER_URL);
-      mockHttpsProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  void before() throws Exception {
+    mockProducer.start(HTTP_PRODUCER_URL);
+    mockHttpsProducer.start(HTTPS_PRODUCER_URL);
     TestLogAppender.clearEvents();
   }
 
   @Test
-  public void callHttpsVPEndpoint2HttpProducerHappyDays() {
+  void callHttpsVPEndpoint2HttpProducerHappyDays() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "originalid");
     String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
     assertEquals("<mocked answer/>", response);
-
-    //Map<String, Object> producerheaders = mockProducer.getInHeaders();
 
     assertMessageLogsExists();
 
@@ -103,7 +96,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void callHttpVPEndpoint2HttpsProducerHappyDays() {
+  void callHttpVPEndpoint2HttpsProducerHappyDays() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -113,6 +106,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     String response2 = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_HTTPS), headers);
 
     assertEquals("<mocked answer/>", response);
+    assertEquals("<mocked answer/>", response2);
 
     assertMessageLogsExists();
 
@@ -126,7 +120,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void testVagvalContainingWsdlQuery() {
+  void testVagvalContainingWsdlQuery() {
     mockHttpsProducer.setResponseBody("<mocked https answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -147,7 +141,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void callHttpVPEndpointDeclaredUTF16ButIsUTF8() {
+  void callHttpVPEndpointDeclaredUTF16ButIsUTF8() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -169,7 +163,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void callHttpVPEndpointDeclaredUTF16ButIsUTF8WithContentTypeSet() {
+  void callHttpVPEndpointDeclaredUTF16ButIsUTF8WithContentTypeSet() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -192,7 +186,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void callHttpVPEndpointUTF16() throws UnsupportedEncodingException {
+  void callHttpVPEndpointUTF16() throws UnsupportedEncodingException {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -217,7 +211,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void callHttpVPEndpointUTF16NoContentTypeSet() throws UnsupportedEncodingException {
+  void callHttpVPEndpointUTF16NoContentTypeSet() throws UnsupportedEncodingException {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -241,7 +235,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void callWithUTF16ShouldGenerateUTF8CallToProducer() throws UnsupportedEncodingException {
+  void callWithUTF16ShouldGenerateUTF8CallToProducer() throws UnsupportedEncodingException {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -257,13 +251,13 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     String inContentType = mockProducer.getInHeader("Content-Type");
     assertStringContains(inContentType, "UTF-8");
 
-    String xmlEncoding = mockProducer.getInBodyXmlReader().getEncoding(); ;
+    String xmlEncoding = mockProducer.getInBodyXmlReader().getEncoding();
     assertEquals("UTF-8", xmlEncoding);
 
   }
 
   @Test
-  public void callHttpVPLargePayloadHappyDays() {
+  void callHttpVPLargePayloadHappyDays() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -286,7 +280,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void callHttpsVPLargePayloadHappyDays() {
+  void callHttpsVPLargePayloadHappyDays() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -322,7 +316,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
    * </ul>
    */
   @Test
-  public void testLoadBalancerXForwardedInfo() throws Exception {
+  void testLoadBalancerXForwardedInfo() {
 
     mockProducer.setResponseBody("<mocked answer/>");
 
@@ -348,7 +342,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void getWsdlByHttpsHappyDays() {
+  void getWsdlByHttpsHappyDays() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -363,7 +357,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void getWsdlByHttpHappyDays() {
+  void getWsdlByHttpHappyDays() {
     String response = testConsumer
         .sendHttpRequestToVP("/clinicalprocess/healthcond/certificate/GetCertificate/2/rivtabp21?wsdl",
             null, new HashMap<>());
@@ -376,7 +370,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void getXsdByHttpsHappyDays() {
+  void getXsdByHttpsHappyDays() {
     String response = testConsumer
         .sendHttpsRequestToVP(
             "clinicalprocess/healthcond/certificate/GetCertificate/2/rivtabp21?xsd=../../core_components/itintegration_registry_1.0.xsd",
@@ -387,7 +381,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void getXsdByHttpHappyDays() {
+  void getXsdByHttpHappyDays() {
     String response = testConsumer
         .sendHttpRequestToVP(
             "clinicalprocess/healthcond/certificate/GetCertificate/2/rivtabp21?xsd=../../core_components/itintegration_registry_1.0.xsd",

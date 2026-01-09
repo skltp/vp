@@ -4,11 +4,18 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.apache.camel.support.jsse.CipherSuitesParameters;
+import org.apache.camel.support.jsse.KeyManagersParameters;
+import org.apache.camel.support.jsse.KeyStoreParameters;
+import org.apache.camel.support.jsse.SSLContextParameters;
+import org.apache.camel.support.jsse.SecureSocketProtocolsParameters;
+import org.apache.camel.support.jsse.TrustManagersParameters;
 import se.skl.tp.vp.constants.HttpHeaders;
 
 import org.apache.camel.CamelContext;
@@ -29,9 +36,24 @@ public class MockProducer {
   private String responseResourceXml =null;
   private Integer timeout=0;
 
+  // Add SSL configuration fields
+  private String[] enabledProtocols;
+  private String[] enabledCipherSuites;
+
+  // Server certificate configuration
+  private String serverKeystoreResource = "certs/tp.jks";
+  private String serverKeystorePassword = "password";
+
+  // Client certificate verification configuration
+  private boolean clientCertVerificationEnabled = false;
+  private static final String TRUSTED_CA_CERT_RESOURCE = "cert/truststore.jks";
+  private static final String TRUSTED_CA_CERT_PASSWORD = "password";
+
   private RandomCollection<Integer> weightedTimeouts = new RandomCollection<>();
 
   private CamelContext camelContext;
+
+  private String producerAddress;
 
   String inBody;
   XMLStreamReader inBodyXmlReader;
@@ -48,8 +70,30 @@ public class MockProducer {
     start(producerAddress);
   }
 
+  public MockProducer withServerKeystore(String resource,  String password) {
+    this.serverKeystoreResource = resource;
+    this.serverKeystorePassword = password;
+    return this;
+  }
 
+  public MockProducer withProtocols(String... protocols) {
+    this.enabledProtocols = protocols;
+    return this;
+  }
+
+  public MockProducer withCipherSuites(String... cipherSuites) {
+    this.enabledCipherSuites = cipherSuites;
+    return this;
+  }
+
+  public MockProducer withClientCertVerification(boolean enabled) {
+    this.clientCertVerificationEnabled = enabled;
+    return this;
+  }
+
+  @SuppressWarnings("java:S2925") // Sleep is needed to simulate timeout
   public void start(String producerAddress) throws Exception {
+    this.producerAddress = producerAddress;
     inHeaders.clear();
     outHeaders.clear();
     inBody=null;
@@ -61,8 +105,20 @@ public class MockProducer {
 
     camelContext.addRoutes(new RouteBuilder() {
       @Override
-      public void configure() throws Exception {
-        from(NETTY_HTTP + producerAddress).id(producerAddress).routeDescription("Producer")
+      public void configure() {
+        StringBuilder endpoint = new StringBuilder(NETTY_HTTP).append(producerAddress);
+
+        if (producerAddress.startsWith("https")) {
+          SSLContextParameters sslParams = createSslContextParameters();
+          String paramName = "mockProducerSSL-" + producerAddress.hashCode();
+          getContext().getRegistry().bind(paramName, sslParams);
+          endpoint.append("?sslContextParameters=#").append(paramName).append("&ssl=true");
+          if (clientCertVerificationEnabled) {
+            endpoint.append("&needClientAuth=true");
+          }
+        }
+
+        from(endpoint.toString()).id(producerAddress).routeDescription("Producer")
             .process((Exchange exchange) -> {
               inHeaders.putAll(exchange.getIn().getHeaders());
               inBody = exchange.getIn().getBody(String.class);
@@ -82,6 +138,77 @@ public class MockProducer {
     });
   }
 
+  public void stop() throws Exception {
+    Route route = camelContext.getRoute(producerAddress);
+    if (route != null) {
+      camelContext.getRouteController().stopRoute(producerAddress);
+      camelContext.removeRoute(producerAddress);
+
+      // Also unbind the SSL context parameters from registry to fully clean up
+      if (producerAddress.startsWith("https")) {
+        String paramName = "mockProducerSSL-" + producerAddress.hashCode();
+        try {
+          camelContext.getRegistry().unbind(paramName);
+        } catch (Exception e) {
+          // Ignore if not found
+          log.debug("Could not unbind SSL parameters '{}': {}", paramName, e.getMessage());
+        }
+      }
+
+      log.info("Producer route with address '{}' stopped and removed", producerAddress);
+    }
+  }
+
+  private SSLContextParameters createSslContextParameters(){
+    SSLContextParameters sslParams = new SSLContextParameters();
+
+    try {
+      if (serverKeystoreResource != null && serverKeystorePassword != null) {
+        KeyStoreParameters keyStoreParams = new KeyStoreParameters();
+        keyStoreParams.setResource("classpath:" + serverKeystoreResource);
+        keyStoreParams.setPassword(serverKeystorePassword);
+        keyStoreParams.setType("JKS");
+
+        KeyManagersParameters keyManagersParams = new KeyManagersParameters();
+        keyManagersParams.setKeyStore(keyStoreParams);
+        keyManagersParams.setKeyPassword(serverKeystorePassword);
+
+        sslParams.setKeyManagers(keyManagersParams);
+      }
+
+      // Configure client certificate verification if enabled
+      if (clientCertVerificationEnabled) {
+        KeyStoreParameters trustStoreParams = new KeyStoreParameters();
+        trustStoreParams.setResource("classpath:" + TRUSTED_CA_CERT_RESOURCE);
+        trustStoreParams.setPassword(TRUSTED_CA_CERT_PASSWORD);
+        trustStoreParams.setType("JKS");
+
+        TrustManagersParameters trustManagersParams = new TrustManagersParameters();
+        trustManagersParams.setKeyStore(trustStoreParams);
+
+        sslParams.setTrustManagers(trustManagersParams);
+      }
+
+      if (enabledProtocols != null) {
+        SecureSocketProtocolsParameters protocols = new SecureSocketProtocolsParameters();
+        protocols.setSecureSocketProtocol(java.util.Arrays.asList(enabledProtocols));
+        sslParams.setSecureSocketProtocols(protocols);
+      }
+
+      if (enabledCipherSuites != null) {
+        CipherSuitesParameters ciphers = new CipherSuitesParameters();
+        ciphers.setCipherSuite(java.util.Arrays.asList(enabledCipherSuites));
+        sslParams.setCipherSuites(ciphers);
+      }
+
+    } catch (Exception e) {
+      log.error("Failed to configure SSL context parameters", e);
+      throw new RuntimeException("Failed to configure SSL context parameters", e);
+    }
+
+    return sslParams;
+  }
+
   private long getTimeoutValue() {
     if(weightedTimeouts.isEmpty()){
       return timeout;
@@ -91,7 +218,7 @@ public class MockProducer {
 
   private void updateRoutingHistory() {
 	  String routinghistory = getInHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
-	  if(routinghistory == null || routinghistory.length() == 0)
+	  if(routinghistory == null || routinghistory.isEmpty())
           addResponseHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, "mock-producer");
 	  else
           addResponseHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY, routinghistory +",mock-producer");		  
@@ -107,8 +234,20 @@ public class MockProducer {
 
   private void addResponseFromFile(Exchange exchange, String fileName) throws IOException, XMLStreamException {
     final URL resource = Thread.currentThread().getContextClassLoader().getResource(fileName);
+    assert resource != null;
     final XMLStreamReader xstream = XMLInputFactory.newInstance().createXMLStreamReader(resource.openStream());
     exchange.getMessage().setBody(xstream);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    MockProducer that = (MockProducer) o;
+    return Objects.equals(getProducerAddress(), that.getProducerAddress());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getProducerAddress());
+  }
 }

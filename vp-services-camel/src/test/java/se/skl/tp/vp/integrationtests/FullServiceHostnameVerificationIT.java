@@ -1,6 +1,7 @@
 package se.skl.tp.vp.integrationtests;
 
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,17 +42,13 @@ public class FullServiceHostnameVerificationIT extends LeakDetectionBaseTest {
     String vpInstanceId;
 
     @BeforeEach
-    public void before() {
-        try {
-            mockHttpsProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    void before() throws Exception {
+        mockHttpsProducer.withServerKeystore(null, null).start(HTTPS_PRODUCER_URL);
         TestLogAppender.clearEvents();
     }
 
     @Test
-    public void unknownCertificateAtProducerGivesVP009() {
+    void unknownCertificateAtProducerGivesVP009() {
         mockHttpsProducer.setResponseBody("<mocked answer/>");
 
         Map<String, Object> headers = new HashMap<>();
@@ -61,6 +58,7 @@ public class FullServiceHostnameVerificationIT extends LeakDetectionBaseTest {
 
         assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
         String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+        Assertions.assertNotNull(errorLogMsg);
         assertStringContains(errorLogMsg, "VP009");
         assertStringContains(errorLogMsg, "SSLHandshakeException");
     }

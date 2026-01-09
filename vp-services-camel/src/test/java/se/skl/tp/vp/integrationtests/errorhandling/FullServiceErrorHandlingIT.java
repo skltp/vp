@@ -96,7 +96,7 @@ public class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   @BeforeEach
   public void beforeTest(){
     try {
-      mockHttpsProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");
+      mockHttpsProducer.start(HTTPS_PRODUCER_URL);
     } catch (Exception e) {
       e.printStackTrace();
     }
