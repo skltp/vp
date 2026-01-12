@@ -49,6 +49,24 @@
     <ns2:tomTidpunkt>2123-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
   </anropsBehorighetsInfo>
   <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>3</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpsProducerStrict</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2123-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
+    <ns2:anropsBehorighetsInfoId>3</ns2:anropsBehorighetsInfoId>
+    <ns2:receiverId>HttpsProducerLegacy</ns2:receiverId>
+    <ns2:senderId>tp</ns2:senderId>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
+    </ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.293+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2123-08-09T14:25:24.294+02:00</ns2:tomTidpunkt>
+  </anropsBehorighetsInfo>
+  <anropsBehorighetsInfo>
     <ns2:anropsBehorighetsInfoId>4</ns2:anropsBehorighetsInfoId>
     <ns2:receiverId>RecevierNoProducerAvailable</ns2:receiverId>
     <ns2:senderId>tp</ns2:senderId>

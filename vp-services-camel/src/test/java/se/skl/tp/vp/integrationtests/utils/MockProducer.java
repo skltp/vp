@@ -15,7 +15,6 @@ import org.apache.camel.support.jsse.KeyManagersParameters;
 import org.apache.camel.support.jsse.KeyStoreParameters;
 import org.apache.camel.support.jsse.SSLContextParameters;
 import org.apache.camel.support.jsse.SecureSocketProtocolsParameters;
-import org.apache.camel.support.jsse.TrustManagersParameters;
 import se.skl.tp.vp.constants.HttpHeaders;
 
 import org.apache.camel.CamelContext;
@@ -43,9 +42,9 @@ public class MockProducer {
   // Server certificate configuration
   private String serverKeystoreResource = "certs/tp.jks";
   private String serverKeystorePassword = "password";
+  private String serverKeystoreType = "JKS";
 
   // Client certificate verification configuration
-  private boolean clientCertVerificationEnabled = false;
   private static final String TRUSTED_CA_CERT_RESOURCE = "cert/truststore.jks";
   private static final String TRUSTED_CA_CERT_PASSWORD = "password";
 
@@ -73,6 +72,12 @@ public class MockProducer {
   public MockProducer withServerKeystore(String resource,  String password) {
     this.serverKeystoreResource = resource;
     this.serverKeystorePassword = password;
+    // Detect keystore type from file extension
+    if (resource != null && (resource.endsWith(".p12") || resource.endsWith(".pfx"))) {
+      this.serverKeystoreType = "PKCS12";
+    } else {
+      this.serverKeystoreType = "JKS";
+    }
     return this;
   }
 
@@ -83,11 +88,6 @@ public class MockProducer {
 
   public MockProducer withCipherSuites(String... cipherSuites) {
     this.enabledCipherSuites = cipherSuites;
-    return this;
-  }
-
-  public MockProducer withClientCertVerification(boolean enabled) {
-    this.clientCertVerificationEnabled = enabled;
     return this;
   }
 
@@ -113,9 +113,6 @@ public class MockProducer {
           String paramName = "mockProducerSSL-" + producerAddress.hashCode();
           getContext().getRegistry().bind(paramName, sslParams);
           endpoint.append("?sslContextParameters=#").append(paramName).append("&ssl=true");
-          if (clientCertVerificationEnabled) {
-            endpoint.append("&needClientAuth=true");
-          }
         }
 
         from(endpoint.toString()).id(producerAddress).routeDescription("Producer")
@@ -167,26 +164,13 @@ public class MockProducer {
         KeyStoreParameters keyStoreParams = new KeyStoreParameters();
         keyStoreParams.setResource("classpath:" + serverKeystoreResource);
         keyStoreParams.setPassword(serverKeystorePassword);
-        keyStoreParams.setType("JKS");
+        keyStoreParams.setType(serverKeystoreType);
 
         KeyManagersParameters keyManagersParams = new KeyManagersParameters();
         keyManagersParams.setKeyStore(keyStoreParams);
         keyManagersParams.setKeyPassword(serverKeystorePassword);
 
         sslParams.setKeyManagers(keyManagersParams);
-      }
-
-      // Configure client certificate verification if enabled
-      if (clientCertVerificationEnabled) {
-        KeyStoreParameters trustStoreParams = new KeyStoreParameters();
-        trustStoreParams.setResource("classpath:" + TRUSTED_CA_CERT_RESOURCE);
-        trustStoreParams.setPassword(TRUSTED_CA_CERT_PASSWORD);
-        trustStoreParams.setType("JKS");
-
-        TrustManagersParameters trustManagersParams = new TrustManagersParameters();
-        trustManagersParams.setKeyStore(trustStoreParams);
-
-        sslParams.setTrustManagers(trustManagersParams);
       }
 
       if (enabledProtocols != null) {

@@ -27,7 +27,7 @@ import javax.net.ssl.*;
 public class SSLContextParametersConfig {
 
     public static final String DELIMITER = ",";
-    public static final String DEPRECATED_CONTEXT = "deprecated";
+    public static final String DEPRECATED_CONTEXT = "default";
 
     private final SecurityProperties securityProperies;
     private final CamelContext camelContext;

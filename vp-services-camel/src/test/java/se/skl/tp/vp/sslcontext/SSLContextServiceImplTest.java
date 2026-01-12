@@ -226,7 +226,7 @@ class SSLContextServiceImplTest {
 
         String contextId = sslContextService.getClientSSLContextId("example.com:443");
 
-        assertEquals("SSLContext-deprecated", contextId);
+        assertEquals("SSLContext-default", contextId);
     }
 
     @Test
