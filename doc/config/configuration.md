@@ -90,66 +90,103 @@ Spring-boot property fil som ligger under resources i jaren. Inställningarna ka
 ### Application-security.properties ###
 Default Spring-boot property fil (Kräver att Spring profilen 'security' är aktiverad). Denna fil i original ligger under resources i jaren. Inställningarna kan överlagras enligt de sätt som Spring-boot föreskriver. 
 
+#### SSL Bundles ####
+SSL bundles är det rekommenderade sättet att konfigurera certifikat i moderna Spring Boot-applikationer. Bundles definieras med `spring.ssl.bundle.*` och refereras sedan från `vp.tls.*` konfigurationen.
+
 |Nyckel|Defaultvärde/Exempel|Beskrivning|
 |------|--------------------|----------|
-|tp.tls.store.location|/certs/|Mapp där certifikaten kan hittas|
-|tp.tls.store.truststore.file|truststore.jks|Ska innehålla namn på de CA’s och Certifikat som VP kan lita på|
-|tp.tls.store.truststore.password|<password>|Lösenord för trust-store|
-|tp.tls.store.producer.file|tp.jks|Certifikat som används av VP i rollen som producent|
-|tp.tls.store.producer.password|<password>|Lösenord för producent-certifikatet|
-|tp.tls.store.producer.keyPassword|<password>|Lösenord för den privata nyckeln i producent-certifikatet|
-|tp.tls.store.consumer.file|client.jks|Certifikat som används av VP i rollen som konsument|
-|tp.tls.store.consumer.password|<password>|Lösenord för konsument-certifikatet|
-|tp.tls.store.consumer.keyPassword|<password>|Lösenord för den privata nyckeln i konsument-certifikatet|
-|tp.tls.allowedIncomingProtocols|TLSv1,TLSv1.1,TLSv1.2|Godkända protokoll för inkommande trafik|
-|tp.tls.allowedOutgoingProtocols |TLSv1,TLSv1.1,TLSv1.2|Godkända protokoll för utgående trafik|
+|spring.ssl.bundle.pem.\<bundle-name\>.keystore.certificate|classpath:/certs/client-cert.pem|Sökväg till certifikatfilen (PEM-format)|
+|spring.ssl.bundle.pem.\<bundle-name\>.keystore.private-key|classpath:/certs/client-key.pem|Sökväg till privat nyckel (PEM-format)|
+|spring.ssl.bundle.pem.\<bundle-name\>.keystore.private-key-password|<password>|Lösenord för privat nyckel (valfritt)|
+|spring.ssl.bundle.pem.\<bundle-name\>.truststore.certificate|classpath:/certs/ca-cert.pem|Sökväg till CA-certifikat för trust (PEM-format)|
 
-### Timeoutconfig.json ###
- För att konfigurera olika timeout’s på olika tjänstekontrakt redigeras denna. Default värdet sätts genom att konfigurera timouten där nyckeln 'tjanstekontrakt' har värdet 'default_timeouts'. För att konfigurera specifika timeouter för ett tjänstekontrakt skall nyckeln 'tjanstekontrakt' sättas till namnet på tjänstekontraktet. I `application.properties` pekas denna fil ut av nyckeln `timeout.json.file`. Filen är i json format enligt:
-```
-[
-  {
-    "tjanstekontrakt": "default_timeouts",
-    "routetimeout": 30000,
-    "producertimeout": 30000
-  },  
-  {
-    "tjanstekontrakt": "urn:riv.processdevelopment:infections:DeleteActivityResponder:1",
-    "routetimeout": 5000,
-    "producertimeout": 5000
-  },
-  {
-    "tjanstekontrakt": "urn:riv:processdevelopment:infections:DeleteCareEncounterResponder:1",
-    "routetimeout": 4000,
-    "producertimeout": 4000
-  }
-]
-```
-Producertimeout anger hur lång tid producenten har på sig att svara. Routetimeout används inte i nuläget.
-Nycklarna och deras default-värden är:
+Exempel på bundle-definition:
+```properties
+spring.ssl.bundle.pem.prod.keystore.certificate=classpath:/certs/tp-cert.pem
+spring.ssl.bundle.pem.prod.keystore.private-key=classpath:/certs/tp-key.pem
+spring.ssl.bundle.pem.prod.keystore.private-key-password=password
+spring.ssl.bundle.pem.prod.truststore.certificate=classpath:/certs/ca-cert.pem
 
-|Nyckel|Defaultvärde/Exempel|
-|------|--------------------|
-|"tjanstekontrakt"|"default_timeouts"|
-|"routetimeout"|30000|
-|"producertimeout"|29000|
+spring.ssl.bundle.pem.cons.truststore.certificate=classpath:/certs/ca-cert.pem
+```
 
-### Wsdlconfig.json ###
-I `application.properties` pekas denna fil ut av nyckeln `wsdl.json.file`. Om man har wsdl-filer som av någon anledning inte följer namnstandarden, så kan man lägga in dem i denna fil, på det format som framgår nedan. Filen ska vara en komma-separerad lista på wsdl:er i json-format:
+#### TLS-konfiguration (vp.tls.*) ####
+**OBS: Detta är den rekommenderade konfigurationen. Den ersätter den äldre `tp.tls.*` konfigurationen för utgående trafik.**
+
+TLS-konfigurationen styr vilka SSL-bundles som ska användas samt vilka protokoll och cipher suites som är tillåtna. Konfigurationen stödjer både en default-konfiguration och specifika overrides för olika mål baserat på domännamn, suffix eller port.
+
+##### Default-konfiguration #####
+|Nyckel|Defaultvärde/Exempel| Beskrivning                                                                                |
+|------|--------------------|--------------------------------------------------------------------------------------------|
+|vp.tls.default-config.name|default| Namn på konfigurationen. Måste vara unikt.                                                 |
+|vp.tls.default-config.bundle|prod| Namn på SSL-bundle som ska användas (refererar till spring.ssl.bundle.pem.\<bundle-name\>) |
+|vp.tls.default-config.protocols-include|TLSv1.2,TLSv1.3| Komma-separerad lista av tillåtna TLS-protokoll (vitlistning)                              |
+|vp.tls.default-config.protocols-exclude| | Komma-separerad lista av protokoll som ska exkluderas (svartlistning)                      |
+|vp.tls.default-config.cipher-suites-include|TLS_AES_256_GCM_SHA384,...| Komma-separerad lista av tillåtna cipher suites (vitlistning)                              |
+|vp.tls.default-config.cipher-suites-exclude| | Komma-separerad lista av cipher suites som ska exkluderas (svartlistning)                  |
+
+Namn och bundle är obligatoriska. Protokoll och cipher suites är valfria. Om ingen specificeras används Spring Boots default-värden.
+
+Använd antingen vitlistning eller svartlistning, inte båda. Om include används tas endast de angivna med. Om exclude används tas alla default-värden utom de angivna med.
+
+##### Override-konfiguration #####
+Overrides används för att konfigurera specifika TLS-inställningar för vissa mål. Detta är användbart när olika tjänsteproducenter kräver olika säkerhetsinställningar.
+
+|Nyckel|Defaultvärde/Exempel| Beskrivning                                                               |
+|------|--------------------|---------------------------------------------------------------------------|
+|vp.tls.overrides[].name|strict| Namn på konfigurationen. Måste vara unikt.                                |
+|vp.tls.overrides[].bundle|strict-bundle| Namn på SSL-bundle för denna override                                     |
+|vp.tls.overrides[].protocols-include|TLSv1.3| Tillåtna protokoll för denna override (vitlistning)                       |
+|vp.tls.default-config.protocols-exclude| | Komma-separerad lista av protokoll som ska exkluderas (svartlistning)     |
+|vp.tls.overrides[].cipher-suites-include|TLS_AES_256_GCM_SHA384| Tillåtna cipher suites för denna override (vitlistning)                   |
+|vp.tls.default-config.cipher-suites-exclude| | Komma-separerad lista av cipher suites som ska exkluderas (svartlistning) |
+|vp.tls.overrides[].match.domain-name|secure.example.com| Matcha exakt domännamn                                                    |
+|vp.tls.overrides[].match.domain-suffix|.example.com| Matcha domänsuffix                                                        |
+|vp.tls.overrides[].match.port|8443| Matcha specifik port                                                      |
+
+Namn, bundle och någon match-konfiguration är obligatoriska. Protokoll och cipher suites är valfria. Om ingen specificeras används Spring Boots default-värden.
+
+Använd antingen vitlistning eller svartlistning, inte båda. Om include används tas endast de angivna med. Om exclude används tas alla default-värden utom de angivna med.
+
+Exakt matchning av domännamn prioriteras högst, så om både `domain-name` och `domain-suffix` är angivna, kommer `domain-name` att användas först.
+Portmatchning kan kombineras med domänmatchning för mer specifika regler.
+
+Exempel på override-konfiguration:
+```properties
+# Override för strängare säkerhet mot vissa domäner
+vp.tls.overrides[0].name=strict
+vp.tls.overrides[0].bundle=strict-bundle
+vp.tls.overrides[0].protocols-include=TLSv1.3
+vp.tls.overrides[0].cipher-suites-include=TLS_AES_256_GCM_SHA384
+vp.tls.overrides[0].match.domain-suffix=.secure-domain.com
+
+# Override för legacy-system som kräver äldre protokoll
+vp.tls.overrides[1].name=legacy
+vp.tls.overrides[1].bundle=legacy-bundle
+vp.tls.overrides[1].protocols-include=TLSv1.2,TLSv1.1
+vp.tls.overrides[1].match.domain-name=legacy.example.com
+vp.tls.overrides[1].match.port=8080
 ```
-[
-  {
-   "tjanstekontrakt": "urn:riv:clinicalprocess:activity:actions:DeleteActivityResponder:1",    
-   "wsdlfilepath": "classpath:testfiles/wsdl/clinicalprocess.activity.actions.GetActivities.1.rivtabp21/schemas/interactions/GetActivitiesInteraction/GetActivitiesInteraction_1.0_RIVTABP21.wsdl",    
-   "wsdlurl": "vp/SomWeirdUrlNotFollowingNamingConventions"  
-  }, 
-  {
-   "tjanstekontrakt":"x:x:x:x:1", 
-   "wsdlfilepath":"classpath:xxx/yyy/GetSomethingInteraction_1.0_RIVTAB21.wsdl", 
-   "wsdlurl":"vp/SomWeirdUrlNotFollowingNamingConventions"  
-  }
-]
-```
+
+#### tp.tls.* (DEPRECATED) ####
+**️ VARNING: Denna konfiguration är deprecated och kommer att tas bort i framtida versioner. Migrera till `vp.tls.*` och SSL bundles så snart som möjligt.**
+
+|Nyckel|Defaultvärde/Exempel|Beskrivning|
+|------|--------------------|----------|
+|tp.tls.store.location|/certs/|**(DEPRECATED)** Mapp där certifikaten kan hittas|
+|tp.tls.store.truststore.file|truststore.jks|**(DEPRECATED)** Ska innehålla namn på de CA's och Certifikat som VP kan lita på|
+|tp.tls.store.truststore.password|<password>|**(DEPRECATED)** Lösenord för trust-store|
+|tp.tls.store.producer.file|tp.jks|**(DEPRECATED)** Certifikat som används av VP i rollen som producent|
+|tp.tls.store.producer.password|<password>|**(DEPRECATED)** Lösenord för producent-certifikatet|
+|tp.tls.store.producer.keyPassword|<password>|**(DEPRECATED)** Lösenord för den privata nyckeln i producent-certifikatet|
+|tp.tls.store.consumer.file|client.jks|**(DEPRECATED)** Certifikat som används av VP i rollen som konsument|
+|tp.tls.store.consumer.password|<password>|**(DEPRECATED)** Lösenord för konsument-certifikatet|
+|tp.tls.store.consumer.keyPassword|<password>|**(DEPRECATED)** Lösenord för den privata nyckeln i konsument-certifikatet|
+|tp.tls.allowedIncomingProtocols|TLSv1,TLSv1.1,TLSv1.2|**(DEPRECATED)** Godkända protokoll för inkommande trafik|
+|tp.tls.allowedOutgoingProtocols |TLSv1,TLSv1.1,TLSv1.2|**(DEPRECATED)** Godkända protokoll för utgående trafik|
+|tp.tls.allowedIncomingCipherSuites|*|**(DEPRECATED)** Godkända cipher suites för inkommande trafik (* = alla)|
+|tp.tls.allowedOutgoingCipherSuites|*|**(DEPRECATED)** Godkända cipher suites för utgående trafik (* = alla)|
+
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
