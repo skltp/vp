@@ -1,7 +1,5 @@
 # Certifikat för test
 
-Lokala certifikat för test med WireMock eller liknande.
-
 ## CA
 
 ```sh

@@ -1,5 +1,6 @@
 package se.skl.tp.vp.integrationtests;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 
@@ -151,6 +152,9 @@ public class TLSConfigurationIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_DEFAULT), headers);
 
     assertEquals("<default-tls-response/>", response);
+    assertEquals("TLSv1.3", mockProducerDefault.getLastNegotiatedProtocol());
+    assertThat(mockProducerDefault.getLastNegotiatedCipherSuite())
+        .isIn("TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384");
   }
 
   /**
@@ -180,6 +184,8 @@ public class TLSConfigurationIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_STRICT), headers);
 
     assertEquals("<strict-tls-response/>", response);
+    assertEquals("TLSv1.3", mockProducerStrict.getLastNegotiatedProtocol());
+    assertEquals("TLS_AES_128_GCM_SHA256", mockProducerStrict.getLastNegotiatedCipherSuite());
   }
 
   /**
@@ -206,6 +212,7 @@ public class TLSConfigurationIT extends LeakDetectionBaseTest {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest(RECEIVER_LEGACY), headers);
 
     assertEquals("<legacy-tls-response/>", response);
+    assertEquals("TLSv1.2", mockProducerLegacy.getLastNegotiatedProtocol());
   }
 
   /**

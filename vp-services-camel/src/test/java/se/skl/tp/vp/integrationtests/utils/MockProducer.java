@@ -9,6 +9,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.camel.support.jsse.CipherSuitesParameters;
 import org.apache.camel.support.jsse.KeyManagersParameters;
@@ -58,6 +59,12 @@ public class MockProducer {
   XMLStreamReader inBodyXmlReader;
   Map<String, Object> inHeaders = new HashMap<>();
   Map<String, Object> outHeaders = new HashMap<>();
+
+  // SSL session information
+  @Getter
+  private String lastNegotiatedProtocol;
+  @Getter
+  private String lastNegotiatedCipherSuite;
 
   @Autowired
   public MockProducer(CamelContext camelContext){
@@ -117,6 +124,20 @@ public class MockProducer {
 
         from(endpoint.toString()).id(producerAddress).routeDescription("Producer")
             .process((Exchange exchange) -> {
+              // Capture SSL session information if available
+              try {
+                javax.net.ssl.SSLSession sslSession = exchange.getIn().getHeader(
+                    "CamelNettySSLSession", javax.net.ssl.SSLSession.class);
+                if (sslSession != null) {
+                  lastNegotiatedProtocol = sslSession.getProtocol();
+                  lastNegotiatedCipherSuite = sslSession.getCipherSuite();
+                  log.debug("Captured SSL session - Protocol: {}, CipherSuite: {}",
+                      lastNegotiatedProtocol, lastNegotiatedCipherSuite);
+                }
+              } catch (Exception e) {
+                log.debug("Could not retrieve SSL session information", e);
+              }
+
               inHeaders.putAll(exchange.getIn().getHeaders());
               inBody = exchange.getIn().getBody(String.class);
               inBodyXmlReader = exchange.getIn().getBody(XMLStreamReader.class);
