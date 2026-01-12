@@ -14,7 +14,7 @@ public class SelectSslContextProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String vagvalHost = exchange.getProperty(VPExchangeProperties.VAGVAL_HOST, String.class);
-        if (vagvalHost == null) {
+        if (vagvalHost == null || vagvalHost.isBlank()) {
             throw new IllegalStateException("Vagval not set in exchange properties");
         }
         String sslContextId = sslContextService.getClientSSLContextId(vagvalHost);
