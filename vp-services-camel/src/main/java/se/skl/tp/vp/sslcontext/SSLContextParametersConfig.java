@@ -50,6 +50,8 @@ public class SSLContextParametersConfig {
     @PostConstruct
     public void registerSSLContextParameters() throws GeneralSecurityException, IOException {
         if (tlsProperties.getDefaultConfig() != null) {
+            validateUniqueConfigurationNames();
+
             SSLContextParameters defaultParams = createSSLContextParameters(tlsProperties.getDefaultConfig());
             camelContext.getRegistry().bind(getId(tlsProperties.getDefaultConfig().getName()), defaultParams);
 
@@ -62,6 +64,36 @@ public class SSLContextParametersConfig {
         } else {
             registerDeprecatedSSLContextParameters();
         }
+    }
+
+    private void validateUniqueConfigurationNames() {
+        List<String> allNames = getAllNames();
+
+        List<String> duplicates = allNames.stream()
+            .filter(name -> allNames.stream().filter(n -> n.equals(name)).count() > 1)
+            .distinct()
+            .toList();
+
+        if (!duplicates.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Duplicate TLS configuration names found: " + String.join(", ", duplicates)
+            );
+        }
+    }
+
+    private @NonNull List<String> getAllNames() {
+        List<String> allNames = new ArrayList<>();
+        if (tlsProperties.getDefaultConfig() != null && tlsProperties.getDefaultConfig().getName() != null) {
+            allNames.add(tlsProperties.getDefaultConfig().getName());
+        }
+        if (tlsProperties.getOverrides() != null) {
+            for (var override : tlsProperties.getOverrides()) {
+                if (override.getName() != null) {
+                    allNames.add(override.getName());
+                }
+            }
+        }
+        return allNames;
     }
 
     private void registerDeprecatedSSLContextParameters() {

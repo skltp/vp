@@ -301,4 +301,140 @@ class SSLContextParametersConfigTest {
         assertEquals(2, legacyParams.getSecureSocketProtocols().getSecureSocketProtocol().size());
         assertNull(legacyParams.getCipherSuites());
     }
+
+    @Test
+    void testRegisterSSLContextParameters_DuplicateNameInOverrides_ThrowsException() {
+        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        defaultConfig.setName("default");
+        defaultConfig.setBundle("default-bundle");
+        tlsProperties.setDefaultConfig(defaultConfig);
+
+        TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
+        override1.setName("duplicate");
+        override1.setBundle("bundle1");
+
+        TLSProperties.TLSOverride override2 = new TLSProperties.TLSOverride();
+        override2.setName("duplicate");
+        override2.setBundle("bundle2");
+
+        tlsProperties.setOverrides(Arrays.asList(override1, override2));
+
+        config = new SSLContextParametersConfig(securityProperties, camelContext, sslBundles, tlsProperties);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> config.registerSSLContextParameters());
+
+        assertTrue(exception.getMessage().contains("Duplicate TLS configuration names found"));
+        assertTrue(exception.getMessage().contains("duplicate"));
+    }
+
+    @Test
+    void testRegisterSSLContextParameters_DefaultNameDuplicatedInOverride_ThrowsException() {
+        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        defaultConfig.setName("sameName");
+        defaultConfig.setBundle("default-bundle");
+        tlsProperties.setDefaultConfig(defaultConfig);
+
+        TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
+        override1.setName("sameName");
+        override1.setBundle("override-bundle");
+
+        tlsProperties.setOverrides(List.of(override1));
+
+        config = new SSLContextParametersConfig(securityProperties, camelContext, sslBundles, tlsProperties);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> config.registerSSLContextParameters());
+
+        assertTrue(exception.getMessage().contains("Duplicate TLS configuration names found"));
+        assertTrue(exception.getMessage().contains("sameName"));
+    }
+
+    @Test
+    void testRegisterSSLContextParameters_MultipleDuplicates_ThrowsException() {
+        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        defaultConfig.setName("default");
+        defaultConfig.setBundle("default-bundle");
+        tlsProperties.setDefaultConfig(defaultConfig);
+
+        TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
+        override1.setName("dup1");
+        override1.setBundle("bundle1");
+
+        TLSProperties.TLSOverride override2 = new TLSProperties.TLSOverride();
+        override2.setName("dup1");
+        override2.setBundle("bundle2");
+
+        TLSProperties.TLSOverride override3 = new TLSProperties.TLSOverride();
+        override3.setName("dup2");
+        override3.setBundle("bundle3");
+
+        TLSProperties.TLSOverride override4 = new TLSProperties.TLSOverride();
+        override4.setName("dup2");
+        override4.setBundle("bundle4");
+
+        tlsProperties.setOverrides(Arrays.asList(override1, override2, override3, override4));
+
+        config = new SSLContextParametersConfig(securityProperties, camelContext, sslBundles, tlsProperties);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> config.registerSSLContextParameters());
+
+        assertTrue(exception.getMessage().contains("Duplicate TLS configuration names found"));
+        assertTrue(exception.getMessage().contains("dup1"));
+        assertTrue(exception.getMessage().contains("dup2"));
+    }
+
+    @Test
+    void testRegisterSSLContextParameters_UniqueNames_NoException() {
+        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        defaultConfig.setName("default");
+        defaultConfig.setBundle("default-bundle");
+        tlsProperties.setDefaultConfig(defaultConfig);
+
+        TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
+        override1.setName("override1");
+        override1.setBundle("bundle1");
+
+        TLSProperties.TLSOverride override2 = new TLSProperties.TLSOverride();
+        override2.setName("override2");
+        override2.setBundle("bundle2");
+
+        TLSProperties.TLSOverride override3 = new TLSProperties.TLSOverride();
+        override3.setName("override3");
+        override3.setBundle("bundle3");
+
+        tlsProperties.setOverrides(Arrays.asList(override1, override2, override3));
+
+        config = new SSLContextParametersConfig(securityProperties, camelContext, sslBundles, tlsProperties);
+
+        assertDoesNotThrow(() -> config.registerSSLContextParameters());
+
+        assertNotNull(registry.lookupByName(SSLContextParametersConfig.getId("default")));
+        assertNotNull(registry.lookupByName(SSLContextParametersConfig.getId("override1")));
+        assertNotNull(registry.lookupByName(SSLContextParametersConfig.getId("override2")));
+        assertNotNull(registry.lookupByName(SSLContextParametersConfig.getId("override3")));
+    }
+
+    @Test
+    void testRegisterSSLContextParameters_NullNames_NoException() {
+        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        defaultConfig.setName("default");
+        defaultConfig.setBundle("default-bundle");
+        tlsProperties.setDefaultConfig(defaultConfig);
+
+        TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
+        override1.setName(null);
+        override1.setBundle("bundle1");
+
+        tlsProperties.setOverrides(List.of(override1));
+
+        config = new SSLContextParametersConfig(securityProperties, camelContext, sslBundles, tlsProperties);
+
+        // Should not throw exception for null names, but might fail during registration
+        // This test verifies that null names don't cause NPE in validation
+        assertDoesNotThrow(() -> config.registerSSLContextParameters());
+    }
 }
+
+
