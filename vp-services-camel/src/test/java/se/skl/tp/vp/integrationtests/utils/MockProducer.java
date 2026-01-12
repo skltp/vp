@@ -45,10 +45,6 @@ public class MockProducer {
   private String serverKeystorePassword = "password";
   private String serverKeystoreType = "JKS";
 
-  // Client certificate verification configuration
-  private static final String TRUSTED_CA_CERT_RESOURCE = "cert/truststore.jks";
-  private static final String TRUSTED_CA_CERT_PASSWORD = "password";
-
   private RandomCollection<Integer> weightedTimeouts = new RandomCollection<>();
 
   private CamelContext camelContext;
