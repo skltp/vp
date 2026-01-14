@@ -3,14 +3,13 @@ package se.skl.tp.vp.logging;
 import org.apache.camel.Exchange;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ObjectMessage;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import se.skl.tp.vp.logging.logentry.LogEntry;
-
-import java.util.HashMap;
+import se.skl.tp.vp.utils.SoapFaultExtractor;
+import se.skl.tp.vp.utils.SoapFaultInfo;
 
 
 public class MessageInfoLogger {
-
 
   public static final String REQ_IN = "se.skl.tp.vp.logging.req.in";
   public static final String REQ_OUT = "se.skl.tp.vp.logging.req.out";
@@ -33,6 +32,8 @@ public class MessageInfoLogger {
   private static final String MSG_TYPE_LOG_RESP_IN = "resp-in";
   private static final String MSG_TYPE_LOG_RESP_OUT = "resp-out";
   private static final String MSG_TYPE_ERROR = "error";
+
+  static SoapFaultExtractor soapFaultExtractor = new SoapFaultExtractor();
 
 
   public void logReqIn(Exchange exchange) {
@@ -68,19 +69,46 @@ public class MessageInfoLogger {
   public void log(Logger log, Exchange exchange, String messageType) {
     try {
       if (log.isDebugEnabled()) {
-        LogEntry logEntry = LogEntryBuilder.createLogEntry(messageType, exchange);
-        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOURCE, getClass().getName());
+        LogEntry logEntry = getLogEntry(exchange, messageType);
         logEntry.setPayload(exchange.getIn().getBody(String.class));
         log.debug(LogMessageFormatter.format(LOG_EVENT_DEBUG, logEntry));
       } else if (log.isInfoEnabled()) {
-        LogEntry logEntry = LogEntryBuilder.createLogEntry(messageType, exchange);
-        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOURCE, getClass().getName());
+        LogEntry logEntry = getLogEntry(exchange, messageType);
         log.info(LogMessageFormatter.format(LOG_EVENT_INFO, logEntry));
       }
-
     } catch (Exception e) {
       log.error("Failed log message: {}", messageType, e);
     }
   }
 
+  private @NonNull LogEntry getLogEntry(Exchange exchange, String messageType) {
+    LogEntry logEntry = LogEntryBuilder.createLogEntry(messageType, exchange);
+    logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOURCE, getClass().getName());
+    if (messageType.equals(MSG_TYPE_LOG_RESP_IN) && isErrorResponse(exchange)) {
+      extractSoapFaultInfo(exchange, logEntry);
+    }
+    return logEntry;
+  }
+
+  private boolean isErrorResponse(Exchange exchange) {
+    Object responseCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE);
+    return responseCode != null && responseCode.equals(500);
+  }
+
+  private void extractSoapFaultInfo(Exchange exchange, LogEntry logEntry) {
+    String body = exchange.getIn().getBody(String.class);
+    SoapFaultInfo faultInfo = soapFaultExtractor.extractSoapFault(body);
+
+    if (faultInfo.hasFaultInfo()) {
+      if (faultInfo.faultCode() != null) {
+        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOAP_FAULT_CODE, faultInfo.faultCode());
+      }
+      if (faultInfo.faultString() != null) {
+        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOAP_FAULT_STRING, faultInfo.faultString());
+      }
+      if (faultInfo.detail() != null) {
+        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOAP_FAULT_DETAIL, faultInfo.detail());
+      }
+    }
+  }
 }

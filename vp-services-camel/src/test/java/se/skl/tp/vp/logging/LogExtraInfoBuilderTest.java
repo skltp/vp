@@ -18,7 +18,7 @@ public class LogExtraInfoBuilderTest {
         headers.put("X-Forwarded-Tls-Client-Cert", "This-should-be-hidden");
         
         Map<String, String> result = new HashMap<String, String>();
-        LogExtraInfoBuilder.filterHeaders(headers, LogExtraInfoBuilder.FILTERHEADER_REGEX, result);
+        LogExtraInfoBuilder.filterHeaders(headers, result);
 
         assertAll(() -> result.values().forEach(str -> assertEquals(LogExtraInfoBuilder.FILTERED_TEXT, str)));
     }
