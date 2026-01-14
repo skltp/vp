@@ -14,8 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import se.skl.tp.vp.logging.logentry.LogEntry;
 import se.skl.tp.vp.logging.logentry.LogMessageExceptionType;
 import se.skl.tp.vp.logging.logentry.LogMessageType;
-import se.skl.tp.vp.utils.SoapFaultExtractor;
-import se.skl.tp.vp.utils.SoapFaultInfo;
+import se.skl.tp.vp.errorhandling.SoapFaultExtractor;
+import se.skl.tp.vp.errorhandling.SoapFaultInfo;
 
 import java.util.HashMap;
 import java.util.Map;

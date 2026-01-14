@@ -1,4 +1,4 @@
-package se.skl.tp.vp.utils;
+package se.skl.tp.vp.errorhandling;
 
 /**
  * Record containing extracted SOAP fault information.

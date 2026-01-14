@@ -1,4 +1,4 @@
-package se.skl.tp.vp.utils;
+package se.skl.tp.vp.errorhandling;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -1,4 +1,4 @@
-package se.skl.tp.vp.utils;
+package se.skl.tp.vp.errorhandling;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
