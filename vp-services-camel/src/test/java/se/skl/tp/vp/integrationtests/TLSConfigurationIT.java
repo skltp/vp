@@ -32,7 +32,7 @@ import se.skl.tp.vp.util.TestLogAppender;
  * Integration test that verifies vp.tls.default-config and vp.tls.overrides
  * configuration takes effect when connecting to producers with different TLS requirements.
  */
-@SuppressWarnings("JavadocLinkAsPlainText")
+@SuppressWarnings("JavadocLinkAsPlainText") // The IDE incorrectly flags the links in the Javadoc
 @CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -134,8 +134,7 @@ public class TLSConfigurationIT extends LeakDetectionBaseTest {
 
   /**
    * Verifies that:
-   * - Default SSL context is registered in the Camel registry with ID `SSLContext-default`
-   * - Default protocols (TLSv1.3) are configured
+   * - Default SSL context is registered in the Camel registry with ID `SSLContext-default`   * - Default protocols (TLSv1.3) are configured
    * - Default cipher suites (2 suites) are configured
    * - Requests to producer `HttpsProducer` at `https://localhost:19001` use the default config
    */

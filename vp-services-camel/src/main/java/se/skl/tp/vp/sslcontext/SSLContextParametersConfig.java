@@ -117,7 +117,7 @@ public class SSLContextParametersConfig {
         sslContextParameters.setSecureSocketProtocol(sspp.getSecureSocketProtocol().get(0));
 
         // Set cipher suites
-        if (notUsingAllCiphers(securityProperies.getAllowedIncomingCipherSuites())) {
+        if (notAllowingAllCiphers(securityProperies.getAllowedIncomingCipherSuites())) {
             CipherSuitesParameters cipherSuites = createCipherSuiteParameters(securityProperies.getAllowedIncomingCipherSuites());
             sslContextParameters.setCipherSuites(cipherSuites);
         }
@@ -161,7 +161,7 @@ public class SSLContextParametersConfig {
         return sslContextParameters;
     }
 
-    private boolean notUsingAllCiphers(String s) {
+    private boolean notAllowingAllCiphers(String s) {
         return (s != null && !s.isBlank() && !s.trim().equals("*"));
     }
 
@@ -267,7 +267,7 @@ public class SSLContextParametersConfig {
         sslContextParameters.setSecureSocketProtocols(sspp);
 
         // Set cipher suites
-        if (notUsingAllCiphers(securityProperies.getAllowedOutgoingCipherSuites())) {
+        if (notAllowingAllCiphers(securityProperies.getAllowedOutgoingCipherSuites())) {
             CipherSuitesParameters cipherSuites = createCipherSuiteParameters(securityProperies.getAllowedOutgoingCipherSuites());
             sslContextParameters.setCipherSuites(cipherSuites);
         }

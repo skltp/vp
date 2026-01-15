@@ -56,7 +56,7 @@ import se.skl.tp.vp.util.TestLogAppender;
 @StartTakService
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Disabled // Disabled to avoid running in CI/CD pipelines by mistake
-@SuppressWarnings({"java:S3577", "java:S2925", "NewClassNamingConvention"})
+@SuppressWarnings({"java:S3577", "java:S2925", "NewClassNamingConvention"}) // Thread.sleep is ok in load test, class name is descriptive
 public class ManualLoadTesting extends LeakDetectionBaseTest {
 
   private enum CallTypes {
@@ -101,7 +101,7 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
   Map<CallTypes, Long> randomCalls = new ConcurrentHashMap<>();
 
   @BeforeAll
-  @SuppressWarnings("java:S5786")
+  @SuppressWarnings("java:S5786") // Used both in @BeforeAll and direct calls, so must be public
   public static void startLeakDetection() {
     System.setProperty("spring.profiles.active", "leak");
     LeakDetectionBaseTest.startLeakDetection();
@@ -118,7 +118,7 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
 
 
   @Test
-  @SuppressWarnings("java:S2699")
+  @SuppressWarnings("java:S2699") // No assertions as this is a manual load test
   void justLoad() throws InterruptedException {
 
     startResetByPeerServer();

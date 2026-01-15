@@ -110,7 +110,7 @@ public class LogExtraInfoBuilder {
     }
   }
 
-  @SuppressWarnings("java:S125")
+  @SuppressWarnings("java:S125") // SonarQube incorrectly flags the URI as commented-out code
   private static String createWsdlNamespace(String serviceContractNS, String profile) {
     //  Convert from interaction target namespace
     //    urn:${domänPrefix}:${tjänsteDomän}:${tjänsteInteraktion}${roll}:${m}
