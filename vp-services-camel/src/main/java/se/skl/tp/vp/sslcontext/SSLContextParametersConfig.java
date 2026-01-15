@@ -3,7 +3,7 @@ package se.skl.tp.vp.sslcontext;
 import jakarta.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
 import org.apache.camel.support.jsse.*;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.springframework.lang.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ssl.SslBundle;
 import org.springframework.boot.ssl.SslBundles;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+
 import se.skl.tp.vp.config.SecurityProperties;
 import se.skl.tp.vp.config.TLSProperties;
 

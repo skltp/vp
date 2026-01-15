@@ -1,8 +1,8 @@
 package se.skl.tp.vp.sslcontext;
 
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import se.skl.tp.vp.config.TLSProperties;
 
