@@ -3,7 +3,7 @@ package se.skl.tp.vp.logging;
 import org.apache.camel.Exchange;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.springframework.lang.NonNull;
 import se.skl.tp.vp.logging.logentry.LogEntry;
 import se.skl.tp.vp.errorhandling.SoapFaultExtractor;
 import se.skl.tp.vp.errorhandling.SoapFaultInfo;
