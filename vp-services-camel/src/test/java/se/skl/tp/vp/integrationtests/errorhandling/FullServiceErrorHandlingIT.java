@@ -32,7 +32,7 @@ import java.util.Map;
 import jakarta.xml.soap.DetailEntry;
 import jakarta.xml.soap.SOAPBody;
 
-import io.undertow.util.FileUtils;
+import se.skl.tp.vp.utils.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;

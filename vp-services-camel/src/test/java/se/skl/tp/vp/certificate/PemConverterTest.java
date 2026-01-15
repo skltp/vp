@@ -1,6 +1,6 @@
 package se.skl.tp.vp.certificate;
 
-import io.undertow.util.FileUtils;
+import se.skl.tp.vp.utils.FileUtils;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;

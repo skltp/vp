@@ -5,7 +5,7 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertifica
 import static se.skl.tp.vp.utils.MemoryUtil.getNettyMemoryJsonString;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.undertow.util.FileUtils;
+import se.skl.tp.vp.utils.FileUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

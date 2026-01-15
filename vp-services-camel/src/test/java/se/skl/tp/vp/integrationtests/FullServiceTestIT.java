@@ -8,7 +8,7 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRiv20UTF16Request;
 
-import io.undertow.util.FileUtils;
+import se.skl.tp.vp.utils.FileUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;

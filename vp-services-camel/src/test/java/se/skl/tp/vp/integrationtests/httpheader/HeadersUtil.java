@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.undertow.util.FileUtils;
+import se.skl.tp.vp.utils.FileUtils;
 import se.skl.tp.vp.constants.HttpHeaders;
 
 public class HeadersUtil {

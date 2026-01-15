@@ -1,17 +1,17 @@
 package se.skl.tp.vp.certificate;
 
 
-import io.undertow.util.FileUtils;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.net.URL;
 import java.security.cert.X509Certificate;
 import javax.security.auth.x500.X500Principal;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import se.skl.tp.vp.exceptions.VpSemanticException;
+import se.skl.tp.vp.utils.FileUtils;
 
 public class HeaderCertificateHelperImplTest {
 
@@ -50,7 +50,8 @@ public class HeaderCertificateHelperImplTest {
 
   @Test
   public void getSenderIDFromPemCertificate() {
-    String pemCert = FileUtils.readFile(getClass().getClassLoader().getResource("certs/cert_ou_is_tp.pem"));
+    URL url = getClass().getClassLoader().getResource("certs/cert_ou_is_tp.pem");
+    String pemCert = FileUtils.readFile(url);
     String senderId = headerCertificateHelper.getSenderIDFromHeaderCertificate(pemCert);
     assertEquals("tp", senderId);
   }
