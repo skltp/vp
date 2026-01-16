@@ -1,7 +1,12 @@
 package se.skl.tp.vp.errorhandling;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.support.DefaultExchange;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import se.skl.tp.vp.constants.VPExchangeProperties;
 
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -10,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 @SuppressWarnings("HttpUrlsUsage")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SoapFaultExtractorImplTest {
+class ExtractSoapFaultImplTest {
   
   private final ExtractSoapFaultImpl extractSoapFault = new ExtractSoapFaultImpl();
   
@@ -393,5 +398,147 @@ class SoapFaultExtractorImplTest {
 
     // Verify that getTransformerFactory was called (attempted serialization)
     verify(extractorSpy, atLeastOnce()).getTransformerFactory();
+  }
+
+  @Test
+  void testProcessWithHttp500AndValidFault() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    SoapFaultInfo mockFaultInfo = new SoapFaultInfo("soap:Server", "Internal Server Error", "<detail>Error details</detail>");
+    doReturn(mockFaultInfo).when(extractorSpy).extractSoapFault(anyString());
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
+    exchange.getIn().setBody("mock body");
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy).extractSoapFault("mock body");
+    assertEquals("soap:Server", exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertEquals("Internal Server Error", exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertEquals("<detail>Error details</detail>", exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
+  }
+
+  @Test
+  void testProcessWithHttp500AndPartialFaultInfo() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    SoapFaultInfo mockFaultInfo = new SoapFaultInfo(null, "Error occurred", null);
+    doReturn(mockFaultInfo).when(extractorSpy).extractSoapFault(anyString());
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
+    exchange.getIn().setBody("mock body");
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy).extractSoapFault("mock body");
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertEquals("Error occurred", exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
+  }
+
+  @Test
+  void testProcessWithHttp500AndNoFaultInfo() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    SoapFaultInfo mockFaultInfo = new SoapFaultInfo(null, null, null);
+    doReturn(mockFaultInfo).when(extractorSpy).extractSoapFault(anyString());
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
+    exchange.getIn().setBody("mock body");
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy).extractSoapFault("mock body");
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
+  }
+
+  @Test
+  void testProcessWithNonHttp500Response() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
+    exchange.getIn().setBody("mock body");
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy, never()).extractSoapFault(anyString());
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
+  }
+
+  @Test
+  void testProcessWithHttp404Response() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);
+    exchange.getIn().setBody("mock body");
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy, never()).extractSoapFault(anyString());
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
+  }
+
+  @Test
+  void testProcessWithNoHttpResponseCode() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setBody("mock body");
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy, never()).extractSoapFault(anyString());
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
+  }
+
+  @Test
+  void testProcessWithHttp500AndNullBody() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    SoapFaultInfo mockFaultInfo = new SoapFaultInfo(null, null, null);
+    doReturn(mockFaultInfo).when(extractorSpy).extractSoapFault(null);
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
+    exchange.getIn().setBody(null);
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy).extractSoapFault(null);
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertNull(exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
+  }
+
+  @Test
+  void testProcessWithHttp500AndAllFaultElements() throws Exception {
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
+    SoapFaultInfo mockFaultInfo = new SoapFaultInfo(
+        "soap:Client",
+        "VP004 [NTjP] Det finns inget vägval",
+        "<detail><detailString>No receiverId found</detailString></detail>"
+    );
+    doReturn(mockFaultInfo).when(extractorSpy).extractSoapFault(anyString());
+    CamelContext context = new DefaultCamelContext();
+    Exchange exchange = new DefaultExchange(context);
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 500);
+    exchange.getIn().setBody("<soap:Envelope>...</soap:Envelope>");
+
+    extractorSpy.process(exchange);
+
+    verify(extractorSpy).extractSoapFault("<soap:Envelope>...</soap:Envelope>");
+    assertEquals("soap:Client", exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE));
+    assertEquals("VP004 [NTjP] Det finns inget vägval", exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING));
+    assertEquals("<detail><detailString>No receiverId found</detailString></detail>",
+                 exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL));
   }
 }
