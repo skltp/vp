@@ -14,8 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import se.skl.tp.vp.logging.logentry.LogEntry;
 import se.skl.tp.vp.logging.logentry.LogMessageExceptionType;
 import se.skl.tp.vp.logging.logentry.LogMessageType;
-import se.skl.tp.vp.errorhandling.SoapFaultExtractor;
-import se.skl.tp.vp.errorhandling.SoapFaultInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +32,6 @@ class MessageInfoLoggerTest {
     private Message message;
 
     @Mock
-    private SoapFaultExtractor soapFaultExtractor;
-
-    @Mock
     private Logger mockLogger;
 
     @InjectMocks
@@ -53,9 +48,6 @@ class MessageInfoLoggerTest {
         // Set up static mocks
         logEntryBuilderMock = mockStatic(LogEntryBuilder.class);
         logMessageFormatterMock = mockStatic(LogMessageFormatter.class);
-
-        // Replace the static soapFaultExtractor with our mock
-        MessageInfoLogger.soapFaultExtractor = soapFaultExtractor;
 
         // Set up common test data
         extraInfo = new HashMap<>();
@@ -209,129 +201,5 @@ class MessageInfoLoggerTest {
         messageInfoLogger.log(mockLogger, exchange, "req-in");
 
         verify(mockLogger).error(eq("Failed log message: {}"), eq("req-in"), any(RuntimeException.class));
-    }
-
-    @Test
-    void testLogRespInWithErrorResponse() {
-        String soapBody = "<soap:Fault>test</soap:Fault>";
-        SoapFaultInfo faultInfo = new SoapFaultInfo("soap:Server", "Error message", "Detail");
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        when(message.getBody(String.class)).thenReturn(soapBody);
-        when(soapFaultExtractor.extractSoapFault(soapBody)).thenReturn(faultInfo);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
-
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
-
-        assertEquals(MessageInfoLogger.class.getName(), extraInfo.get("source")); // Verify basic extraInfo works
-        verify(soapFaultExtractor).extractSoapFault(soapBody);
-        assertEquals("soap:Server", extraInfo.get("faultCode"));
-        assertEquals("Error message", extraInfo.get("faultString"));
-        assertEquals("Detail", extraInfo.get("faultDetail"));
-    }
-
-    @Test
-    void testLogRespInWithErrorResponseAndPartialFaultInfo() {
-        String soapBody = "<soap:Fault>test</soap:Fault>";
-        SoapFaultInfo faultInfo = new SoapFaultInfo("soap:Client", null, null);
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        when(message.getBody(String.class)).thenReturn(soapBody);
-        when(soapFaultExtractor.extractSoapFault(soapBody)).thenReturn(faultInfo);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
-
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
-
-        verify(soapFaultExtractor).extractSoapFault(soapBody);
-        assertEquals("soap:Client", extraInfo.get("faultCode"));
-        assertFalse(extraInfo.containsKey("faultString"));
-        assertFalse(extraInfo.containsKey("faultDetail"));
-    }
-
-    @Test
-    void testLogRespInWithErrorResponseButNoFaultInfo() {
-        String soapBody = "<soap:Fault>test</soap:Fault>";
-        SoapFaultInfo faultInfo = new SoapFaultInfo(null, null, null);
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        when(message.getBody(String.class)).thenReturn(soapBody);
-        when(soapFaultExtractor.extractSoapFault(soapBody)).thenReturn(faultInfo);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
-
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
-
-        verify(soapFaultExtractor).extractSoapFault(soapBody);
-        assertFalse(extraInfo.containsKey("faultCode"));
-        assertFalse(extraInfo.containsKey("faultString"));
-        assertFalse(extraInfo.containsKey("faultDetail"));
-    }
-
-    @Test
-    void testLogRespInWithNon500Response() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(200);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
-
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
-
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
-    }
-
-    @Test
-    void testLogRespInWithNullResponseCode() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(null);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
-
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
-
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
-    }
-
-    @Test
-    void testLogRespOutDoesNotExtractSoapFault() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        lenient().when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-out", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
-
-        messageInfoLogger.log(mockLogger, exchange, "resp-out");
-
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
-    }
-
-    @Test
-    void testLogReqInDoesNotExtractSoapFault() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        lenient().when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("req-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
-
-        messageInfoLogger.log(mockLogger, exchange, "req-in");
-
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
     }
 }

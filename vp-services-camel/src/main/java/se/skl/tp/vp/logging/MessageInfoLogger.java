@@ -5,8 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.lang.NonNull;
 import se.skl.tp.vp.logging.logentry.LogEntry;
-import se.skl.tp.vp.errorhandling.SoapFaultExtractor;
-import se.skl.tp.vp.errorhandling.SoapFaultInfo;
 
 
 public class MessageInfoLogger {
@@ -32,9 +30,6 @@ public class MessageInfoLogger {
   private static final String MSG_TYPE_LOG_RESP_IN = "resp-in";
   private static final String MSG_TYPE_LOG_RESP_OUT = "resp-out";
   private static final String MSG_TYPE_ERROR = "error";
-
-  static SoapFaultExtractor soapFaultExtractor = new SoapFaultExtractor();
-
 
   public void logReqIn(Exchange exchange) {
     log(LOGGER_REQ_IN, exchange, MSG_TYPE_LOG_REQ_IN);
@@ -84,31 +79,6 @@ public class MessageInfoLogger {
   private @NonNull LogEntry getLogEntry(Exchange exchange, String messageType) {
     LogEntry logEntry = LogEntryBuilder.createLogEntry(messageType, exchange);
     logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOURCE, getClass().getName());
-    if (messageType.equals(MSG_TYPE_LOG_RESP_IN) && isErrorResponse(exchange)) {
-      extractSoapFaultInfo(exchange, logEntry);
-    }
     return logEntry;
-  }
-
-  private boolean isErrorResponse(Exchange exchange) {
-    Object responseCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE);
-    return responseCode != null && responseCode.equals(500);
-  }
-
-  private void extractSoapFaultInfo(Exchange exchange, LogEntry logEntry) {
-    String body = exchange.getIn().getBody(String.class);
-    SoapFaultInfo faultInfo = soapFaultExtractor.extractSoapFault(body);
-
-    if (faultInfo.hasFaultInfo()) {
-      if (faultInfo.faultCode() != null) {
-        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOAP_FAULT_CODE, faultInfo.faultCode());
-      }
-      if (faultInfo.faultString() != null) {
-        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOAP_FAULT_STRING, faultInfo.faultString());
-      }
-      if (faultInfo.detail() != null) {
-        logEntry.getExtraInfo().put(LogExtraInfoBuilder.SOAP_FAULT_DETAIL, faultInfo.detail());
-      }
-    }
   }
 }

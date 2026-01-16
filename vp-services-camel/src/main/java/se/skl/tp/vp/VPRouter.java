@@ -19,6 +19,7 @@ import se.skl.tp.vp.charset.ConvertResponseCharset;
 import se.skl.tp.vp.config.HttpHeaderFilterProperties;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.errorhandling.ExceptionMessageProcessor;
+import se.skl.tp.vp.errorhandling.ExtractSoapFaultImpl;
 import se.skl.tp.vp.errorhandling.HandleEmptyResponseProcessor;
 import se.skl.tp.vp.errorhandling.HandleProducerExceptionProcessor;
 import se.skl.tp.vp.httpheader.HttpSenderIdExtractorProcessor;
@@ -122,6 +123,9 @@ public class VPRouter extends RouteBuilder {
 
 
 
+    @Autowired
+    private ExtractSoapFaultImpl extractSoapFault;
+
     @Override
     public void configure() throws Exception {
 
@@ -210,6 +214,7 @@ public class VPRouter extends RouteBuilder {
                     .toD(NETTY_HTTP_OUTGOING_TOD)
                     .endChoice()
             .end()
+            .process(extractSoapFault)
             .bean(MessageInfoLogger.class, LOG_RESP_IN_METHOD)
             .process(convertResponseCharset)
             .end();

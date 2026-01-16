@@ -10,9 +10,9 @@ import static org.mockito.Mockito.*;
 
 @SuppressWarnings("HttpUrlsUsage")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SoapFaultExtractorTest {
+class SoapFaultExtractorImplTest {
   
-  private final SoapFaultExtractor soapFaultExtractor = new SoapFaultExtractor();
+  private final ExtractSoapFaultImpl extractSoapFault = new ExtractSoapFaultImpl();
   
   @Test
   void testExtractSimpleSoapFault() {
@@ -29,7 +29,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soapenv:Server", result.faultCode());
@@ -54,7 +54,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soapenv:Client", result.faultCode());
@@ -85,7 +85,7 @@ class SoapFaultExtractorTest {
         </soap:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soap:Server", result.faultCode());
@@ -113,7 +113,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soapenv:Client", result.faultCode());
@@ -134,7 +134,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soapenv:Server", result.faultCode());
@@ -158,7 +158,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soapenv:Client", result.faultCode());
@@ -179,7 +179,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(normalResponse);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(normalResponse);
 
     assertFalse(result.hasFaultInfo());
     assertNull(result.faultCode());
@@ -189,7 +189,7 @@ class SoapFaultExtractorTest {
 
   @Test
   void testNullMessageBody() {
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(null);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(null);
 
     assertFalse(result.hasFaultInfo());
     assertNull(result.faultCode());
@@ -199,7 +199,7 @@ class SoapFaultExtractorTest {
 
   @Test
   void testEmptyMessageBody() {
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault("");
+    SoapFaultInfo result = extractSoapFault.extractSoapFault("");
 
     // Should return a fault info with error message in faultString
     assertTrue(result.hasFaultInfo());
@@ -213,7 +213,7 @@ class SoapFaultExtractorTest {
   void testInvalidXmlReturnsErrorFaultInfo() {
     String invalidXml = "<soapenv:Envelope><soapenv:Fault><invalid";
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(invalidXml);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(invalidXml);
 
     // Should return a fault info with error message in faultString
     assertTrue(result.hasFaultInfo());
@@ -245,7 +245,7 @@ class SoapFaultExtractorTest {
         </soap:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soap:Server", result.faultCode());
@@ -280,7 +280,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soapenv:Client", result.faultCode());
@@ -306,7 +306,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertEquals("soapenv:Server", result.faultCode());
@@ -326,7 +326,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertTrue(result.hasFaultInfo());
     assertNull(result.faultCode());
@@ -344,7 +344,7 @@ class SoapFaultExtractorTest {
         </soapenv:Envelope>
         """;
 
-    SoapFaultInfo result = soapFaultExtractor.extractSoapFault(soapFault);
+    SoapFaultInfo result = extractSoapFault.extractSoapFault(soapFault);
 
     assertFalse(result.hasFaultInfo());
   }
@@ -371,7 +371,7 @@ class SoapFaultExtractorTest {
         """;
 
     // Create a spy of the extractor
-    SoapFaultExtractor extractorSpy = spy(new SoapFaultExtractor());
+    ExtractSoapFaultImpl extractorSpy = spy(new ExtractSoapFaultImpl());
 
     // Mock getTransformerFactory to throw an exception
     doThrow(new TransformerConfigurationException("Transformer configuration failed"))

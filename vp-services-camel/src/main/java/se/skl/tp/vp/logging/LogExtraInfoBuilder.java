@@ -86,6 +86,10 @@ public class LogExtraInfoBuilder {
 
     addHttpForwardHeaders(exchange, extraInfo);
 
+    extraInfo.putNotNull(SOAP_FAULT_CODE, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE, String.class));
+    extraInfo.putNotNull(SOAP_FAULT_STRING, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING, String.class));
+    extraInfo.putNotNull(SOAP_FAULT_DETAIL, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, String.class));
+
     final Boolean isError = exchange.getProperty(VPExchangeProperties.SESSION_ERROR, Boolean.class);
     if (isError != null && isError) {
       addErrorInfo(exchange, extraInfo);
