@@ -37,7 +37,6 @@ import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.httpheader.OutHeaderProcessorImpl;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
-import se.skl.tp.vp.logging.LogExtraInfoBuilder;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
@@ -47,7 +46,7 @@ import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @StartTakService
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class HttpsRequestHeadersIT {
+class HttpsRequestHeadersIT {
 
 
   @Value("${" + PropertyConstants.PROPAGATE_CORRELATION_ID_FOR_HTTPS + "}")
@@ -74,18 +73,17 @@ public class HttpsRequestHeadersIT {
   private static boolean isContextStarted = false;
 
   @BeforeAll
-  public static void startLeakDetection() {
+  static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
   }
 
   @AfterAll
-  public static void verifyNoLeaks() throws Exception {
+  static void verifyNoLeaks() throws Exception {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
   @BeforeEach
-  public void setUp() throws Exception {
-    vpHeaderUserAgent = vpHeaderUserAgent;
+  void setUp() throws Exception {
     if (!isContextStarted) {
       addConsumerRoute(camelContext);
       camelContext.start();
@@ -97,111 +95,115 @@ public class HttpsRequestHeadersIT {
   }
 
   @AfterEach
-  public void after() {
+  void after() {
     headerProcessor.setPropagateCorrelationIdForHttps(oldCorrelation);
   }
 
   @Test
-  public void checkSoapActionSetTest() {
+  void checkSoapActionSetTest() {
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeaders());
     String soapActionHeader = (String) producerResultEndpoint.getExchanges().get(0).getIn().getHeader(SOAP_ACTION);
     assertEquals("action", soapActionHeader);
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", SOAP_ACTION + "=action");
+    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", SOAP_ACTION + "\":\"action");
   }
 
   // CorrelationId...passCorrelationId set to false.
   @Test // with headers set.
-  public void checkCorrelationIdPropagatedWithIncomingHeaderSetAndPropagateCorrelationSetFalseTest() {
+  void checkCorrelationIdPropagatedWithIncomingHeaderSetAndPropagateCorrelationSetFalseTest() {
     headerProcessor.setPropagateCorrelationIdForHttps(false);
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeadersWithCorrId());
     assertNull(producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_SKLTP_CORRELATION_ID));
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", "BusinessCorrelationId=");
+    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"");
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertFalse(respOutLogMsg.contains(X_SKLTP_CORRELATION_ID));
 
   }
 
   @Test // Without headers
-  public void checkCorrelationIdPropagatedWithoutIncomingHeaderSetAndPropagateCorrelationSetFalseTest() {
+  void checkCorrelationIdPropagatedWithoutIncomingHeaderSetAndPropagateCorrelationSetFalseTest() {
     headerProcessor.setPropagateCorrelationIdForHttps(false);
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeaders());
     assertNull(producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_SKLTP_CORRELATION_ID));
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", "BusinessCorrelationId=");
+    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"");
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertFalse(respOutLogMsg.contains(X_SKLTP_CORRELATION_ID));
   }
 
   // CorrelationId...passCorrelationId set to true.
   @Test // With headers set
-  public void checkCorrelationIdPropagatedWhenIncomingHeaderSetAndPropagateCorrelationSetTrueTest() {
+  void checkCorrelationIdPropagatedWhenIncomingHeaderSetAndPropagateCorrelationSetTrueTest() {
     headerProcessor.setPropagateCorrelationIdForHttps(true);
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeadersWithCorrId());
     assertEquals(TEST_CORRELATION_ID, producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_SKLTP_CORRELATION_ID));
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", "BusinessCorrelationId=" + TEST_CORRELATION_ID);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", X_SKLTP_CORRELATION_ID + "=" + TEST_CORRELATION_ID);
+    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"" + TEST_CORRELATION_ID);
+    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_SKLTP_CORRELATION_ID + "\":\"" + TEST_CORRELATION_ID);
   }
 
   @Test // Without headers
-  public void checkCorrelationIdPropagatedWhenNoIncomingHeaderSetAndPropagateCorrelationSetTrueTest() {
+  void checkCorrelationIdPropagatedWhenNoIncomingHeaderSetAndPropagateCorrelationSetTrueTest() {
     headerProcessor.setPropagateCorrelationIdForHttps(true);
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeaders());
     String s = (String) producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_SKLTP_CORRELATION_ID);
     assertNotNull(s);
     assertNotEquals(TEST_CORRELATION_ID, s);
     assertTrue(s.length() > 20);
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", "BusinessCorrelationId=" + s);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", X_SKLTP_CORRELATION_ID + "=" + s);
+    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"" + s);
+    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_SKLTP_CORRELATION_ID + "\":\"" + s);
   }
 
   // OriginalConsumerId
   @Test // With headers set.
-  public void checkXrivtaOriginalConsumerIdPropagatedWhenIncomingHeaderSet() {
+  void checkXrivtaOriginalConsumerIdPropagatedWhenIncomingHeaderSet() {
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeadersWithOriginalServiceConsumerId());
     assertEquals(TEST_CONSUMER, producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "LogMessage=req-in", LogExtraInfoBuilder.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "=" + TEST_CONSUMER);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "=" + TEST_CONSUMER);
+    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "labels.originalServiceconsumerHsaid_in=\"" + TEST_CONSUMER);
+    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "\":\"" + TEST_CONSUMER);
   }
 
   @Test // Without headers.
-  public void checkXrivtaConsumerIdPropagatedWhenNoIncomingHeaderTest() {
+  void checkXrivtaConsumerIdPropagatedWhenNoIncomingHeaderTest() {
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeaders());
     assertEquals(TEST_SENDER, producerResultEndpoint.getExchanges().get(0).getIn().getHeader(X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
 
     String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
-    assertStringContains(reqInLogMsg, "LogMessage=req-in");
-    boolean b = reqInLogMsg.contains(LogExtraInfoBuilder.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "=" + TEST_SENDER);
+    assertNotNull(reqInLogMsg);
+    assertStringContains(reqInLogMsg, "event.action=\"req-in\"");
+    boolean b = reqInLogMsg.contains("labels.originalServiceconsumerHsaid_in=\"" + TEST_SENDER);
     assertFalse(b);
 
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "=" +TEST_SENDER);
+    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "\":\"" +TEST_SENDER);
   }
 
   @Test
-  public void checkUserAgentGetPropagated() {
+  void checkUserAgentGetPropagated() {
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpsHeaders());
     String s = (String) producerResultEndpoint.getExchanges().get(0).getIn().getHeader(HEADER_USER_AGENT);
     assertEquals(vpHeaderUserAgent, s);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "LogMessage=resp-out", HEADER_USER_AGENT + "=" + vpHeaderUserAgent);
+    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", HEADER_USER_AGENT + "\":\"" + vpHeaderUserAgent);
   }
 
   private void assertLogExistAndContainsMessages(String logger, String msg1, String msg2) {
     assertEquals(1, TestLogAppender.getNumEvents(logger));
     String logMessage = TestLogAppender.getEventMessage(logger, 0);
+    assertNotNull(logMessage);
     assertStringContains(logMessage, msg1);
     assertStringContains(logMessage, msg2);
   }
 
   @Test
-  public void testInstanceIdDontGetPropagatedForHttps () {
+  void testInstanceIdDontGetPropagatedForHttps () {
     //Using http-headers for this one, where X_VP_INSTANCE_ID is set.
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpHeaders());
     negativeHeaderAndLogTest(X_VP_INSTANCE_ID);
   }
 
   @Test
-  public void testXvPSenderIdDontGetPropagatedForHttps () {
+  void testXvPSenderIdDontGetPropagatedForHttps () {
     //Using http-headers for this one, where X_VP_SENDER_ID is set.
     template.sendBodyAndHeaders(TestSoapRequests.GET_CERT_HTTPS_REQUEST, HeadersUtil.createHttpHeaders());
     negativeHeaderAndLogTest(X_VP_SENDER_ID);
@@ -210,7 +212,8 @@ public class HttpsRequestHeadersIT {
   private void negativeHeaderAndLogTest(String header) {
     assertNull(producerResultEndpoint.getExchanges().get(0).getIn().getHeader(header));
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertFalse(respOutLogMsg.contains(header));
   }
 

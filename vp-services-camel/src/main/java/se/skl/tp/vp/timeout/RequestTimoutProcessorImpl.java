@@ -10,7 +10,7 @@ import se.skl.tp.vp.constants.VPExchangeProperties;
 import static org.apache.camel.component.netty.NettyConstants.NETTY_REQUEST_TIMEOUT;
 
 @Service
-public class RequestTimoutProcessorImpl implements RequestTimoutProcessor {
+public class RequestTimoutProcessorImpl implements RequestTimeoutProcessor {
 
     TimeoutConfiguration timeoutConfiguration;
     private final String DEFAULT_TJANSTEKONTRAKT;

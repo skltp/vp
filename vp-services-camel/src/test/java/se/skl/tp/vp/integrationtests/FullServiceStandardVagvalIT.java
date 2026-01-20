@@ -18,7 +18,6 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
-import se.skl.tp.vp.integrationtests.utils.TakMockWebService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.JunitUtil;
@@ -29,11 +28,18 @@ import se.skl.tp.vp.util.TestLogAppender;
 @SpringBootTest
 @StartTakService
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
+class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
   public static final String ANSWER_FROM_DEFAULT_PRODUCER = "<Answer from default producer>";
   public static final String ANSWER_FROM_EXPLICIT_PRODUCER = "<Answer from explicit producer>";
   public static final String ANSWER_FROM_HSATREE_PRODUCER = "<Answer from hsa tree producer>";
+  public static final String EVENT_ACTION = "event.action=\"([^\"]+)\"";
+  public static final String LABELS_SENDERID = "labels.senderid=\"([^\"]+)\"";
+  public static final String LABELS_RECEIVERID = "labels.receiverid=\"([^\"]+)\"";
+  public static final String URL_ORIGINAL = "url.original=\"([^\"]+)\"";
+  public static final String LABELS_ROUTER_VAGVAL_TRACE = "labels.routerVagvalTrace=\"([^\"]+)\"";
+  public static final String LABELS_ROUTER_BEHORIGHET_TRACE = "labels.routerBehorighetTrace=\"([^\"]+)\"";
+  public static final String LABELS_ERROR_CODE = "labels.errorCode=\"([^\"]+)\"";
 
   @Autowired
   TestConsumer testConsumer;
@@ -42,26 +48,23 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
   MockProducer defaultRoutedProducer;
 
   @Autowired
-  MockProducer explicedRoutedProducer;
+  MockProducer explicitlyRoutedProducer;
 
   @Autowired
   MockProducer hsaTreeRoutedProducer;
-
-  @Autowired
-  TakMockWebService takMockWebService;
 
   @Value("${vp.instance.id}")
   String vpInstanceId;
 
   @BeforeEach
-  public void before() throws Exception {
+  void before() throws Exception {
     defaultRoutedProducer.start("http://localhost:1900/default/GetActivitiesResponder");
-    explicedRoutedProducer.start("http://localhost:1900/explicit/GetActivitiesResponder");
+    explicitlyRoutedProducer.start("http://localhost:1900/explicit/GetActivitiesResponder");
     TestLogAppender.clearEvents();
   }
 
   @Test
-  public void testDefaultBehorighetAndDefaultRouting() throws Exception {
+  void testDefaultBehorighetAndDefaultRouting() {
     defaultRoutedProducer.setResponseBody(ANSWER_FROM_DEFAULT_PRODUCER);
 
     Map<String, Object> headers = new HashMap<>();
@@ -72,17 +75,17 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", "resp-out", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", "SenderWithDefaultBehorighet", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)", "AnyReceiver", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", "http://localhost:1900/default/GetActivitiesResponder", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", "AnyReceiver,(parent),SE,(default),*", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", "AnyReceiver,(default),*", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "SenderWithDefaultBehorighet", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "AnyReceiver", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, URL_ORIGINAL, "http://localhost:1900/default/GetActivitiesResponder", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_VAGVAL_TRACE, "AnyReceiver,(parent),SE,(default),*", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_BEHORIGHET_TRACE, "AnyReceiver,(default),*", 1);
   }
 
   @Test
-  public void testDefaultBehorighetAndExplicitRouting() throws Exception {
-    explicedRoutedProducer.setResponseBody(ANSWER_FROM_EXPLICIT_PRODUCER);
+  void testDefaultBehorighetAndExplicitRouting() {
+    explicitlyRoutedProducer.setResponseBody(ANSWER_FROM_EXPLICIT_PRODUCER);
 
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
@@ -92,18 +95,18 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
     assertEquals(ANSWER_FROM_EXPLICIT_PRODUCER, response);
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", "resp-out", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", "SenderWithDefaultBehorighet", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)", "HttpProducer", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", "http://localhost:1900/explicit/GetActivitiesResponder", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", "HttpProducer", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", "HttpProducer,(default),*", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "SenderWithDefaultBehorighet", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "HttpProducer", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, URL_ORIGINAL, "http://localhost:1900/explicit/GetActivitiesResponder", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_VAGVAL_TRACE, "HttpProducer", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_BEHORIGHET_TRACE, "HttpProducer,(default),*", 1);
   }
 
   @Test
-  public void testDefaultVagvalButNoDefaultBehorighetShouldGiveVP007() throws Exception {
+  void testDefaultVagvalButNoDefaultBehorighetShouldGiveVP007() {
 
-    explicedRoutedProducer.setResponseBody(ANSWER_FROM_EXPLICIT_PRODUCER);
+    explicitlyRoutedProducer.setResponseBody(ANSWER_FROM_EXPLICIT_PRODUCER);
 
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
@@ -113,18 +116,18 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
     assertStringContains(response, "VP007" );
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", "resp-out", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", "AnySender", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)", "AnyReceiver", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", "http://localhost:1900/default/GetActivitiesResponder", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", "AnyReceiver,(parent),SE,(default),*", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", "AnyReceiver,(default),*,(parent),SE", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-errorCode=(.*)", "VP007", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "AnySender", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "AnyReceiver", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, URL_ORIGINAL, "http://localhost:1900/default/GetActivitiesResponder", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_VAGVAL_TRACE, "AnyReceiver,(parent),SE,(default),*", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_BEHORIGHET_TRACE, "AnyReceiver,(default),*,(parent),SE", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ERROR_CODE, "VP007", 1);
 
   }
 
   @Test
-  public void testDefaultVagvalAndDirectBehorighetShouldGiveDefaultRouting() throws Exception {
+  void testDefaultVagvalAndDirectBehorighetShouldGiveDefaultRouting() {
     defaultRoutedProducer.setResponseBody(ANSWER_FROM_DEFAULT_PRODUCER);
 
     Map<String, Object> headers = new HashMap<>();
@@ -135,16 +138,16 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", "resp-out", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", "tp", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)", "GetActivitiesReceiverWithNoExplicitVagval", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", "http://localhost:1900/default/GetActivitiesResponder", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", "GetActivitiesReceiverWithNoExplicitVagval,(parent),SE,(default),*", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", "GetActivitiesReceiverWithNoExplicitVagval", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "tp", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "GetActivitiesReceiverWithNoExplicitVagval", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, URL_ORIGINAL, "http://localhost:1900/default/GetActivitiesResponder", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_VAGVAL_TRACE, "GetActivitiesReceiverWithNoExplicitVagval,(parent),SE,(default),*", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_BEHORIGHET_TRACE, "GetActivitiesReceiverWithNoExplicitVagval", 1);
   }
 
   @Test
-  public void testHsaRoutingShouldBeDoneBeforeStandardVagval() throws Exception {
+  void testHsaRoutingShouldBeDoneBeforeStandardVagval() throws Exception {
     hsaTreeRoutedProducer.start("http://localhost:1900/treeclimbing/GetActivitiesResponder");
     hsaTreeRoutedProducer.setResponseBody(ANSWER_FROM_HSATREE_PRODUCER);
 
@@ -156,12 +159,12 @@ public class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
     assertEquals(ANSWER_FROM_HSATREE_PRODUCER, response);
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", "resp-out", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", "SenderWithDefaultBehorighet", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)", "SE0000000001-1234", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", "http://localhost:1900/treeclimbing/GetActivitiesResponder", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", "SE0000000001-1234,(parent),SE0000000002-1234,SE0000000003-1234", 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", "SE0000000001-1234,(default),*", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "SenderWithDefaultBehorighet", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "SE0000000001-1234", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, URL_ORIGINAL, "http://localhost:1900/treeclimbing/GetActivitiesResponder", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_VAGVAL_TRACE, "SE0000000001-1234,(parent),SE0000000002-1234,SE0000000003-1234", 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_ROUTER_BEHORIGHET_TRACE, "SE0000000001-1234,(default),*", 1);
   }
 
 }

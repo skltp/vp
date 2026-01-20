@@ -7,7 +7,7 @@ import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.SocketException;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -28,14 +28,14 @@ import se.skl.tp.vp.httpheader.OutHeaderProcessor;
 import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.requestreader.RequestReaderProcessor;
 import se.skl.tp.vp.sslcontext.SelectSslContextProcessor;
-import se.skl.tp.vp.timeout.RequestTimoutProcessor;
+import se.skl.tp.vp.timeout.RequestTimeoutProcessor;
 import se.skl.tp.vp.vagval.BehorighetProcessor;
 import se.skl.tp.vp.vagval.RivTaProfilProcessor;
 import se.skl.tp.vp.vagval.VagvalProcessor;
 import se.skl.tp.vp.wsdl.WsdlProcessor;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class VPRouter extends RouteBuilder {
 
     public static final String VP_HTTP_ROUTE = "vp-http-route";
@@ -58,6 +58,7 @@ public class VPRouter extends RouteBuilder {
         + "matchOnUriPrefix=true&"
         + "chunkedMaxContentLength={{vp.max.receive.length}}&"
         + "nettyHttpBinding=#VPNettyHttpBinding";
+    @SuppressWarnings("HttpUrlsUsage") // Intentional use of http
     public static final String NETTY_HTTP_OUTGOING_TOD = "netty-http:http://${exchangeProperty.vagvalHost}?"
         + "useRelativePath=true&"
         + "nettyHttpBinding=#VPNettyHttpBinding&"
@@ -109,7 +110,7 @@ public class VPRouter extends RouteBuilder {
 
     private final WsdlProcessor wsdlProcessor;
 
-    private final RequestTimoutProcessor requestTimoutProcessor;
+    private final RequestTimeoutProcessor requestTimeoutProcessor;
 
     private final HandleProducerExceptionProcessor handleProducerExceptionProcessor;
 
@@ -121,10 +122,7 @@ public class VPRouter extends RouteBuilder {
 
     private final SelectSslContextProcessor selectSslContextProcessor;
 
-
-
-    @Autowired
-    private ExtractSoapFaultImpl extractSoapFault;
+    private final ExtractSoapFaultImpl extractSoapFault;
 
     @Override
     public void configure() throws Exception {
@@ -172,7 +170,7 @@ public class VPRouter extends RouteBuilder {
             .bean(MessageInfoLogger.class, LOG_REQ_IN_METHOD)
             .process(vagvalProcessor).id(VAGVAL_PROCESSOR_ID)
             .process(behorighetProcessor).id(BEHORIGHET_PROCESSOR_ID)
-            .process(requestTimoutProcessor)
+            .process(requestTimeoutProcessor)
             .process(rivTaProfilProcessor)
             .process(setOutHeadersProcessor)
             .to(DIRECT_PRODUCER_ROUTE)
@@ -229,7 +227,7 @@ public class VPRouter extends RouteBuilder {
             .process(convertResponseCharset)
             .removeHeaders(headerFilter.getResponseHeadersToRemove(), headerFilter.getResponseHeadersToKeep())
             .bean(MessageInfoLogger.class, LOG_RESP_OUT_METHOD)
-            // Always return status 500 to when soap fault
+            // Always return status 500 when soap fault occurs
             .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500));
 
         from(DIRECT_WSDL)

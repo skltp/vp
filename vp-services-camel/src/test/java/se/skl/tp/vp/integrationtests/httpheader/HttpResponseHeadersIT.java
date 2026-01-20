@@ -1,9 +1,6 @@
 package se.skl.tp.vp.integrationtests.httpheader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 
@@ -30,7 +27,7 @@ import se.skl.tp.vp.util.TestLogAppender;
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 @StartTakService
-public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
+class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   public static final String HTTPS_PRODUCER_URL = "https://localhost:19001/vardgivare-b/tjanst2";
 
   @Autowired
@@ -43,17 +40,13 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   String vpInstanceId;
 
   @BeforeEach
-  public void before() {
-    try {
-      mockProducer.start(HTTPS_PRODUCER_URL);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  void before() throws Exception {
+    mockProducer.start(HTTPS_PRODUCER_URL);
     TestLogAppender.clearEvents();
   }
 
   @Test
-  public void testHeaderSoapActionFilteredInResponse() {
+  void testHeaderSoapActionFilteredInResponse() {
     mockProducer.setResponseBody("<mocked answer/>");
     mockProducer.addResponseHeader(HttpHeaders.SOAP_ACTION, "mySoapAction");
 
@@ -66,14 +59,16 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertNull( testConsumer.getReceivedHeader(HttpHeaders.SOAP_ACTION), "SoapAction not expected in response");
 
     String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
-    assertTrue(respInLog.contains("SOAPAction=mySoapAction"));
+    assertNotNull(respInLog);
+    assertTrue(respInLog.contains("SOAPAction\":\"mySoapAction"));
 
     String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertFalse(respOutLog.contains("SOAPAction=mySoapAction"));
+    assertNotNull(respOutLog);
+    assertFalse(respOutLog.contains("SOAPAction\":\"mySoapAction"));
   }
 
   @Test
-  public void testHeaderMULE_XFilteredInResponse() {
+  void testHeaderMULE_XFilteredInResponse() {
     mockProducer.setResponseBody("<mocked answer/>");
     mockProducer.addResponseHeader("MULE_CORRELATION_GROUP_SIZE", "-1");
     mockProducer.addResponseHeader("MULE_CORRELATION_ID", "1234");
@@ -91,7 +86,7 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void testHeaderX_MULE_XFilteredInResponse() {
+  void testHeaderX_MULE_XFilteredInResponse() {
     mockProducer.setResponseBody("<mocked answer/>");
     mockProducer.addResponseHeader("X-MULE_CORRELATION_GROUP_SIZE", "-1");
     mockProducer.addResponseHeader("X-MULE_CORRELATION_ID", "1234");
@@ -106,7 +101,7 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   }
 
   @Test
-  public void testThatRandomHeaderIsNotFilteredInResponse() {
+  void testThatRandomHeaderIsNotFilteredInResponse() {
     mockProducer.setResponseBody("<mocked answer/>");
     mockProducer.addResponseHeader("MyRandomHeader", "myRandomValue");
 
@@ -115,15 +110,17 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertEquals( "myRandomValue", testConsumer.getReceivedHeader("MyRandomHeader"));
 
     String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
-    assertTrue(respInLog.contains("MyRandomHeader=myRandomValue"));
+    assertNotNull(respInLog);
+    assertTrue(respInLog.contains("MyRandomHeader\":\"myRandomValue"));
 
     String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertTrue(respOutLog.contains("MyRandomHeader=myRandomValue"));
+    assertNotNull(respOutLog);
+    assertTrue(respOutLog.contains("MyRandomHeader\":\"myRandomValue"));
 
   }
 
   @Test
-  public void testCorrectContentTypeInResponse() {
+  void testCorrectContentTypeInResponse() {
     mockProducer.setResponseBody("<mocked answer/>");
     mockProducer.addResponseHeader("Content-Type", "text/plain;charset=UTF-8");
 
@@ -132,25 +129,28 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertEquals( "text/xml; charset=UTF-8", testConsumer.getReceivedHeader("Content-Type"));
 
     String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
-    assertTrue(respInLog.contains("Content-Type=text/plain;charset=UTF-8"));
+    assertNotNull(respInLog);
+    assertTrue(respInLog.contains("Content-Type\":\"text/plain;charset=UTF-8"));
 
     String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertTrue(respOutLog.contains("Content-Type=text/xml; charset=UTF-8"));
+    assertNotNull(respOutLog);
+    assertTrue(respOutLog.contains("Content-Type\":\"text/xml; charset=UTF-8"));
 
   }
 
   @Test
-  public void testCorrectContentTypeWhenErrorInResponse() {
+  void testCorrectContentTypeWhenErrorInResponse() {
     String response = testConsumer.sendHttpRequestToVP(createGetCertificateRequest("Unknown"));
     assertTrue(response.contains("VP004"));
     assertEquals( "text/xml; charset=UTF-8", testConsumer.getReceivedHeader("Content-Type"));
 
     String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertTrue(respOutLog.contains("Content-Type=text/xml; charset=UTF-8"));
+    assertNotNull(respOutLog);
+    assertTrue(respOutLog.contains("Content-Type\":\"text/xml; charset=UTF-8"));
   }
 
   @Test
-  public void testRoutingHistory() {
+  void testRoutingHistory() {
     mockProducer.setResponseBody("<mocked answer/>");
     mockProducer.addResponseHeader(HttpHeaders.SOAP_ACTION, "mySoapAction");
 
@@ -163,13 +163,15 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertEquals("<mocked answer/>", response);
 
     // Since http, vpInstanceId should not have beeen be added to routing history 
-    String routing_history = testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
-    assertTrue("some-server,mock-producer".equals(routing_history));
+    String routingHistory = testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
+    assertEquals("some-server,mock-producer", routingHistory);
 
     String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
-    assertTrue(respInLog.contains("x-rivta-routing-history=some-server,mock-producer"));
+    assertNotNull(respInLog);
+    assertTrue(respInLog.contains("x-rivta-routing-history\":\"some-server,mock-producer"));
 
     String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertTrue(respOutLog.contains("x-rivta-routing-history=some-server,mock-producer"));
+    assertNotNull(respOutLog);
+    assertTrue(respOutLog.contains("x-rivta-routing-history\":\"some-server,mock-producer"));
   }
 }

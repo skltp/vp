@@ -68,7 +68,7 @@
   </anropsBehorighetsInfo>
   <anropsBehorighetsInfo>
     <ns2:anropsBehorighetsInfoId>4</ns2:anropsBehorighetsInfoId>
-    <ns2:receiverId>RecevierNoProducerAvailable</ns2:receiverId>
+    <ns2:receiverId>ReceiverNoProducerAvailable</ns2:receiverId>
     <ns2:senderId>tp</ns2:senderId>
     <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
     </ns2:tjansteKontrakt>
@@ -77,7 +77,7 @@
   </anropsBehorighetsInfo>
   <anropsBehorighetsInfo>
     <ns2:anropsBehorighetsInfoId>5</ns2:anropsBehorighetsInfoId>
-    <ns2:receiverId>RecevierUnknownRivVersion</ns2:receiverId>
+    <ns2:receiverId>ReceiverUnknownRivVersion</ns2:receiverId>
     <ns2:senderId>tp</ns2:senderId>
     <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1
     </ns2:tjansteKontrakt>

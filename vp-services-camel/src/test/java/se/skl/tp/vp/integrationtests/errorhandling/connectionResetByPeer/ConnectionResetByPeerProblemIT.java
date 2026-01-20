@@ -34,7 +34,7 @@ import se.skl.tp.vp.util.TestLogAppender;
 @TestPropertySource(locations = {"classpath:application.properties", "classpath:vp-messages.properties"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @StartTakService
-public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
+class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
 
     @Autowired
     TestConsumer testConsumer;
@@ -43,7 +43,7 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
     CamelContext camelContext;
 
     @Test
-    public void errorWithClosedChanel() throws InterruptedException {
+    void errorWithClosedChanel() throws InterruptedException {
         ServerBehavior b = (ChannelHandlerContext ctx) -> {
             FullHttpResponse response = new DefaultFullHttpResponse(
                     HTTP_1_1, OK,
@@ -54,21 +54,24 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
             ctx.writeAndFlush(response);
         };
 
-        ResetByPeerServer.startServer(19007, b);
+        try {
+            ResetByPeerServer.startServer(19007, b);
 
-        Map<String, Object> headers = HeadersUtil.createHttpHeaders();
-        String receiver = "HttpProducerResetByPeer";
-        String request = createGetCertificateRequest(receiver);
-        testConsumer.sendHttpRequestToVP(request, headers);
+            Map<String, Object> headers = HeadersUtil.createHttpHeaders();
+            String receiver = "HttpProducerResetByPeer";
+            String request = createGetCertificateRequest(receiver);
+            testConsumer.sendHttpRequestToVP(request, headers);
 
-        Thread.sleep(6000);
-        ResetByPeerServer.stopServer();
+            Thread.sleep(6000);
+        } finally {
+            ResetByPeerServer.stopServer();
+        }
 
         assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     }
 
     @Test
-    public void errorWithLiveChanel() throws InterruptedException {
+    void errorWithLiveChanel() throws InterruptedException {
         ServerBehavior b = (ChannelHandlerContext ctx) -> {
             ctx.channel().close();
         };
@@ -82,9 +85,8 @@ public class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
 
         assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
         String msg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
-        assertStringContains(msg, "logEvent-error.start");
         assertStringContains(msg, "java.net.SocketException: Connection reset");
-        assertStringContains(msg, "errorCode=VP009");
+        assertStringContains(msg, "labels.errorCode=\"VP009\"");
 
         ResetByPeerServer.stopServer();
     }

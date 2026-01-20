@@ -2,6 +2,7 @@ package se.skl.tp.vp.integrationtests;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.skl.tp.vp.requestreader.RequestReaderProcessorXMLEventReaderTest.MTOM_TEXT_1;
 import static se.skl.tp.vp.requestreader.RequestReaderProcessorXMLEventReaderTest.MTOM_TEXT_2;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
@@ -23,6 +24,7 @@ import se.skl.tp.vp.logging.MessageInfoLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
+@SuppressWarnings("HttpUrlsUsage") // Localhost url for testing
 @CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -30,6 +32,7 @@ import se.skl.tp.vp.util.TestLogAppender;
 public class FullServiceMtomIT extends LeakDetectionBaseTest {
 
   public static final String HTTP_PRODUCER_URL = "http://localhost:19000/vardgivare-b/tjanst2";
+  public static final String CONTENT_TYPE_HEADER = "multipart/related; type=\"application/xop+xml\";start=\"<http://tempuri.org/0>\";boundary=\"uuid:1b56605a-1344-46cd-98b9-4687e64cfe7a+id=393\";start-info=\"text/xml\"\\r\\n";
 
   @Autowired
   TestConsumer testConsumer;
@@ -37,68 +40,48 @@ public class FullServiceMtomIT extends LeakDetectionBaseTest {
   @Autowired
   MockProducer mockProducer;
 
-  @Value("${vp.http.route.url}")
-  String vpHttpUrl;
-
   @Value("${vp.https.route.url}")
   String vpHttpsUrl;
 
-  @Value("${vp.instance.id}")
-  String vpInstanceId;
-
-  @Value("${http.forwarded.header.xfor}")
-  String forwardedHeaderFor;
-
-  @Value("${http.forwarded.header.host}")
-  String forwardedHeaderHost;
-
-  @Value("${http.forwarded.header.port}")
-  String forwardedHeaderPort;
-
-  @Value("${http.forwarded.header.proto}")
-  String forwardedHeaderProto;
-
   @BeforeEach
-  public void before() {
-    try {
-      mockProducer.start(HTTP_PRODUCER_URL);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  void before() throws Exception {
+    mockProducer.start(HTTP_PRODUCER_URL);
     TestLogAppender.clearEvents();
   }
 
   @Test
-  public void callMtomHappyDays() {
+  void callMtomHappyDays() {
     mockProducer.setResponseBody("<This worked!/>");
 
     Map<String, Object> headers = new HashMap<>();
-    headers.put("Content-Type", "multipart/related; type=\"application/xop+xml\";start=\"<http://tempuri.org/0>\";boundary=\"uuid:1b56605a-1344-46cd-98b9-4687e64cfe7a+id=393\";start-info=\"text/xml\"\\r\\n");
+    headers.put("Content-Type", CONTENT_TYPE_HEADER);
     String response = testConsumer.sendHttpsRequestToVP(MTOM_TEXT_1, headers);
     assertEquals("<This worked!/>", response);
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "skltp-messages");
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpsUrl);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpsUrl);
 
   }
 
   @Test
-  public void callMtomHappyDays2() {
+  void callMtomHappyDays2() {
     mockProducer.setResponseBody("<This also worked!/>");
 
     Map<String, Object> headers = new HashMap<>();
-    headers.put("Content-Type", "multipart/related; type=\"application/xop+xml\";start=\"<http://tempuri.org/0>\";boundary=\"uuid:1b56605a-1344-46cd-98b9-4687e64cfe7a+id=393\";start-info=\"text/xml\"\\r\\n");
+    headers.put("Content-Type", CONTENT_TYPE_HEADER);
     String response = testConsumer.sendHttpsRequestToVP(MTOM_TEXT_2, headers);
     assertEquals("<This also worked!/>", response);
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "skltp-messages");
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpsUrl);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpsUrl);
 
   }
 

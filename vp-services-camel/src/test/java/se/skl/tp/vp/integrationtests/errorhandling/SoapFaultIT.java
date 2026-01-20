@@ -1,20 +1,17 @@
 package se.skl.tp.vp.integrationtests.errorhandling;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.VPRouter.VAGVAL_PROCESSOR_ID;
 import static se.skl.tp.vp.VPRouter.VAGVAL_ROUTE;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_NO_PRODUCER_AVAILABLE;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.regex.Pattern;
+
 import jakarta.xml.soap.SOAPBody;
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
 
@@ -50,21 +47,20 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
   private CamelContext camelContext;
 
   @BeforeEach
-  public void mockVagvalProcessor() throws Exception {
+  void mockVagvalProcessor() throws Exception {
     replaceVagvalProcessor();
     makeMockVagvalProcessorThrowException();
     camelContext.start();
   }
 
   @Test
-  public void unexpectedExceptionInRouteShouldResultInSoapFault() throws Exception {
+  void unexpectedExceptionInRouteShouldResultInSoapFault() {
 
-    Map<String, Object> headers = new HashMap<>();
-    String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), headers);
+    String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NO_PRODUCER_AVAILABLE), java.util.Collections.emptyMap());
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
     assertNotNull(soapBody, "Expected a SOAP message");
-    assertNotNull(soapBody.hasFault(), "Expected a SOAPFault");
+    assertTrue(soapBody.hasFault(), "Expected a SOAPFault");
 
     String faultString = soapBody.getFault().getFaultString();
     assertStringContains(faultString, TEST_EXCEPTION_MESSAGE);
@@ -83,31 +79,35 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
     String errMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
     String reqInMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
     String respOutMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    String corr1 = errMsg.substring(errMsg.indexOf("BusinessCorrelationId"), errMsg.indexOf("ExtraInfo")).trim();
-    String corr2 = reqInMsg.substring(reqInMsg.indexOf("BusinessCorrelationId"), reqInMsg.indexOf("ExtraInfo")).trim();
-    String corr3 = respOutMsg.substring(respOutMsg.indexOf("BusinessCorrelationId"), respOutMsg.indexOf("ExtraInfo")).trim();
-    assertEquals(corr1, corr2);
-    assertEquals(corr2, corr3);
+    assertNotNull(errMsg);
+    assertNotNull(reqInMsg);
+    assertNotNull(respOutMsg);
+    var regex = Pattern.compile("trace.id=\"([^\"]+)\"");
+    var errMatcher = regex.matcher(errMsg);
+    var reqInMatcher = regex.matcher(reqInMsg);
+    var respOutMatcher = regex.matcher(respOutMsg);
+    assertTrue(errMatcher.find(), "No trace.id found in REQ_ERROR log");
+    assertTrue(reqInMatcher.find(), "No trace.id found in REQ_IN log");
+    assertTrue(respOutMatcher.find(), "No trace.id found in RESP_OUT log");
+    String errTraceId = errMatcher.group(1);
+    String reqInTraceId = reqInMatcher.group(1);
+    String respOutTraceId = respOutMatcher.group(1);
+    assertEquals(errTraceId, reqInTraceId);
+    assertEquals(reqInTraceId, respOutTraceId);
   }
 
   private void replaceVagvalProcessor() throws Exception {
 
-	  AdviceWith.adviceWith(camelContext, VAGVAL_ROUTE, a -> {
-		  a.weaveById(VAGVAL_PROCESSOR_ID)
-          .replace().to("mock:vagvalprocessor");
-		  
-		}
-	  );  
+	  AdviceWith.adviceWith(
+        camelContext, VAGVAL_ROUTE,
+        a -> a.weaveById(VAGVAL_PROCESSOR_ID).replace().to("mock:vagvalprocessor")
+    );
     
   }
 
   private void makeMockVagvalProcessorThrowException() {
-    resultEndpoint.whenAnyExchangeReceived(new Processor() {
-      @Override
-      public void process(Exchange exchange) throws Exception {
-        throw new NullPointerException(TEST_EXCEPTION_MESSAGE);
-      }
+    resultEndpoint.whenAnyExchangeReceived(exchange -> {
+      throw new NullPointerException(TEST_EXCEPTION_MESSAGE);
     });
   }
-
 }

@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import lombok.Getter;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
@@ -27,29 +30,28 @@ public class TestLogAppender extends AbstractAppender {
       instance.start();
     }
 
-    if(instance != null){
-      instance.clearEvents();
-    }
+    TestLogAppender.clearEvents();
 
     return instance;
   }
 
-  public static TestLogAppender getInstance(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions) {
+  public static TestLogAppender getInstance(String name, Filter filter, Layout<? extends Serializable> layout) {
     if (instance == null) {
       instance = new TestLogAppender(name, filter, layout, true);
     }
     return instance;
   }
 
-  private static List<LogEvent> events = new ArrayList<>();
-  private static List<LogEvent> leakEvents = new ArrayList<>();
+  private static final List<LogEvent> events = new ArrayList<>();
+  @Getter
+  private static final List<LogEvent> leakEvents = new ArrayList<>();
 
   protected TestLogAppender(String name, Filter filter, Layout<? extends Serializable> layout) {
-    super(name, filter, layout);
+    super(name, filter, layout, true, Property.EMPTY_ARRAY);
   }
 
   protected TestLogAppender(String name, Filter filter, Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
-    super(name, filter, layout, ignoreExceptions);
+    super(name, filter, layout, ignoreExceptions, Property.EMPTY_ARRAY);
   }
 
   @Override
@@ -73,10 +75,6 @@ public class TestLogAppender extends AbstractAppender {
 
   public static void clearLeakEvents(){
     leakEvents.clear();
-  }
-
-  public static List<LogEvent> getLeakEvents() {
-    return leakEvents;
   }
 
   public static String getEventMessage(String loggerName, int index) {
@@ -109,11 +107,11 @@ public class TestLogAppender extends AbstractAppender {
   }
 
   public static List<LogEvent> getEvents(String loggerName) {
-    return events.stream().filter(lg -> loggerName.equals(lg.getLoggerName())).collect(Collectors.toList());
+    return events.stream().filter(lg -> loggerName.equals(lg.getLoggerName())).toList();
   }
 
-  public static int getNumEvents(String loggerName) {
-    return events.stream().filter(lg -> loggerName.equals(lg.getLoggerName())).collect(Collectors.toList()).size();
+  public static long getNumEvents(String loggerName) {
+    return events.stream().filter(lg -> loggerName.equals(lg.getLoggerName())).count();
   }
 
 
@@ -136,17 +134,17 @@ public class TestLogAppender extends AbstractAppender {
       layout = PatternLayout.createDefaultLayout();
     }
 
-    return getInstance(name, filter, layout, true);
+    return getInstance(name, filter, layout);
   }
 
   public static void assertLogMessage(String loggerName, String receiver, String trace, String logMessage, String endpointUrl, String senderId) {
     String respOutLogMsg = TestLogAppender.getEventMessage(loggerName, 0);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "LogMessage=(.*)", logMessage, 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-senderid=(.*)", senderId, 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-endpoint_url=(.*)", endpointUrl, 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-receiverid=(.*)",  receiver, 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerVagvalTrace=(.*)", trace, 1);
-    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "-routerBehorighetTrace=(.*)", trace, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "event.action=\"([^\"]+)\"", logMessage, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "labels.senderid=\"([^\"]+)\"", senderId, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "url.original=\"([^\"]+)\"", endpointUrl, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "labels.receiverid=\"([^\"]+)\"",  receiver, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "labels.routerVagvalTrace=\"([^\"]+)\"", trace, 1);
+    JunitUtil.assertMatchRegexGroup(respOutLogMsg, "labels.routerBehorighetTrace=\"([^\"]+)\"", trace, 1);
   }
 
 }
