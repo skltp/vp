@@ -156,7 +156,47 @@ memory.logger.period.seconds=0
 ```
 
 ### Exempel på application-security.properties
+
+#### Rekommenderad konfiguration med vp.tls och SSL bundles ####
+```properties
+
+spring.ssl.bundle.pem.prod-bundle.keystore.certificate=/certs/tp-cert.pem
+spring.ssl.bundle.pem.prod-bundle.keystore.private-key=/certs/tp-key.pem
+spring.ssl.bundle.pem.prod-bundle.keystore.private-key-password=password
+spring.ssl.bundle.pem.prod-bundle.truststore.certificate=/certs/ca-cert.pem
+
+spring.ssl.bundle.pem.legacy-bundle.keystore.certificate=/certs/legacy-client-cert.pem
+spring.ssl.bundle.pem.legacy-bundle.keystore.private-key=/certs/legacy-client-key.pem
+spring.ssl.bundle.pem.legacy-bundle.keystore.private-key-password=password
+spring.ssl.bundle.pem.legacy-bundle.truststore.certificate=/certs/legacy-ca-cert.pem
+
+# -----------------------------------------------------------
+# TLS-konfiguration (vp.tls.*)
+# -----------------------------------------------------------
+
+# Default TLS-konfiguration
+vp.tls.default-config.name=default
+vp.tls.default-config.bundle=prod-bundle
+
+# Exempel på override för specifika domäner med strängare krav
+vp.tls.overrides[0].name=strict
+vp.tls.overrides[0].bundle=prod-bundle
+vp.tls.overrides[0].protocols-include=TLSv1.3
+vp.tls.overrides[0].cipher-suites-include=TLS_AES_256_GCM_SHA384
+vp.tls.overrides[0].match.domain-suffix=.secure-domain.se
+
+# Exempel på override för legacy-system
+vp.tls.overrides[1].name=legacy
+vp.tls.overrides[1].bundle=legacy-bundle
+vp.tls.overrides[1].protocols-include=TLSv1.2,TLSv1.1
+vp.tls.overrides[1].match.domain-name=legacy-system.example.se
+vp.tls.overrides[1].match.port=8080
 ```
+
+#### Äldre konfiguration med tp.tls (DEPRECATED) ####
+**️ VARNING: Denna konfiguration är deprecated och kommer att tas bort i framtida versioner. Migrera till `vp.tls.*` och SSL bundles så snart som möjligt.**
+
+```properties
 # Overrides applications default vp-config.properties
  
 #Location where certificate files are found
@@ -182,7 +222,6 @@ tp.tls.allowedOutgoingProtocols=TLSv1,TLSv1.1,TLSv1.2
 
 tp.tls.allowedIncomingCipherSuites=*
 tp.tls.allowedOutgoingCipherSuites=*
- 
 ```
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)

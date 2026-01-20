@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.camel.Exchange;
-import org.springframework.beans.factory.annotation.Value;
 
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.VPExchangeProperties;
@@ -22,6 +21,7 @@ public class LogExtraInfoBuilder {
   public static final String WSDL_NAMESPACE = "wsdl_namespace";
   public static final String SENDER_IP_ADRESS = VPExchangeProperties.SENDER_IP_ADRESS;
   public static final String VAGVAL_TRACE = VPExchangeProperties.VAGVAL_TRACE;
+  public static final String SSL_CONTEXT_ID = VPExchangeProperties.SSL_CONTEXT_ID;
   public static final String ANROPSBEHORIGHET_TRACE = VPExchangeProperties.ANROPSBEHORIGHET_TRACE;
   public static final String OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid";
   public static final String IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID = "originalServiceconsumerHsaid_in";
@@ -76,6 +76,7 @@ public class LogExtraInfoBuilder {
     extraInfo.putNotNull(VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class));
     extraInfo.putNotNull(ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class));
     extraInfo.putNotNull(ENDPOINT_URL, exchange.getProperty(VPExchangeProperties.VAGVAL, String.class));
+    extraInfo.putNotNull(SSL_CONTEXT_ID, exchange.getProperty(VPExchangeProperties.SSL_CONTEXT_ID, String.class));
 
     String timeProducer = exchange.getIn().getHeader(HttpHeaders.X_SKLTP_PRODUCER_RESPONSETIME, String.class);
     extraInfo.putNotNull(TIME_PRODUCER, timeProducer);
@@ -112,6 +113,7 @@ public class LogExtraInfoBuilder {
     }
   }
 
+  @SuppressWarnings("java:S125") // SonarQube incorrectly flags the URI as commented-out code
   private static String createWsdlNamespace(String serviceContractNS, String profile) {
     //  Convert from interaction target namespace
     //    urn:${domänPrefix}:${tjänsteDomän}:${tjänsteInteraktion}${roll}:${m}

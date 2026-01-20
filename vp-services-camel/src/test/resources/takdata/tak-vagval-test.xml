@@ -32,6 +32,24 @@
   </virtualiseringsInfo>
   <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
     <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpsProducerStrict</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2123-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:19002/vardgivare-c/tjanst3</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
+    <ns2:receiverId>HttpsProducerLegacy</ns2:receiverId>
+    <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
+    <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>
+    <ns2:fromTidpunkt>2013-08-09T13:25:24.260+02:00</ns2:fromTidpunkt>
+    <ns2:tomTidpunkt>2123-08-09T14:25:24.260+02:00</ns2:tomTidpunkt>
+    <ns2:adress>https://localhost:19003/vardgivare-d/tjanst4</ns2:adress>
+  </virtualiseringsInfo>
+  <virtualiseringsInfo xmlns:ns2="urn:skl:tp:vagvalsinfo:v2">
+    <ns2:virtualiseringsInfoId>1</ns2:virtualiseringsInfoId>
     <ns2:receiverId>NotAuhorizedReceiver</ns2:receiverId>
     <ns2:rivProfil>RIVTABP20</ns2:rivProfil>
     <ns2:tjansteKontrakt>urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1</ns2:tjansteKontrakt>

@@ -17,6 +17,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +55,8 @@ import se.skl.tp.vp.util.TestLogAppender;
 @SpringBootTest
 @StartTakService
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Disabled // Disabled to avoid running in CI/CD pipelines by mistake
+@SuppressWarnings({"java:S3577", "java:S2925", "NewClassNamingConvention"}) // Thread.sleep is ok in load test, class name is descriptive
 public class ManualLoadTesting extends LeakDetectionBaseTest {
 
   private enum CallTypes {
@@ -61,7 +64,7 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
     NORMAL_PAYLOAD,
     RESET_BY_PEER,
     VP007
-  };
+  }
 
   // CHANGE THIS TO CHANGE BEHAVIOUR OF THE TEST
   public static final int CALLS_PER_SECOND = 25;
@@ -82,10 +85,6 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
   public static final String HTTPS_PRODUCER_URL = "https://localhost:19001/vardgivare-b/tjanst2";
   public static final String HTTP_PRODUCER_URL = "http://localhost:19000/vardgivare-b/tjanst2";
 
-  static {
-//    System.setProperty("io.netty.maxDirectMemory", "0");
-  }
-
   @Value("${vp.instance.id}")
   String vpInstanceId;
 
@@ -102,28 +101,25 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
   Map<CallTypes, Long> randomCalls = new ConcurrentHashMap<>();
 
   @BeforeAll
+  @SuppressWarnings("java:S5786") // Used both in @BeforeAll and direct calls, so must be public
   public static void startLeakDetection() {
     System.setProperty("spring.profiles.active", "leak");
     LeakDetectionBaseTest.startLeakDetection();
   }
 
   @BeforeEach
-  public void before() {
-
-    try {
-      mockProducer.start(HTTP_PRODUCER_URL);
-      mockProducer.setResponseResourceXml("testfiles/GetSubjectOfCareLargeResponse.xml");
-      mockHttpsProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");
-      mockHttpsProducer.setResponseResourceXml("testfiles/GetSubjectOfCareLargeResponse.xml");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  void before() throws Exception {
+    mockProducer.start(HTTP_PRODUCER_URL);
+    mockProducer.setResponseResourceXml("testfiles/GetSubjectOfCareLargeResponse.xml");
+    mockHttpsProducer.start(HTTPS_PRODUCER_URL);
+    mockHttpsProducer.setResponseResourceXml("testfiles/GetSubjectOfCareLargeResponse.xml");
     TestLogAppender.clearEvents();
   }
 
 
-  //@Test
-  public void justLoad() throws InterruptedException {
+  @Test
+  @SuppressWarnings("java:S2699") // No assertions as this is a manual load test
+  void justLoad() throws InterruptedException {
 
     startResetByPeerServer();
 
@@ -132,7 +128,7 @@ public class ManualLoadTesting extends LeakDetectionBaseTest {
     mockProducer.setWeightedTimeouts(PRODUCER_WEIGHTED_TIMEOUTS);
     mockHttpsProducer.setWeightedTimeouts(PRODUCER_WEIGHTED_TIMEOUTS);
 
-    load(() -> callWithRandomContract(), CALLS_PER_SECOND, DURATION_IN_SECONDS);
+    load(this::callWithRandomContract, CALLS_PER_SECOND, DURATION_IN_SECONDS);
     System.out.println(getNettyMemoryJsonString());
 
     TimeUnit.SECONDS.sleep(10);

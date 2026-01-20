@@ -45,7 +45,7 @@ public class HttpResponseHeadersIT extends LeakDetectionBaseTest {
   @BeforeEach
   public void before() {
     try {
-      mockProducer.start(HTTPS_PRODUCER_URL + "?sslContextParameters=#outgoingSSLContextParameters&ssl=true");
+      mockProducer.start(HTTPS_PRODUCER_URL);
     } catch (Exception e) {
       e.printStackTrace();
     }
