@@ -9,7 +9,6 @@ import se.skl.tp.vp.logging.logentry.EcsLogEntry;
 
 import java.util.UUID;
 
-
 public class MessageInfoLogger {
 
   public static final String REQ_IN = "se.skl.tp.vp.logging.req.in";
@@ -58,7 +57,6 @@ public class MessageInfoLogger {
       EcsLogEntry ecsLogEntry = new EcsLogEntry.Builder(MSG_TYPE_ERROR)
               .fromExchange(exchange)
               .withHttpForwardHeaders(exchange)
-              .withLabel(EcsLogEntry.LABEL_SOURCE, getClass().getName())
               .withException(exchange, stackTrace)
               .build();
       LOGGER_ERROR.error(ecsLogEntry);
@@ -86,7 +84,6 @@ public class MessageInfoLogger {
     return new EcsLogEntry.Builder(messageType)
             .fromExchange(exchange)
             .withHttpForwardHeaders(exchange)
-            .withLabel(EcsLogEntry.LABEL_SOURCE, getClass().getName())
             .build();
   }
 }

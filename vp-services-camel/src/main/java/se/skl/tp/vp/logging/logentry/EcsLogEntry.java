@@ -3,6 +3,7 @@ package se.skl.tp.vp.logging.logentry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.logging.log4j.message.StringMapMessage;
 import se.skl.tp.vp.constants.HttpHeaders;
@@ -11,14 +12,18 @@ import se.skl.tp.vp.errorhandling.VpCodeMessages;
 
 import java.util.*;
 
+@Slf4j
 public class EcsLogEntry extends StringMapMessage {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static final String EVENT_KIND_VALUE = "event";
+    public static final String EVENT_MODULE_VALUE = "skltp-messages";
     public static final String EVENT_CATEGORY_VALUE;
     public static final String EVENT_TYPE_VALUE_REQ;
     public static final String EVENT_TYPE_VALUE_RESP;
+
+    private static final EcsSystemProperties SYSTEM_PROPERTIES = EcsSystemProperties.getInstance();
 
     static {
         try {
@@ -31,6 +36,8 @@ public class EcsLogEntry extends StringMapMessage {
     }
 
     // Custom label fields
+    /** Parent ID for tracing, used to identify the parent operation of a span */
+    public static final String LABEL_PARENT_ID = "parent.id";
     public static final String LABEL_VP_X_FORWARDED_PROTO = "httpXForwardedProto";
     public static final String LABEL_VP_X_FORWARDED_HOST = "httpXForwardedHost";
     public static final String LABEL_VP_X_FORWARDED_PORT = "httpXForwardedPort";
@@ -53,9 +60,16 @@ public class EcsLogEntry extends StringMapMessage {
     public static final String LABEL_SOAP_FAULT_CODE = "faultCode";
     public static final String LABEL_SOAP_FAULT_STRING = "faultString";
     public static final String LABEL_SOAP_FAULT_DETAIL = "faultDetail";
-    public static final String LABEL_SOURCE = "source";
 
-    public static final String EVENT_MODULE_VALUE = "skltp-messages";
+    // Fields for backward compatibility
+    public static final String BACKWARD_COMPAT_LOG_MESSAGE = "LogMessage";
+    public static final String BACKWARD_COMPAT_SERVICE_IMPL = "ServiceImpl";
+    public static final String BACKWARD_COMPAT_COMPONENT_ID = "ComponentId";
+    public static final String BACKWARD_COMPAT_ENDPOINT = "Endpoint";
+    public static final String BACKWARD_COMPAT_MESSAGE_ID = "MessageId";
+    public static final String BACKWARD_COMPAT_BUSINESS_CORRELATION_ID = "BusinessCorrelationId";
+
+    // Fields for backward compatibility
 
     public EcsLogEntry withPayload(String payload) {
         if (payload != null) {
@@ -78,17 +92,34 @@ public class EcsLogEntry extends StringMapMessage {
             putData(EcsFields.EVENT_CATEGORY, EVENT_CATEGORY_VALUE);
             putData(EcsFields.EVENT_TYPE, isReq(msgType) ? EVENT_TYPE_VALUE_REQ : EVENT_TYPE_VALUE_RESP);
             putData(EcsFields.EVENT_MODULE, EVENT_MODULE_VALUE);
+            putData(EcsFields.HOST_HOSTNAME, SYSTEM_PROPERTIES.getHostName());
+            putData(EcsFields.HOST_IP, SYSTEM_PROPERTIES.getHostIp());
+            putData(EcsFields.HOST_ARCHITECTURE, SYSTEM_PROPERTIES.getHostArchitecture());
+            putData(EcsFields.HOST_OS_FAMILY, SYSTEM_PROPERTIES.getHostOsFamily());
+            putData(EcsFields.HOST_OS_NAME, SYSTEM_PROPERTIES.getHostOsName());
+            putData(EcsFields.HOST_OS_VERSION, SYSTEM_PROPERTIES.getHostOsVersion());
+            putData(EcsFields.HOST_OS_PLATFORM, SYSTEM_PROPERTIES.getHostOsPlatform());
+            putData(EcsFields.HOST_TYPE, SYSTEM_PROPERTIES.getHostType());
         }
 
         public EcsLogEntry build() {
+            addBackwardCompatibilityFields();
+            putData(EcsFields.MESSAGE, String.format("%s %s -> %s",
+                    data.get(EcsFields.EVENT_ACTION),
+                    data.get(EcsFields.LABELS + LABEL_SENDER_ID),
+                    data.get(EcsFields.LABELS + LABEL_RECEIVER_ID)));
             EcsLogEntry ecsLogEntry = new EcsLogEntry();
             ecsLogEntry.putAll(data.getData());
             return ecsLogEntry;
         }
 
-        public Builder withLabel(String source, String name) {
-            putData(EcsFields.LABELS + source, name);
-            return this;
+        private void addBackwardCompatibilityFields() {
+            putData(BACKWARD_COMPAT_LOG_MESSAGE, data.get(EcsFields.EVENT_ACTION));
+            putData(BACKWARD_COMPAT_SERVICE_IMPL, data.get(EcsFields.LABELS + LABEL_ROUTE));
+            putData(BACKWARD_COMPAT_COMPONENT_ID, data.get(EcsFields.SERVICE_NAME));
+            putData(BACKWARD_COMPAT_ENDPOINT, data.get(EcsFields.URL_FULL));
+            putData(BACKWARD_COMPAT_MESSAGE_ID, data.get(EcsFields.TRANSACTION_ID));
+            putData(BACKWARD_COMPAT_BUSINESS_CORRELATION_ID, data.get(EcsFields.TRACE_ID));
         }
 
         public Builder fromExchange(Exchange exchange) {
@@ -102,7 +133,7 @@ public class EcsLogEntry extends StringMapMessage {
 
             putTracing(exchange);
             putData(EcsFields.SERVICE_NAME, componentId); // Name of the service
-            withLabel(LABEL_ROUTE, serviceImplementation); // Internal route identifier
+            putLabel(LABEL_ROUTE, serviceImplementation); // Internal route identifier
             putData(EcsFields.URL_FULL, endpoint); // Full URL of the request
             putData(EcsFields.HTTP_REQUEST_METHOD, exchange.getIn().getHeader(Exchange.HTTP_METHOD, String.class));
             putData(EcsFields.HTTP_RESPONSE_STATUS_CODE, exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, String.class));
@@ -121,7 +152,7 @@ public class EcsLogEntry extends StringMapMessage {
             if (spanB == null) {
                 putData(EcsFields.SPAN_ID, spanA);
             } else {
-                putData(EcsFields.PARENT_ID, spanA);
+                putLabel(LABEL_PARENT_ID, spanA);
                 putData(EcsFields.SPAN_ID, spanB);
             }
         }
@@ -143,17 +174,17 @@ public class EcsLogEntry extends StringMapMessage {
         public Builder withHttpForwardHeaders(Exchange exchange) {
             String httpXForwardedProto = exchange.getProperty(VPExchangeProperties.VP_X_FORWARDED_PROTO, String.class);
             if (httpXForwardedProto != null) {
-                withLabel(LABEL_VP_X_FORWARDED_PROTO, httpXForwardedProto);
+                putLabel(LABEL_VP_X_FORWARDED_PROTO, httpXForwardedProto);
                 exchange.removeProperty(VPExchangeProperties.VP_X_FORWARDED_PROTO);
             }
             String httpXForwardedHost = exchange.getProperty(VPExchangeProperties.VP_X_FORWARDED_HOST, String.class);
             if (httpXForwardedHost != null) {
-                withLabel(LABEL_VP_X_FORWARDED_HOST, httpXForwardedHost);
+                putLabel(LABEL_VP_X_FORWARDED_HOST, httpXForwardedHost);
                 exchange.removeProperty(VPExchangeProperties.VP_X_FORWARDED_HOST);
             }
             String httpXForwardedPort = exchange.getProperty(VPExchangeProperties.VP_X_FORWARDED_PORT, String.class);
             if (httpXForwardedPort != null) {
-                withLabel(LABEL_VP_X_FORWARDED_PORT, httpXForwardedPort);
+                putLabel(LABEL_VP_X_FORWARDED_PORT, httpXForwardedPort);
                 exchange.removeProperty(VPExchangeProperties.VP_X_FORWARDED_PORT);
             }
             return this;
@@ -170,19 +201,19 @@ public class EcsLogEntry extends StringMapMessage {
             putData(EcsFields.SOURCE_IP, senderIp);
             putDestination(exchange);
 
-            withLabel(LABEL_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class));
-            withLabel(LABEL_RECEIVER_ID, exchange.getProperty(VPExchangeProperties.RECEIVER_ID, String.class));
-            withLabel(LABEL_OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID, exchange.getProperty(VPExchangeProperties.OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class));
-            withLabel(LABEL_IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class));
-            withLabel(LABEL_ACTING_ON_BEHALF_OF_HSA_ID, exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID, String.class));
-            withLabel(LABEL_SERVICECONTRACT_NAMESPACE, serviceContractNS);
-            withLabel(LABEL_RIV_VERSION, rivVersion);
-            withLabel(LABEL_WSDL_NAMESPACE, createWsdlNamespace(serviceContractNS, rivVersion));
-            withLabel(LABEL_VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class));
-            withLabel(LABEL_ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class));
-            withLabel(LABEL_SOAP_FAULT_CODE, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE, String.class));
-            withLabel(LABEL_SOAP_FAULT_STRING, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING, String.class));
-            withLabel(LABEL_SOAP_FAULT_DETAIL, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, String.class));
+            putLabel(LABEL_SENDER_ID, exchange.getProperty(VPExchangeProperties.SENDER_ID, String.class));
+            putLabel(LABEL_RECEIVER_ID, exchange.getProperty(VPExchangeProperties.RECEIVER_ID, String.class));
+            putLabel(LABEL_OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID, exchange.getProperty(VPExchangeProperties.OUT_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class));
+            putLabel(LABEL_IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, exchange.getProperty(VPExchangeProperties.IN_ORIGINAL_SERVICE_CONSUMER_HSA_ID, String.class));
+            putLabel(LABEL_ACTING_ON_BEHALF_OF_HSA_ID, exchange.getIn().getHeader(HttpHeaders.X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID, String.class));
+            putLabel(LABEL_SERVICECONTRACT_NAMESPACE, serviceContractNS);
+            putLabel(LABEL_RIV_VERSION, rivVersion);
+            putLabel(LABEL_WSDL_NAMESPACE, createWsdlNamespace(serviceContractNS, rivVersion));
+            putLabel(LABEL_VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class));
+            putLabel(LABEL_ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class));
+            putLabel(LABEL_SOAP_FAULT_CODE, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE, String.class));
+            putLabel(LABEL_SOAP_FAULT_STRING, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING, String.class));
+            putLabel(LABEL_SOAP_FAULT_DETAIL, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, String.class));
 
             String eventAction = Optional.ofNullable(data.get(EcsFields.EVENT_ACTION)).orElse("?");
             String contentLength = isReq(eventAction) ? EcsFields.HTTP_REQUEST_BODY_BYTES : EcsFields.HTTP_RESPONSE_BODY_BYTES;
@@ -239,11 +270,11 @@ public class EcsLogEntry extends StringMapMessage {
             String errorCode = exchange.getProperty(VPExchangeProperties.SESSION_ERROR_CODE, String.class);
             String htmlStatus = exchange.getProperty(VPExchangeProperties.SESSION_HTML_STATUS, String.class);
 
-            withLabel(LABEL_SESSION_ERROR, "true");
-            withLabel(LABEL_SESSION_ERROR_DESCRIPTION, errorDescription);
-            withLabel(LABEL_SESSION_ERROR_TECHNICAL_DESCRIPTION, technicalDescription);
-            withLabel(LABEL_SESSION_ERROR_CODE, errorCode);
-            withLabel(LABEL_SESSION_HTML_STATUS, htmlStatus);
+            putLabel(LABEL_SESSION_ERROR, "true");
+            putLabel(LABEL_SESSION_ERROR_DESCRIPTION, errorDescription);
+            putLabel(LABEL_SESSION_ERROR_TECHNICAL_DESCRIPTION, technicalDescription);
+            putLabel(LABEL_SESSION_ERROR_CODE, errorCode);
+            putLabel(LABEL_SESSION_HTML_STATUS, htmlStatus);
         }
 
         @SuppressWarnings("java:S125") // URI incorrectly flagged as commented out code
@@ -267,6 +298,10 @@ public class EcsLogEntry extends StringMapMessage {
 
         static void filterHeaders(Map<String, Object> headers, Map<String, String> res) {
             headers.forEach((s, o) -> res.put(s, s.matches(FILTERHEADER_REGEX) ? FILTERED_TEXT : String.valueOf(o)));
+        }
+
+        private void putLabel(String source, String name) {
+            putData(EcsFields.LABELS + source, name);
         }
 
         void putData(String key, String value) {

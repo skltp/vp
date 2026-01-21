@@ -6,12 +6,26 @@ package se.skl.tp.vp.logging.logentry;
  */
 public class EcsFields {
     private EcsFields() { /* Static utility class */ }
+    /** Name of the host machine */
+    public static final String HOST_HOSTNAME = "host.hostname";
+    /** IP address of the host machine */
+    public static final String HOST_IP = "host.ip";
+    /** Architecture of the host (e.g., x86_64, arm64) */
+    public static final String HOST_ARCHITECTURE = "host.architecture";
+    /** OS family (e.g., windows, unix, darwin) */
+    public static final String HOST_OS_FAMILY = "host.os.family";
+    /** Operating system name (e.g., Linux, Windows Server 2019) */
+    public static final String HOST_OS_NAME = "host.os.name";
+    /** Operating system version */
+    public static final String HOST_OS_VERSION = "host.os.version";
+    /** Operating system platform (e.g., linux, windows, darwin) */
+    public static final String HOST_OS_PLATFORM = "host.os.platform";
+    /** Type of host (e.g., container, vm, physical) */
+    public static final String HOST_TYPE = "host.type";
     /** Correlation ID for tracing, used to tie related events together */
     public static final String TRACE_ID = "trace.id";
     /** Span ID for tracing, used to identify a specific operation within a trace */
     public static final String SPAN_ID = "span.id";
-    /** Parent ID for tracing, used to identify the parent operation of a span */
-    public static final String PARENT_ID = "parent.id";
     /** Camel exchange ID */
     public static final String TRANSACTION_ID = "transaction.id";
 
@@ -76,4 +90,7 @@ public class EcsFields {
 
     /** Labels for additional metadata as key-value pairs */
     public static final String LABELS = "labels.";
+
+    /** The log message */
+    public static final String MESSAGE = "message";
 }
