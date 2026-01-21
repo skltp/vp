@@ -38,5 +38,10 @@ public class VPExchangeProperties {
 
   public static final String EXCHANGE_CREATED = "exchangeCreated";
 
+  public static final String SOAP_FAULT_CODE = "faultCode";
+  public static final String SOAP_FAULT_STRING = "faultString";
+  public static final String SOAP_FAULT_DETAIL = "faultDetail";
 
+  public static final String SPAN_REQ_IN_TO_RESP_OUT = "spanIdRequest";
+  public static final String SPAN_REQ_OUT_TO_RESP_IN = "spanIdResponse";
 }

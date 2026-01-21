@@ -1,6 +1,7 @@
 package se.skl.tp.vp.integrationtests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTP;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
@@ -37,17 +38,13 @@ public class FullServiceInvalidContentLengthIT extends LeakDetectionBaseTest {
   MockProducer mockProducer;
 
   @BeforeEach
-  public void before() throws Exception {
-    try {
-      mockProducer.start(HTTP_PRODUCER_URL + "?nettyHttpBinding=#producerContentLengthManipulator&disconnect=true");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  void before() throws Exception {
+    mockProducer.start(HTTP_PRODUCER_URL + "?nettyHttpBinding=#producerContentLengthManipulator&disconnect=true");
     TestLogAppender.clearEvents();
   }
 
   @Test
-  public void producerAnswerWithTooBigContentLengthShouldBeOk() {
+  void producerAnswerWithTooBigContentLengthShouldBeOk() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -56,11 +53,12 @@ public class FullServiceInvalidContentLengthIT extends LeakDetectionBaseTest {
     assertEquals("<mocked answer/>", response);
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "skltp-messages");
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid_in=originalid");
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=originalid");
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid_in=\"originalid\"");
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"originalid\"");
   }
 
 }

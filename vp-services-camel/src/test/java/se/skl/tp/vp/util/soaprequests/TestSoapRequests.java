@@ -11,12 +11,12 @@ public class TestSoapRequests {
   public static final String RECEIVER_HTTPS = "HttpsProducer";
   public static final String RECEIVER_TRAILING_WHITESPACE = "HttpsProducer ";
   public static final String RECEIVER_LEADING_WHITESPACE = " HttpsProducer";
-  public static final String RECEIVER_NO_PRODUCER_AVAILABLE = "RecevierNoProducerAvailable";
+  public static final String RECEIVER_NO_PRODUCER_AVAILABLE = "ReceiverNoProducerAvailable";
   public static final String RECEIVER_WITH_NO_VAGVAL = "NoVagvalReceiver";
-  public static final String RECEIVER_NOT_AUHORIZED = "NotAuhorizedReceiver";
-  public static final String RECEIVER_UNKNOWN_RIVVERSION = "RecevierUnknownRivVersion";
-  public static final String RECEIVER_MULTIPLE_VAGVAL = "RecevierMultipleVagval";
-  public static final String RECEIVER_NO_PHYSICAL_ADDRESS = "RecevierNoPhysicalAddress";
+  public static final String RECEIVER_NOT_AUTHORIZED = "NotAuthorizedReceiver";
+  public static final String RECEIVER_UNKNOWN_RIVVERSION = "ReceiverUnknownRivVersion";
+  public static final String RECEIVER_MULTIPLE_VAGVAL = "ReceiverMultipleVagval";
+  public static final String RECEIVER_NO_PHYSICAL_ADDRESS = "ReceiverNoPhysicalAddress";
   public static final String RECEIVER_RIV21 = "ReceiverRiv21";
   public static final String RECEIVER_RIV20 = "ReceiverRiv20";
 

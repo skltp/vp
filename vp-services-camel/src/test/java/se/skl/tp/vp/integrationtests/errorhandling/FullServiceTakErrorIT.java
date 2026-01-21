@@ -1,9 +1,8 @@
 package se.skl.tp.vp.integrationtests.errorhandling;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum.VP008;
-import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_NOT_AUHORIZED;
+import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_NOT_AUTHORIZED;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 
@@ -30,7 +29,7 @@ import se.skltp.takcache.TakCacheLog.RefreshStatus;
 @CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
+class FullServiceTakErrorIT extends LeakDetectionBaseTest {
 
   @Autowired
   TestConsumer testConsumer;
@@ -39,31 +38,32 @@ public class FullServiceTakErrorIT extends LeakDetectionBaseTest {
   TakCacheService takCacheService;
 
   @BeforeEach
-  public void beforeTest(){
+  void beforeTest(){
     TestLogAppender.clearEvents();
   }
 
   @Test
-  public void shouldGetVP008NoTakServiceAndNoLocalCache() throws Exception {
+  void shouldGetVP008NoTakServiceAndNoLocalCache() {
     TakCacheLog takCacheLog = takCacheService.refresh();
-    assertEquals(false, takCacheLog.isRefreshSuccessful());
+    assertFalse(takCacheLog.isRefreshSuccessful());
     assertEquals(RefreshStatus.REFRESH_FAILED, takCacheLog.getRefreshStatus());
 
     Map<String, Object> headers = new HashMap<>();
-    String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NOT_AUHORIZED), headers);
+    String result = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_NOT_AUTHORIZED), headers);
 
     SOAPBody soapBody = SoapUtils.getSoapBody(result);
     assertNotNull(soapBody, "Expected a SOAP message");
-    assertNotNull(soapBody.hasFault(), "Expected a SOAPFault");
+    assertTrue(soapBody.hasFault(), "Expected a SOAPFault");
 
-    System.out.printf("Code:%s FaultString:%s\n", soapBody.getFault().getFaultCode(),
+    System.out.printf("Code:%s FaultString:%s%n", soapBody.getFault().getFaultCode(),
         soapBody.getFault().getFaultString());
     assertStringContains(soapBody.getFault().getFaultString(), VP008.getVpDigitErrorCode());
 
     assertEquals(1,TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
-    assertStringContains(errorLogMsg, "-errorCode=VP008");
-    assertStringContains(errorLogMsg, "Stacktrace=se.skl.tp.vp.exceptions.VpSemanticException: VP008");
+    assertNotNull(errorLogMsg);
+    assertStringContains(errorLogMsg, "labels.errorCode=\"VP008\"");
+    assertStringContains(errorLogMsg, "error.stack_trace=\"se.skl.tp.vp.exceptions.VpSemanticException: VP008");
 
   }
 

@@ -9,6 +9,8 @@ import static se.skl.tp.vp.util.takcache.TestTakDataDefines.RIV20;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
@@ -21,9 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
@@ -65,13 +67,13 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   @Produce("direct:start")
   protected ProducerTemplate template;
 
-  @MockBean
+  @MockitoBean
   TakCache takCache;
 
-  @MockBean
+  @MockitoBean
   VagvalCache vagvalCache;
 
-  @MockBean
+  @MockitoBean
   BehorigheterCache behorigheterCache;
 
   @Autowired
@@ -80,7 +82,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   private static MockProducer mockProducer;
 
   @BeforeEach
-  public void setUp() throws Exception {
+  void setUp() throws Exception {
     mockProducer = new MockProducer(camelContext, MOCK_PRODUCER_ADDRESS);
     addConsumerRoute(camelContext);
     camelContext.start();
@@ -94,7 +96,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   }
 
   @Test //Test för när ett SOAP-fault kommer från Producenten
-  public void errorInResponseTest() throws Exception {
+  void errorInResponseTest() throws Exception {
     mockProducer.setResponseHttpStatus(200);
     mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_EXCEPTION_MESSAGE,
         VPFaultCodeEnum.Client));
@@ -110,7 +112,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   }
 
   @Test //Test för när en Producent inte går att nå
-  public void noProducerOnURLResponseTest() throws Exception {
+  void noProducerOnURLResponseTest() throws Exception {
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(NO_EXISTING_PRODUCER, RIV20));
     setTakCacheMockResult(list);
@@ -123,13 +125,14 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
-    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
-    assertTrue(respOutLogMsg.contains("-sessionErrorTechnicalDescription=java.net.ConnectException: Cannot connect to localhost:12100"));
-    assertTrue(respOutLogMsg.contains("-sessionErrorDescription=Cannot connect to localhost:12100"));
+    assertNotNull(respOutLogMsg);
+    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode\":\"500"));
+    assertTrue(respOutLogMsg.contains("labels.sessionErrorTechnicalDescription=\"java.net.ConnectException: Cannot connect to localhost:12100"));
+    assertTrue(respOutLogMsg.contains("labels.sessionErrorDescription=\"Cannot connect to localhost:12100"));
   }
 
   @Test //Test för när en Producent inte svarar inom timeout-tiden (satt till 4s i testerna)
-  public void producerTimeoutTest() throws Exception {
+  void producerTimeoutTest() throws Exception {
     List<RoutingInfo> list = new ArrayList<>();
     list.add(createRoutingInfo(MOCK_PRODUCER_ADDRESS, RIV20));
     setTakCacheMockResult(list);
@@ -143,13 +146,14 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
-    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
-    assertTrue(respOutLogMsg.contains("-sessionErrorTechnicalDescription=io.netty.handler.timeout.ReadTimeoutException"));
-    assertTrue(respOutLogMsg.contains("-sessionErrorDescription=Fel vid kontakt med tjänsteproducenten."));
+    assertNotNull(respOutLogMsg);
+    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode\":\"500"));
+    assertTrue(respOutLogMsg.contains("labels.sessionErrorTechnicalDescription=\"io.netty.handler.timeout.ReadTimeoutException"));
+    assertTrue(respOutLogMsg.contains("labels.sessionErrorDescription=\"Fel vid kontakt med tjänsteproducenten."));
   }
 
   @Test //Test för när en Producent svarar med ett tomt svar
-  public void emptyResponseTest() throws Exception {
+  void emptyResponseTest() throws Exception {
     mockProducer.setResponseBody("");
 
     List<RoutingInfo> list = new ArrayList<>();
@@ -165,7 +169,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   }
 
   @Test //Test för när en Producent svarar med http status 404 (not found)
-  public void notFoundStatusResponseTest() throws Exception {
+  void notFoundStatusResponseTest() throws Exception {
     mockProducer.setResponseHttpStatus(404);
     mockProducer.setResponseBody("");
 
@@ -183,7 +187,7 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
   }
 
   @Test //Test för när en Producent svarar med annat än SOAP tex ett exception, kontrolleras inte av VP
-  public void nonSOAPResponseTest() throws Exception {
+  void nonSOAPResponseTest() throws Exception {
     mockProducer.setResponseHttpStatus(200);
     mockProducer.setResponseBody(createExceptionMessage());
 
@@ -198,11 +202,12 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertTrue(respOutLogMsg.contains("Payload=java.lang.NullPointerException"));
+    assertNotNull(respOutLogMsg);
+    assertTrue(respOutLogMsg.contains("http.response.body.content=\"java.lang.NullPointerException"));
   }
 
   @Test // If a producer sends soap fault, we shall return with ResponseCode 500, with the fault embedded in the body.
-  public void soapFaultPropagatedToCustomerTest() throws InterruptedException {
+  void soapFaultPropagatedToCustomerTest() throws InterruptedException {
     mockProducer.setResponseHttpStatus(500);
     mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT, VPFaultCodeEnum.Client));
 
@@ -221,15 +226,16 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
-    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode=500"));
+    assertNotNull(respOutLogMsg);
+    assertTrue(respOutLogMsg.contains("CamelHttpResponseCode\":\"500"));
     assertTrue(respOutLogMsg.contains("Internal Server Error"));
-    assertTrue(respOutLogMsg.contains("Payload=<soapenv:Envelope"));
+    assertTrue(respOutLogMsg.contains("http.response.body.content=\"<soapenv:Envelope"));
     assertTrue(respOutLogMsg.contains("VP011"));
     assertTrue(respOutLogMsg.contains("Anrop har gjorts"));
   }
 
   @Test // If a producer sends soap fault, we shall return with ResponseCode 500, with the fault embedded in the body.
-  public void malformedSoapRequestThrowsVP015() throws InterruptedException {
+  void malformedSoapRequestThrowsVP015() throws InterruptedException {
     mockProducer.setResponseHttpStatus(500);
     mockProducer.setResponseBody(SoapFaultHelper.generateSoap11FaultWithCause(REMOTE_SOAP_FAULT, VPFaultCodeEnum.Client));
 
@@ -247,12 +253,12 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0)
+    String respOutLogMsg = Objects.requireNonNull(TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0))
             .replace("\n", "").replace("\r", "");
 
 
-    List<String> expected = new ArrayList<String>();
-    List<String> actual = new ArrayList<String>();
+    List<String> expected = new ArrayList<>();
+    List<String> actual = new ArrayList<>();
 
     // Add SOAP Body content matches
     expected.add(".*<faultcode>SOAP-ENV:Client</faultcode>.*");
@@ -263,11 +269,11 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
       actual.add(resultBody);
 
     // Add log content matches
-    expected.add(".*-sessionErrorTechnicalDescription=se.skl.tp.vp.exceptions.VpTechnicalException.*");
-    expected.add(".*CamelHttpResponseCode=500,.*");
-    expected.add(".*-errorCode=VP015.*");
-    expected.add(".*-statusCode=500 Internal Server Error.*");
-    expected.add(".*Payload=<SOAP-ENV:Envelope.*");
+    expected.add(".*labels.sessionErrorTechnicalDescription=\"se.skl.tp.vp.exceptions.VpTechnicalException.*");
+    expected.add(".*CamelHttpResponseCode\":\"500\",.*");
+    expected.add(".*labels.errorCode=\"VP015\".*");
+    expected.add(".*labels.statusCode=\"500 Internal Server Error\".*");
+    expected.add(".*http.response.body.content=\"<SOAP-ENV:Envelope.*");
     expected.add(".*<faultstring>VP015 .*?</faultstring>.*");
 
     // add the log content once per match in "expected" list

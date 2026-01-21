@@ -1,15 +1,16 @@
 package se.skl.tp.vp.integrationtests;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTP;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_HTTPS;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRiv20UTF16Request;
 
 import io.undertow.util.FileUtils;
-import java.io.UnsupportedEncodingException;
+
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,13 +87,14 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "skltp-messages");
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpsUrl);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpsUrl);
     assertExtraInfoLog(respOutLogMsg, RECEIVER_HTTP, HTTP_PRODUCER_URL);
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid_in=originalid");
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=originalid");
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid_in=\"originalid\"");
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"originalid\"");
   }
 
   @Test
@@ -111,12 +113,14 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpUrl);
+    assertStringContains(respOutLogMsg, "source.ip=");
     assertExtraInfoLog(respOutLogMsg, RECEIVER_HTTPS, HTTPS_PRODUCER_URL);
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=tp");
-    assertTrue(!respOutLogMsg.contains("-originalServiceconsumerHsaid_in"));
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"tp\"");
+      assertFalse(respOutLogMsg.contains("labels.originalServiceconsumerHsaid_in"));
   }
 
   @Test
@@ -132,12 +136,14 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpUrl);
+    assertStringContains(respOutLogMsg, "source.ip=");
     assertExtraInfoLog(respOutLogMsg, RECEIVER_HTTPS, HTTPS_PRODUCER_URL);
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=tp");
-    assertTrue(!respOutLogMsg.contains("-originalServiceconsumerHsaid_in"));
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"tp\"");
+    assertFalse(respOutLogMsg.contains("labels.originalServiceconsumerHsaid_in"));
   }
 
   @Test
@@ -154,12 +160,14 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpUrl);
+    assertStringContains(respOutLogMsg, "source.ip=");
     assertExtraInfoLog(respOutLogMsg, RECEIVER_HTTPS, HTTPS_PRODUCER_URL);
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=tp");
-    assertTrue(!respOutLogMsg.contains("-originalServiceconsumerHsaid_in"));
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"tp\"");
+    assertFalse(respOutLogMsg.contains("labels.originalServiceconsumerHsaid_in"));
   }
 
   @Test
@@ -177,16 +185,18 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpUrl);
+    assertStringContains(respOutLogMsg, "source.ip=");
     assertExtraInfoLog(respOutLogMsg, RECEIVER_HTTPS, HTTPS_PRODUCER_URL);
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=tp");
-    assertTrue(!respOutLogMsg.contains("-originalServiceconsumerHsaid_in"));
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"tp\"");
+    assertFalse(respOutLogMsg.contains("labels.originalServiceconsumerHsaid_in"));
   }
 
   @Test
-  void callHttpVPEndpointUTF16() throws UnsupportedEncodingException {
+  void callHttpVPEndpointUTF16() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -194,48 +204,52 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID, "tp");
     headers.put(HttpHeaders.HEADER_CONTENT_TYPE, "text/xml;charset=UTF-16");
     String payload = createGetCertificateRiv20UTF16Request(RECEIVER_HTTPS);
-    byte[] byteResponse = testConsumer.sendHttpRequestToVP(payload.getBytes("UTF-16"), headers);
-    String response = new String(byteResponse, "UTF-16");
+    byte[] byteResponse = testConsumer.sendHttpRequestToVP(payload.getBytes(StandardCharsets.UTF_16), headers);
+    String response = new String(byteResponse, StandardCharsets.UTF_16);
 
     assertEquals("<mocked answer/>", response);
 
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpUrl);
+    assertStringContains(respOutLogMsg, "source.ip=");
     assertExtraInfoLog(respOutLogMsg, RECEIVER_HTTPS, HTTPS_PRODUCER_URL);
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=tp");
-    assertTrue(!respOutLogMsg.contains("-originalServiceconsumerHsaid_in"));
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"tp\"");
+    assertFalse(respOutLogMsg.contains("labels.originalServiceconsumerHsaid_in"));
   }
 
   @Test
-  void callHttpVPEndpointUTF16NoContentTypeSet() throws UnsupportedEncodingException {
+  void callHttpVPEndpointUTF16NoContentTypeSet() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
     headers.put(HttpHeaders.X_VP_SENDER_ID, "tp");
     String payload = createGetCertificateRiv20UTF16Request(RECEIVER_HTTPS);
-    byte[] byteResponse = testConsumer.sendHttpRequestToVP(payload.getBytes("UTF-16"), headers);
-    String response = new String(byteResponse, "UTF-16");
+    byte[] byteResponse = testConsumer.sendHttpRequestToVP(payload.getBytes(StandardCharsets.UTF_16), headers);
+    String response = new String(byteResponse, StandardCharsets.UTF_16);
 
     assertEquals("<mocked answer/>", response);
 
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpUrl);
+    assertStringContains(respOutLogMsg, "source.ip=");
     assertExtraInfoLog(respOutLogMsg, RECEIVER_HTTPS, HTTPS_PRODUCER_URL);
-    assertStringContains(respOutLogMsg, "-originalServiceconsumerHsaid=tp");
-    assertTrue(!respOutLogMsg.contains("-originalServiceconsumerHsaid_in"));
+    assertStringContains(respOutLogMsg, "labels.originalServiceconsumerHsaid=\"tp\"");
+    assertFalse(respOutLogMsg.contains("labels.originalServiceconsumerHsaid_in"));
   }
 
   @Test
-  void callWithUTF16ShouldGenerateUTF8CallToProducer() throws UnsupportedEncodingException {
+  void callWithUTF16ShouldGenerateUTF8CallToProducer() {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -243,8 +257,8 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID, "tp");
     headers.put(HttpHeaders.HEADER_CONTENT_TYPE, "text/xml;charset=UTF-16");
     String payload = createGetCertificateRiv20UTF16Request(RECEIVER_HTTPS);
-    byte[] byteResponse = testConsumer.sendHttpRequestToVP(payload.getBytes("UTF-16"), headers);
-    String response = new String(byteResponse, "UTF-16");
+    byte[] byteResponse = testConsumer.sendHttpRequestToVP(payload.getBytes(StandardCharsets.UTF_16), headers);
+    String response = new String(byteResponse, StandardCharsets.UTF_16);
 
     assertEquals("<mocked answer/>", response);
 
@@ -263,8 +277,9 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     Map<String, Object> headers = new HashMap<>();
     headers.put(HttpHeaders.X_VP_INSTANCE_ID, vpInstanceId);
     headers.put(HttpHeaders.X_VP_SENDER_ID, "tp");
-    String largeRequest = FileUtils
-        .readFile(getClass().getClassLoader().getResource("testfiles/ProcessNotificationLargePayload.xml"));
+    URL resource = getClass().getClassLoader().getResource("testfiles/ProcessNotificationLargePayload.xml");
+    assertNotNull(resource);
+    String largeRequest = FileUtils.readFile(resource);
     String response = testConsumer.sendHttpRequestToVP(largeRequest, headers);
 
     assertEquals("<mocked answer/>", response);
@@ -272,11 +287,12 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpUrl);
     assertStringContains(respOutLogMsg,
-        "-servicecontract_namespace=urn:riv:itintegration:engagementindex:ProcessNotificationResponder:1");
+        "labels.servicecontract_namespace=\"urn:riv:itintegration:engagementindex:ProcessNotificationResponder:1\"");
   }
 
   @Test
@@ -284,8 +300,9 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
-    String largeRequest = FileUtils
-        .readFile(getClass().getClassLoader().getResource("testfiles/ProcessNotificationLargePayload.xml"));
+    URL resource = getClass().getClassLoader().getResource("testfiles/ProcessNotificationLargePayload.xml");
+    assertNotNull(resource);
+    String largeRequest = FileUtils.readFile(resource);
     String response = testConsumer.sendHttpsRequestToVP(largeRequest, headers);
 
     assertEquals("<mocked answer/>", response);
@@ -293,11 +310,12 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
-    assertStringContains(respOutLogMsg, "LogMessage=resp-out");
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services");
-    assertStringContains(respOutLogMsg, "Endpoint=" + vpHttpsUrl);
+    assertNotNull(respOutLogMsg);
+    assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
+    assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
+    assertStringContains(respOutLogMsg, "url.full=\"" + vpHttpsUrl);
     assertStringContains(respOutLogMsg,
-        "-servicecontract_namespace=urn:riv:itintegration:engagementindex:ProcessNotificationResponder:1");
+        "labels.servicecontract_namespace=\"urn:riv:itintegration:engagementindex:ProcessNotificationResponder:1\"");
   }
 
   /**
@@ -334,10 +352,11 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
     assertMessageLogsExists();
 
     String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
-    assertStringContains(reqInLogMsg, "-senderIpAdress=1.2.3.4");
-    assertStringContains(reqInLogMsg, "-httpXForwardedProto=https");
-    assertStringContains(reqInLogMsg, "-httpXForwardedHost=skltp-lb.example.org");
-    assertStringContains(reqInLogMsg, "-httpXForwardedPort=443");
+    assertNotNull(reqInLogMsg);
+    assertStringContains(reqInLogMsg, "source.ip=\"1.2.3.4\"");
+    assertStringContains(reqInLogMsg, "labels.httpXForwardedProto=\"https\"");
+    assertStringContains(reqInLogMsg, "labels.httpXForwardedHost=\"skltp-lb.example.org\"");
+    assertStringContains(reqInLogMsg, "labels.httpXForwardedPort=\"443\"");
 
   }
 
@@ -400,17 +419,16 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   private void assertExtraInfoLog(String respOutLogMsg, String expectedReceiverId, String expectedProducerUrl) {
-    assertStringContains(respOutLogMsg, "-senderIpAdress=");
     assertStringContains(respOutLogMsg,
-        "-servicecontract_namespace=urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1");
-    assertStringContains(respOutLogMsg, "-senderid=tp");
-    assertStringContains(respOutLogMsg, "-receiverid=" + expectedReceiverId);
-    assertStringContains(respOutLogMsg, "-endpoint_url=" + expectedProducerUrl);
-    assertStringContains(respOutLogMsg, "-routerVagvalTrace=" + expectedReceiverId);
-    assertStringContains(respOutLogMsg, "-wsdl_namespace=urn:riv:insuranceprocess:healthreporting:GetCertificate:1:rivtabp20");
-    assertStringContains(respOutLogMsg, "-rivversion=rivtabp20");
-    assertStringContains(respOutLogMsg, "-time.producer=");
-    assertStringContains(respOutLogMsg, "-routerBehorighetTrace=" + expectedReceiverId);
+        "labels.servicecontract_namespace=\"urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1\"");
+    assertStringContains(respOutLogMsg, "labels.senderid=\"tp\"");
+    assertStringContains(respOutLogMsg, "labels.receiverid=\"" + expectedReceiverId);
+    assertStringContains(respOutLogMsg, "url.original=\"" + expectedProducerUrl);
+    assertStringContains(respOutLogMsg, "labels.routerVagvalTrace=\"" + expectedReceiverId);
+    assertStringContains(respOutLogMsg, "labels.wsdl_namespace=\"urn:riv:insuranceprocess:healthreporting:GetCertificate:1:rivtabp20\"");
+    assertStringContains(respOutLogMsg, "labels.rivversion=\"rivtabp20\"");
+    assertStringContains(respOutLogMsg, "event.duration=");
+    assertStringContains(respOutLogMsg, "labels.routerBehorighetTrace=\"" + expectedReceiverId);
   }
 
 }

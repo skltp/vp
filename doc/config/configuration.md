@@ -8,7 +8,7 @@ Konfigurering kan göras i filerna listade nedan. Vid respektive avsnitt finns i
  * wsdlconfig.json
 
 För mer information om hur eventuell proxy eller lastbalanserare ska konfigureras, hur användare och lösenord för Hawtio konfigureras samt exempelfiler, se [Detaljerad konfiguration].
-Loggning och hur det går till och kan konfigureras kan man läsa om här: [Loggning konfiguration]
+Loggning och hur det går till och kan konfigureras kan man läsa om här: [Loggning konfiguration]. Loggformatet beskrivs här: [Loggformat].
 
 ### Application.properties ###
 Spring-boot property fil som ligger under resources i jaren. Inställningarna kan överlagras enligt de sätt som Spring-boot föreskriver. 
@@ -193,6 +193,7 @@ vp.tls.overrides[1].match.port=8080
 
    [Detaljerad konfiguration]: <detail_config.md>
    [Loggning konfiguration]: <logging_configuration.md>
+   [Loggformat]: <ecs_log_format.md>
    [Tips på hur man konfigurerar undertow]: <https://howtodoinjava.com/spring-boot2/embedded-server-logging-config/>
    [Spring-boot doc's]: <https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html>
    [SKLTP VP - Status tjänst]: <https://inera.atlassian.net/wiki/spaces/SKLTP/pages/3187836663/SKLTP+VP+-+Status+tj+nst>

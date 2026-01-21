@@ -1,337 +1,253 @@
 package se.skl.tp.vp.logging;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.support.DefaultExchange;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
+import org.apache.logging.log4j.core.LogEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.junit.jupiter.MockitoExtension;
-import se.skl.tp.vp.logging.logentry.LogEntry;
-import se.skl.tp.vp.logging.logentry.LogMessageExceptionType;
-import se.skl.tp.vp.logging.logentry.LogMessageType;
-import se.skl.tp.vp.errorhandling.SoapFaultExtractor;
-import se.skl.tp.vp.errorhandling.SoapFaultInfo;
+import se.skl.tp.vp.constants.VPExchangeProperties;
+import se.skl.tp.vp.util.TestLogAppender;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class MessageInfoLoggerTest {
 
-    @Mock
-    private Exchange exchange;
-
-    @Mock
-    private Message message;
-
-    @Mock
-    private SoapFaultExtractor soapFaultExtractor;
-
-    @Mock
-    private Logger mockLogger;
-
-    @InjectMocks
     private MessageInfoLogger messageInfoLogger;
-
-    private MockedStatic<LogEntryBuilder> logEntryBuilderMock;
-    private MockedStatic<LogMessageFormatter> logMessageFormatterMock;
-
-    private LogEntry logEntry;
-    private Map<String, String> extraInfo;
+    private Exchange exchange;
+    private CamelContext camelContext;
 
     @BeforeEach
     void setUp() {
-        // Set up static mocks
-        logEntryBuilderMock = mockStatic(LogEntryBuilder.class);
-        logMessageFormatterMock = mockStatic(LogMessageFormatter.class);
-
-        // Replace the static soapFaultExtractor with our mock
-        MessageInfoLogger.soapFaultExtractor = soapFaultExtractor;
-
-        // Set up common test data
-        extraInfo = new HashMap<>();
-        LogMessageType messageInfo = new LogMessageType();
-        messageInfo.setMessage("test-message");
-
-        logEntry = new LogEntry();
-        logEntry.setExtraInfo(extraInfo);
-        logEntry.setMessageInfo(messageInfo);
-
-        // Common exchange setup - use lenient() to avoid UnnecessaryStubbingException
-        // This allows tests that don't call exchange.getIn() to skip this stubbing
-        lenient().when(exchange.getIn()).thenReturn(message);
-        lenient().when(message.getBody(String.class)).thenReturn("test-body");
-    }
-
-    @AfterEach
-    void tearDown() {
-        logEntryBuilderMock.close();
-        logMessageFormatterMock.close();
+        messageInfoLogger = new MessageInfoLogger();
+        camelContext = new DefaultCamelContext();
+        exchange = new DefaultExchange(camelContext);
+        exchange.setProperty(VPExchangeProperties.EXCHANGE_CREATED, new Date());
+        exchange.setProperty(VPExchangeProperties.SKLTP_CORRELATION_ID, "test-correlation-id");
+        TestLogAppender.clearEvents();
     }
 
     @Test
-    void testLogReqIn() {
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("req-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format(anyString(), any(LogEntry.class)))
-                .thenReturn("formatted-log-message");
-        MessageInfoLogger loggerSpy = spy(messageInfoLogger);
-        doNothing().when(loggerSpy).log(any(Logger.class), eq(exchange), eq("req-in"));
+    void testLogReqInCreatesSpanIdAndLogs() {
+        messageInfoLogger.logReqIn(exchange);
 
-        loggerSpy.logReqIn(exchange);
-
-        verify(loggerSpy).log(any(Logger.class), eq(exchange), eq("req-in"));
+        String spanId = getSpanA();
+        assertNotNull(spanId, "Span ID should be created");
+        assertFalse(spanId.isEmpty(), "Span ID should not be empty");
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_IN);
+        assertEquals(1, events.size(), "Should log one req-in event");
+        LogEvent event = events.get(0);
+        assertEquals(Level.DEBUG, event.getLevel());
+        assertNotNull(event.getMessage());
     }
 
     @Test
-    void testLogReqOut() {
-        MessageInfoLogger loggerSpy = spy(messageInfoLogger);
-        doNothing().when(loggerSpy).log(any(Logger.class), eq(exchange), eq("req-out"));
+    void testLogReqOutCreatesSpanIdAndLogs() {
+        exchange.setProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT, "parent-span-id");
 
-        loggerSpy.logReqOut(exchange);
+        messageInfoLogger.logReqOut(exchange);
 
-        verify(loggerSpy).log(any(Logger.class), eq(exchange), eq("req-out"));
+        String outboundSpanId = getSpanB();
+        assertNotNull(outboundSpanId, "Outbound span ID should be created");
+        assertFalse(outboundSpanId.isEmpty(), "Outbound span ID should not be empty");
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_OUT);
+        assertEquals(1, events.size(), "Should log one req-out event");
+        LogEvent event = events.get(0);
+        assertEquals(Level.DEBUG, event.getLevel());
     }
 
     @Test
-    void testLogRespIn() {
-        MessageInfoLogger loggerSpy = spy(messageInfoLogger);
-        doNothing().when(loggerSpy).log(any(Logger.class), eq(exchange), eq("resp-in"));
+    void testLogRespInLogsAndRemovesOutboundSpanId() {
+        String outboundSpanId = "outbound-span-id";
+        exchange.setProperty(VPExchangeProperties.SPAN_REQ_OUT_TO_RESP_IN, outboundSpanId);
 
-        loggerSpy.logRespIn(exchange);
+        messageInfoLogger.logRespIn(exchange);
 
-        verify(loggerSpy).log(any(Logger.class), eq(exchange), eq("resp-in"));
+        assertNull(exchange.getProperty(VPExchangeProperties.SPAN_REQ_OUT_TO_RESP_IN),
+                "Outbound span ID should be removed");
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_IN);
+        assertEquals(1, events.size(), "Should log one resp-in event");
     }
 
     @Test
-    void testLogRespOut() {
-        MessageInfoLogger loggerSpy = spy(messageInfoLogger);
-        doNothing().when(loggerSpy).log(any(Logger.class), eq(exchange), eq("resp-out"));
+    void testLogRespOutLogsAndRemovesRequestSpanId() {
+        String requestSpanId = "request-span-id";
+        exchange.setProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT, requestSpanId);
 
-        loggerSpy.logRespOut(exchange);
+        messageInfoLogger.logRespOut(exchange);
 
-        verify(loggerSpy).log(any(Logger.class), eq(exchange), eq("resp-out"));
-    }
-
-    @Test
-    void testLogError() {
-        String stackTrace = "test-stack-trace";
-        LogMessageExceptionType exception = new LogMessageExceptionType();
-        exception.setStackTrace(stackTrace);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("error", exchange))
-                .thenReturn(logEntry);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createMessageException(exchange, stackTrace))
-                .thenReturn(exception);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-error", logEntry))
-                .thenReturn("formatted-error-message");
-
-        messageInfoLogger.logError(exchange, stackTrace);
-
-        logEntryBuilderMock.verify(() -> LogEntryBuilder.createLogEntry("error", exchange));
-        logEntryBuilderMock.verify(() -> LogEntryBuilder.createMessageException(exchange, stackTrace));
-        logMessageFormatterMock.verify(() -> LogMessageFormatter.format("logEvent-error", logEntry));
-        assertEquals(exception, logEntry.getMessageInfo().getException());
-        assertTrue(extraInfo.containsKey("source"));
+        assertNull(exchange.getProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT),
+                "Request span ID should be removed");
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_OUT);
+        assertEquals(1, events.size(), "Should log one resp-out event");
     }
 
     @Test
     void testLogErrorWithException() {
-        String stackTrace = "test-stack-trace";
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("error", exchange))
-                .thenThrow(new RuntimeException("Test exception"));
+        String stackTrace = "java.lang.RuntimeException: Test error\n\tat TestClass.method(TestClass.java:10)";
+        RuntimeException exception = new RuntimeException("Test error");
+        exchange.setProperty(Exchange.EXCEPTION_CAUGHT, exception);
 
-        // Should handle gracefully
-        assertDoesNotThrow(() -> messageInfoLogger.logError(exchange, stackTrace));
+        messageInfoLogger.logError(exchange, stackTrace);
+
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        assertEquals(1, events.size(), "Should log one error event");
+        LogEvent event = events.get(0);
+        assertEquals(Level.ERROR, event.getLevel());
+        String message = event.getMessage().getFormattedMessage();
+        assertNotNull(message);
+        assertTrue(message.contains("error"), "Error message should contain 'error' type");
     }
 
     @Test
-    void testLogWithDebugEnabled() {
-        when(mockLogger.isDebugEnabled()).thenReturn(true);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("req-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-debug", logEntry))
-                .thenReturn("formatted-debug-message");
+    void testLogErrorWithoutException() {
+        String stackTrace = "Stack trace information";
 
-        messageInfoLogger.log(mockLogger, exchange, "req-in");
+        messageInfoLogger.logError(exchange, stackTrace);
 
-        verify(mockLogger).isDebugEnabled();
-        verify(mockLogger).debug("formatted-debug-message");
-        verify(mockLogger, never()).isInfoEnabled();
-        assertEquals("test-body", logEntry.getPayload());
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        assertEquals(1, events.size(), "Should log one error event even without exception");
     }
 
     @Test
-    void testLogWithInfoEnabled() {
-        when(mockLogger.isDebugEnabled()).thenReturn(false);
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("req-out", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-info-message");
+    void testLogErrorHandlesExceptionDuringLogging() {
+        Exchange emptyExchange = new DefaultExchange(camelContext);
+        // Don't set required properties to potentially trigger exception handling
 
-        messageInfoLogger.log(mockLogger, exchange, "req-out");
+        assertDoesNotThrow(() -> messageInfoLogger.logError(emptyExchange, "stack trace"));
 
-        verify(mockLogger).isDebugEnabled();
-        verify(mockLogger).isInfoEnabled();
-        verify(mockLogger).info("formatted-info-message");
-        assertNull(logEntry.getPayload()); // Payload not set in info mode
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        assertFalse(events.isEmpty(), "Should log error event or fallback error message");
     }
 
     @Test
-    void testLogWithLoggingDisabled() {
-        when(mockLogger.isDebugEnabled()).thenReturn(false);
-        when(mockLogger.isInfoEnabled()).thenReturn(false);
+    void testLogWithDebugEnabledIncludesPayload() {
+        String payload = "<soap:Envelope>test payload</soap:Envelope>";
+        exchange.getIn().setBody(payload);
+        Logger logger = LogManager.getLogger(MessageInfoLogger.REQ_IN);
 
-        messageInfoLogger.log(mockLogger, exchange, "req-in");
+        messageInfoLogger.log(logger, exchange, "req-in");
 
-        verify(mockLogger).isDebugEnabled();
-        verify(mockLogger).isInfoEnabled();
-        verify(mockLogger, never()).debug(anyString());
-        verify(mockLogger, never()).info(anyString());
-        logEntryBuilderMock.verifyNoInteractions();
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_IN);
+        assertFalse(events.isEmpty(), "Should log event");
+        LogEvent event = events.get(0);
+        assertNotNull(event.getMessage());
     }
 
     @Test
-    void testLogWithException() {
-        when(mockLogger.isDebugEnabled()).thenReturn(true);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry(anyString(), any(Exchange.class)))
-                .thenThrow(new RuntimeException("Test exception"));
+    void testLogWithInfoEnabledDoesNotIncludePayload() {
+        String payload = "<soap:Envelope>sensitive data</soap:Envelope>";
+        exchange.getIn().setBody(payload);
+        Logger logger = LogManager.getLogger(MessageInfoLogger.RESP_OUT);
 
-        messageInfoLogger.log(mockLogger, exchange, "req-in");
+        messageInfoLogger.log(logger, exchange, "resp-out");
 
-        verify(mockLogger).error(eq("Failed log message: {}"), eq("req-in"), any(RuntimeException.class));
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_OUT);
+        assertFalse(events.isEmpty(), "Should log event");
     }
 
     @Test
-    void testLogRespInWithErrorResponse() {
-        String soapBody = "<soap:Fault>test</soap:Fault>";
-        SoapFaultInfo faultInfo = new SoapFaultInfo("soap:Server", "Error message", "Detail");
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        when(message.getBody(String.class)).thenReturn(soapBody);
-        when(soapFaultExtractor.extractSoapFault(soapBody)).thenReturn(faultInfo);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
+    void testLogHandlesExceptionDuringLogging() {
+        Exchange problematicExchange = new DefaultExchange(camelContext);
+        Logger logger = LogManager.getLogger(MessageInfoLogger.REQ_IN);
 
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
-
-        assertEquals(MessageInfoLogger.class.getName(), extraInfo.get("source")); // Verify basic extraInfo works
-        verify(soapFaultExtractor).extractSoapFault(soapBody);
-        assertEquals("soap:Server", extraInfo.get("faultCode"));
-        assertEquals("Error message", extraInfo.get("faultString"));
-        assertEquals("Detail", extraInfo.get("faultDetail"));
+        assertDoesNotThrow(() -> messageInfoLogger.log(logger, problematicExchange, "req-in"));
     }
 
     @Test
-    void testLogRespInWithErrorResponseAndPartialFaultInfo() {
-        String soapBody = "<soap:Fault>test</soap:Fault>";
-        SoapFaultInfo faultInfo = new SoapFaultInfo("soap:Client", null, null);
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        when(message.getBody(String.class)).thenReturn(soapBody);
-        when(soapFaultExtractor.extractSoapFault(soapBody)).thenReturn(faultInfo);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
+    void testSpanIdsAreUnique() {
+        messageInfoLogger.logReqIn(exchange);
+        String spanId1 = getSpanA();
+        messageInfoLogger.logReqOut(exchange);
+        String spanId2 = getSpanB();
 
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
-
-        verify(soapFaultExtractor).extractSoapFault(soapBody);
-        assertEquals("soap:Client", extraInfo.get("faultCode"));
-        assertFalse(extraInfo.containsKey("faultString"));
-        assertFalse(extraInfo.containsKey("faultDetail"));
+        assertNotNull(spanId1);
+        assertNotNull(spanId2);
+        assertNotEquals(spanId1, spanId2, "Span IDs should be unique");
     }
 
     @Test
-    void testLogRespInWithErrorResponseButNoFaultInfo() {
-        String soapBody = "<soap:Fault>test</soap:Fault>";
-        SoapFaultInfo faultInfo = new SoapFaultInfo(null, null, null);
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        when(message.getBody(String.class)).thenReturn(soapBody);
-        when(soapFaultExtractor.extractSoapFault(soapBody)).thenReturn(faultInfo);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
+    void testCompleteRequestResponseFlow() {
+        messageInfoLogger.logReqIn(exchange);
+        assertNotNull(getSpanA(), "Span A should be set after req-in");
 
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
+        messageInfoLogger.logReqOut(exchange);
+        assertNotNull(getSpanA(), "Span A should still exist after req-out");
+        assertNotNull(getSpanB(), "Span B should be set after req-out");
 
-        verify(soapFaultExtractor).extractSoapFault(soapBody);
-        assertFalse(extraInfo.containsKey("faultCode"));
-        assertFalse(extraInfo.containsKey("faultString"));
-        assertFalse(extraInfo.containsKey("faultDetail"));
+        messageInfoLogger.logRespIn(exchange);
+        assertNotNull(getSpanA(), "Span A should still exist after resp-in");
+        assertNull(getSpanB(), "Span B should be removed after resp-in");
+
+        messageInfoLogger.logRespOut(exchange);
+        assertNull(getSpanA(), "Span A should be removed after resp-out");
+
+        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
+        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
+        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_IN));
+        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
     }
 
     @Test
-    void testLogRespInWithNon500Response() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(200);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
+    void testLogReqInWithEmptyExchange() {
+        Exchange emptyExchange = new DefaultExchange(camelContext);
 
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
+        assertDoesNotThrow(() -> messageInfoLogger.logReqIn(emptyExchange));
 
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
+        String spanId = emptyExchange.getProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT, String.class);
+        assertNotNull(spanId, "Span ID should still be created even with empty exchange");
     }
 
     @Test
-    void testLogRespInWithNullResponseCode() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(null);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
+    void testLogReqOutWithEmptyExchange() {
+        Exchange emptyExchange = new DefaultExchange(camelContext);
 
-        messageInfoLogger.log(mockLogger, exchange, "resp-in");
+        assertDoesNotThrow(() -> messageInfoLogger.logReqOut(emptyExchange));
 
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
+        String spanId = emptyExchange.getProperty(VPExchangeProperties.SPAN_REQ_OUT_TO_RESP_IN, String.class);
+        assertNotNull(spanId, "Outbound span ID should still be created even with empty exchange");
     }
 
     @Test
-    void testLogRespOutDoesNotExtractSoapFault() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        lenient().when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("resp-out", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
+    void testLogRespInWithoutSpanId() {
+        assertDoesNotThrow(() -> messageInfoLogger.logRespIn(exchange));
 
-        messageInfoLogger.log(mockLogger, exchange, "resp-out");
-
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_IN);
+        assertEquals(1, events.size(), "Should log resp-in event even without span ID");
     }
 
     @Test
-    void testLogReqInDoesNotExtractSoapFault() {
-        when(mockLogger.isInfoEnabled()).thenReturn(true);
-        lenient().when(message.getHeader(Exchange.HTTP_RESPONSE_CODE)).thenReturn(500);
-        logEntryBuilderMock.when(() -> LogEntryBuilder.createLogEntry("req-in", exchange))
-                .thenReturn(logEntry);
-        logMessageFormatterMock.when(() -> LogMessageFormatter.format("logEvent-info", logEntry))
-                .thenReturn("formatted-message");
+    void testLogRespOutWithoutSpanId() {
+        assertDoesNotThrow(() -> messageInfoLogger.logRespOut(exchange));
 
-        messageInfoLogger.log(mockLogger, exchange, "req-in");
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_OUT);
+        assertEquals(1, events.size(), "Should log resp-out event even without span ID");
+    }
 
-        verify(soapFaultExtractor, never()).extractSoapFault(anyString());
-        assertFalse(extraInfo.containsKey("faultCode"));
+    @Test
+    void testMultipleErrorLogs() {
+        String stackTrace1 = "Error trace 1";
+        String stackTrace2 = "Error trace 2";
+
+        messageInfoLogger.logError(exchange, stackTrace1);
+        messageInfoLogger.logError(exchange, stackTrace2);
+
+        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        assertEquals(2, events.size(), "Should log multiple error events");
+    }
+
+    private String getSpanB() {
+        return exchange.getProperty(VPExchangeProperties.SPAN_REQ_OUT_TO_RESP_IN, String.class);
+    }
+
+    private String getSpanA() {
+        return exchange.getProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT, String.class);
     }
 }

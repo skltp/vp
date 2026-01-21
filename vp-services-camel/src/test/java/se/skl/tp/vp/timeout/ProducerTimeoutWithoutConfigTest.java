@@ -93,7 +93,7 @@ public class ProducerTimeoutWithoutConfigTest {
     resultEndpoint.assertIsSatisfied();
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
     String reqOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
-    assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout=29000");
+    assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout\":\"29000");
   }
 
   private void createRoute(CamelContext camelContext) throws Exception {

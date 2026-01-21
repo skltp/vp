@@ -1,6 +1,7 @@
 package se.skl.tp.vp.timeout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.skl.tp.vp.util.JunitUtil.assertStringContains;
 import static se.skl.tp.vp.util.soaprequests.RoutingInfoUtil.createRoutingInfo;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.RECEIVER_UNIT_TEST;
@@ -27,10 +28,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
@@ -48,7 +49,7 @@ import se.skltp.takcache.VagvalCache;
 @SpringBootTest(classes = TestBeanConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-public class ProducerTimeoutTest {
+class ProducerTimeoutTest {
 
   @EndpointInject("mock:result")
   protected MockEndpoint resultEndpoint;
@@ -58,9 +59,9 @@ public class ProducerTimeoutTest {
 
   @Autowired SenderIpExtractor senderIpExtractor;
   @Autowired CamelContext camelContext;
-  @MockBean TakCache takCache;
-  @MockBean VagvalCache vagvalCache;
-  @MockBean BehorigheterCache behorigheterCache;
+  @MockitoBean TakCache takCache;
+  @MockitoBean VagvalCache vagvalCache;
+  @MockitoBean BehorigheterCache behorigheterCache;
   @Autowired TimeoutConfiguration timeoutConfiguration;
   @Autowired TakCacheService takCacheService;
   @Value("${" + PropertyConstants.VP_INSTANCE_NAME + "}")
@@ -71,17 +72,17 @@ public class ProducerTimeoutTest {
   private static boolean isContextStarted = false;
 
   @BeforeAll
-  public static void startLeakDetection() {
+  static void startLeakDetection() {
     LeakDetectionBaseTest.startLeakDetection();
   }
 
   @AfterAll
-  public static void verifyNoLeaks() throws Exception {
+  static void verifyNoLeaks() throws Exception {
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
   @BeforeEach
-  public void setUp() throws Exception {
+  void setUp() throws Exception {
     if (!isContextStarted) {
       createRoute(camelContext);
       camelContext.start();
@@ -94,12 +95,12 @@ public class ProducerTimeoutTest {
   }
 
   @Test
-  public void configSetForTjanstekontraktTest() throws Exception {
+  void configSetForTjanstekontraktTest() throws Exception {
     runTimeoutTestWithDifferentConfig(false);
   }
 
   @Test
-  public void noConfigSetForTjanstekontraktTest() throws Exception {
+  void noConfigSetForTjanstekontraktTest() throws Exception {
     runTimeoutTestWithDifferentConfig(true);
   }
 
@@ -120,18 +121,21 @@ public class ProducerTimeoutTest {
 
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
     String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
-    assertStringContains(errorLogMsg, "-errorCode=VP009");
-    assertStringContains(errorLogMsg, "Stacktrace=io.netty.handler.timeout.ReadTimeoutException");
+    assertNotNull(errorLogMsg);
+    assertStringContains(errorLogMsg, "labels.errorCode=\"VP009\"");
+    assertStringContains(errorLogMsg, "error.stack_trace=\"io.netty.handler.timeout.ReadTimeoutException");
 
     assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
     String reqOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
+    assertNotNull(reqOutLogMsg);
     if (onlyDefaultTimeoutInConfig) {
-      assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout=500");
+      assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout\":\"500");
     } else {
-      assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout=460");
+      assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout\":\"460");
     }
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "VP009 [" + vpInstance + "] Fel vid kontakt med tjänsteproducenten.");
     assertStringContains(respOutLogMsg, "Timeout when waiting on response from producer");
   }
@@ -161,7 +165,6 @@ public class ProducerTimeoutTest {
                 .setHeader("X-Forwarded-For", constant("1.2.3.4"))
                 .to("netty-http:http://localhost:12312/vp?throwExceptionOnFailure=false")
                 .to("mock:result");
-            ;
             from("netty-http:http://localhost:12123/vp")
                 .process(
                     (Exchange exchange) -> {
