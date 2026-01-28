@@ -61,11 +61,50 @@ data:
               -Dcom.sun.management.jmxremote.local.only=false
               -Dcom.sun.management.jmxremote.authenticate=false
               -Dcom.sun.management.jmxremote.ssl=false
+
 {{- range .Values.tls.bundles }}
-  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate=/etc/certs/{{ .name }}/tls.crt
-  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key=/etc/certs/{{ .name }}/tls.key
-  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate=/etc/certs/{{ .name }}/tls.ca
+  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate={{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.crt
+  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key={{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.key
+  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate={{ tpl $.Values.paths.certs $ }}/{{ .name }}/ca.crt
 {{- end }}
-  vp.tls.default-config.name: {{ .Values.tls.default-config.name }}
-  vp.tls.default-config.bundle: {{ .Values.tls.default-config.bundle }}
-  vp.tls.default-config.protocols-include: {{ .Values.tls.default-config.protocols-include }}
+{{- with .Values.tls.defaultConfig }}
+  vp.tls.default-config.name: "{{ .name }}"
+  vp.tls.default-config.bundle: "{{ .bundle }}"
+  {{- if .protocolsInclude }}
+  vp.tls.default-config.protocols-include: "{{ join "," .protocolsInclude "" }}"
+  {{- end }}
+  {{- if .protocolsExclude }}
+  vp.tls.default-config.protocols-exclude: "{{ join "," .protocolsExclude }}"
+  {{- end }}
+  {{- if .cipherSuitesInclude }}
+  vp.tls.default-config.cipher-suites-include: "{{ join "," .cipherSuitesInclude }}"
+  {{- end }}
+  {{- if .cipherSuitesExclude }}
+  vp.tls.default-config.cipher-suites-exclude: "{{ join "," .cipherSuitesExclude }}"
+  {{- end }}
+{{- end }}
+{{- range $index, $override := .Values.tls.overrides }}
+  vp.tls.overrides[{{ $index }}].name: "{{ $override.name }}"
+  vp.tls.overrides[{{ $index }}].bundle: "{{ $override.bundle }}"
+  {{- if $override.match.domainName }}
+  vp.tls.overrides[{{ $index }}].match.domain-name: "{{ $override.match.domainName }}"
+  {{- end }}
+  {{- if $override.match.domainSuffix }}
+  vp.tls.overrides[{{ $index }}].match.domain-suffix: "{{ $override.match.domainSuffix }}"
+  {{- end }}
+  {{- if $override.match.port }}
+  vp.tls.overrides[{{ $index }}].match.port: "{{ $override.match.port }}"
+  {{- end }}
+  {{- if $override.protocolsInclude }}
+  vp.tls.overrides[{{ $index }}].protocols-include: "{{ join "," $override.protocolsInclude }}"
+  {{- end }}
+  {{- if $override.protocolsExclude }}
+  vp.tls.overrides[{{ $index }}].protocols-exclude: "{{ join "," $override.protocolsExclude }}"
+  {{- end }}
+  {{- if $override.cipherSuitesInclude }}
+  vp.tls.overrides[{{ $index }}].cipher-suites-include: "{{ join "," $override.cipherSuitesInclude }}"
+  {{- end }}
+  {{- if $override.cipherSuitesExclude }}
+  vp.tls.overrides[{{ $index }}].cipher-suites-exclude: "{{ join "," $override.cipherSuitesExclude }}"
+  {{- end }}
+{{- end }}
