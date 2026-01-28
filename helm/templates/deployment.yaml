@@ -51,18 +51,11 @@ spec:
       {{- end }}
 
       volumes: 
-        - name: trust-pem-vol
+        {{- range .Values.tls.bundles }}
+        - name: {{ .name }}
           secret:
-            secretName: {{ .Values.pem_to_pfx.trust.secretName }}
-        - name: producer-pem-vol
-          secret:
-            secretName: {{ .Values.pem_to_pfx.producer.secretName }}
-        {{ if .Values.pem_to_pfx.consumer }}
-        - name: consumer-pem-vol
-          secret:
-            secretName: {{ .Values.pem_to_pfx.consumer.secretName }}
+            secretName: {{ .secret }}
         {{- end }}
-        - name: pkcs12-volume
         - name: data-volume
         - name: hsafiles-volume
           persistentVolumeClaim:
@@ -77,46 +70,6 @@ spec:
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      initContainers:
-        - name: {{ .Values.initContainer.certGen.image.name }}
-          image: "{{ .Values.repository }}{{ .Values.initContainer.certGen.image.name }}:{{ .Values.initContainer.certGen.image.tag | default $.Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.initContainer.certGen.image.pullPolicy }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            runAsNonRoot: true
-            runAsUser: 1000 # usr1
-            seccompProfile:
-              type: RuntimeDefault
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: pkcs12-volume
-              mountPath: /opt/certs/pkcs12
-              {{- with .Values.pem_to_pfx }}
-            - name: trust-pem-vol
-              mountPath: {{ .pem.path }}/{{ .trust.pemFile }}
-              subPath: ca.crt
-            - name: producer-pem-vol
-              mountPath: {{ .pem.path }}/{{ .producer.pemKeyFile }}
-              subPath: tls.key
-            - name: producer-pem-vol
-              mountPath: {{ .pem.path }}/{{ .producer.pemCertFile }}
-              subPath: tls.crt
-              {{ if .consumer }}
-            - name: consumer-pem-vol
-              mountPath: {{ .pem.path }}/{{ .consumer.pemKeyFile }}
-              subPath: tls.key
-            - name: consumer-pem-vol
-              mountPath: {{ .pem.path }}/{{ .consumer.pemCertFile }}
-              subPath: tls.crt
-              {{- end }}
-              {{- end }}
-          envFrom:
-            - configMapRef:
-                name: pem2pfx
 
       containers:
         - name: {{ .Values.container.image.name }}
@@ -167,10 +120,12 @@ spec:
           volumeMounts:
             - name: data-volume
               mountPath: {{ tpl .Values.paths.data . }}
-            - name: pkcs12-volume
-              mountPath: {{ .Values.pem_to_pfx.pfx.path }}
             - name: hsafiles-volume
               mountPath: {{ tpl .Values.paths.hsafiles . }}
+           {{- range .Values.tls.bundles }}
+            - name: {{ .name }}
+              mountPath: /etc/certs/{{ .name }}
+            {{- end }}
             {{- range .Values.environment.config_files }}
             - name: {{ .volume_name }}
               mountPath: {{ tpl .path $ }}

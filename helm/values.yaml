@@ -120,35 +120,15 @@ timeoutConfig:
     routetimeout: 35000
     producertimeout: 35000
 
-initContainer:
-  certGen:
-    image:
-      name: cert-generator-utility
-      pullPolicy: Always
+tls:
+    bundles:
+    - name: clientcert
+      secret: esb-funtion-cert
 
-pem_to_pfx:
-  envPrefix: PEM2PFX
-  pem:
-    path: /opt/certs/pem
-  pfx:
-    path: /opt/certs/pkcs12
-  trust:
-    secretName: esb-function-cert
-    pemFile: ca.pem
-    pfxFile: truststore.pfx
-    password: password
-  producer:
-    secretName: esb-function-cert
-    pemCertFile: producer.crt
-    pemKeyFile: producer.key
-    pfxFile: producer.pfx
-    password: password
-  consumer:
-    secretName: test.esb.ntjp.sjunet.org
-    pemCertFile: consumer.crt
-    pemKeyFile: consumer.key
-    pfxFile: consumer.pfx
-    password: password
+    default-config:
+      name: main-bundle
+      bundle: clientcert
+      protocols-include: TLSv1.3,TLSv1.2
 
 probes:
   startupProbe:
