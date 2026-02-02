@@ -83,6 +83,7 @@ paths:
   hsafiles: "/var/run/vp/hsafiles"
   config: "{{ .Values.paths.base }}/config"
   log: /var/log/camel
+  certs: "{{ .Values.paths.base }}/certs"
 
 environment:
   config_files:
@@ -120,35 +121,58 @@ timeoutConfig:
     routetimeout: 35000
     producertimeout: 35000
 
-initContainer:
-  certGen:
-    image:
-      name: cert-generator-utility
-      pullPolicy: Always
-
-pem_to_pfx:
-  envPrefix: PEM2PFX
-  pem:
-    path: /opt/certs/pem
-  pfx:
-    path: /opt/certs/pkcs12
-  trust:
-    secretName: esb-function-cert
-    pemFile: ca.pem
-    pfxFile: truststore.pfx
-    password: password
-  producer:
-    secretName: esb-function-cert
-    pemCertFile: producer.crt
-    pemKeyFile: producer.key
-    pfxFile: producer.pfx
-    password: password
-  consumer:
-    secretName: test.esb.ntjp.sjunet.org
-    pemCertFile: consumer.crt
-    pemKeyFile: consumer.key
-    pfxFile: consumer.pfx
-    password: password
+tls:
+    bundles:
+    - name: clientcert
+      secret: esb-funtion-cert
+    defaultConfig:
+      name: main
+      bundle: clientcert
+      protocolsInclude:
+      - TLSv1.3
+      - TLSv1.2
+      cipherSuitesInclude:
+      - TLS_AES_128_GCM_SHA256
+      - TLS_AES_256_GCM_SHA384
+      - TLS_CHACHA20_POLY1305_SHA256
+      - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+      - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_DHE_DSS_WITH_AES_256_GCM_SHA384
+      - TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_DHE_DSS_WITH_AES_128_GCM_SHA256
+      - TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+      - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384
+      - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+      - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
+      - TLS_DHE_RSA_WITH_AES_256_CBC_SHA256
+      - TLS_DHE_DSS_WITH_AES_256_CBC_SHA256
+      - TLS_DHE_RSA_WITH_AES_128_CBC_SHA256
+      - TLS_DHE_DSS_WITH_AES_128_CBC_SHA256
+      - TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384
+      - TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384
+      - TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256
+      - TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+      - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+      - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+      - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+      - TLS_DHE_DSS_WITH_AES_256_CBC_SHA
+      - TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+      - TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+      - TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+      - TLS_ECDH_RSA_WITH_AES_256_CBC_SHA
+      - TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA
+      - TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
+    overrides: []
 
 probes:
   startupProbe:
