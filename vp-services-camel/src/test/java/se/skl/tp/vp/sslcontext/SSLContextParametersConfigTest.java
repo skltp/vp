@@ -77,7 +77,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_WithDefaultConfigOnly() throws GeneralSecurityException, IOException {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -94,7 +94,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_WithDefaultAndOverrides() throws GeneralSecurityException, IOException {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -123,7 +123,7 @@ class SSLContextParametersConfigTest {
                                                         List<String> protocolsExclude,
                                                         List<String> expectedIncluded,
                                                         List<String> expectedExcluded) throws GeneralSecurityException, IOException {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         defaultConfig.setProtocolsInclude(protocolsInclude);
@@ -163,7 +163,7 @@ class SSLContextParametersConfigTest {
                                                            List<String> cipherSuitesExclude,
                                                            List<String> expectedIncluded,
                                                            List<String> expectedExcluded) throws GeneralSecurityException, IOException {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         defaultConfig.setCipherSuitesInclude(cipherSuitesInclude);
@@ -200,7 +200,7 @@ class SSLContextParametersConfigTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideOverrideTestCases")
     void testRegisterSSLContextParameters_WithOverrides(String testName, List<TLSProperties.TLSOverride> overrides) throws GeneralSecurityException, IOException {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -273,7 +273,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_MultipleOverridesWithDifferentConfigurations() throws GeneralSecurityException, IOException {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -304,7 +304,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_DuplicateNameInOverrides_ThrowsException() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -330,7 +330,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_DefaultNameDuplicatedInOverride_ThrowsException() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("sameName");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -352,7 +352,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_MultipleDuplicates_ThrowsException() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -387,7 +387,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_UniqueNames_NoException() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
@@ -418,7 +418,7 @@ class SSLContextParametersConfigTest {
 
     @Test
     void testRegisterSSLContextParameters_NullNames_NoException() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         defaultConfig.setBundle("default-bundle");
         tlsProperties.setDefaultConfig(defaultConfig);
