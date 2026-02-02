@@ -14,7 +14,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "vp.tls")
 public class TLSProperties {
     @Data
-    public static class TlSConfig {
+    public static class TLSConfig {
         private String name;
         private String bundle;
         private List<String> protocolsInclude;
@@ -32,10 +32,15 @@ public class TLSProperties {
 
     @EqualsAndHashCode(callSuper = true)
     @Data
-    public static class TLSOverride extends TlSConfig {
+    public static class TLSOverride extends TLSConfig {
         private TLSConfigMatch match;
     }
 
-    private TlSConfig defaultConfig;
+    private TLSConfig defaultConfig;
     private List<TLSOverride> overrides;
+
+    /**
+     * Enable mTLS verification for outgoing HTTPS connections.
+     */
+    private boolean mtlsVerificationEnabled = false;
 }

@@ -62,16 +62,49 @@ data:
               -Dcom.sun.management.jmxremote.authenticate=false
               -Dcom.sun.management.jmxremote.ssl=false
 
-  TP_TLS_ALLOWEDINCOMINGCIPHERSUITES: '*'
-  TP_TLS_ALLOWEDINCOMINGPROTOCOLS: TLSv1.2,TLSv1.3
-  TP_TLS_ALLOWEDOUTGOINGPROTOCOLS: TLSv1.2,TLSv1.3
-  TP_TLS_STORE_CONSUMER_FILE: function_cert.p12
-  TP_TLS_STORE_CONSUMER_TYPE: PKCS12
-  TP_TLS_STORE_LOCATION: file://{{ tpl .Values.paths.base . }}/certs/
-  TP_TLS_STORE_PRODUCER_FILE: function_cert.p12
-  TP_TLS_STORE_PRODUCER_TYPE: PKCS12
-  TP_TLS_STORE_TRUSTSTORE_FILE: truststore.p12
-  TP_TLS_STORE_TRUSTSTORE_PASSWORD: password
-  TP_TLS_STORE_TRUSTSTORE_TYPE: PKCS12
-  TP_TLS_ALLOWEDOUTGOINGCIPHERSUITES: >-
-    TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_DHE_DSS_WITH_AES_256_GCM_SHA384,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_DSS_WITH_AES_128_GCM_SHA256,TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_DSS_WITH_AES_256_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_DSS_WITH_AES_128_CBC_SHA256,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
+{{- range .Values.tls.bundles }}
+  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.crt
+  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.key
+  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-truststore/ca.crt
+{{- end }}
+{{- with .Values.tls.defaultConfig }}
+  vp.tls.default-config.name: "{{ .name }}"
+  vp.tls.default-config.bundle: "{{ .bundle }}"
+  {{- if .protocolsInclude }}
+  vp.tls.default-config.protocols-include: "{{ join "," .protocolsInclude }}"
+  {{- end }}
+  {{- if .protocolsExclude }}
+  vp.tls.default-config.protocols-exclude: "{{ join "," .protocolsExclude }}"
+  {{- end }}
+  {{- if .cipherSuitesInclude }}
+  vp.tls.default-config.cipher-suites-include: "{{ join "," .cipherSuitesInclude }}"
+  {{- end }}
+  {{- if .cipherSuitesExclude }}
+  vp.tls.default-config.cipher-suites-exclude: "{{ join "," .cipherSuitesExclude }}"
+  {{- end }}
+{{- end }}
+{{- range $index, $override := .Values.tls.overrides }}
+  vp.tls.overrides[{{ $index }}].name: "{{ $override.name }}"
+  vp.tls.overrides[{{ $index }}].bundle: "{{ $override.bundle }}"
+  {{- if $override.match.domainName }}
+  vp.tls.overrides[{{ $index }}].match.domain-name: "{{ $override.match.domainName }}"
+  {{- end }}
+  {{- if $override.match.domainSuffix }}
+  vp.tls.overrides[{{ $index }}].match.domain-suffix: "{{ $override.match.domainSuffix }}"
+  {{- end }}
+  {{- if $override.match.port }}
+  vp.tls.overrides[{{ $index }}].match.port: "{{ $override.match.port }}"
+  {{- end }}
+  {{- if $override.protocolsInclude }}
+  vp.tls.overrides[{{ $index }}].protocols-include: "{{ join "," $override.protocolsInclude }}"
+  {{- end }}
+  {{- if $override.protocolsExclude }}
+  vp.tls.overrides[{{ $index }}].protocols-exclude: "{{ join "," $override.protocolsExclude }}"
+  {{- end }}
+  {{- if $override.cipherSuitesInclude }}
+  vp.tls.overrides[{{ $index }}].cipher-suites-include: "{{ join "," $override.cipherSuitesInclude }}"
+  {{- end }}
+  {{- if $override.cipherSuitesExclude }}
+  vp.tls.overrides[{{ $index }}].cipher-suites-exclude: "{{ join "," $override.cipherSuitesExclude }}"
+  {{- end }}
+{{- end }}

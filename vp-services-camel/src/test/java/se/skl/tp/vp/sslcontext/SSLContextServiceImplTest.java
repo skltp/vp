@@ -27,7 +27,7 @@ class SSLContextServiceImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideDefaultConfigTestCases")
     void testGetClientSSLContextId_WithDefaultConfig(String testName, String vagvalHost, String expectedContextId) {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
 
@@ -46,7 +46,7 @@ class SSLContextServiceImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideDomainMatchTestCases")
     void testGetClientSSLContextId_WithDomainMatch(String testName, String matchDomain, String vagvalHost, String expectedContextId) {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -71,7 +71,7 @@ class SSLContextServiceImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideDomainSuffixMatchTestCases")
     void testGetClientSSLContextId_WithDomainSuffixMatch(String testName, String matchSuffix, String vagvalHost, String expectedContextId) {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -96,7 +96,7 @@ class SSLContextServiceImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("providePortMatchTestCases")
     void testGetClientSSLContextId_WithPortMatch(String testName, Integer matchPort, String vagvalHost, String expectedContextId) {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -121,7 +121,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_WithMultipleOverrides_FirstMatchWins() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
@@ -144,7 +144,7 @@ class SSLContextServiceImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideOverrideListTestCases")
     void testGetClientSSLContextId_WithEmptyOverrideList(String testName, List<TLSProperties.TLSOverride> overrides, String expectedContextId) {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         tlsProperties.setOverrides(overrides);
@@ -163,7 +163,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_WithOverride_NoMatch() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -180,7 +180,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_WithOverride_NullMatch_IsIgnored() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
@@ -200,7 +200,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_WithOverride_NullName_IsIgnored() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override1 = new TLSProperties.TLSOverride();
@@ -231,7 +231,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_DefaultConfigWithNullName_ThrowsException() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName(null);
         tlsProperties.setDefaultConfig(defaultConfig);
 
@@ -243,7 +243,7 @@ class SSLContextServiceImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideCachingTestCases")
     void testGetClientSSLContextId_Caching(String testName, String host1, String host2, String expectedId1, String expectedId2, boolean shouldBeSame) {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -276,7 +276,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_NoMatchCriteria_ReturnsFalse() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -293,7 +293,7 @@ class SSLContextServiceImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("providePortCombinationTestCases")
     void testGetClientSSLContextId_PortCombinations(String testName, String vagvalHost, String expectedContextId) {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -318,7 +318,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_DefaultPortAssumption() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
@@ -336,7 +336,7 @@ class SSLContextServiceImplTest {
 
     @Test
     void testGetClientSSLContextId_WithDomainNameAndSuffixBothSet_DomainNameTakesPrecedence() {
-        TLSProperties.TlSConfig defaultConfig = new TLSProperties.TlSConfig();
+        TLSProperties.TLSConfig defaultConfig = new TLSProperties.TLSConfig();
         defaultConfig.setName("default");
         tlsProperties.setDefaultConfig(defaultConfig);
         TLSProperties.TLSOverride override = new TLSProperties.TLSOverride();
