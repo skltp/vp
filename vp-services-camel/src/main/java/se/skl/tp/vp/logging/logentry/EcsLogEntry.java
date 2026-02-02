@@ -60,6 +60,7 @@ public class EcsLogEntry extends StringMapMessage {
     public static final String LABEL_SOAP_FAULT_CODE = "faultCode";
     public static final String LABEL_SOAP_FAULT_STRING = "faultString";
     public static final String LABEL_SOAP_FAULT_DETAIL = "faultDetail";
+    public static final String LABEL_SSL_CONTEXT_ID = "sslContextId";
 
     // Fields for backward compatibility
     public static final String BACKWARD_COMPAT_LOG_MESSAGE = "LogMessage";
@@ -214,6 +215,7 @@ public class EcsLogEntry extends StringMapMessage {
             putLabel(LABEL_SOAP_FAULT_CODE, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE, String.class));
             putLabel(LABEL_SOAP_FAULT_STRING, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING, String.class));
             putLabel(LABEL_SOAP_FAULT_DETAIL, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, String.class));
+            putLabel(LABEL_SSL_CONTEXT_ID, exchange.getProperty(VPExchangeProperties.SSL_CONTEXT_ID, String.class));
 
             String eventAction = Optional.ofNullable(data.get(EcsFields.EVENT_ACTION)).orElse("?");
             String contentLength = isReq(eventAction) ? EcsFields.HTTP_REQUEST_BODY_BYTES : EcsFields.HTTP_RESPONSE_BODY_BYTES;

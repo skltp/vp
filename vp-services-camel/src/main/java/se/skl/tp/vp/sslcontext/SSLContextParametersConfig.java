@@ -52,18 +52,14 @@ public class SSLContextParametersConfig {
     public void registerSSLContextParameters() throws GeneralSecurityException, IOException {
         if (tlsProperties.getDefaultConfig() != null) {
             validateUniqueConfigurationNames();
-
-            SSLContextParameters defaultParams = createSSLContextParameters(tlsProperties.getDefaultConfig());
-            camelContext.getRegistry().bind(getId(tlsProperties.getDefaultConfig().getName()), defaultParams);
-
+            registerSSLContext(tlsProperties.getDefaultConfig());
             if (tlsProperties.getOverrides() != null) {
                 for (var override : tlsProperties.getOverrides()) {
-                    SSLContextParameters overrideParams = createSSLContextParameters(override);
-                    camelContext.getRegistry().bind(getId(override.getName()), overrideParams);
+                    registerSSLContext(override);
                 }
             }
         } else {
-            registerDeprecatedSSLContextParameters();
+            registerDeprecatedSSLContext();
         }
     }
 
@@ -97,7 +93,14 @@ public class SSLContextParametersConfig {
         return allNames;
     }
 
-    private void registerDeprecatedSSLContextParameters() {
+    private void registerSSLContext(TLSProperties.TlSConfig configuration) throws GeneralSecurityException, IOException {
+        SSLContextParameters params = createSSLContextParameters(configuration);
+        String id = getId(configuration.getName());
+        log.info("Registering SSL Context with id '{}'", id);
+        camelContext.getRegistry().bind(id, params);
+    }
+
+    private void registerDeprecatedSSLContext() {
         log.warn("Using deprecated SSL context configuration. Please migrate to vp.tls configuration.");
         SSLContextParameters params = getDeprecatedOutgoingSSLContextParameters(sslBundles, deprecatedBundle);
         camelContext.getRegistry().bind(getId(DEPRECATED_CONTEXT), params);
