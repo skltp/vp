@@ -63,15 +63,15 @@ data:
               -Dcom.sun.management.jmxremote.ssl=false
 
 {{- range .Values.tls.bundles }}
-  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate={{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.crt
-  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key={{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.key
-  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate={{ tpl $.Values.paths.certs $ }}/{{ .name }}/ca.crt
+  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.crt
+  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key: {{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.key
+  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}/ca.crt
 {{- end }}
 {{- with .Values.tls.defaultConfig }}
   vp.tls.default-config.name: "{{ .name }}"
   vp.tls.default-config.bundle: "{{ .bundle }}"
   {{- if .protocolsInclude }}
-  vp.tls.default-config.protocols-include: "{{ join "," .protocolsInclude "" }}"
+  vp.tls.default-config.protocols-include: "{{ join "," .protocolsInclude }}"
   {{- end }}
   {{- if .protocolsExclude }}
   vp.tls.default-config.protocols-exclude: "{{ join "," .protocolsExclude }}"
