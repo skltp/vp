@@ -168,6 +168,12 @@ vp.tls.overrides[1].match.domain-name=legacy.example.com
 vp.tls.overrides[1].match.port=8080
 ```
 
+Övriga konfigurationsparametrar:
+
+|Nyckel| Defaultvärde/Exempel | Beskrivning                                                                                                                         |
+|------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|vp.tls.mtls-verification-enabled| false                | Logga ett fel om mTLS inte användes vid TLS-förhandlingen. Loggningen sker i se.skl.tp.vp.sslcontext.MtlsAwareSSLContextParameters. |
+
 #### tp.tls.* (DEPRECATED) ####
 **️ VARNING: Denna konfiguration är deprecated och kommer att tas bort i framtida versioner. Migrera till `vp.tls.*` och SSL bundles så snart som möjligt.**
 

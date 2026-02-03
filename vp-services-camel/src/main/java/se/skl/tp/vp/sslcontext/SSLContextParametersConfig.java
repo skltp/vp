@@ -102,6 +102,14 @@ public class SSLContextParametersConfig {
 
         SSLContextParameters params = createSSLContextParameters(configuration);
 
+        // Wrap with mTLS verification if enabled
+        if (tlsProperties.isMtlsVerificationEnabled()) {
+            log.info("Wrapping SSL context '{}' with mTLS verification",
+                configuration.getName());
+            params = new MtlsAwareSSLContextParameters(params,
+                tlsProperties.isMtlsVerificationEnabled());
+        }
+
         if (log.isDebugEnabled()) {
             logResolvedConfiguration(params);
         }
@@ -113,6 +121,14 @@ public class SSLContextParametersConfig {
     private void registerDeprecatedSSLContext() {
         log.warn("Using deprecated SSL context configuration. Please migrate to vp.tls configuration.");
         SSLContextParameters params = getDeprecatedOutgoingSSLContextParameters(sslBundles, deprecatedBundle);
+
+        // Wrap with mTLS verification if enabled
+        if (tlsProperties.isMtlsVerificationEnabled()) {
+            log.info("Wrapping deprecated SSL context with mTLS verification");
+            params = new MtlsAwareSSLContextParameters(params,
+                tlsProperties.isMtlsVerificationEnabled());
+        }
+
         camelContext.getRegistry().bind(getId(DEPRECATED_CONTEXT), params);
     }
 
