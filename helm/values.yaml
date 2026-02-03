@@ -124,8 +124,8 @@ timeoutConfig:
 tls:
     bundles:
     - name: clientcert
-      tlsSecret: test.esb.ntjp.sjunet.org
-      truststoreConfigMap: test-siths-ca
+      tlsSecret: esb-function-cert
+      truststoreConfigMap: esb-ca
     defaultConfig:
       name: main
       bundle: clientcert
