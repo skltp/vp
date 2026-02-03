@@ -124,7 +124,8 @@ timeoutConfig:
 tls:
     bundles:
     - name: clientcert
-      secret: esb-function-cert
+      tlsSecret: esb-function-cert
+      truststoreConfigMap: esb-ca
     defaultConfig:
       name: main
       bundle: clientcert

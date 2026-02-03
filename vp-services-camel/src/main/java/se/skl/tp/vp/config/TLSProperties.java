@@ -38,4 +38,9 @@ public class TLSProperties {
 
     private TLSConfig defaultConfig;
     private List<TLSOverride> overrides;
+
+    /**
+     * Enable mTLS verification for outgoing HTTPS connections.
+     */
+    private boolean mtlsVerificationEnabled = false;
 }
