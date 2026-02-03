@@ -52,9 +52,12 @@ spec:
 
       volumes: 
         {{- range .Values.tls.bundles }}
-        - name: {{ .name }}
+        - name: {{ .name }}-keystore
           secret:
-            secretName: {{ .secret }}
+            secretName: {{ .tlsSecret }}
+        - name: {{ .name }}-truststore
+          configMap:
+            name: {{ .truststoreConfigMap }}
         {{- end }}
         - name: data-volume
         - name: hsafiles-volume
@@ -123,8 +126,10 @@ spec:
             - name: hsafiles-volume
               mountPath: {{ tpl .Values.paths.hsafiles . }}
            {{- range .Values.tls.bundles }}
-            - name: {{ .name }}
-              mountPath: {{ tpl $.Values.paths.certs $ }}/{{ .name }}
+            - name: {{ .name }}-keystore
+              mountPath: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore
+            - name: {{ .name }}-truststore
+              mountPath: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-truststore
             {{- end }}
             {{- range .Values.environment.config_files }}
             - name: {{ .volume_name }}

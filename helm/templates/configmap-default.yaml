@@ -63,9 +63,9 @@ data:
               -Dcom.sun.management.jmxremote.ssl=false
 
 {{- range .Values.tls.bundles }}
-  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.crt
-  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key: {{ tpl $.Values.paths.certs $ }}/{{ .name }}/tls.key
-  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}/ca.crt
+  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.crt
+  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.key
+  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-truststore/ca.crt
 {{- end }}
 {{- with .Values.tls.defaultConfig }}
   vp.tls.default-config.name: "{{ .name }}"
