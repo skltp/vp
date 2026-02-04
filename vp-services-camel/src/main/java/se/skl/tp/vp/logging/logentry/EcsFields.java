@@ -88,9 +88,24 @@ public class EcsFields {
     /** Complete URL of the outgoing request to the backend (forwarding destination) */
     public static final String URL_ORIGINAL = "url.original";
 
+    // TLS/SSL fields
+    /** Normalized lowercase protocol name parsed from original string (e.g., tls, ssl) */
+    public static final String TLS_VERSION_PROTOCOL = "tls.version_protocol";
+    /** Numeric part of the version parsed from the original string (e.g., 1.2, 1.3) */
+    public static final String TLS_VERSION = "tls.version";
+    /** TLS cipher suite used in the connection */
+    public static final String TLS_CIPHER = "tls.cipher";
+    /** Whether the TLS connection was successfully established */
+    public static final String TLS_ESTABLISHED = "tls.established";
+
+    // Server fields (for TLS handshake logging)
+    /** Server address (hostname or IP) */
+    public static final String SERVER_ADDRESS = "server.address";
+
     /** Labels for additional metadata as key-value pairs */
     public static final String LABELS = "labels.";
 
     /** The log message */
     public static final String MESSAGE = "message";
 }
+
