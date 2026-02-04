@@ -307,11 +307,11 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
                 Certificate[] localCerts = session.getLocalCertificates();
                 boolean mtlsUsed = localCerts != null && localCerts.length > 0;
 
-                if (log.isDebugEnabled()) {
-                    log.debug("TLS handshake completed for {}", session.getPeerHost());
-                    log.debug("  Protocol: {}", session.getProtocol());
-                    log.debug("  Cipher Suite: {}", session.getCipherSuite());
-                    log.debug("  Local certificates (client): {} sent",
+                if (log.isInfoEnabled()) {
+                    log.info("TLS handshake completed for {} - Protocol: {}, Cipher Suite: {}, Local certificates (client): {} sent",
+                        session.getPeerHost(),
+                        session.getProtocol(),
+                        session.getCipherSuite(),
                         localCerts != null ? localCerts.length : 0);
                 }
 
