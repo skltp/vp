@@ -1,11 +1,9 @@
 package se.skl.tp.vp.logging.logentry;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
-import org.apache.logging.log4j.message.StringMapMessage;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.errorhandling.VpCodeMessages;
@@ -13,17 +11,13 @@ import se.skl.tp.vp.errorhandling.VpCodeMessages;
 import java.util.*;
 
 @Slf4j
-public class EcsLogEntry extends StringMapMessage {
+public class EcsLogEntry extends BaseEcsLogEntry {
 
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    public static final String EVENT_KIND_VALUE = "event";
     public static final String EVENT_MODULE_VALUE = "skltp-messages";
     public static final String EVENT_CATEGORY_VALUE;
     public static final String EVENT_TYPE_VALUE_REQ;
     public static final String EVENT_TYPE_VALUE_RESP;
 
-    private static final EcsSystemProperties SYSTEM_PROPERTIES = EcsSystemProperties.getInstance();
 
     static {
         try {
@@ -70,8 +64,6 @@ public class EcsLogEntry extends StringMapMessage {
     public static final String BACKWARD_COMPAT_MESSAGE_ID = "MessageId";
     public static final String BACKWARD_COMPAT_BUSINESS_CORRELATION_ID = "BusinessCorrelationId";
 
-    // Fields for backward compatibility
-
     public EcsLogEntry withPayload(String payload) {
         if (payload != null) {
             String eventAction = Optional.ofNullable(get(EcsFields.EVENT_ACTION)).orElse("?");
@@ -81,28 +73,17 @@ public class EcsLogEntry extends StringMapMessage {
         return this;
     }
 
-    public static class Builder {
+    public static class Builder extends BaseBuilder<EcsLogEntry, Builder> {
         public static final String FILTERHEADER_REGEX = "(?i)X-Forwarded-Tls-Client-Cert|x-vp-auth-cert|x-fk-auth-cert";
         protected static final String FILTERED_TEXT = "<filtered>";
         public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
-        private final StringMapMessage data = new StringMapMessage();
 
         public Builder(String msgType) {
-            putData(EcsFields.EVENT_ACTION, msgType);
-            putData(EcsFields.EVENT_KIND, EVENT_KIND_VALUE);
-            putData(EcsFields.EVENT_CATEGORY, EVENT_CATEGORY_VALUE);
+            super(msgType, EVENT_KIND_VALUE, EVENT_CATEGORY_VALUE, EVENT_MODULE_VALUE);
             putData(EcsFields.EVENT_TYPE, isReq(msgType) ? EVENT_TYPE_VALUE_REQ : EVENT_TYPE_VALUE_RESP);
-            putData(EcsFields.EVENT_MODULE, EVENT_MODULE_VALUE);
-            putData(EcsFields.HOST_HOSTNAME, SYSTEM_PROPERTIES.getHostName());
-            putData(EcsFields.HOST_IP, SYSTEM_PROPERTIES.getHostIp());
-            putData(EcsFields.HOST_ARCHITECTURE, SYSTEM_PROPERTIES.getHostArchitecture());
-            putData(EcsFields.HOST_OS_FAMILY, SYSTEM_PROPERTIES.getHostOsFamily());
-            putData(EcsFields.HOST_OS_NAME, SYSTEM_PROPERTIES.getHostOsName());
-            putData(EcsFields.HOST_OS_VERSION, SYSTEM_PROPERTIES.getHostOsVersion());
-            putData(EcsFields.HOST_OS_PLATFORM, SYSTEM_PROPERTIES.getHostOsPlatform());
-            putData(EcsFields.HOST_TYPE, SYSTEM_PROPERTIES.getHostType());
         }
 
+        @Override
         public EcsLogEntry build() {
             addBackwardCompatibilityFields();
             putData(EcsFields.MESSAGE, String.format("%s %s -> %s",
@@ -125,7 +106,7 @@ public class EcsLogEntry extends StringMapMessage {
 
         public Builder fromExchange(Exchange exchange) {
             if (exchange == null) {
-                return this;
+                return self();
             }
             String componentId = exchange.getContext().getName();
             String serviceImplementation = exchange.getFromRouteId();
@@ -140,7 +121,7 @@ public class EcsLogEntry extends StringMapMessage {
             putData(EcsFields.HTTP_RESPONSE_STATUS_CODE, exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, String.class));
 
             putExtraInfo(exchange);
-            return this;
+            return self();
         }
 
         private void putTracing(Exchange exchange) {
@@ -161,14 +142,14 @@ public class EcsLogEntry extends StringMapMessage {
         public Builder withException(Exchange exchange, String stackTrace) {
             Throwable throwable = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
             if (throwable == null) {
-                return this;
+                return self();
 
             }
 
             putData(EcsFields.ERROR_TYPE, throwable.getClass().getName()); // The type of the error, for example the class name of the exception.
             putData(EcsFields.ERROR_MESSAGE, throwable.getMessage()); // Error message
             putData(EcsFields.ERROR_STACK_TRACE, stackTrace); // The stack trace of this error in plain text.
-            return this;
+            return self();
         }
 
 
@@ -188,7 +169,7 @@ public class EcsLogEntry extends StringMapMessage {
                 putLabel(LABEL_VP_X_FORWARDED_PORT, httpXForwardedPort);
                 exchange.removeProperty(VPExchangeProperties.VP_X_FORWARDED_PORT);
             }
-            return this;
+            return self();
         }
 
         public void putExtraInfo(Exchange exchange) {
@@ -300,16 +281,6 @@ public class EcsLogEntry extends StringMapMessage {
 
         static void filterHeaders(Map<String, Object> headers, Map<String, String> res) {
             headers.forEach((s, o) -> res.put(s, s.matches(FILTERHEADER_REGEX) ? FILTERED_TEXT : String.valueOf(o)));
-        }
-
-        private void putLabel(String source, String name) {
-            putData(EcsFields.LABELS + source, name);
-        }
-
-        void putData(String key, String value) {
-            if (value != null) {
-                data.put(key, value);
-            }
         }
     }
 

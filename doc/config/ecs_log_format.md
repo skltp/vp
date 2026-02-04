@@ -17,17 +17,31 @@ Grundläggande fält som finns i alla loggposter:
 
 ### Event-fält
 
-Event-fält beskriver händelsen som loggas. Dessa är centrala för att kategorisera och förstå loggposter.
+Event-fält beskriver händelsen som loggas.
 
 | Fält             | ECS-referens                                                                                      | Beskrivning                                                                                               |
 |------------------|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | `event.id`       | [event.id](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-id)             | Unik identifierare för denna händelse (UUID)                                                              |
 | `event.action`   | [event.action](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-action)     | Den åtgärd som händelsen fångade (t.ex. `req-in`, `resp-out`)                                             |
-| `event.module`   | [event.module](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-module)     | Namnet på modulen som data kommer från (alltid `skltp-messages`)                                          |
+| `event.module`   | [event.module](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-module)     | Namnet på modulen som data kommer från (`skltp-messages` för HTTP/SOAP-meddelanden, `skltp-tls` för TLS/SSL-händelser) |
 | `event.duration` | [event.duration](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-duration) | Tidsåtgång för operationen i nanosekunder.                                                                |
 | `event.kind`     | [event.kind](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-kind)         | Första nivån i ECS kategorihierarki (alltid `event`)                                                      |
-| `event.category` | [event.category](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-category) | Andra nivån i ECS kategorihierarki (alltid `["web"]`)                                                     |
+| `event.category` | [event.category](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-category) | Andra nivån i ECS kategorihierarki (`["web"]` för HTTP/SOAP, `["configuration", "network"]` för TLS)     |
 | `event.type`     | [event.type](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-type)         | Tredje nivån i ECS kategorihierarki (`["access", "start"]` för request, `["access", "end"]` för response) |
+
+#### Event Actions
+
+VP-tjänsten använder olika `event.action`-värden beroende på händelsetyp:
+
+**HTTP/SOAP-meddelanden** (`event.module`: `skltp-messages`):
+- `req-in` - Inkommande request till VP
+- `req-out` - Utgående request från VP till producent
+- `resp-in` - Inkommande response från producent till VP
+- `resp-out` - Utgående response från VP till konsument
+
+**TLS/SSL-händelser** (`event.module`: `skltp-tls`):
+- `ssl-context-register` - Registrering av en SSL-kontext med protokoll och cipher suites
+- `tls-handshake-complete` - Slutförd TLS-handskakning med peer
 
 ### Tracing-fält
 
@@ -158,6 +172,23 @@ Detaljer om loggmekanismen.
 | `log.level`   | [log.level](https://www.elastic.co/guide/en/ecs/current/ecs-log.html#field-log-level)        | Loggnivå för händelsen (t.ex. `DEBUG`, `INFO`, `ERROR`)         |
 | `log.logger`  | [log.logger](https://www.elastic.co/guide/en/ecs/current/ecs-log.html#field-log-logger)      | Namnet på loggern som genererade händelsen                      |
 
+### TLS/SSL-fält
+
+TLS/SSL-fält beskriver säkerhetsaspekter av krypterade anslutningar.
+
+| Fält                   | ECS-referens                                                                                                     | Beskrivning                                                        |
+|------------------------|------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| `tls.version_protocol` | [tls.version_protocol](https://www.elastic.co/guide/en/ecs/current/ecs-tls.html#field-tls-version-protocol)      | Normaliserat protokollnamn i gemener (t.ex. `tls`, `ssl`)          |
+| `tls.version`          | [tls.version](https://www.elastic.co/guide/en/ecs/current/ecs-tls.html#field-tls-version)                        | Numerisk version från protokollsträngen (t.ex. `1.2`, `1.3`)       |
+| `tls.cipher`           | [tls.cipher](https://www.elastic.co/guide/en/ecs/current/ecs-tls.html#field-tls-cipher)                          | Cipher suite som används i anslutningen                            |
+| `tls.established`      | [tls.established](https://www.elastic.co/guide/en/ecs/current/ecs-tls.html#field-tls-established)                | Om TLS-anslutningen etablerades framgångsrikt (boolean som sträng) |
+
+#### Server-fält (för TLS handshake-loggning)
+
+| Fält             | ECS-referens                                                                                       | Beskrivning                   |
+|------------------|----------------------------------------------------------------------------------------------------|-------------------------------|
+| `server.address` | [server.address](https://www.elastic.co/guide/en/ecs/current/ecs-server.html#field-server-address) | Serveradress (värdnamn eller IP) |
+
 
 ## Labels (Anpassade fält)
 
@@ -210,6 +241,19 @@ Labels används för att lägga till domänspecifik metadata som inte täcks av 
 | `labels.routerVagvalTrace`     | Spårningsinformation från vägval-routing                                |
 | `labels.routerBehorighetTrace` | Spårningsinformation från anropsbehörighetskontroll                     |
 | `labels.parent.id`             | Identifierar huvudoperationen i ett delflöde. Se även fältet `span.id`. |
+
+### TLS/SSL-konfiguration
+
+TLS/SSL-specifika labels används för loggning av SSL-kontextregistrering och handshake-händelser.
+
+| Label                         | Beskrivning                                                           |
+|-------------------------------|-----------------------------------------------------------------------|
+| `labels.sslContextId`         | Identifierare för SSL-kontexten                                       |
+| `labels.protocolCount`        | Antal tillgängliga TLS-protokoll i SSL-kontexten                      |
+| `labels.protocols`            | Lista över tillgängliga TLS-protokoll (JSON-array)                    |
+| `labels.cipherSuiteCount`     | Antal tillgängliga cipher suites i SSL-kontexten                      |
+| `labels.cipherSuites`         | Lista över tillgängliga cipher suites (JSON-array)                    |
+| `labels.clientCertCount`      | Antal klientcertifikat som skickades under TLS-handshake              |
 
 ## Bakåtkompatibilitet
 

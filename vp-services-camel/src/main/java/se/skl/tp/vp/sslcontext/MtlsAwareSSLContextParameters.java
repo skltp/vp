@@ -10,6 +10,7 @@ import org.apache.camel.support.jsse.CipherSuitesParameters;
 import org.apache.camel.support.jsse.SecureRandomParameters;
 import org.apache.camel.support.jsse.SSLContextClientParameters;
 import org.apache.camel.support.jsse.SSLContextServerParameters;
+import se.skl.tp.vp.logging.logentry.EcsTlsLogEntry;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLContextSpi;
@@ -306,19 +307,25 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
 
                 Certificate[] localCerts = session.getLocalCertificates();
                 boolean mtlsUsed = localCerts != null && localCerts.length > 0;
+                int certCount = localCerts != null ? localCerts.length : 0;
 
-                if (log.isInfoEnabled()) {
-                    log.info("TLS handshake completed for {} - Protocol: {}, Cipher Suite: {}, Local certificates (client): {} sent",
-                        session.getPeerHost(),
-                        session.getProtocol(),
-                        session.getCipherSuite(),
-                        localCerts != null ? localCerts.length : 0);
-                }
+                EcsTlsLogEntry logEntry = new EcsTlsLogEntry.Builder(EcsTlsLogEntry.ACTION_TLS_HANDSHAKE_COMPLETE)
+                        .withHandshakeDetails(
+                                session.getPeerHost(),
+                                session.getProtocol(),
+                                session.getCipherSuite(),
+                                certCount)
+                        .withMessage(String.format("TLS handshake completed for %s - Protocol: %s, Cipher Suite: %s, Local certificates (client): %d sent",
+                                session.getPeerHost(),
+                                session.getProtocol(),
+                                session.getCipherSuite(),
+                                certCount))
+                        .build();
 
-                if (!mtlsUsed) {
-                    String peerHost = session.getPeerHost() != null ? session.getPeerHost() : "unknown";
-                    log.error("mTLS verification failed: No client certificate was sent to producer at {}",
-                        peerHost);
+                if (mtlsUsed) {
+                    log.info(logEntry);
+                } else {
+                    log.error(logEntry);
                 }
             } catch (Exception e) {
                 log.error("Error during mTLS verification: {}", e.getMessage(), e);
