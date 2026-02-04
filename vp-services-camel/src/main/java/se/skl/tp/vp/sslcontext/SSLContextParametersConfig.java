@@ -95,7 +95,6 @@ public class SSLContextParametersConfig {
     }
 
     private void registerSSLContext(TLSProperties.TLSConfig configuration) throws GeneralSecurityException, IOException {
-        String id = getId(configuration.getName());
         if (log.isDebugEnabled()) {
             logTLSConfiguration(configuration);
         }
@@ -110,11 +109,11 @@ public class SSLContextParametersConfig {
                 tlsProperties.isMtlsVerificationEnabled());
         }
 
-        if (log.isDebugEnabled()) {
-            logResolvedConfiguration(params);
+        String id = getId(configuration.getName());
+        if (log.isInfoEnabled()) {
+            logResolvedConfiguration(id, params);
         }
 
-        log.info("Registering SSL Context with id '{}'", id);
         camelContext.getRegistry().bind(id, params);
     }
 
@@ -346,14 +345,16 @@ public class SSLContextParametersConfig {
         }
     }
 
-    private static void logResolvedConfiguration(SSLContextParameters params) {
+    private static void logResolvedConfiguration(String id, SSLContextParameters params) {
         List<String> finalProtocols = params.getSecureSocketProtocols() != null ?
                 params.getSecureSocketProtocols().getSecureSocketProtocol() : List.of();
         List<String> finalCipherSuites = params.getCipherSuites() != null ?
                 params.getCipherSuites().getCipherSuite() : List.of();
 
-        log.debug("  Final resolved protocols ({}): {}", finalProtocols.size(), finalProtocols);
-        log.debug("  Final resolved cipher suites ({}): {}", finalCipherSuites.size(), finalCipherSuites);
+        log.info("Registering SSL Context with id '{}' - protocols ({}): {}, cipher suites ({}): {}",
+                id,
+                finalProtocols.size(), finalProtocols,
+                finalCipherSuites.size(), finalCipherSuites);
     }
 
 
@@ -410,3 +411,4 @@ public class SSLContextParametersConfig {
         }
     }
 }
+
