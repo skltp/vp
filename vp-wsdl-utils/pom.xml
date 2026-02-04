@@ -5,7 +5,7 @@
   <parent>
     <groupId>se.skltp.vp</groupId>
     <artifactId>vp-parent-camel</artifactId>
-    <version>4.7.1</version>
+    <version>4.7.2</version>
   </parent>
   <artifactId>vp-wsdl-utils</artifactId>
   <name>vp-wsdl-utils</name>
