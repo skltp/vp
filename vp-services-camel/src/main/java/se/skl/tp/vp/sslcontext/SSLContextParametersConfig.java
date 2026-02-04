@@ -20,6 +20,7 @@ import java.util.List;
 
 import se.skl.tp.vp.config.SecurityProperties;
 import se.skl.tp.vp.config.TLSProperties;
+import se.skl.tp.vp.logging.logentry.EcsTlsLogEntry;
 
 
 import javax.net.ssl.*;
@@ -351,10 +352,13 @@ public class SSLContextParametersConfig {
         List<String> finalCipherSuites = params.getCipherSuites() != null ?
                 params.getCipherSuites().getCipherSuite() : List.of();
 
-        log.info("Registering SSL Context with id '{}' - protocols ({}): {}, cipher suites ({}): {}",
-                id,
-                finalProtocols.size(), finalProtocols,
-                finalCipherSuites.size(), finalCipherSuites);
+        EcsTlsLogEntry logEntry = new EcsTlsLogEntry.Builder(EcsTlsLogEntry.ACTION_SSL_CONTEXT_REGISTER)
+                .withSslContextId(id)
+                .withProtocolsAndCipherSuites(finalProtocols, finalCipherSuites)
+                .withMessage(String.format("Registering SSL Context with id '%s' - protocols (%d): %s, cipher suites (%d)",
+                        id, finalProtocols.size(), finalProtocols, finalCipherSuites.size()))
+                .build();
+        log.info(logEntry);
     }
 
 
