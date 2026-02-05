@@ -5,7 +5,7 @@
   <parent>
     <groupId>se.skltp.vp</groupId>
     <artifactId>vp-parent-camel</artifactId>
-    <version>4.7.2</version>
+    <version>4.7.3</version>
   </parent>
   <artifactId>cert-generator-utility</artifactId>
   <packaging>pom</packaging>
