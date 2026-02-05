@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:eb0a90ea-d771-48bf-8be8-b88ff60f7189",
+  "serialNumber": "urn:uuid:8c7c3029-65e6-422e-85b9-9306b873f19a",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-05T12:49:11+00:00",
+    "timestamp": "2026-02-05T16:06:18+00:00",
     "tools": {
       "components": [
         {
@@ -20,18 +20,18 @@
       ]
     },
     "component": {
-      "bom-ref": "pkg:oci/cert-generator-utility@sha256%3A833aed7e685741c83321114203e1f9f94966bc0b9ab3b1225862d35354f957c7?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
+      "bom-ref": "pkg:oci/cert-generator-utility@sha256%3A8466df5bbb3db48e6e10e335ef7a044685d0127ff26d10eb84ca8dfd60ef0ca6?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
       "type": "container",
-      "name": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.3",
-      "purl": "pkg:oci/cert-generator-utility@sha256%3A833aed7e685741c83321114203e1f9f94966bc0b9ab3b1225862d35354f957c7?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
+      "name": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.4",
+      "purl": "pkg:oci/cert-generator-utility@sha256%3A8466df5bbb3db48e6e10e335ef7a044685d0127ff26d10eb84ca8dfd60ef0ca6?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
       "properties": [
         {
           "name": "aquasecurity:trivy:DiffID",
-          "value": "sha256:3dfc8584d2154839814d7745db2d33882f17b4d328df828f187370d46dafb31e"
+          "value": "sha256:1015df4dc839a6be6fc5998c7bbda73e3a3095bf0f62d922ad315f1c01503250"
         },
         {
           "name": "aquasecurity:trivy:DiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:788de963ba66b65362e9fd4371b0eea05a75a15649f99607865cea81aeb3f834"
         },
         {
           "name": "aquasecurity:trivy:DiffID",
@@ -39,19 +39,19 @@
         },
         {
           "name": "aquasecurity:trivy:DiffID",
-          "value": "sha256:e998a8ab52559fe5b07d6740a93d5912c09e22000b299ad3a620a614d4d44b76"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:ImageID",
-          "value": "sha256:cd44762c73417f327659262bbe3b75b2ff2e2f7acce6bba713290c48824aeee7"
+          "value": "sha256:3dc6918d2587474b87848474853688e78ca1521c5eae2bfe7a73e487450b4501"
         },
         {
           "name": "aquasecurity:trivy:Reference",
-          "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.3"
+          "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.4"
         },
         {
           "name": "aquasecurity:trivy:RepoDigest",
-          "value": "docker.drift.inera.se/ntjp/cert-generator-utility@sha256:833aed7e685741c83321114203e1f9f94966bc0b9ab3b1225862d35354f957c7"
+          "value": "docker.drift.inera.se/ntjp/cert-generator-utility@sha256:8466df5bbb3db48e6e10e335ef7a044685d0127ff26d10eb84ca8dfd60ef0ca6"
         },
         {
           "name": "aquasecurity:trivy:RepoTag",
@@ -59,7 +59,7 @@
         },
         {
           "name": "aquasecurity:trivy:RepoTag",
-          "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.3"
+          "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.4"
         },
         {
           "name": "aquasecurity:trivy:RepoTag",
@@ -82,7 +82,7 @@
   },
   "components": [
     {
-      "bom-ref": "aba9b6f0-ffae-4cef-8215-c4a2f5b26604",
+      "bom-ref": "dc0af047-761e-4fca-833e-f31d9c3873b4",
       "type": "operating-system",
       "name": "alpine",
       "version": "3.23.3",
@@ -492,7 +492,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -537,7 +537,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -582,7 +582,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -717,7 +717,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -807,7 +807,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -952,7 +952,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -997,7 +997,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -1042,7 +1042,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -1087,7 +1087,7 @@
       "properties": [
         {
           "name": "aquasecurity:trivy:LayerDiffID",
-          "value": "sha256:8a5c57a5d0278bd18d4db4bdf2c8669e39a42d9e697212861325ef6818618b32"
+          "value": "sha256:e8ebb8e573f738db117ac66e54092df09a3164eadee98a2fee0668cd91c2b34d"
         },
         {
           "name": "aquasecurity:trivy:PkgID",
@@ -1245,7 +1245,7 @@
   ],
   "dependencies": [
     {
-      "ref": "aba9b6f0-ffae-4cef-8215-c4a2f5b26604",
+      "ref": "dc0af047-761e-4fca-833e-f31d9c3873b4",
       "dependsOn": [
         "pkg:apk/alpine/alpine-baselayout@3.7.1-r8?arch=x86_64&distro=3.23.3",
         "pkg:apk/alpine/alpine-release@3.23.3-r0?arch=x86_64&distro=3.23.3",
@@ -1425,9 +1425,9 @@
       ]
     },
     {
-      "ref": "pkg:oci/cert-generator-utility@sha256%3A833aed7e685741c83321114203e1f9f94966bc0b9ab3b1225862d35354f957c7?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
+      "ref": "pkg:oci/cert-generator-utility@sha256%3A8466df5bbb3db48e6e10e335ef7a044685d0127ff26d10eb84ca8dfd60ef0ca6?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
       "dependsOn": [
-        "aba9b6f0-ffae-4cef-8215-c4a2f5b26604"
+        "dc0af047-761e-4fca-833e-f31d9c3873b4"
       ]
     }
   ],
