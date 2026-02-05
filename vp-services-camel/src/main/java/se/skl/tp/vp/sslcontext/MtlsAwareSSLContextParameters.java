@@ -305,6 +305,11 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
         private void verifyMtls() {
             try {
                 SSLSession session = delegate.getSession();
+
+                if (log.isTraceEnabled()) {
+                    logCertificateDetails(session);
+                }
+
                 if (session == null || session.getPeerHost() == null || session.getProtocol() == null || session.getCipherSuite() == null) {
                     log.debug("SSLSession is null or incomplete, cannot verify mTLS");
                     return;
@@ -313,10 +318,6 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
                 Certificate[] localCerts = session.getLocalCertificates();
                 boolean mtlsUsed = localCerts != null && localCerts.length > 0;
                 int certCount = localCerts != null ? localCerts.length : 0;
-
-                if (log.isTraceEnabled()) {
-                    logCertificateDetails(session);
-                }
 
                 var builder = new EcsTlsLogEntry.Builder(EcsTlsLogEntry.ACTION_TLS_HANDSHAKE_COMPLETE)
                         .withHandshakeDetails(
@@ -356,6 +357,9 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
          * @param session The SSL session containing peer certificates
          */
         private void logCertificateDetails(SSLSession session) {
+            if (session == null) {
+                return;
+            }
             try {
                 // Log local certificates (client certificates)
                 Certificate[] localCerts = session.getLocalCertificates();
