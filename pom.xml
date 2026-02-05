@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.skltp.vp</groupId>
   <artifactId>vp-parent-camel</artifactId>
-  <version>4.7.4</version>
+  <version>4.7.5</version>
   <packaging>pom</packaging>
   <name>vp-parent-camel</name>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>

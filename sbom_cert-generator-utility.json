@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:8c7c3029-65e6-422e-85b9-9306b873f19a",
+  "serialNumber": "urn:uuid:9c3a9110-74ca-49d9-8d78-89205cf87911",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-02-05T16:06:18+00:00",
+    "timestamp": "2026-02-05T16:26:31+00:00",
     "tools": {
       "components": [
         {
@@ -22,7 +22,7 @@
     "component": {
       "bom-ref": "pkg:oci/cert-generator-utility@sha256%3A8466df5bbb3db48e6e10e335ef7a044685d0127ff26d10eb84ca8dfd60ef0ca6?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
       "type": "container",
-      "name": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.4",
+      "name": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.5",
       "purl": "pkg:oci/cert-generator-utility@sha256%3A8466df5bbb3db48e6e10e335ef7a044685d0127ff26d10eb84ca8dfd60ef0ca6?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
       "properties": [
         {
@@ -47,7 +47,7 @@
         },
         {
           "name": "aquasecurity:trivy:Reference",
-          "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.4"
+          "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.5"
         },
         {
           "name": "aquasecurity:trivy:RepoDigest",
@@ -60,6 +60,10 @@
         {
           "name": "aquasecurity:trivy:RepoTag",
           "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.4"
+        },
+        {
+          "name": "aquasecurity:trivy:RepoTag",
+          "value": "docker.drift.inera.se/ntjp/cert-generator-utility:4.7.5"
         },
         {
           "name": "aquasecurity:trivy:RepoTag",
@@ -82,7 +86,7 @@
   },
   "components": [
     {
-      "bom-ref": "dc0af047-761e-4fca-833e-f31d9c3873b4",
+      "bom-ref": "eed339fb-b82a-4e79-80ce-154256e148c0",
       "type": "operating-system",
       "name": "alpine",
       "version": "3.23.3",
@@ -1245,7 +1249,7 @@
   ],
   "dependencies": [
     {
-      "ref": "dc0af047-761e-4fca-833e-f31d9c3873b4",
+      "ref": "eed339fb-b82a-4e79-80ce-154256e148c0",
       "dependsOn": [
         "pkg:apk/alpine/alpine-baselayout@3.7.1-r8?arch=x86_64&distro=3.23.3",
         "pkg:apk/alpine/alpine-release@3.23.3-r0?arch=x86_64&distro=3.23.3",
@@ -1427,7 +1431,7 @@
     {
       "ref": "pkg:oci/cert-generator-utility@sha256%3A8466df5bbb3db48e6e10e335ef7a044685d0127ff26d10eb84ca8dfd60ef0ca6?arch=amd64&repository_url=docker.drift.inera.se%2Fntjp%2Fcert-generator-utility",
       "dependsOn": [
-        "dc0af047-761e-4fca-833e-f31d9c3873b4"
+        "eed339fb-b82a-4e79-80ce-154256e148c0"
       ]
     }
   ],
