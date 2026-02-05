@@ -24,6 +24,10 @@ import se.skl.tp.vp.logging.logentry.EcsTlsLogEntry;
 
 
 import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 
 @Log4j2
 @Configuration
@@ -352,11 +356,17 @@ public class SSLContextParametersConfig {
         List<String> finalCipherSuites = params.getCipherSuites() != null ?
                 params.getCipherSuites().getCipherSuite() : List.of();
 
+        // Determine if using explicitly configured values or bundle defaults
+        String protocolsSource = params.getSecureSocketProtocols() != null ? "configured" : "bundle defaults";
+        String cipherSuitesSource = params.getCipherSuites() != null ? "configured" : "bundle defaults";
+
         EcsTlsLogEntry logEntry = new EcsTlsLogEntry.Builder(EcsTlsLogEntry.ACTION_SSL_CONTEXT_REGISTER)
                 .withSslContextId(id)
                 .withProtocolsAndCipherSuites(finalProtocols, finalCipherSuites)
-                .withMessage(String.format("Registering SSL Context with id '%s' - protocols (%d): %s, cipher suites (%d)",
-                        id, finalProtocols.size(), finalProtocols, finalCipherSuites.size()))
+                .withMessage(String.format("Registering SSL Context with id '%s' - protocols (%d, %s): %s, cipher suites (%d, %s)",
+                        id, finalProtocols.size(), protocolsSource,
+                        finalProtocols.isEmpty() ? "using bundle defaults" : finalProtocols,
+                        finalCipherSuites.size(), cipherSuitesSource))
                 .build();
         log.info(logEntry);
     }
@@ -380,9 +390,29 @@ public class SSLContextParametersConfig {
     }
 
     private static void logX509TrustManager(int index, X509TrustManager x509tm) {
-        int acceptedIssuers = x509tm.getAcceptedIssuers() != null ?
-                x509tm.getAcceptedIssuers().length : 0;
-        log.debug("          [{}] Accepted issuers: {} CA(s)", index, acceptedIssuers);
+        X509Certificate[] acceptedIssuers = x509tm.getAcceptedIssuers();
+        int count = acceptedIssuers != null ? acceptedIssuers.length : 0;
+        log.debug("          [{}] Accepted issuers: {} CA(s)", index, count);
+
+        if (acceptedIssuers != null && acceptedIssuers.length > 0) {
+            for (int i = 0; i < acceptedIssuers.length; i++) {
+                X509Certificate cert = acceptedIssuers[i];
+                log.debug("            CA[{}] Subject: {}", i, cert.getSubjectX500Principal().getName());
+                log.debug("            CA[{}] Issuer:  {}", i, cert.getIssuerX500Principal().getName());
+                log.debug("            CA[{}] Valid from {} to {}", i, cert.getNotBefore(), cert.getNotAfter());
+                log.debug("            CA[{}] Serial: {}", i, cert.getSerialNumber());
+
+                // Log SHA-256 fingerprint for certificate identification
+                try {
+                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                    byte[] fingerprint = digest.digest(cert.getEncoded());
+                    String fingerprintHex = HexFormat.of().withUpperCase().withDelimiter(":").formatHex(fingerprint);
+                    log.debug("            CA[{}] SHA-256: {}", i, fingerprintHex);
+                } catch (Exception e) {
+                    log.debug("            CA[{}] Unable to compute fingerprint: {}", i, e.getMessage());
+                }
+            }
+        }
     }
 
     private static void logKeyManagers(SslManagerBundle managers) {
