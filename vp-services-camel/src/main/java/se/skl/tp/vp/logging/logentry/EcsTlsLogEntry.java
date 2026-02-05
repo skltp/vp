@@ -116,7 +116,7 @@ public class EcsTlsLogEntry extends BaseEcsLogEntry {
             putData(EcsFields.SERVER_ADDRESS, peerHost);
             parseTlsProtocol(protocol);
             putData(EcsFields.TLS_CIPHER, cipherSuite);
-            putData(EcsFields.TLS_ESTABLISHED, "true");
+            putData(EcsFields.TLS_ESTABLISHED, 0 < clientCertCount ? "true" : "false");
             putLabel(LABEL_CLIENT_CERT_COUNT, String.valueOf(clientCertCount));
             return self();
         }

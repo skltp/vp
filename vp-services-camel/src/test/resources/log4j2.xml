@@ -28,7 +28,7 @@
         <AsyncLogger name="se.skl.tp.vp.errorhandling" level="INFO"/>
 
         <!-- Debug logging of SSL context configuration -->
-        <AsyncLogger name="se.skl.tp.vp.sslcontext" level="DEBUG"/>
+        <AsyncLogger name="se.skl.tp.vp.sslcontext" level="TRACE"/>
 
         <!-- Message logging -->
         <!-- Use synchronous loggers here since some tests use
