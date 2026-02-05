@@ -63,48 +63,48 @@ data:
               -Dcom.sun.management.jmxremote.ssl=false
 
 {{- range .Values.tls.bundles }}
-  spring.ssl.bundle.pem.{{ .name }}.keystore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.crt
-  spring.ssl.bundle.pem.{{ .name }}.keystore.private-key: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.key
-  spring.ssl.bundle.pem.{{ .name }}.truststore.certificate: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-truststore/ca.crt
+  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_KEYSTORE_CERTIFICATE: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.crt
+  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_KEYSTORE_PRIVATEKEY: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.key
+  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_TRUSTSTORE_CERTIFICATE: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-truststore/ca.crt
 {{- end }}
 {{- with .Values.tls.defaultConfig }}
-  vp.tls.default-config.name: "{{ .name }}"
-  vp.tls.default-config.bundle: "{{ .bundle }}"
+  VP_TLS_DEFAULTCONFIG_NAME: "{{ .name }}"
+  VP_TLS_DEFAULTCONFIG_BUNDLE: "{{ .bundle }}"
   {{- if .protocolsInclude }}
-  vp.tls.default-config.protocols-include: "{{ join "," .protocolsInclude }}"
+  VP_TLS_DEFAULTCONFIG_PROTOCOLSINCLUDE: "{{ join "," .protocolsInclude }}"
   {{- end }}
   {{- if .protocolsExclude }}
-  vp.tls.default-config.protocols-exclude: "{{ join "," .protocolsExclude }}"
+  VP_TLS_DEFAULTCONFIG_PROTOCOLSEXCLUDE: "{{ join "," .protocolsExclude }}"
   {{- end }}
   {{- if .cipherSuitesInclude }}
-  vp.tls.default-config.cipher-suites-include: "{{ join "," .cipherSuitesInclude }}"
+  VP_TLS_DEFAULTCONFIG_CIPHERSUITESINCLUDE: "{{ join "," .cipherSuitesInclude }}"
   {{- end }}
   {{- if .cipherSuitesExclude }}
-  vp.tls.default-config.cipher-suites-exclude: "{{ join "," .cipherSuitesExclude }}"
+  VP_TLS_DEFAULTCONFIG_CIPHERSUITESEXCLUDE: "{{ join "," .cipherSuitesExclude }}"
   {{- end }}
 {{- end }}
 {{- range $index, $override := .Values.tls.overrides }}
-  vp.tls.overrides[{{ $index }}].name: "{{ $override.name }}"
-  vp.tls.overrides[{{ $index }}].bundle: "{{ $override.bundle }}"
+  VP_TLS_OVERRIDES_{{ $index }}_NAME: "{{ $override.name }}"
+  VP_TLS_OVERRIDES_{{ $index }}_BUNDLE: "{{ $override.bundle }}"
   {{- if $override.match.domainName }}
-  vp.tls.overrides[{{ $index }}].match.domain-name: "{{ $override.match.domainName }}"
+  VP_TLS_OVERRIDES_{{ $index }}_MATCH_DOMAINNAME: "{{ $override.match.domainName }}"
   {{- end }}
   {{- if $override.match.domainSuffix }}
-  vp.tls.overrides[{{ $index }}].match.domain-suffix: "{{ $override.match.domainSuffix }}"
+  VP_TLS_OVERRIDES_{{ $index }}_MATCH_DOMAINSUFFIX: "{{ $override.match.domainSuffix }}"
   {{- end }}
   {{- if $override.match.port }}
-  vp.tls.overrides[{{ $index }}].match.port: "{{ $override.match.port }}"
+  VP_TLS_OVERRIDES_{{ $index }}_MATCH_PORT: "{{ $override.match.port }}"
   {{- end }}
   {{- if $override.protocolsInclude }}
-  vp.tls.overrides[{{ $index }}].protocols-include: "{{ join "," $override.protocolsInclude }}"
+  VP_TLS_OVERRIDES_{{ $index }}_PROTOCOLSINCLUDE: "{{ join "," $override.protocolsInclude }}"
   {{- end }}
   {{- if $override.protocolsExclude }}
-  vp.tls.overrides[{{ $index }}].protocols-exclude: "{{ join "," $override.protocolsExclude }}"
+  VP_TLS_OVERRIDES_{{ $index }}_PROTOCOLSEXCLUDE: "{{ join "," $override.protocolsExclude }}"
   {{- end }}
   {{- if $override.cipherSuitesInclude }}
-  vp.tls.overrides[{{ $index }}].cipher-suites-include: "{{ join "," $override.cipherSuitesInclude }}"
+  VP_TLS_OVERRIDES_{{ $index }}_CIPHERSUITESINCLUDE: "{{ join "," $override.cipherSuitesInclude }}"
   {{- end }}
   {{- if $override.cipherSuitesExclude }}
-  vp.tls.overrides[{{ $index }}].cipher-suites-exclude: "{{ join "," $override.cipherSuitesExclude }}"
+  VP_TLS_OVERRIDES_{{ $index }}_CIPHERSUITESEXCLUDE: "{{ join "," $override.cipherSuitesExclude }}"
   {{- end }}
 {{- end }}
