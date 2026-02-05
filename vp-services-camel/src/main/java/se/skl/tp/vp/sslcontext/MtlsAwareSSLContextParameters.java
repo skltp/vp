@@ -26,8 +26,11 @@ import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.HexFormat;
 
 /**
  * Custom SSLContextParameters that wraps SSL engines to monitor mTLS (mutual TLS) certificate exchange.
@@ -266,6 +269,8 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
      * SSLEngine wrapper that monitors handshake completion and verifies mTLS certificate exchange.
      */
     private static class MtlsVerifyingSSLEngine extends SSLEngine {
+        public static final String TLS_HANDSHAKE_COMPLETED = "TLS handshake completed for %s - Protocol: %s, Cipher Suite: %s, Local certificates (client): %d sent";
+        public static final String TLS_HANDSHAKE_FAILED = "TLS handshake failed for %s - Protocol: %s, Cipher Suite: %s, NO local certificates (client) sent";
         private final SSLEngine delegate;
         private boolean handshakeChecked = false;
 
@@ -300,8 +305,8 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
         private void verifyMtls() {
             try {
                 SSLSession session = delegate.getSession();
-                if (session == null) {
-                    log.warn("SSLSession is null, cannot verify mTLS");
+                if (session == null || session.getPeerHost() == null || session.getProtocol() == null || session.getCipherSuite() == null) {
+                    log.debug("SSLSession is null or incomplete, cannot verify mTLS");
                     return;
                 }
 
@@ -309,26 +314,123 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
                 boolean mtlsUsed = localCerts != null && localCerts.length > 0;
                 int certCount = localCerts != null ? localCerts.length : 0;
 
-                EcsTlsLogEntry logEntry = new EcsTlsLogEntry.Builder(EcsTlsLogEntry.ACTION_TLS_HANDSHAKE_COMPLETE)
+                if (log.isTraceEnabled()) {
+                    logCertificateDetails(session);
+                }
+
+                var builder = new EcsTlsLogEntry.Builder(EcsTlsLogEntry.ACTION_TLS_HANDSHAKE_COMPLETE)
                         .withHandshakeDetails(
                                 session.getPeerHost(),
                                 session.getProtocol(),
                                 session.getCipherSuite(),
-                                certCount)
-                        .withMessage(String.format("TLS handshake completed for %s - Protocol: %s, Cipher Suite: %s, Local certificates (client): %d sent",
+                                certCount);
+
+                if (mtlsUsed) {
+                    log.info(
+                        builder
+                            .withMessage(String.format(TLS_HANDSHAKE_COMPLETED,
                                 session.getPeerHost(),
                                 session.getProtocol(),
                                 session.getCipherSuite(),
                                 certCount))
-                        .build();
-
-                if (mtlsUsed) {
-                    log.info(logEntry);
+                            .build()
+                    );
                 } else {
-                    log.error(logEntry);
+                    log.error(
+                        builder
+                            .withMessage(String.format(TLS_HANDSHAKE_FAILED,
+                                session.getPeerHost(),
+                                session.getProtocol(),
+                                session.getCipherSuite()))
+                            .build()
+                    );
                 }
             } catch (Exception e) {
                 log.error("Error during mTLS verification: {}", e.getMessage(), e);
+            }
+        }
+
+        /**
+         * Logs detailed certificate information at TRACE level for debugging purposes.
+         *
+         * @param session The SSL session containing peer certificates
+         */
+        private void logCertificateDetails(SSLSession session) {
+            try {
+                // Log local certificates (client certificates)
+                Certificate[] localCerts = session.getLocalCertificates();
+                if (localCerts != null && localCerts.length > 0) {
+                    log.trace("Local certificates (client) sent: {} certificate(s)", localCerts.length);
+                    for (int i = 0; i < localCerts.length; i++) {
+                        Certificate cert = localCerts[i];
+                        log.trace("  Local certificate [{}]: Type={}", i, cert.getType());
+                        logCertificateDetails("Local", i, cert);
+                    }
+                } else {
+                    log.trace("No local certificates (client) sent");
+                }
+
+                // Log peer certificates (server certificates)
+                Certificate[] peerCerts = session.getPeerCertificates();
+                if (peerCerts != null && peerCerts.length > 0) {
+                    log.trace("Peer certificates (server) received: {} certificate(s)", peerCerts.length);
+                    for (int i = 0; i < peerCerts.length; i++) {
+                        Certificate cert = peerCerts[i];
+                        log.trace("  Peer certificate [{}]: Type={}", i, cert.getType());
+                        logCertificateDetails("Peer", i, cert);
+                    }
+                } else {
+                    log.trace("No peer certificates (server) received");
+                }
+            } catch (javax.net.ssl.SSLPeerUnverifiedException e) {
+                log.trace("Peer certificates not verified: {}", e.getMessage());
+            } catch (Exception e) {
+                log.trace("Error logging certificate details: {}", e.getMessage(), e);
+            }
+        }
+
+        /**
+         * Logs detailed information for an individual certificate.
+         * For X.509 certificates, extracts Subject, Issuer, validity dates, serial number, and fingerprint.
+         *
+         * @param certType "Local" or "Peer" to identify certificate origin in logs
+         * @param index Certificate index in the chain
+         * @param cert The certificate to log details for
+         */
+        private void logCertificateDetails(String certType, int index, Certificate cert) {
+            try {
+                if (cert instanceof X509Certificate x509) {
+                    log.trace("    {} cert [{}] Subject: {}", certType, index, x509.getSubjectX500Principal().getName());
+                    log.trace("    {} cert [{}] Issuer:  {}", certType, index, x509.getIssuerX500Principal().getName());
+                    log.trace("    {} cert [{}] Valid from {} to {}", certType, index, x509.getNotBefore(), x509.getNotAfter());
+                    log.trace("    {} cert [{}] Serial: {}", certType, index, x509.getSerialNumber());
+
+                    // Log SHA-256 fingerprint for certificate identification
+                    logCertificateFingerprint(certType, index, x509);
+                } else {
+                    // Fallback for non-X.509 certificates
+                    log.trace("    {} cert [{}] Details: {}", certType, index, cert.toString());
+                }
+            } catch (Exception e) {
+                log.trace("    {} cert [{}] Error logging details: {}", certType, index, e.getMessage());
+            }
+        }
+
+        /**
+         * Logs the SHA-256 fingerprint of an X.509 certificate for identification purposes.
+         *
+         * @param certType "Local" or "Peer" to identify certificate origin in logs
+         * @param index Certificate index in the chain
+         * @param x509 The X.509 certificate to compute fingerprint for
+         */
+        private void logCertificateFingerprint(String certType, int index, X509Certificate x509) {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] fingerprint = digest.digest(x509.getEncoded());
+                String fingerprintHex = HexFormat.of().withUpperCase().withDelimiter(":").formatHex(fingerprint);
+                log.trace("    {} cert [{}] SHA-256: {}", certType, index, fingerprintHex);
+            } catch (Exception e) {
+                log.trace("    {} cert [{}] Could not compute fingerprint: {}", certType, index, e.getMessage());
             }
         }
 
