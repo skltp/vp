@@ -15,15 +15,14 @@ import org.springframework.boot.ssl.SslManagerBundle;
 import se.skl.tp.vp.config.SecurityProperties;
 import se.skl.tp.vp.config.TLSProperties;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509KeyManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -297,9 +296,12 @@ class SSLContextParametersConfigTest {
         assertEquals("TLSv1.3", strictParams.getSecureSocketProtocols().getSecureSocketProtocol().get(0));
         assertEquals(1, strictParams.getCipherSuites().getCipherSuite().size());
         SSLContextParameters legacyParams = (SSLContextParameters) registry.lookupByName(SSLContextParametersConfig.getId("legacy"));
+        SSLContext legacySslContext = legacyParams.createSSLContext(camelContext);
+        Set<String> expectedCipherSuites = Set.of(legacySslContext.getDefaultSSLParameters().getCipherSuites());
+
         assertNotNull(legacyParams);
         assertEquals(2, legacyParams.getSecureSocketProtocols().getSecureSocketProtocol().size());
-        assertNull(legacyParams.getCipherSuites());
+        assertEquals(expectedCipherSuites, new HashSet<>(legacyParams.getCipherSuites().getCipherSuite()));
     }
 
     @Test
