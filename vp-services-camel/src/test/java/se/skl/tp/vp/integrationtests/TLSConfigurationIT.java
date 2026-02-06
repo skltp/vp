@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertificateRequest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.*;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.support.jsse.SSLContextParameters;
@@ -27,6 +28,8 @@ import se.skl.tp.vp.integrationtests.utils.TestConsumer;
 import se.skl.tp.vp.sslcontext.SSLContextParametersConfig;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
+
+import javax.net.ssl.SSLContext;
 
 /**
  * Integration test that verifies vp.tls.default-config and vp.tls.overrides
@@ -139,12 +142,16 @@ public class TLSConfigurationIT extends LeakDetectionBaseTest {
    * - Requests to producer `HttpsProducer` at `https://localhost:19001` use the default config
    */
   @Test
-  void testDefaultTLSConfigIsUsed() {
+  void testDefaultTLSConfigIsUsed() throws GeneralSecurityException, IOException {
     String defaultContextId = SSLContextParametersConfig.getId("default");
     SSLContextParameters defaultParams = (SSLContextParameters) camelContext.getRegistry().lookupByName(defaultContextId);
+    SSLContext sslContext = defaultParams.createSSLContext(camelContext);
+
     assertNotNull(defaultParams, "Default SSL context should be registered");
-    assertNull(defaultParams.getSecureSocketProtocols());
-    assertNull(defaultParams.getCipherSuites());
+    Set<String> expectedProtocols = Set.of(sslContext.getDefaultSSLParameters().getProtocols());
+    Set<String> expectedCipherSuites = Set.of(sslContext.getDefaultSSLParameters().getCipherSuites());
+    assertEquals(expectedProtocols, new HashSet<>(defaultParams.getSecureSocketProtocols().getSecureSocketProtocol()));
+    assertEquals(expectedCipherSuites, new HashSet<>(defaultParams.getCipherSuites().getCipherSuite()));
 
     mockProducerDefault.setResponseBody("<default-tls-response/>");
     Map<String, Object> headers = createHeaders();
