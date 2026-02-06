@@ -26,7 +26,6 @@ import se.skl.tp.vp.logging.logentry.EcsTlsLogEntry;
 import javax.net.ssl.*;
 import java.security.cert.X509Certificate;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 @Log4j2
@@ -242,67 +241,52 @@ public class SSLContextParametersConfig {
         SSLContextParameters params = getBundleBasedParameters(sslBundles, config.getBundle());
 
         List<String> protocols = determineProtocols(config, params);
-        if (!protocols.isEmpty()) {
-            log.debug("    Setting protocols: {}", protocols);
-            SecureSocketProtocolsParameters sspp = new SecureSocketProtocolsParameters();
-            sspp.getSecureSocketProtocol().addAll(protocols);
-            params.setSecureSocketProtocols(sspp);
-        } else {
-            log.debug("    No protocols specified, using bundle defaults");
+        List<String> cipherSuites = determineCipherSuites(config, params);
+
+        if (protocols.isEmpty() || cipherSuites.isEmpty()) {
+            throw new GeneralSecurityException("No protocols or cipherSuites specified");
         }
 
-        List<String> cipherSuites = determineCipherSuites(config, params);
-        if (!cipherSuites.isEmpty()) {
-            log.debug("    Setting cipher suites (count={}): {}", cipherSuites.size(), cipherSuites);
-            CipherSuitesParameters csp = new CipherSuitesParameters();
-            csp.getCipherSuite().addAll(cipherSuites);
-            params.setCipherSuites(csp);
-        } else {
-            log.debug("    No cipher suites specified, using bundle defaults");
-        }
+        SecureSocketProtocolsParameters sspp = new SecureSocketProtocolsParameters();
+        sspp.getSecureSocketProtocol().addAll(protocols);
+        params.setSecureSocketProtocols(sspp);
+
+        CipherSuitesParameters csp = new CipherSuitesParameters();
+        csp.getCipherSuite().addAll(cipherSuites);
+        params.setCipherSuites(csp);
 
         return params;
     }
 
     private List<String> determineProtocols(TLSProperties.TLSConfig config, SSLContextParameters params) throws GeneralSecurityException, IOException {
+        List<String> includeList;
         if (config.getProtocolsInclude() != null && !config.getProtocolsInclude().isEmpty()) {
-            log.debug("      Using protocol include list: {}", config.getProtocolsInclude());
-            return config.getProtocolsInclude();
+            includeList = new ArrayList<>(config.getProtocolsInclude());
+        } else {
+            includeList = getDefaultProtocols(params);
         }
-
-        if (config.getProtocolsExclude() != null && !config.getProtocolsExclude().isEmpty()) {
-            List<String> defaultProtocols = getDefaultProtocols(params);
-            log.debug("      Using protocol exclude list. Defaults: {}, Excluding: {}",
-                defaultProtocols, config.getProtocolsExclude());
-            defaultProtocols.removeAll(config.getProtocolsExclude());
-            log.debug("      Resulting protocols after exclusion: {}", defaultProtocols);
-            return defaultProtocols;
-        }
-
-        log.debug("      No protocol filters specified");
-        return List.of();
+        List<String> excludeList = config.getProtocolsExclude() != null ? config.getProtocolsExclude() : new ArrayList<>();
+        log.debug("      Including protocols: {}", includeList);
+        log.debug("      Excluding protocols: {}", excludeList);
+        includeList.removeAll(excludeList);
+        log.debug("      Resulting protocols: {}", includeList);
+        return includeList;
     }
 
     private List<String> determineCipherSuites(TLSProperties.TLSConfig config, SSLContextParameters params) throws GeneralSecurityException, IOException {
+        List<String> includeList;
         if (config.getCipherSuitesInclude() != null && !config.getCipherSuitesInclude().isEmpty()) {
-            log.debug("      Using cipher suite include list (count={}): {}",
-                config.getCipherSuitesInclude().size(), config.getCipherSuitesInclude());
-            return config.getCipherSuitesInclude();
+            includeList = new ArrayList<>(config.getCipherSuitesInclude());
+        } else {
+            includeList = getDefaultCipherSuites(params);
         }
 
-        if (config.getCipherSuitesExclude() != null && !config.getCipherSuitesExclude().isEmpty()) {
-            List<String> defaultCipherSuites = getDefaultCipherSuites(params);
-            log.debug("      Using cipher suite exclude list. Defaults count: {}, Excluding count: {}",
-                defaultCipherSuites.size(), config.getCipherSuitesExclude().size());
-            log.debug("      Excluding cipher suites: {}", config.getCipherSuitesExclude());
-            defaultCipherSuites.removeAll(config.getCipherSuitesExclude());
-            log.debug("      Resulting cipher suites after exclusion (count={}): {}",
-                defaultCipherSuites.size(), defaultCipherSuites);
-            return defaultCipherSuites;
-        }
-
-        log.debug("      No cipher suite filters specified");
-        return List.of();
+        List<String> excludeList = config.getCipherSuitesExclude() != null ? config.getCipherSuitesExclude() : new ArrayList<>();
+        log.debug("      Including cipher suites: {}", includeList);
+        log.debug("      Excluding cipher suites: {}", excludeList);
+        includeList.removeAll(excludeList);
+        log.debug("      Resulting cipher suites: {}", includeList);
+        return includeList;
     }
 
     private List<String> getDefaultProtocols(SSLContextParameters params) throws GeneralSecurityException, IOException {
