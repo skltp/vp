@@ -116,10 +116,6 @@ spec:
             - secretRef:
                 name: {{ . }}
             {{- end }}
-            {{ if .Values.pem_to_pfx }}
-            - configMapRef:
-                name: generated-pfx-values
-            {{- end }}
           volumeMounts:
             - name: data-volume
               mountPath: {{ tpl .Values.paths.data . }}
