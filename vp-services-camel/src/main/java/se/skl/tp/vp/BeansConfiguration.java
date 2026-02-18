@@ -42,6 +42,7 @@ public class BeansConfiguration {
 
   @Bean
   @ConditionalOnProperty(name = "vp.logging.style", havingValue = "LEGACY", matchIfMissing = true)
+  @SuppressWarnings({"removal"}) // LegacyMessageInfoLogger is deprecated, but supported for backward compatibility until removed in a future version.
   public MessageLogger legacyMessageInfoLogger() {
     log.warn("Configuring LEGACY format message logger. This format is deprecated. Please migrate to ECS format by setting vp.logging.style=ECS");
     return new LegacyMessageInfoLogger();
