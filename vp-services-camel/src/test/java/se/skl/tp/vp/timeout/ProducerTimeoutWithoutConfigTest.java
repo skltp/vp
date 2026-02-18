@@ -29,7 +29,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skltp.takcache.BehorigheterCache;
@@ -91,8 +91,8 @@ public class ProducerTimeoutWithoutConfigTest {
     template.sendBody(createGetCertificateRequest(RECEIVER_UNIT_TEST));
     resultEndpoint.expectedHeaderReceived(Exchange.HTTP_RESPONSE_CODE, 200);
     resultEndpoint.assertIsSatisfied();
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
-    String reqOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_OUT));
+    String reqOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_OUT, 0);
     assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout\":\"29000");
   }
 

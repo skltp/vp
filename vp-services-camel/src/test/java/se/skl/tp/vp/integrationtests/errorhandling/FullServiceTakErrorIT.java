@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
@@ -59,8 +59,8 @@ class FullServiceTakErrorIT extends LeakDetectionBaseTest {
         soapBody.getFault().getFaultString());
     assertStringContains(soapBody.getFault().getFaultString(), VP008.getVpDigitErrorCode());
 
-    assertEquals(1,TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertEquals(1,TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    String errorLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_ERROR,0);
     assertNotNull(errorLogMsg);
     assertStringContains(errorLogMsg, "labels.errorCode=\"VP008\"");
     assertStringContains(errorLogMsg, "error.stack_trace=\"se.skl.tp.vp.exceptions.VpSemanticException: VP008");
