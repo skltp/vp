@@ -56,13 +56,6 @@ public class EcsLogEntry extends BaseEcsLogEntry {
     public static final String LABEL_SOAP_FAULT_DETAIL = "faultDetail";
     public static final String LABEL_SSL_CONTEXT_ID = "sslContextId";
 
-    // Fields for backward compatibility
-    public static final String BACKWARD_COMPAT_LOG_MESSAGE = "LogMessage";
-    public static final String BACKWARD_COMPAT_SERVICE_IMPL = "ServiceImpl";
-    public static final String BACKWARD_COMPAT_COMPONENT_ID = "ComponentId";
-    public static final String BACKWARD_COMPAT_ENDPOINT = "Endpoint";
-    public static final String BACKWARD_COMPAT_MESSAGE_ID = "MessageId";
-    public static final String BACKWARD_COMPAT_BUSINESS_CORRELATION_ID = "BusinessCorrelationId";
 
     public EcsLogEntry withPayload(String payload) {
         if (payload != null) {
@@ -85,7 +78,6 @@ public class EcsLogEntry extends BaseEcsLogEntry {
 
         @Override
         public EcsLogEntry build() {
-            addBackwardCompatibilityFields();
             putData(EcsFields.MESSAGE, String.format("%s %s -> %s",
                     data.get(EcsFields.EVENT_ACTION),
                     data.get(EcsFields.LABELS + LABEL_SENDER_ID),
@@ -95,14 +87,6 @@ public class EcsLogEntry extends BaseEcsLogEntry {
             return ecsLogEntry;
         }
 
-        private void addBackwardCompatibilityFields() {
-            putData(BACKWARD_COMPAT_LOG_MESSAGE, data.get(EcsFields.EVENT_ACTION));
-            putData(BACKWARD_COMPAT_SERVICE_IMPL, data.get(EcsFields.LABELS + LABEL_ROUTE));
-            putData(BACKWARD_COMPAT_COMPONENT_ID, data.get(EcsFields.SERVICE_NAME));
-            putData(BACKWARD_COMPAT_ENDPOINT, data.get(EcsFields.URL_FULL));
-            putData(BACKWARD_COMPAT_MESSAGE_ID, data.get(EcsFields.TRANSACTION_ID));
-            putData(BACKWARD_COMPAT_BUSINESS_CORRELATION_ID, data.get(EcsFields.TRACE_ID));
-        }
 
         public Builder fromExchange(Exchange exchange) {
             if (exchange == null) {

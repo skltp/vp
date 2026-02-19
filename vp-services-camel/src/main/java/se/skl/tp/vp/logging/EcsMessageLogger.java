@@ -9,13 +9,11 @@ import se.skl.tp.vp.logging.logentry.EcsLogEntry;
 
 import java.util.UUID;
 
-public class MessageInfoLogger {
+/**
+ * ECS (Elastic Common Schema) format message logger implementation.
+ */
+public class EcsMessageLogger implements MessageLogger {
 
-  public static final String REQ_IN = "se.skl.tp.vp.logging.req.in";
-  public static final String REQ_OUT = "se.skl.tp.vp.logging.req.out";
-  public static final String RESP_IN = "se.skl.tp.vp.logging.resp.in";
-  public static final String RESP_OUT = "se.skl.tp.vp.logging.resp.out";
-  public static final String REQ_ERROR = "se.skl.tp.vp.logging.error";
 
   private static final Logger LOGGER_REQ_IN = LogManager.getLogger(REQ_IN);
   private static final Logger LOGGER_REQ_OUT = LogManager.getLogger(REQ_OUT);
@@ -29,30 +27,41 @@ public class MessageInfoLogger {
   private static final String MSG_TYPE_LOG_RESP_OUT = "resp-out";
   private static final String MSG_TYPE_ERROR = "error";
 
+  /**
+   * Default constructor for ECS message logger.
+   */
+  public EcsMessageLogger() {
+    // No configuration needed for ECS logger
+  }
+
+  @Override
   public void logReqIn(Exchange exchange) {
     String requestSpanId = UUID.randomUUID().toString();
     exchange.setProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT, requestSpanId);
     log(LOGGER_REQ_IN, exchange, MSG_TYPE_LOG_REQ_IN);
   }
 
+  @Override
   public void logReqOut(Exchange exchange) {
     String outboundRequestSpanId = UUID.randomUUID().toString();
     exchange.setProperty(VPExchangeProperties.SPAN_REQ_OUT_TO_RESP_IN, outboundRequestSpanId);
     log(LOGGER_REQ_OUT, exchange, MSG_TYPE_LOG_REQ_OUT);
   }
 
+  @Override
   public void logRespIn(Exchange exchange) {
     log(LOGGER_RESP_IN, exchange, MSG_TYPE_LOG_RESP_IN);
     exchange.removeProperty(VPExchangeProperties.SPAN_REQ_OUT_TO_RESP_IN);
   }
 
+  @Override
   public void logRespOut(Exchange exchange) {
     log(LOGGER_RESP_OUT, exchange, MSG_TYPE_LOG_RESP_OUT);
     exchange.removeProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT);
   }
 
+  @Override
   public void logError(Exchange exchange, String stackTrace) {
-
     try {
       EcsLogEntry ecsLogEntry = new EcsLogEntry.Builder(MSG_TYPE_ERROR)
               .fromExchange(exchange)
@@ -62,11 +71,11 @@ public class MessageInfoLogger {
       LOGGER_ERROR.error(ecsLogEntry);
 
     } catch (Exception e) {
-      LOGGER_ERROR.error("Failed log message: {}",MSG_TYPE_ERROR, e);
+      LOGGER_ERROR.error("Failed log message: {}", MSG_TYPE_ERROR, e);
     }
   }
 
-  public void log(Logger log, Exchange exchange, String messageType) {
+  void log(Logger log, Exchange exchange, String messageType) {
     try {
       EcsLogEntry ecsLogEntry = getEcsLogEntry(exchange, messageType);
       if (log.isDebugEnabled()) {
@@ -87,3 +96,6 @@ public class MessageInfoLogger {
             .build();
   }
 }
+
+
+

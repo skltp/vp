@@ -36,7 +36,7 @@ import se.skl.tp.vp.config.ProxyHttpForwardedHeaderProperties;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.soaprequests.TestSoapRequests;
@@ -124,16 +124,16 @@ class HttpRequestHeadersIT {
   void checkCorrelationIdPropagatedWhenIncomingHeaderSetTest() {
     template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeadersWithMembers());
     assertEquals(TEST_CORRELATION_ID, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_SKLTP_CORRELATION_ID));
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"" + TEST_CORRELATION_ID);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"",  X_SKLTP_CORRELATION_ID + "\":\"" + TEST_CORRELATION_ID);
+    assertLogExistAndContainsMessages(MessageLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"" + TEST_CORRELATION_ID);
+    assertLogExistAndContainsMessages(MessageLogger.RESP_OUT, "event.action=\"resp-out\"",  X_SKLTP_CORRELATION_ID + "\":\"" + TEST_CORRELATION_ID);
   }
 
   @Test
   void checkXrivtaOriginalConsumerIdPropagatedWhenIncomingHeaderSetTest() {
     template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeadersWithMembers());
     assertEquals(TEST_CONSUMER, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "originalServiceconsumerHsaid_in=\"" + TEST_CONSUMER);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "\":\"" + TEST_CONSUMER);
+    assertLogExistAndContainsMessages(MessageLogger.REQ_IN, "event.action=\"req-in\"", "originalServiceconsumerHsaid_in=\"" + TEST_CONSUMER);
+    assertLogExistAndContainsMessages(MessageLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "\":\"" + TEST_CONSUMER);
   }
 
   @Test
@@ -142,8 +142,8 @@ class HttpRequestHeadersIT {
     headers.put("x-rivta-acting-on-behalf-of-hsaid", "TEST_PRINCIPAL_ID");
     template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeadersWithXRivta(headers));
     assertEquals("TEST_PRINCIPAL_ID", resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID));
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"",  "actingOnBehalfOfHsaid=\"TEST_PRINCIPAL_ID");
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID + "\":\"TEST_PRINCIPAL_ID");
+    assertLogExistAndContainsMessages(MessageLogger.REQ_IN, "event.action=\"req-in\"",  "actingOnBehalfOfHsaid=\"TEST_PRINCIPAL_ID");
+    assertLogExistAndContainsMessages(MessageLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ACTING_ON_BEHALF_OF_HSA_ID + "\":\"TEST_PRINCIPAL_ID");
   }
 
   @Test
@@ -153,8 +153,8 @@ class HttpRequestHeadersIT {
     assertNotNull(s);
     assertNotEquals(TEST_CORRELATION_ID, s);
     assertTrue(s.length() > 20);
-    assertLogExistAndContainsMessages(MessageInfoLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"" + s);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_SKLTP_CORRELATION_ID + "\":\"" + s);
+    assertLogExistAndContainsMessages(MessageLogger.REQ_IN, "event.action=\"req-in\"", "trace.id=\"" + s);
+    assertLogExistAndContainsMessages(MessageLogger.RESP_OUT, "event.action=\"resp-out\"", X_SKLTP_CORRELATION_ID + "\":\"" + s);
   }
 
   @Test
@@ -162,12 +162,12 @@ class HttpRequestHeadersIT {
     template.sendBodyAndHeaders(TestSoapRequests.GET_NO_CERT_HTTP_SOAP_REQUEST, HeadersUtil.createHttpHeaders());
     assertEquals(TEST_SENDER, resultEndpoint.getExchanges().get(0).getIn().getHeader(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID));
 
-    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_IN, 0);
     assertNotNull(reqInLogMsg);
     assertStringContains(reqInLogMsg, "event.action=\"req-in\"");
     boolean b = reqInLogMsg.contains("originalServiceconsumerHsaid_in");
     assertFalse(b);
-    assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "\":\"" + TEST_SENDER);
+    assertLogExistAndContainsMessages(MessageLogger.RESP_OUT, "event.action=\"resp-out\"", X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID + "\":\"" + TEST_SENDER);
   }
 
   @Test
@@ -183,7 +183,7 @@ class HttpRequestHeadersIT {
       String err = ne.getContentAsString();
       assert(err.contains("VP013"));
       assert(err.contains("Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid. Kontakta tjänsteplattformsförvaltningen."));
-      assertLogExistAndContainsMessages(MessageInfoLogger.RESP_OUT, "event.action=\"resp-out\"",
+      assertLogExistAndContainsMessages(MessageLogger.RESP_OUT, "event.action=\"resp-out\"",
           "Enligt tjänsteplattformens konfiguration saknar tjänstekonsumenten rätt att använda headern x-rivta-original-serviceconsumer-hsaid");
     }
   }

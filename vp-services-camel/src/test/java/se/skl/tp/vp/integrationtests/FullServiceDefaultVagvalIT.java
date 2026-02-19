@@ -22,7 +22,7 @@ import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
@@ -70,7 +70,7 @@ class FullServiceDefaultVagvalIT extends LeakDetectionBaseTest {
     headers.put(HttpHeaders.X_VP_SENDER_ID,"SenderWithDefaultBehorighet");
     String response = testConsumer.sendHttpRequestToVP(createGetActivitiesRiv21Request(receiverId), headers);
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
-    assertLogMessage(MessageInfoLogger.RESP_OUT, receiverId, expectedLogReceiverIds, "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
+    assertLogMessage(MessageLogger.RESP_OUT, receiverId, expectedLogReceiverIds, "resp-out", "http://localhost:1900/default/GetActivitiesResponder", "SenderWithDefaultBehorighet");
   }
 
   @Test

@@ -25,7 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.integrationtests.httpheader.HeadersUtil;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
@@ -67,7 +67,7 @@ class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
             ResetByPeerServer.stopServer();
         }
 
-        assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+        assertEquals(0, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
     }
 
     @Test
@@ -83,8 +83,8 @@ class ConnectionResetByPeerProblemIT extends LeakDetectionBaseTest {
         String request = createGetCertificateRequest(receiver);
         testConsumer.sendHttpRequestToVP(request, headers);
 
-        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-        String msg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+        assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+        String msg = TestLogAppender.getEventMessage(MessageLogger.REQ_ERROR,0);
         assertStringContains(msg, "java.net.SocketException: Connection reset");
         assertStringContains(msg, "labels.errorCode=\"VP009\"");
 

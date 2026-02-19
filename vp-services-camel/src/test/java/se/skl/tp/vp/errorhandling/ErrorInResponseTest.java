@@ -31,7 +31,7 @@ import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.exceptions.VPFaultCodeEnum;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.RandomCollection;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
@@ -123,8 +123,8 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten."));
     assertTrue(resultBody.contains("Error connecting to service producer at address " + NO_EXISTING_PRODUCER));
     resultEndpoint.assertIsSatisfied();
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_ERROR,0);
     assertNotNull(respOutLogMsg);
     assertTrue(respOutLogMsg.contains("CamelHttpResponseCode\":\"500"));
     assertTrue(respOutLogMsg.contains("labels.sessionErrorTechnicalDescription=\"java.net.ConnectException: Cannot connect to localhost:12100"));
@@ -144,8 +144,8 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(resultBody.contains("Fel vid kontakt med tjänsteproducenten."));
     assertTrue(resultBody.contains("Error connecting to service producer at address " + MOCK_PRODUCER_ADDRESS));
     resultEndpoint.assertIsSatisfied();
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_ERROR,0);
     assertNotNull(respOutLogMsg);
     assertTrue(respOutLogMsg.contains("CamelHttpResponseCode\":\"500"));
     assertTrue(respOutLogMsg.contains("labels.sessionErrorTechnicalDescription=\"io.netty.handler.timeout.ReadTimeoutException"));
@@ -200,8 +200,8 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(resultBody.contains("java.lang.NullPointerException"));
     resultEndpoint.assertIsSatisfied();
 
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT,0);
     assertNotNull(respOutLogMsg);
     assertTrue(respOutLogMsg.contains("http.response.body.content=\"java.lang.NullPointerException"));
   }
@@ -222,10 +222,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
     assertTrue(resultBody.contains("Anrop har gjorts"));
     assertTrue(resultBody.contains("Caller was not on the white list of accepted IP-addresses"));
     resultEndpoint.assertIsSatisfied();
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT,0);
     assertNotNull(respOutLogMsg);
     assertTrue(respOutLogMsg.contains("CamelHttpResponseCode\":\"500"));
     assertTrue(respOutLogMsg.contains("Internal Server Error"));
@@ -250,10 +250,10 @@ public class ErrorInResponseTest extends LeakDetectionBaseTest {
 
 
     resultEndpoint.assertIsSatisfied();
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
 
-    String respOutLogMsg = Objects.requireNonNull(TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0))
+    String respOutLogMsg = Objects.requireNonNull(TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0))
             .replace("\n", "").replace("\r", "");
 
 

@@ -20,7 +20,7 @@ import org.xmlunit.matchers.CompareMatcher;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
@@ -56,15 +56,15 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
     assertNotEquals("", inBody);
     assertThat(inBody, CompareMatcher.isSimilarTo(createGetActivitiesRiv21Request(RECEIVER_RIV21)));
 
-    assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(0, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
 
-    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_IN, 0);
     assertNotNull(reqInLogMsg);
     assertStringContains(reqInLogMsg, "labels.rivversion=\"rivtabp20\"");
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "labels.rivversion=\"RIVTABP21\"");
 
@@ -80,15 +80,15 @@ public class FullServiceRivVersionTransformationIT extends LeakDetectionBaseTest
     String inBody = mockProducer.getInBody();
     assertThat(inBody, CompareMatcher.isSimilarTo(createGetActivitiesRiv20Request(RECEIVER_RIV20)));
 
-    assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(0, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
 
-    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_IN, 0);
     assertNotNull(reqInLogMsg);
     assertStringContains(reqInLogMsg, "labels.rivversion=\"rivtabp21\"");
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "labels.rivversion=\"RIVTABP20\"");
 

@@ -19,7 +19,7 @@ import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.JunitUtil;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
@@ -74,7 +74,7 @@ class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "SenderWithDefaultBehorighet", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "AnyReceiver", 1);
@@ -94,7 +94,7 @@ class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_EXPLICIT_PRODUCER, response);
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "SenderWithDefaultBehorighet", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "HttpProducer", 1);
@@ -115,7 +115,7 @@ class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertStringContains(response, "VP007" );
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "AnySender", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "AnyReceiver", 1);
@@ -137,7 +137,7 @@ class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_DEFAULT_PRODUCER, response);
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "tp", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "GetActivitiesReceiverWithNoExplicitVagval", 1);
@@ -158,7 +158,7 @@ class FullServiceStandardVagvalIT extends LeakDetectionBaseTest {
 
     assertEquals(ANSWER_FROM_HSATREE_PRODUCER, response);
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, EVENT_ACTION, "resp-out", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_SENDERID, "SenderWithDefaultBehorighet", 1);
     JunitUtil.assertMatchRegexGroup(respOutLogMsg, LABELS_RECEIVERID, "SE0000000001-1234", 1);

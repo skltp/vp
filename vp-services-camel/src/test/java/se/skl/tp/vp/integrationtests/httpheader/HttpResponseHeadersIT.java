@@ -19,7 +19,7 @@ import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
@@ -58,11 +58,11 @@ class HttpResponseHeadersIT extends LeakDetectionBaseTest {
 
     assertNull( testConsumer.getReceivedHeader(HttpHeaders.SOAP_ACTION), "SoapAction not expected in response");
 
-    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageLogger.RESP_IN, 0);
     assertNotNull(respInLog);
     assertTrue(respInLog.contains("SOAPAction\":\"mySoapAction"));
 
-    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLog);
     assertFalse(respOutLog.contains("SOAPAction\":\"mySoapAction"));
   }
@@ -109,11 +109,11 @@ class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertEquals("<mocked answer/>", response);
     assertEquals( "myRandomValue", testConsumer.getReceivedHeader("MyRandomHeader"));
 
-    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageLogger.RESP_IN, 0);
     assertNotNull(respInLog);
     assertTrue(respInLog.contains("MyRandomHeader\":\"myRandomValue"));
 
-    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLog);
     assertTrue(respOutLog.contains("MyRandomHeader\":\"myRandomValue"));
 
@@ -128,11 +128,11 @@ class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertEquals("<mocked answer/>", response);
     assertEquals( "text/xml; charset=UTF-8", testConsumer.getReceivedHeader("Content-Type"));
 
-    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageLogger.RESP_IN, 0);
     assertNotNull(respInLog);
     assertTrue(respInLog.contains("Content-Type\":\"text/plain;charset=UTF-8"));
 
-    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLog);
     assertTrue(respOutLog.contains("Content-Type\":\"text/xml; charset=UTF-8"));
 
@@ -144,7 +144,7 @@ class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     assertTrue(response.contains("VP004"));
     assertEquals( "text/xml; charset=UTF-8", testConsumer.getReceivedHeader("Content-Type"));
 
-    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLog);
     assertTrue(respOutLog.contains("Content-Type\":\"text/xml; charset=UTF-8"));
   }
@@ -166,11 +166,11 @@ class HttpResponseHeadersIT extends LeakDetectionBaseTest {
     String routingHistory = testConsumer.getReceivedHeader(HttpHeaders.X_RIVTA_ROUTING_HISTORY);
     assertEquals("some-server,mock-producer", routingHistory);
 
-    String respInLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_IN, 0);
+    String respInLog = TestLogAppender.getEventMessage(MessageLogger.RESP_IN, 0);
     assertNotNull(respInLog);
     assertTrue(respInLog.contains("x-rivta-routing-history\":\"some-server,mock-producer"));
 
-    String respOutLog = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLog = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLog);
     assertTrue(respOutLog.contains("x-rivta-routing-history\":\"some-server,mock-producer"));
   }

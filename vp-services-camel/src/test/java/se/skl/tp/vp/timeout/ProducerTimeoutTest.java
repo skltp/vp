@@ -36,7 +36,7 @@ import se.skl.tp.vp.TestBeanConfiguration;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.constants.PropertyConstants;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.service.TakCacheService;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
@@ -119,14 +119,14 @@ class ProducerTimeoutTest {
     assertStringContains(resultBody, "Timeout");
     resultEndpoint.assertIsSatisfied();
 
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    String errorLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_ERROR, 0);
     assertNotNull(errorLogMsg);
     assertStringContains(errorLogMsg, "labels.errorCode=\"VP009\"");
     assertStringContains(errorLogMsg, "error.stack_trace=\"io.netty.handler.timeout.ReadTimeoutException");
 
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
-    String reqOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_OUT, 0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_OUT));
+    String reqOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_OUT, 0);
     assertNotNull(reqOutLogMsg);
     if (onlyDefaultTimeoutInConfig) {
       assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout\":\"500");
@@ -134,7 +134,7 @@ class ProducerTimeoutTest {
       assertStringContains(reqOutLogMsg, "CamelNettyRequestTimeout\":\"460");
     }
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "VP009 [" + vpInstance + "] Fel vid kontakt med tjänsteproducenten.");
     assertStringContains(respOutLogMsg, "Timeout when waiting on response from producer");

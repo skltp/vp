@@ -25,7 +25,7 @@ import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 
@@ -86,7 +86,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "skltp-messages");
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
@@ -112,7 +112,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -135,7 +135,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -159,7 +159,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -184,7 +184,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -211,7 +211,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -237,7 +237,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -286,7 +286,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -309,7 +309,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, "event.action=\"resp-out\"");
     assertStringContains(respOutLogMsg, "service.name=\"vp-services-test\"");
@@ -351,7 +351,7 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
 
     assertMessageLogsExists();
 
-    String reqInLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
+    String reqInLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_IN, 0);
     assertNotNull(reqInLogMsg);
     assertStringContains(reqInLogMsg, "source.ip=\"1.2.3.4\"");
     assertStringContains(reqInLogMsg, "labels.httpXForwardedProto=\"https\"");
@@ -411,11 +411,11 @@ public class FullServiceTestIT extends LeakDetectionBaseTest {
   }
 
   private void assertMessageLogsExists() {
-    assertEquals(0, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_IN));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(0, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_OUT));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
   }
 
   private void assertExtraInfoLog(String respOutLogMsg, String expectedReceiverId, String expectedProducerUrl) {

@@ -25,7 +25,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.soaprequests.SoapUtils;
@@ -69,16 +69,16 @@ public class SoapFaultIT extends LeakDetectionBaseTest {
   }
 
   private void assertNumLogMessages() {
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_IN));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
   }
 
   private void assertCorrelationIdIsSameInAllLogs() {
     // This check is done in old VP, VpFullServiceTest.testWhenErrorOneInfoEventAndOneErrorEventIsCreated(). Needed??
-    String errMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR, 0);
-    String reqInMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_IN, 0);
-    String respOutMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT, 0);
+    String errMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_ERROR, 0);
+    String reqInMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_IN, 0);
+    String respOutMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(errMsg);
     assertNotNull(reqInMsg);
     assertNotNull(respOutMsg);
