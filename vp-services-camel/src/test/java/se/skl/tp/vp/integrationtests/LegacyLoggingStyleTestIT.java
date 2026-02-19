@@ -7,12 +7,15 @@ import static se.skl.tp.vp.util.soaprequests.TestSoapRequests.createGetCertifica
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -30,6 +33,7 @@ import se.skl.tp.vp.util.TestLogAppender;
  * This test ensures that when legacy logging is enabled, log messages are formatted in the
  * legacy format with skltp-messages marker and fields like LogMessage, BusinessCorrelationId, etc.
  */
+@SuppressWarnings("SpringBootApplicationProperties") // vp.logging.style is not detected by the IDE
 @CamelSpringBootTest
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
@@ -46,9 +50,6 @@ public class LegacyLoggingStyleTestIT extends LeakDetectionBaseTest {
 
   @Autowired
   MockProducer mockProducer;
-
-  @Value("${vp.instance.id}")
-  String vpInstanceId;
 
   @BeforeEach
   void before() throws Exception {
@@ -107,25 +108,21 @@ public class LegacyLoggingStyleTestIT extends LeakDetectionBaseTest {
     assertStringContains(respOutLogMsg, "LogMessage=resp-out");
   }
 
-  @Test
-  void testLegacyLoggingContainsBusinessCorrelationId() {
-    mockProducer.setResponseBody("<mocked answer/>");
-
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "originalid");
-    String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
-    assertEquals("<mocked answer/>", response);
-
-    assertMessageLogsExists();
-
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
-    assertNotNull(respOutLogMsg);
-    // Legacy format should contain BusinessCorrelationId field
-    assertStringContains(respOutLogMsg, "BusinessCorrelationId=");
+  static Stream<Arguments> legacyLogFieldParameters() {
+    return Stream.of(
+        Arguments.of("BusinessCorrelationId=", new String[0]),
+        Arguments.of("ExtraInfo=", new String[] {"-senderid=tp", "-receiverid=" + RECEIVER_HTTP}),
+        Arguments.of("servicecontract_namespace=urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1", new String[0]),
+        Arguments.of("Endpoint=", new String[0]),
+        Arguments.of("ComponentId=vp-services-test", new String[0]),
+        Arguments.of("MessageId=", new String[0]),
+        Arguments.of("Host=", new String[0])
+    );
   }
 
-  @Test
-  void testLegacyLoggingContainsExtraInfo() {
+  @ParameterizedTest
+  @MethodSource("legacyLogFieldParameters")
+  void testLegacyLoggingContainsExpectedFields(String expectedField, String[] additionalExpectedFields) {
     mockProducer.setResponseBody("<mocked answer/>");
 
     Map<String, Object> headers = new HashMap<>();
@@ -137,95 +134,11 @@ public class LegacyLoggingStyleTestIT extends LeakDetectionBaseTest {
 
     String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
     assertNotNull(respOutLogMsg);
-    // Legacy format should contain ExtraInfo field with sender/receiver information
-    assertStringContains(respOutLogMsg, "ExtraInfo=");
-    assertStringContains(respOutLogMsg, "-senderid=tp");
-    assertStringContains(respOutLogMsg, "-receiverid=" + RECEIVER_HTTP);
-  }
+    assertStringContains(respOutLogMsg, expectedField);
 
-  @Test
-  void testLegacyLoggingContainsServiceContractInfo() {
-    mockProducer.setResponseBody("<mocked answer/>");
-
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "originalid");
-    String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
-    assertEquals("<mocked answer/>", response);
-
-    assertMessageLogsExists();
-
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
-    assertNotNull(respOutLogMsg);
-    // Legacy format should contain service contract namespace in ExtraInfo
-    assertStringContains(respOutLogMsg, "servicecontract_namespace=urn:riv:insuranceprocess:healthreporting:GetCertificateResponder:1");
-  }
-
-  @Test
-  void testLegacyLoggingContainsEndpointInfo() {
-    mockProducer.setResponseBody("<mocked answer/>");
-
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "originalid");
-    String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
-    assertEquals("<mocked answer/>", response);
-
-    assertMessageLogsExists();
-
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
-    assertNotNull(respOutLogMsg);
-    // Legacy format should contain Endpoint field
-    assertStringContains(respOutLogMsg, "Endpoint=");
-  }
-
-  @Test
-  void testLegacyLoggingContainsComponentId() {
-    mockProducer.setResponseBody("<mocked answer/>");
-
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "originalid");
-    String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
-    assertEquals("<mocked answer/>", response);
-
-    assertMessageLogsExists();
-
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
-    assertNotNull(respOutLogMsg);
-    // Legacy format should contain ComponentId field with the Camel context name
-    assertStringContains(respOutLogMsg, "ComponentId=vp-services-test");
-  }
-
-  @Test
-  void testLegacyLoggingContainsMessageId() {
-    mockProducer.setResponseBody("<mocked answer/>");
-
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "originalid");
-    String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
-    assertEquals("<mocked answer/>", response);
-
-    assertMessageLogsExists();
-
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
-    assertNotNull(respOutLogMsg);
-    // Legacy format should contain MessageId field
-    assertStringContains(respOutLogMsg, "MessageId=");
-  }
-
-  @Test
-  void testLegacyLoggingContainsHostInfo() {
-    mockProducer.setResponseBody("<mocked answer/>");
-
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(HttpHeaders.X_RIVTA_ORIGINAL_SERVICE_CONSUMER_HSA_ID, "originalid");
-    String response = testConsumer.sendHttpsRequestToVP(createGetCertificateRequest(RECEIVER_HTTP), headers);
-    assertEquals("<mocked answer/>", response);
-
-    assertMessageLogsExists();
-
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT, 0);
-    assertNotNull(respOutLogMsg);
-    // Legacy format should contain Host field
-    assertStringContains(respOutLogMsg, "Host=");
+    for (String additionalField : additionalExpectedFields) {
+      assertStringContains(respOutLogMsg, additionalField);
+    }
   }
 
   @Test

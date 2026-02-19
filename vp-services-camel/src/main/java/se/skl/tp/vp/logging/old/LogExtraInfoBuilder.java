@@ -38,7 +38,7 @@ public class LogExtraInfoBuilder {
   public static final String SOAP_FAULT_STRING = "faultString";
   public static final String SOAP_FAULT_DETAIL = "faultDetail";
   public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
-  // Case insensitive regex to match what headers to filter out. This should of course be loaded through conf, but alas, we have static fields.
+  // Case-insensitive regex to match what headers to filter out. This should of course be loaded through conf, but alas, we have static fields.
   // This class may be a good candidate for refactoring!
   public static final String FILTERHEADER_REGEX = "(?i)X-Forwarded-Tls-Client-Cert|x-vp-auth-cert|x-fk-auth-cert";
   
@@ -68,7 +68,7 @@ public class LogExtraInfoBuilder {
     extraInfo.put(WSDL_NAMESPACE, createWsdlNamespace(serviceContractNS, rivVersion));
 
     Map<String, String> headers = new HashMap<>();
-    filterHeaders(exchange.getIn().getHeaders(), FILTERHEADER_REGEX, headers);
+    filterHeaders(exchange.getIn().getHeaders(), headers);
     extraInfo.put(HEADERS, getHeadersAsString(headers));
     extraInfo.put(TIME_ELAPSED, getElapsedTime(exchange).toString());
 
@@ -114,6 +114,7 @@ public class LogExtraInfoBuilder {
     }
   }
 
+  @SuppressWarnings("java:S125") // Incorrect warning about commented out code
   private static String createWsdlNamespace(String serviceContractNS, String profile) {
     //  Convert from interaction target namespace
     //    urn:${domänPrefix}:${tjänsteDomän}:${tjänsteInteraktion}${roll}:${m}
@@ -152,8 +153,8 @@ public class LogExtraInfoBuilder {
     return (s == null) ? "" : s;
   }
 
-  static void filterHeaders(Map<String, Object> headers, String filterRegex, Map<String, String> res) {
-    headers.forEach((s, o) -> res.put(s, s.matches(filterRegex) ? FILTERED_TEXT : String.valueOf(o)));
+  static void filterHeaders(Map<String, Object> headers, Map<String, String> res) {
+    headers.forEach((s, o) -> res.put(s, s.matches(LogExtraInfoBuilder.FILTERHEADER_REGEX) ? FILTERED_TEXT : String.valueOf(o)));
   }
 
   private static String getHeadersAsString(Map<String, ?> headersMap) {
@@ -163,12 +164,16 @@ public class LogExtraInfoBuilder {
 
   private static class ExtraInfoMap<K, V> extends HashMap<K, V> {
 
-    public V putNotNull(K key, V value) {
-      return value == null ? null : put(key, value);
+    public void putNotNull(K key, V value) {
+      if (value != null) {
+        put(key, value);
+      }
     }
 
-    public V putNotEmpty(K key, V value) {
-      return (value == null || ((String) value).isEmpty()) ? null : put(key, value);
+    public void putNotEmpty(K key, V value) {
+      if ((value != null && !((String) value).isEmpty())) {
+        put(key, value);
+      }
     }
   }
 }

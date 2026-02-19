@@ -3,7 +3,7 @@
 Denna sida handlar om loggning. För allmän information om konfiguration av VP Camel, se [VP Camel konfigurering].
 ### Allmänt
 Som logg-ramverk används Log4j2, se [log4j2s dokumentation] för mer information.
-En grundkonfigurering finns i projektet under `resources/log4j2.xml` som default loggar till konsollen.
+En grundkonfigurering finns i projektet under `resources/log4j2.xml` som default loggar till konsolen.
 Det är möjligt att konfigurera json-formaterade loggar med hjälp av log4j2-ecs-layout, se [ecs-logging dokumentation] för mer information.
 
 ### Extern konfiguration
@@ -13,7 +13,7 @@ till exempel:
 java -jar -Xms256m -Xmx1024m -Dlog4j.configurationFile=file:///opt/vp/config/log4j2.xml vp-services.jar
 ```
 ### Ändring av loggnivåer i runtime
-Här beskrivs två sätt att ändra loggnivåer i runtime (det finns förmodligen fler), .
+Här beskrivs två sätt att ändra loggnivåer i runtime (det finns förmodligen fler).
 
  1. Om en extern konfiguration används räcker det att ändra i konfigureringsfilen förutsatt att den är grundkonfigurerad att upptäcka förändringar i runtime. Kontrollera att parametern `monitorInterval="30"` är satt.
  2. Ändra loggnivåer med Hawtio (eller på annat sätt via jmx)
@@ -45,7 +45,7 @@ Vissa loggers kan vara av extra intresse för att följa VPs uppstart och flöde
      <AsyncLogger name="org.apache.camel.spring.SpringCamelContext" level="INFO"/>
  
     <!-- Message logging
-         Used to follow messages sent thru VP
+         Used to follow messages sent through VP
          Level DEBUG will log all message information including payload
          Level INFO will log all message information without payload
          See chapter "Meddelande loggning" for more information
@@ -67,7 +67,7 @@ Det finns fyra speciella loggers som hanterar meddelanden som går genom VP.
    - INFO nivå - innebär att meddelanden loggas utan payload.
    - DEBUG nivå - innebär att meddelanden loggas med payload. Notera att payload kan innehålla känslig information och bör hanteras därefter.
 
-Dessa kan individuellt slås av och genom att ställa upp lognivån alternativt ta bort loggers.
+Dessa kan individuellt slås av och genom att ställa upp loggnivån alternativt ta bort loggers.
  - se.skl.tp.vp.logging.req.in - Loggar inkommande meddelanden från konsumenten.
  - se.skl.tp.vp.logging.req.out - Loggar utgående meddelanden till producenten.
  - se.skl.tp.vp.logging.resp.in - Loggar svaret från producenten.
