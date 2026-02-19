@@ -334,4 +334,90 @@ class LogExtraInfoBuilderTest {
                 "Technical description should contain outer exception type");
         assertEquals("VP007", extraInfo.get(VPExchangeProperties.SESSION_ERROR_CODE));
     }
+
+    @Test
+    void testAddSoapFaultInfo_WithAllSoapFaultFields() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_CODE, "soap:Server");
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_STRING, "Internal server error");
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, "Detailed error information");
+
+        Map<String, String> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange);
+
+        assertEquals("soap:Server", extraInfo.get(LogExtraInfoBuilder.SOAP_FAULT_CODE),
+                "SOAP_FAULT_CODE should be added to extraInfo");
+        assertEquals("Internal server error", extraInfo.get(LogExtraInfoBuilder.SOAP_FAULT_STRING),
+                "SOAP_FAULT_STRING should be added to extraInfo");
+        assertEquals("Detailed error information", extraInfo.get(LogExtraInfoBuilder.SOAP_FAULT_DETAIL),
+                "SOAP_FAULT_DETAIL should be added to extraInfo");
+    }
+
+    @Test
+    void testAddSoapFaultInfo_WithOnlyFaultCode() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_CODE, "soap:Client");
+
+        Map<String, String> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange);
+
+        assertEquals("soap:Client", extraInfo.get(LogExtraInfoBuilder.SOAP_FAULT_CODE),
+                "SOAP_FAULT_CODE should be added to extraInfo");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_STRING),
+                "SOAP_FAULT_STRING should not be in extraInfo when not set");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_DETAIL),
+                "SOAP_FAULT_DETAIL should not be in extraInfo when not set");
+    }
+
+    @Test
+    void testAddSoapFaultInfo_WithOnlyFaultString() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_STRING, "Service unavailable");
+
+        Map<String, String> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange);
+
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_CODE),
+                "SOAP_FAULT_CODE should not be in extraInfo when not set");
+        assertEquals("Service unavailable", extraInfo.get(LogExtraInfoBuilder.SOAP_FAULT_STRING),
+                "SOAP_FAULT_STRING should be added to extraInfo");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_DETAIL),
+                "SOAP_FAULT_DETAIL should not be in extraInfo when not set");
+    }
+
+    @Test
+    void testAddSoapFaultInfo_WithOnlyFaultDetail() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, "Connection timeout");
+
+        Map<String, String> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange);
+
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_CODE),
+                "SOAP_FAULT_CODE should not be in extraInfo when not set");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_STRING),
+                "SOAP_FAULT_STRING should not be in extraInfo when not set");
+        assertEquals("Connection timeout", extraInfo.get(LogExtraInfoBuilder.SOAP_FAULT_DETAIL),
+                "SOAP_FAULT_DETAIL should be added to extraInfo");
+    }
+
+    @Test
+    void testAddSoapFaultInfo_NoSoapFaultFieldsPresent() {
+        Map<String, String> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange);
+
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_CODE),
+                "SOAP_FAULT_CODE should not be in extraInfo when not set");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_STRING),
+                "SOAP_FAULT_STRING should not be in extraInfo when not set");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_DETAIL),
+                "SOAP_FAULT_DETAIL should not be in extraInfo when not set");
+    }
+
+    @Test
+    void testAddSoapFaultInfo_WithNullValues() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_CODE, null);
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_STRING, null);
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, null);
+
+        Map<String, String> extraInfo = LogExtraInfoBuilder.createExtraInfo(exchange);
+
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_CODE),
+                "SOAP_FAULT_CODE should not be in extraInfo when null");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_STRING),
+                "SOAP_FAULT_STRING should not be in extraInfo when null");
+        assertFalse(extraInfo.containsKey(LogExtraInfoBuilder.SOAP_FAULT_DETAIL),
+                "SOAP_FAULT_DETAIL should not be in extraInfo when null");
+    }
 }

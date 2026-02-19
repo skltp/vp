@@ -34,6 +34,9 @@ public class LogExtraInfoBuilder {
   public static final String VP_X_FORWARDED_HOST = VPExchangeProperties.VP_X_FORWARDED_HOST;
   public static final String VP_X_FORWARDED_PROTO = VPExchangeProperties.VP_X_FORWARDED_PROTO;
   public static final String VP_X_FORWARDED_PORT = VPExchangeProperties.VP_X_FORWARDED_PORT;
+  public static final String SOAP_FAULT_CODE = "faultCode";
+  public static final String SOAP_FAULT_STRING = "faultString";
+  public static final String SOAP_FAULT_DETAIL = "faultDetail";
   public static final String DEFAULT_ERROR_DESCRIPTION = VpCodeMessages.getDefaultMessage();
   // Case insensitive regex to match what headers to filter out. This should of course be loaded through conf, but alas, we have static fields.
   // This class may be a good candidate for refactoring!
@@ -72,6 +75,9 @@ public class LogExtraInfoBuilder {
     extraInfo.putNotNull(VAGVAL_TRACE, exchange.getProperty(VPExchangeProperties.VAGVAL_TRACE, String.class));
     extraInfo.putNotNull(ANROPSBEHORIGHET_TRACE, exchange.getProperty(VPExchangeProperties.ANROPSBEHORIGHET_TRACE, String.class));
     extraInfo.putNotNull(ENDPOINT_URL, exchange.getProperty(VPExchangeProperties.VAGVAL, String.class));
+    extraInfo.putNotNull(SOAP_FAULT_CODE, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_CODE, String.class));
+    extraInfo.putNotNull(SOAP_FAULT_STRING, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_STRING, String.class));
+    extraInfo.putNotNull(SOAP_FAULT_DETAIL, exchange.getProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, String.class));
 
     String timeProducer = exchange.getIn().getHeader(HttpHeaders.X_SKLTP_PRODUCER_RESPONSETIME, String.class);
     extraInfo.putNotNull(TIME_PRODUCER, timeProducer);

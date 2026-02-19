@@ -496,7 +496,75 @@ class LegacyMessageInfoLoggerTest {
         }
     }
 
-}
+    @Test
+    void testLogWithSoapFaultFields() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_CODE, "soap:Server");
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_STRING, "Internal server error");
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_DETAIL, "Detailed error information");
 
+        messageLogger.logRespOut(exchange);
+
+        List<LogEvent> events = TestLogAppender.getEvents(MessageLogger.RESP_OUT);
+        assertEquals(1, events.size(), "Should log one event");
+        String message = events.get(0).getMessage().getFormattedMessage();
+        assertTrue(message.contains("faultCode=soap:Server"),
+                "Log should contain SOAP fault code");
+        assertTrue(message.contains("faultString=Internal server error"),
+                "Log should contain SOAP fault string");
+        assertTrue(message.contains("faultDetail=Detailed error information"),
+                "Log should contain SOAP fault detail");
+    }
+
+    @Test
+    void testLogWithSoapFaultCodeOnly() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_CODE, "soap:Client");
+
+        messageLogger.logRespIn(exchange);
+
+        List<LogEvent> events = TestLogAppender.getEvents(MessageLogger.RESP_IN);
+        assertEquals(1, events.size(), "Should log one event");
+        String message = events.get(0).getMessage().getFormattedMessage();
+        assertTrue(message.contains("faultCode=soap:Client"),
+                "Log should contain SOAP fault code");
+        assertFalse(message.contains("faultString="),
+                "Log should not contain SOAP fault string when not set");
+        assertFalse(message.contains("faultDetail="),
+                "Log should not contain SOAP fault detail when not set");
+    }
+
+    @Test
+    void testLogWithSoapFaultPartialFields() {
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_CODE, "soap:VersionMismatch");
+        exchange.setProperty(VPExchangeProperties.SOAP_FAULT_STRING, "SOAP version mismatch");
+
+        messageLogger.logReqOut(exchange);
+
+        List<LogEvent> events = TestLogAppender.getEvents(MessageLogger.REQ_OUT);
+        assertEquals(1, events.size(), "Should log one event");
+        String message = events.get(0).getMessage().getFormattedMessage();
+        assertTrue(message.contains("faultCode=soap:VersionMismatch"),
+                "Log should contain SOAP fault code");
+        assertTrue(message.contains("faultString=SOAP version mismatch"),
+                "Log should contain SOAP fault string");
+        assertFalse(message.contains("faultDetail="),
+                "Log should not contain SOAP fault detail when not set");
+    }
+
+    @Test
+    void testLogWithoutSoapFaultFields() {
+        messageLogger.logReqIn(exchange);
+
+        List<LogEvent> events = TestLogAppender.getEvents(MessageLogger.REQ_IN);
+        assertEquals(1, events.size(), "Should log one event");
+        String message = events.get(0).getMessage().getFormattedMessage();
+        assertFalse(message.contains("faultCode="),
+                "Log should not contain SOAP fault code when not set");
+        assertFalse(message.contains("faultString="),
+                "Log should not contain SOAP fault string when not set");
+        assertFalse(message.contains("faultDetail="),
+                "Log should not contain SOAP fault detail when not set");
+    }
+
+}
 
 
