@@ -78,12 +78,6 @@ Exempel på loggning av resp-out med payload:
 {
     "@timestamp": "2026-01-21T09:56:08.296Z",
     "log.level": "INFO",
-    "BusinessCorrelationId": "ae93bea6-b428-4ee2-813a-e0e78640d0a2",
-    "ComponentId": "vp-services-test",
-    "Endpoint": "http://localhost:12312/vp/PATH1%20",
-    "LogMessage": "resp-out",
-    "MessageId": "08FCEB55E529823-0000000000000017",
-    "ServiceImpl": "vp-http-route",
     "destination.address": "localhost:19001",
     "destination.domain": "localhost",
     "destination.port": "19001",

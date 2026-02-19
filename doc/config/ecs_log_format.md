@@ -255,18 +255,6 @@ TLS/SSL-specifika labels används för loggning av SSL-kontextregistrering och h
 | `labels.cipherSuites`         | Lista över tillgängliga cipher suites (JSON-array)                    |
 | `labels.clientCertCount`      | Antal klientcertifikat som skickades under TLS-handshake              |
 
-## Bakåtkompatibilitet
-
-För bakåtkompatibilitet med äldre logganalysverktyg inkluderas följande fält i loggposterna.
-
-| Fält                    | Mappar till ECS-fält | Beskrivning                                                        |
-|-------------------------|----------------------|--------------------------------------------------------------------|
-| `LogMessage`            | `event.action`       | Den åtgärd som händelsen fångade (t.ex. `req-in`, `resp-out`)      |
-| `ServiceImpl`           | `labels.route`       | Intern route-identifierare                                         |
-| `ComponentId`           | `service.name`       | Tjänstens namn                                                     |
-| `Endpoint`              | `url.full`           | Komplett URL för den inkommande requesten till tjänsten            |
-| `MessageId`             | `transaction.id`     | Identifierar den Camel exchange som används under hela operationen |
-| `BusinessCorrelationId` | `trace.id`           | Korrelations-ID för spårning som kan spänna över flera system      |
 
 ## Referenser
 
