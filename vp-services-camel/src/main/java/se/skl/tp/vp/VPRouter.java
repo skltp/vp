@@ -25,7 +25,7 @@ import se.skl.tp.vp.errorhandling.HandleProducerExceptionProcessor;
 import se.skl.tp.vp.httpheader.HttpSenderIdExtractorProcessor;
 import se.skl.tp.vp.httpheader.OriginalConsumerIdProcessor;
 import se.skl.tp.vp.httpheader.OutHeaderProcessor;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.requestreader.RequestReaderProcessor;
 import se.skl.tp.vp.sslcontext.SelectSslContextProcessor;
 import se.skl.tp.vp.timeout.RequestTimeoutProcessor;
@@ -124,15 +124,17 @@ public class VPRouter extends RouteBuilder {
 
     private final ExtractSoapFaultImpl extractSoapFault;
 
+    private final MessageLogger messageLogger;
+
     @Override
     public void configure() throws Exception {
 
         onException(Exception.class)
             .process(exceptionMessageProcessor)
-            .bean(MessageInfoLogger.class, LOG_ERROR_METHOD)
+            .bean(messageLogger, LOG_ERROR_METHOD)
             .process(convertResponseCharset)
             .removeHeaders(headerFilter.getResponseHeadersToRemove(), headerFilter.getResponseHeadersToKeep())
-            .bean(MessageInfoLogger.class, LOG_RESP_OUT_METHOD)
+            .bean(messageLogger, LOG_RESP_OUT_METHOD)
             .handled(true);
 
 
@@ -145,7 +147,7 @@ public class VPRouter extends RouteBuilder {
                 .process(certificateExtractorProcessor)
                 .to(DIRECT_VP)
                 .removeHeaders(headerFilter.getResponseHeadersToRemove(), headerFilter.getResponseHeadersToKeep())
-                .bean(MessageInfoLogger.class, LOG_RESP_OUT_METHOD)
+                .bean(messageLogger, LOG_RESP_OUT_METHOD)
             .end();
 
         from(NETTY_HTTP_FROM).routeId(VP_HTTP_ROUTE)
@@ -157,7 +159,7 @@ public class VPRouter extends RouteBuilder {
                 .process(httpSenderIdExtractorProcessor)
                 .to(DIRECT_VP)
                 .removeHeaders(headerFilter.getResponseHeadersToRemove(), headerFilter.getResponseHeadersToKeep())
-                .bean(MessageInfoLogger.class, LOG_RESP_OUT_METHOD)
+                .bean(messageLogger, LOG_RESP_OUT_METHOD)
             .end();
 
         from(DIRECT_VP).routeId(VAGVAL_ROUTE)
@@ -167,7 +169,7 @@ public class VPRouter extends RouteBuilder {
             .setProperty(VPExchangeProperties.VP_X_FORWARDED_PROTO,  header("{{http.forwarded.header.proto}}"))
             .process(requestReaderProcessor)
             .process(originalConsumerIdProcessor)
-            .bean(MessageInfoLogger.class, LOG_REQ_IN_METHOD)
+            .bean(messageLogger, LOG_REQ_IN_METHOD)
             .process(vagvalProcessor).id(VAGVAL_PROCESSOR_ID)
             .process(behorighetProcessor).id(BEHORIGHET_PROCESSOR_ID)
             .process(requestTimeoutProcessor)
@@ -177,7 +179,7 @@ public class VPRouter extends RouteBuilder {
             .choice().when(or(body().isNull(), body().isEqualTo("")))
                 .log(LoggingLevel.WARN, "Response from producer is empty")
                 .process(handleEmptyResponseProcessor)
-                .bean(MessageInfoLogger.class, LOG_EMPTY_METHOD)
+                .bean(messageLogger, LOG_EMPTY_METHOD)
             .end();
 
         from(DIRECT_PRODUCER_ROUTE)
@@ -203,7 +205,7 @@ public class VPRouter extends RouteBuilder {
 
             .process(convertRequestCharset)
             .removeHeaders(headerFilter.getRequestHeadersToRemove(), headerFilter.getRequestHeadersToKeep())
-            .bean(MessageInfoLogger.class, LOG_REQ_OUT_METHOD)
+            .bean(messageLogger, LOG_REQ_OUT_METHOD)
             .choice().when(exchangeProperty(VPExchangeProperties.VAGVAL).contains("https://"))
                     .process(selectSslContextProcessor)
                     .toD(NETTY_HTTPS_OUTGOING_TOD)
@@ -213,7 +215,7 @@ public class VPRouter extends RouteBuilder {
                     .endChoice()
             .end()
             .process(extractSoapFault)
-            .bean(MessageInfoLogger.class, LOG_RESP_IN_METHOD)
+            .bean(messageLogger, LOG_RESP_IN_METHOD)
             .process(convertResponseCharset)
             .end();
 
@@ -221,12 +223,12 @@ public class VPRouter extends RouteBuilder {
             .process(handleProducerExceptionProcessor)
             .choice()
 	            .when(header(Exchange.HTTP_RESPONSE_CODE).isNotEqualTo("200"))
-	                .bean(MessageInfoLogger.class, LOG_ERROR_METHOD)
+	                .bean(messageLogger, LOG_ERROR_METHOD)
 	            .end()
             .end()
             .process(convertResponseCharset)
             .removeHeaders(headerFilter.getResponseHeadersToRemove(), headerFilter.getResponseHeadersToKeep())
-            .bean(MessageInfoLogger.class, LOG_RESP_OUT_METHOD)
+            .bean(messageLogger, LOG_RESP_OUT_METHOD)
             // Always return status 500 when soap fault occurs
             .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500));
 

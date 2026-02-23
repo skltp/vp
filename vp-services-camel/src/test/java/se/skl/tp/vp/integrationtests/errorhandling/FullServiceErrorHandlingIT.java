@@ -54,7 +54,7 @@ import se.skl.tp.vp.exceptions.VpSemanticErrorCodeEnum;
 import se.skl.tp.vp.integrationtests.utils.MockProducer;
 import se.skl.tp.vp.integrationtests.utils.StartTakService;
 import se.skl.tp.vp.integrationtests.utils.TestConsumer;
-import se.skl.tp.vp.logging.MessageInfoLogger;
+import se.skl.tp.vp.logging.MessageLogger;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 import se.skl.tp.vp.util.TestLogAppender;
 import se.skl.tp.vp.util.soaprequests.SoapUtils;
@@ -148,7 +148,7 @@ class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
         new String[]{"Anrop har gjorts utanför TLS vilket ej är tillåtet"},
         new String[]{""});
 
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
     assertRespOutLogWithRespCode500("VP011");
     assertRespOutLogWithRespCode500("Caller was not on the white list of accepted IP-addresses");
   }
@@ -372,24 +372,24 @@ class FullServiceErrorHandlingIT extends LeakDetectionBaseTest {
   }
 
   private void assertErrorLog(String code, String message) {
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_ERROR));
-    String errorLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.REQ_ERROR,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.REQ_ERROR));
+    String errorLogMsg = TestLogAppender.getEventMessage(MessageLogger.REQ_ERROR,0);
     assertNotNull(errorLogMsg);
     assertStringContains(errorLogMsg, code);
     assertStringContains(errorLogMsg, message);
   }
 
   private void assertRespOutLogWithRespCode500(String msg) {
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    String respOutLogMsg = TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
+    String respOutLogMsg = TestLogAppender.getEventMessage(MessageLogger.RESP_OUT,0);
     assertNotNull(respOutLogMsg);
     assertStringContains(respOutLogMsg, msg);
     assertStringContains(respOutLogMsg,"CamelHttpResponseCode\":\"500");
   }
 
   private String getAndAssertRespOutLog() {
-    assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
-    return TestLogAppender.getEventMessage(MessageInfoLogger.RESP_OUT,0);
+    assertEquals(1, TestLogAppender.getNumEvents(MessageLogger.RESP_OUT));
+    return TestLogAppender.getEventMessage(MessageLogger.RESP_OUT,0);
   }
 
   private void assertExtraInfoLog(String respOutLogMsg) {

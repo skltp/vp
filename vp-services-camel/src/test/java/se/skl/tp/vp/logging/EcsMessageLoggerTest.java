@@ -18,15 +18,15 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MessageInfoLoggerTest {
+class EcsMessageLoggerTest {
 
-    private MessageInfoLogger messageInfoLogger;
+    private EcsMessageLogger messageInfoLogger;
     private Exchange exchange;
     private CamelContext camelContext;
 
     @BeforeEach
     void setUp() {
-        messageInfoLogger = new MessageInfoLogger();
+        messageInfoLogger = new EcsMessageLogger();
         camelContext = new DefaultCamelContext();
         exchange = new DefaultExchange(camelContext);
         exchange.setProperty(VPExchangeProperties.EXCHANGE_CREATED, new Date());
@@ -41,7 +41,7 @@ class MessageInfoLoggerTest {
         String spanId = getSpanA();
         assertNotNull(spanId, "Span ID should be created");
         assertFalse(spanId.isEmpty(), "Span ID should not be empty");
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_IN);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.REQ_IN);
         assertEquals(1, events.size(), "Should log one req-in event");
         LogEvent event = events.get(0);
         assertEquals(Level.DEBUG, event.getLevel());
@@ -57,7 +57,7 @@ class MessageInfoLoggerTest {
         String outboundSpanId = getSpanB();
         assertNotNull(outboundSpanId, "Outbound span ID should be created");
         assertFalse(outboundSpanId.isEmpty(), "Outbound span ID should not be empty");
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_OUT);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.REQ_OUT);
         assertEquals(1, events.size(), "Should log one req-out event");
         LogEvent event = events.get(0);
         assertEquals(Level.DEBUG, event.getLevel());
@@ -72,7 +72,7 @@ class MessageInfoLoggerTest {
 
         assertNull(exchange.getProperty(VPExchangeProperties.SPAN_REQ_OUT_TO_RESP_IN),
                 "Outbound span ID should be removed");
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_IN);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.RESP_IN);
         assertEquals(1, events.size(), "Should log one resp-in event");
     }
 
@@ -85,7 +85,7 @@ class MessageInfoLoggerTest {
 
         assertNull(exchange.getProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT),
                 "Request span ID should be removed");
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_OUT);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.RESP_OUT);
         assertEquals(1, events.size(), "Should log one resp-out event");
     }
 
@@ -97,7 +97,7 @@ class MessageInfoLoggerTest {
 
         messageInfoLogger.logError(exchange, stackTrace);
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.REQ_ERROR);
         assertEquals(1, events.size(), "Should log one error event");
         LogEvent event = events.get(0);
         assertEquals(Level.ERROR, event.getLevel());
@@ -112,7 +112,7 @@ class MessageInfoLoggerTest {
 
         messageInfoLogger.logError(exchange, stackTrace);
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.REQ_ERROR);
         assertEquals(1, events.size(), "Should log one error event even without exception");
     }
 
@@ -123,7 +123,7 @@ class MessageInfoLoggerTest {
 
         assertDoesNotThrow(() -> messageInfoLogger.logError(emptyExchange, "stack trace"));
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.REQ_ERROR);
         assertFalse(events.isEmpty(), "Should log error event or fallback error message");
     }
 
@@ -131,11 +131,11 @@ class MessageInfoLoggerTest {
     void testLogWithDebugEnabledIncludesPayload() {
         String payload = "<soap:Envelope>test payload</soap:Envelope>";
         exchange.getIn().setBody(payload);
-        Logger logger = LogManager.getLogger(MessageInfoLogger.REQ_IN);
+        Logger logger = LogManager.getLogger(EcsMessageLogger.REQ_IN);
 
         messageInfoLogger.log(logger, exchange, "req-in");
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_IN);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.REQ_IN);
         assertFalse(events.isEmpty(), "Should log event");
         LogEvent event = events.get(0);
         assertNotNull(event.getMessage());
@@ -145,18 +145,18 @@ class MessageInfoLoggerTest {
     void testLogWithInfoEnabledDoesNotIncludePayload() {
         String payload = "<soap:Envelope>sensitive data</soap:Envelope>";
         exchange.getIn().setBody(payload);
-        Logger logger = LogManager.getLogger(MessageInfoLogger.RESP_OUT);
+        Logger logger = LogManager.getLogger(EcsMessageLogger.RESP_OUT);
 
         messageInfoLogger.log(logger, exchange, "resp-out");
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_OUT);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.RESP_OUT);
         assertFalse(events.isEmpty(), "Should log event");
     }
 
     @Test
     void testLogHandlesExceptionDuringLogging() {
         Exchange problematicExchange = new DefaultExchange(camelContext);
-        Logger logger = LogManager.getLogger(MessageInfoLogger.REQ_IN);
+        Logger logger = LogManager.getLogger(EcsMessageLogger.REQ_IN);
 
         assertDoesNotThrow(() -> messageInfoLogger.log(logger, problematicExchange, "req-in"));
     }
@@ -189,10 +189,10 @@ class MessageInfoLoggerTest {
         messageInfoLogger.logRespOut(exchange);
         assertNull(getSpanA(), "Span A should be removed after resp-out");
 
-        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_IN));
-        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.REQ_OUT));
-        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_IN));
-        assertEquals(1, TestLogAppender.getNumEvents(MessageInfoLogger.RESP_OUT));
+        assertEquals(1, TestLogAppender.getNumEvents(EcsMessageLogger.REQ_IN));
+        assertEquals(1, TestLogAppender.getNumEvents(EcsMessageLogger.REQ_OUT));
+        assertEquals(1, TestLogAppender.getNumEvents(EcsMessageLogger.RESP_IN));
+        assertEquals(1, TestLogAppender.getNumEvents(EcsMessageLogger.RESP_OUT));
     }
 
     @Test
@@ -219,7 +219,7 @@ class MessageInfoLoggerTest {
     void testLogRespInWithoutSpanId() {
         assertDoesNotThrow(() -> messageInfoLogger.logRespIn(exchange));
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_IN);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.RESP_IN);
         assertEquals(1, events.size(), "Should log resp-in event even without span ID");
     }
 
@@ -227,7 +227,7 @@ class MessageInfoLoggerTest {
     void testLogRespOutWithoutSpanId() {
         assertDoesNotThrow(() -> messageInfoLogger.logRespOut(exchange));
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.RESP_OUT);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.RESP_OUT);
         assertEquals(1, events.size(), "Should log resp-out event even without span ID");
     }
 
@@ -239,7 +239,7 @@ class MessageInfoLoggerTest {
         messageInfoLogger.logError(exchange, stackTrace1);
         messageInfoLogger.logError(exchange, stackTrace2);
 
-        List<LogEvent> events = TestLogAppender.getEvents(MessageInfoLogger.REQ_ERROR);
+        List<LogEvent> events = TestLogAppender.getEvents(EcsMessageLogger.REQ_ERROR);
         assertEquals(2, events.size(), "Should log multiple error events");
     }
 
@@ -251,3 +251,5 @@ class MessageInfoLoggerTest {
         return exchange.getProperty(VPExchangeProperties.SPAN_REQ_IN_TO_RESP_OUT, String.class);
     }
 }
+
+

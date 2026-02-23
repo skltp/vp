@@ -19,15 +19,15 @@ Grundläggande fält som finns i alla loggposter:
 
 Event-fält beskriver händelsen som loggas.
 
-| Fält             | ECS-referens                                                                                      | Beskrivning                                                                                               |
-|------------------|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
-| `event.id`       | [event.id](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-id)             | Unik identifierare för denna händelse (UUID)                                                              |
-| `event.action`   | [event.action](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-action)     | Den åtgärd som händelsen fångade (t.ex. `req-in`, `resp-out`)                                             |
+| Fält             | ECS-referens                                                                                      | Beskrivning                                                                                                            |
+|------------------|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| `event.id`       | [event.id](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-id)             | Unik identifierare för denna händelse (UUID)                                                                           |
+| `event.action`   | [event.action](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-action)     | Den åtgärd som händelsen fångade (t.ex. `req-in`, `resp-out`)                                                          |
 | `event.module`   | [event.module](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-module)     | Namnet på modulen som data kommer från (`skltp-messages` för HTTP/SOAP-meddelanden, `skltp-tls` för TLS/SSL-händelser) |
-| `event.duration` | [event.duration](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-duration) | Tidsåtgång för operationen i nanosekunder.                                                                |
-| `event.kind`     | [event.kind](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-kind)         | Första nivån i ECS kategorihierarki (alltid `event`)                                                      |
-| `event.category` | [event.category](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-category) | Andra nivån i ECS kategorihierarki (`["web"]` för HTTP/SOAP, `["configuration", "network"]` för TLS)     |
-| `event.type`     | [event.type](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-type)         | Tredje nivån i ECS kategorihierarki (`["access", "start"]` för request, `["access", "end"]` för response) |
+| `event.duration` | [event.duration](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-duration) | Tidsåtgång för operationen i nanosekunder.                                                                             |
+| `event.kind`     | [event.kind](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-kind)         | Första nivån i ECS kategorihierarki (alltid `event`)                                                                   |
+| `event.category` | [event.category](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-category) | Andra nivån i ECS kategorihierarki (`["web"]` för HTTP/SOAP, `["configuration", "network"]` för TLS)                   |
+| `event.type`     | [event.type](https://www.elastic.co/guide/en/ecs/current/ecs-event.html#field-event-type)         | Tredje nivån i ECS kategorihierarki (`["access", "start"]` för request, `["access", "end"]` för response)              |
 
 #### Event Actions
 
@@ -185,8 +185,8 @@ TLS/SSL-fält beskriver säkerhetsaspekter av krypterade anslutningar.
 
 #### Server-fält (för TLS handshake-loggning)
 
-| Fält             | ECS-referens                                                                                       | Beskrivning                   |
-|------------------|----------------------------------------------------------------------------------------------------|-------------------------------|
+| Fält             | ECS-referens                                                                                       | Beskrivning                      |
+|------------------|----------------------------------------------------------------------------------------------------|----------------------------------|
 | `server.address` | [server.address](https://www.elastic.co/guide/en/ecs/current/ecs-server.html#field-server-address) | Serveradress (värdnamn eller IP) |
 
 
@@ -255,18 +255,6 @@ TLS/SSL-specifika labels används för loggning av SSL-kontextregistrering och h
 | `labels.cipherSuites`         | Lista över tillgängliga cipher suites (JSON-array)                    |
 | `labels.clientCertCount`      | Antal klientcertifikat som skickades under TLS-handshake              |
 
-## Bakåtkompatibilitet
-
-För bakåtkompatibilitet med äldre logganalysverktyg inkluderas följande fält i loggposterna.
-
-| Fält                    | Mappar till ECS-fält | Beskrivning                                                        |
-|-------------------------|----------------------|--------------------------------------------------------------------|
-| `LogMessage`            | `event.action`       | Den åtgärd som händelsen fångade (t.ex. `req-in`, `resp-out`)      |
-| `ServiceImpl`           | `labels.route`       | Intern route-identifierare                                         |
-| `ComponentId`           | `service.name`       | Tjänstens namn                                                     |
-| `Endpoint`              | `url.full`           | Komplett URL för den inkommande requesten till tjänsten            |
-| `MessageId`             | `transaction.id`     | Identifierar den Camel exchange som används under hela operationen |
-| `BusinessCorrelationId` | `trace.id`           | Korrelations-ID för spårning som kan spänna över flera system      |
 
 ## Referenser
 
