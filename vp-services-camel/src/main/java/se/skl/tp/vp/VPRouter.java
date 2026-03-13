@@ -214,13 +214,13 @@ public class VPRouter extends RouteBuilder {
                     .toD(NETTY_HTTP_OUTGOING_TOD)
                     .endChoice()
             .end()
-            .process(extractSoapFault)
             .bean(messageLogger, LOG_RESP_IN_METHOD)
             .process(convertResponseCharset)
             .end();
 
         from(DIRECT_PRODUCER_ERROR)
             .process(handleProducerExceptionProcessor)
+            .process(extractSoapFault)
             .choice()
 	            .when(header(Exchange.HTTP_RESPONSE_CODE).isNotEqualTo("200"))
 	                .bean(messageLogger, LOG_ERROR_METHOD)
