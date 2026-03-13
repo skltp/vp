@@ -32,15 +32,16 @@ public class ExtractSoapFaultImpl implements ExtractSoapFault {
     private TransformerFactory transformerFactory;
 
     /**
-     * Extracts SOAP 1.1 fault information from the exchange if the response indicates an error (HTTP 500).
+     * Extracts SOAP 1.1 fault information from the exchange body and sets
+     * the fault code, fault string, and detail as exchange properties.
+     * <p>
+     * This processor is intended to be called only on the error path
+     * ({@code direct:producer-error}), so no HTTP status check is needed.
      *
      * @param exchange The Camel exchange containing the message
      */
     @Override
     public void process(Exchange exchange) throws Exception {
-        if (!isErrorResponse(exchange)) {
-            return;
-        }
         SoapFaultInfo faultInfo = extractSoapFault(exchange.getIn().getBody(String.class));
 
         if (faultInfo.hasFaultInfo()) {
@@ -56,10 +57,6 @@ public class ExtractSoapFaultImpl implements ExtractSoapFault {
         }
     }
 
-    private boolean isErrorResponse(Exchange exchange) {
-        Object responseCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE);
-        return responseCode != null && responseCode.equals(500);
-    }
 
     SoapFaultInfo extractSoapFault(String messageBody) {
         if (messageBody == null) {
