@@ -3,69 +3,72 @@ kind: ConfigMap
 metadata:
   name: vp-configmap-default
 data:
-  BASE_PATH: {{ tpl .Values.paths.base . }}
-  DATA_PATH: {{ tpl .Values.paths.data . }}
-  CONFIGURATION_VERSION_FILE: {{ tpl .Values.paths.config . }}/config.version
-  DEFAULTROUTING_ALLOWEDCONTRACTS: urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateQuestionResponder:1,urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateAnswerResponder:1
-  HEADERS_REG_EXP_REQUESTHEADERSTOREMOVE: (?i)x-vp.*|PEER_CERTIFICATES|X-Forwarded.*|MULE_.*|X-MULE_.*|Connection|accept-encoding|X-Forwarded-Tls-Client-Cert
-  HSA_FILES: {{ tpl .Values.paths.config . }}/hsacachecomplementary.xml,{{ tpl .Values.paths.hsafiles . }}/hsacache.xml
-  IP_WHITELIST: 127.0.0.1,10.
-  HTTP_FORWARDED_HEADER_AUTH_CERT: X-Forwarded-Tls-Client-Cert
-  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health, metrics, prometheus
-  MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED: "true"
-  MEMORY_LOGGER_PERIOD_SECONDS: "1800"
-  PRODUCER_HTTP_KEEPALIVE: "true"
-  PRODUCER_HTTP_WORKERS: "0"
-  PRODUCER_HTTPS_KEEPALIVE: "true"
-  PRODUCER_HTTPS_WORKERS: "0"
-  PROPAGATE_CORRELATION_ID_FOR_HTTPS: "true"
-  SENDER_ID_ALLOWED_LIST: TSTNMT2321000156-B02
-  SERVER_FORWARDHEADERSSTRATEGY: NONE
-  SERVER_PORT: "8089"
-  SERVER_UNDERTOW_ACCESSLOG_DIR: {{ tpl .Values.paths.log . }}
-  SERVER_UNDERTOW_ACCESSLOG_ENABLED: "false"
-  SERVER_UNDERTOW_ACCESSLOG_PATTERN: common
-  SERVER_UNDERTOW_ACCESSLOG_PREFIX: access_log
-  SERVER_UNDERTOW_ACCESSLOG_ROTATE: "true"
-  SERVER_UNDERTOW_ACCESSLOG_SUFFIX: .log
-  TAKCACHE_ENDPOINT_ADDRESS: http://tak-services-svc:8080/tak-services/SokVagvalsInfo/v2
-  TAKCACHE_PERSISTENT_FILE_NAME: {{ tpl .Values.paths.data . }}/localCache
-  THROW_VP013_WHEN_ORIGINALCONSUMER_NOT_ALLOWED: "false"
-  TIMEOUT_JSON_FILE: {{ tpl .Values.paths.config . }}/timeoutconfig.json
-  TIMEOUT_JSON_FILE_DEFAULT_TJANSTEKONTRAKT_NAME: default_timeouts
-  VAGVALROUTER_DEFAULT_ROUTING_ADDRESS_DELIMITER: '#'
-  MESSAGE_LOGGER_METHOD: ecs
-  VP_HSA_RESET_CACHE_URL: http://0.0.0.0:24000/resethsacache
-  VP_HTTP_ROUTE_URL: http://0.0.0.0:8080/vp
-  VP_HTTPS_ROUTE_URL: https://0.0.0.0:20000/vp
-  VP_INSTANCE_ID: {{ .Values.skltp.instanceId }}
-  VP_INSTANCE_NAME: SKLTP-DEFAULT
-  VP_MAX_RECEIVE_LENGTH: "52428800"
-  VP_RESET_CACHE_URL: http://0.0.0.0:23000/resetcache
-  VP_STATUS_URL: http://0.0.0.0:8080/status
-  VP_USE_ROUTING_HISTORY: "true"
-  WSDL_JSON_FILE: {{ tpl .Values.paths.config . }}/wsdlconfig.json
-  WSDLFILES_DIRECTORY: {{ tpl .Values.paths.base . }}/wsdl/
-  JAVA_OPTS:  -Dlog4j2.formatMsgNoLookups=true
-              -Dfile.encoding=UTF-8
-              -Duser.country=SE
-              -Duser.language=sv
-              -Dspring.profiles.active=custom
-              -Xms512m
-              -Xmx1536m
-              -XX:MaxRAMPercentage=65
+  BASE_PATH: "{{ tpl .Values.paths.base . }}"
+  DATA_PATH: "{{ tpl .Values.paths.data . }}"
+  CONFIGURATION_VERSION_FILE: "{{ tpl .Values.paths.config . }}/config.version"
+  DEFAULTROUTING_ALLOWEDCONTRACTS: "{{ .Values.defaultRouting.allowedContracts | join "," }}"
+  HEADERS_REG_EXP_REQUESTHEADERSTOREMOVE: "(?i){{ .Values.headers.requestHeadersToRemove | join "|" }}"
+  HSA_FILES: "{{ tpl .Values.paths.config . }}/hsacachecomplementary.xml,{{ tpl .Values.paths.hsafiles . }}/hsacache.xml"
+  IP_WHITELIST: "{{ .Values.ipWhiteList_vp.prefixes | join "," }}"
+  HTTP_FORWARDED_HEADER_AUTH_CERT: "{{ .Values.headers.forwardedHeaderAuthCert }}"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "{{ .Values.management.endpointsWebExposureInclude | join "," }}"
+  MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED: "{{ .Values.management.endpointPrometheusEnabled }}"
+  MEMORY_LOGGER_PERIOD_SECONDS: "{{ .Values.memoryLoggerPeriodSeconds }}"
+  PRODUCER_HTTP_KEEPALIVE: "{{ .Values.producer.httpKeepalive }}"
+  PRODUCER_HTTP_WORKERS: "{{ .Values.producer.httpWorkers }}"
+  PRODUCER_HTTPS_KEEPALIVE: "{{ .Values.producer.httpsKeepalive }}"
+  PRODUCER_HTTPS_WORKERS: "{{ .Values.producer.httpsWorkers }}"
+  PROPAGATE_CORRELATION_ID_FOR_HTTPS: "{{ .Values.propagateCorrelationIdForHttps }}"
+  SENDER_ID_ALLOWED_LIST: "{{ .Values.senderIdAllowedList | join "," }}"
+  SERVER_FORWARDHEADERSSTRATEGY: "{{ .Values.server.forwardHeadersStrategy }}"
+  SERVER_PORT: "{{ .Values.server.port }}"
+  SERVER_UNDERTOW_ACCESSLOG_DIR: "{{ tpl .Values.server.undertow.accesslogDir . }}"
+  SERVER_UNDERTOW_ACCESSLOG_ENABLED: "{{ .Values.server.undertow.accesslogEnabled }}"
+  SERVER_UNDERTOW_ACCESSLOG_PATTERN: "{{ .Values.server.undertow.accesslogPattern }}"
+  SERVER_UNDERTOW_ACCESSLOG_PREFIX: "{{ .Values.server.undertow.accesslogPrefix }}"
+  SERVER_UNDERTOW_ACCESSLOG_ROTATE: "{{ .Values.server.undertow.accesslogRotate }}"
+  SERVER_UNDERTOW_ACCESSLOG_SUFFIX: "{{ .Values.server.undertow.accesslogSuffix }}"
+  TAKCACHE_ENDPOINT_ADDRESS: "{{ .Values.takcache.endpointAddress }}"
+  TAKCACHE_PERSISTENT_FILE_NAME: "{{ tpl .Values.takcache.persistentFileName . }}"
+  THROW_VP013_WHEN_ORIGINALCONSUMER_NOT_ALLOWED: "{{ .Values.throwVp013WhenOriginalconsumerNotAllowed }}"
+  TIMEOUT_JSON_FILE: "{{ tpl .Values.paths.config . }}/timeoutconfig.json"
+  TIMEOUT_JSON_FILE_DEFAULT_TJANSTEKONTRAKT_NAME: "{{ .Values.timeoutJsonFileDefaultTjanstekontraktName }}"
+  VAGVALROUTER_DEFAULT_ROUTING_ADDRESS_DELIMITER: "{{ .Values.vagvalrouterDefaultRoutingAddressDelimiter }}"
+  MESSAGE_LOGGER_METHOD: "{{ .Values.messageLoggerMethod }}"
+  VP_HSA_RESET_CACHE_URL: "{{ .Values.skltp.urls.hsaResetCache }}"
+  VP_HTTP_ROUTE_URL: "{{ .Values.skltp.urls.httpRoute }}"
+  VP_HTTPS_ROUTE_URL: "{{ .Values.skltp.urls.httpsRoute }}"
+  VP_INSTANCE_ID: "{{ .Values.skltp.instanceId }}"
+  VP_INSTANCE_NAME: "{{ .Values.skltp.instanceName }}"
+  VP_MAX_RECEIVE_LENGTH: "{{ .Values.skltp.maxReceiveLength }}"
+  VP_RESET_CACHE_URL: "{{ .Values.skltp.urls.resetCache }}"
+  VP_STATUS_URL: "{{ .Values.skltp.urls.status }}"
+  VP_USE_ROUTING_HISTORY: "{{ .Values.skltp.useRoutingHistory }}"
+  WSDL_JSON_FILE: "{{ tpl .Values.paths.config . }}/wsdlconfig.json"
+  WSDLFILES_DIRECTORY: "{{ tpl .Values.paths.base . }}/wsdl/"
+  JAVA_OPTS: >-
+              -Dlog4j2.formatMsgNoLookups={{ .Values.javaOpts.systemProperties.log4j2FormatMsgNoLookups }}
+              -Dfile.encoding={{ .Values.javaOpts.systemProperties.fileEncoding }}
+              -Duser.country={{ .Values.javaOpts.systemProperties.userCountry }}
+              -Duser.language={{ .Values.javaOpts.systemProperties.userLanguage }}
+              -Dspring.profiles.active={{ .Values.javaOpts.systemProperties.springProfilesActive }}
+              -Xms{{ .Values.javaOpts.jvm.minHeap }}
+              -Xmx{{ .Values.javaOpts.jvm.maxHeap }}
+              -XX:MaxRAMPercentage={{ .Values.javaOpts.jvm.maxRamPercentage }}
               -Dlog4j.configurationFile=file://{{ tpl .Values.paths.config . }}/log4j2.xml
+              {{- if .Values.javaOpts.jmx.enabled }}
               -Dcom.sun.management.jmxremote
-              -Dcom.sun.management.jmxremote.port=8084
-              -Dcom.sun.management.jmxremote.rmi.port=8084
-              -Dcom.sun.management.jmxremote.local.only=false
-              -Dcom.sun.management.jmxremote.authenticate=false
-              -Dcom.sun.management.jmxremote.ssl=false
+              -Dcom.sun.management.jmxremote.port={{ .Values.javaOpts.jmx.port }}
+              -Dcom.sun.management.jmxremote.rmi.port={{ .Values.javaOpts.jmx.port }}
+              -Dcom.sun.management.jmxremote.local.only={{ .Values.javaOpts.jmx.localOnly }}
+              -Dcom.sun.management.jmxremote.authenticate={{ .Values.javaOpts.jmx.authenticate }}
+              -Dcom.sun.management.jmxremote.ssl={{ .Values.javaOpts.jmx.ssl }}
+              {{- end }}
 
 {{- range .Values.tls.bundles }}
-  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_KEYSTORE_CERTIFICATE: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.crt
-  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_KEYSTORE_PRIVATEKEY: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.key
-  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_TRUSTSTORE_CERTIFICATE: {{ tpl $.Values.paths.certs $ }}/{{ .name }}-truststore/ca.crt
+  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_KEYSTORE_CERTIFICATE: "{{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.crt"
+  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_KEYSTORE_PRIVATEKEY: "{{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.key"
+  SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_TRUSTSTORE_CERTIFICATE: "{{ tpl $.Values.paths.certs $ }}/{{ .name }}-truststore/ca.crt"
 {{- end }}
 {{- with .Values.tls.defaultConfig }}
   VP_TLS_DEFAULTCONFIG_NAME: "{{ .name }}"

@@ -18,6 +18,102 @@ deployment:
 
 skltp:
   instanceId: default_instance
+  instanceName: SKLTP-DEFAULT
+  maxReceiveLength: "52428800"
+  useRoutingHistory: true
+  urls:
+    hsaResetCache: "http://0.0.0.0:24000/resethsacache"
+    httpRoute: "http://0.0.0.0:8080/vp"
+    httpsRoute: "https://0.0.0.0:20000/vp"
+    resetCache: "http://0.0.0.0:23000/resetcache"
+    status: "http://0.0.0.0:8080/status"
+
+memoryLoggerPeriodSeconds: 1800
+
+propagateCorrelationIdForHttps: true
+
+server:
+  forwardHeadersStrategy: NONE
+  port: "8089"
+  undertow:
+    accesslogDir: "{{ tpl .Values.paths.log . }}"
+    accesslogEnabled: false
+    accesslogPattern: common
+    accesslogPrefix: access_log
+    accesslogRotate: true
+    accesslogSuffix: .log
+
+producer:
+  httpKeepalive: true
+  httpWorkers: 0
+  httpsKeepalive: true
+  httpsWorkers: 0
+
+takcache:
+  endpointAddress: "http://tak-services-svc:8080/tak-services/SokVagvalsInfo/v2"
+  persistentFileName: "{{ tpl .Values.paths.data . }}/localCache"
+
+hsacache:
+  fileName: hsaunits.zip
+  fileUrl: "https://wstest.hsa.sjunet.org/hsafileservice/informationlist/hsaunits.zip"
+  caCert: /opt/cert/ca.crt
+  tlsCert: /opt/cert/tls.crt
+  tlsKey: /opt/cert/tls.key
+  resetLabelSelector: app=vp
+  resetUrlFormat: "http://%s:24000/resethsacache"
+  fileAllowableDiff: "100000"
+  sendAlertMail: "false"
+
+messageLoggerMethod: ecs
+throwVp013WhenOriginalconsumerNotAllowed: false
+timeoutJsonFileDefaultTjanstekontraktName: default_timeouts
+vagvalrouterDefaultRoutingAddressDelimiter: "#"
+
+javaOpts:
+  jmx:
+    enabled: true
+    port: 8084
+    localOnly: false
+    authenticate: false
+    ssl: false
+  jvm:
+    minHeap: 512m
+    maxHeap: 1536m
+    maxRamPercentage: 65
+  systemProperties:
+    fileEncoding: UTF-8
+    userCountry: SE
+    userLanguage: sv
+    springProfilesActive: custom
+    log4j2FormatMsgNoLookups: true
+
+defaultRouting:
+  allowedContracts:
+    - urn:riv:ehr:accesscontrol:AssertCareEngagementResponder:1
+    - urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateQuestionResponder:1
+    - urn:riv:insuranceprocess:healthreporting:ReceiveMedicalCertificateAnswerResponder:1
+
+headers:
+  requestHeadersToRemove:
+    - x-vp.*
+    - PEER_CERTIFICATES
+    - X-Forwarded.*
+    - MULE_.*
+    - X-MULE_.*
+    - Connection
+    - accept-encoding
+    - X-Forwarded-Tls-Client-Cert
+  forwardedHeaderAuthCert: X-Forwarded-Tls-Client-Cert
+
+management:
+  endpointsWebExposureInclude:
+    - health
+    - metrics
+    - prometheus
+  endpointPrometheusEnabled: true
+
+senderIdAllowedList:
+  - TSTNMT2321000156-B02
 
 container:
   image:
@@ -71,6 +167,11 @@ ipWhiteList_liveness: # Override to specify loadbalancer ip(s)
 ipWhiteList_direct: # Override to restrict direct https access
   sourceRange:
     - 0.0.0.0/0
+
+ipWhiteList_vp:
+  prefixes:
+    - 127.0.0.1
+    - '10.'
 
 service:
   name: vp
