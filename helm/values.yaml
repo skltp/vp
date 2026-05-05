@@ -4,9 +4,6 @@ deployment:
   name: vp
   elasticGrokFilter: vp
   replicaCount: 2
-  environment:
-    name: dev
-    domain: ntjp.se
   resources: {} # The no-op curly-braces can optionally replace below sub-resources.
   topologySpreadConstraints:
     - labelSelector:
@@ -297,5 +294,3 @@ probes:
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 2
-
-resources: {}
