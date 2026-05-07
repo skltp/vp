@@ -66,23 +66,22 @@ throwVp013WhenOriginalconsumerNotAllowed: false
 timeoutJsonFileDefaultTjanstekontraktName: default_timeouts
 vagvalrouterDefaultRoutingAddressDelimiter: "#"
 
-javaOpts:
-  jmx:
-    enabled: true
-    port: 8084
-    localOnly: false
-    authenticate: false
-    ssl: false
-  jvm:
-    minHeap: 512m
-    maxHeap: 1536m
-    maxRamPercentage: 65
-  systemProperties:
-    fileEncoding: UTF-8
-    userCountry: SE
-    userLanguage: sv
-    springProfilesActive: custom
-    log4j2FormatMsgNoLookups: true
+javaOpts: >-
+  -Dlog4j2.formatMsgNoLookups=true
+  -Dfile.encoding=UTF-8
+  -Duser.country=SE
+  -Duser.language=sv
+  -Dspring.profiles.active=custom
+  -Xms512m
+  -Xmx1536m
+  -XX:MaxRAMPercentage=65
+  -Dlog4j.configurationFile=file://{{ tpl .Values.paths.config . }}/log4j2.xml
+  -Dcom.sun.management.jmxremote
+  -Dcom.sun.management.jmxremote.port=8084
+  -Dcom.sun.management.jmxremote.rmi.port=8084
+  -Dcom.sun.management.jmxremote.local.only=false
+  -Dcom.sun.management.jmxremote.authenticate=false
+  -Dcom.sun.management.jmxremote.ssl=false
 
 defaultRouting:
   allowedContracts:

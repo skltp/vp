@@ -119,35 +119,9 @@ HSA (national organisational directory) cache settings and the associated cron-j
 
 ## javaOpts
 
-JVM and JMX options passed to the VP container entry-point.
-
-### javaOpts.jmx
-
-| Key                         | Description                                 |
-|-----------------------------|---------------------------------------------|
-| `javaOpts.jmx.enabled`      | Enable remote JMX access.                   |
-| `javaOpts.jmx.port`         | JMX RMI port.                               |
-| `javaOpts.jmx.localOnly`    | Restrict JMX to localhost connections only. |
-| `javaOpts.jmx.authenticate` | Require JMX authentication.                 |
-| `javaOpts.jmx.ssl`          | Require TLS for JMX connections.            |
-
-### javaOpts.jvm
-
-| Key                             | Description                                                                    |
-|---------------------------------|--------------------------------------------------------------------------------|
-| `javaOpts.jvm.minHeap`          | JVM minimum heap size (`-Xms`).                                                |
-| `javaOpts.jvm.maxHeap`          | JVM maximum heap size (`-Xmx`).                                                |
-| `javaOpts.jvm.maxRamPercentage` | JVM `MaxRAMPercentage` — percentage of container memory available to the heap. |
-
-### javaOpts.systemProperties
-
-| Key                                                  | Description                                                                 |
-|------------------------------------------------------|-----------------------------------------------------------------------------|
-| `javaOpts.systemProperties.fileEncoding`             | `file.encoding` system property. Should be `UTF-8`.                         |
-| `javaOpts.systemProperties.userCountry`              | `user.country` system property (e.g. `SE`).                                 |
-| `javaOpts.systemProperties.userLanguage`             | `user.language` system property (e.g. `sv`).                                |
-| `javaOpts.systemProperties.springProfilesActive`     | Comma-separated list of active Spring profiles.                             |
-| `javaOpts.systemProperties.log4j2FormatMsgNoLookups` | Disable Log4j2 message lookups (CVE-2021-44228 mitigation). Must be `true`. |
+| Key        | Description                                                                                                                                                                                                                                                                                                                  |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `javaOpts` | Complete `JAVA_OPTS` string passed to the JVM. Contains all system properties, heap settings, JMX flags, and the Log4j2 configuration file path. The value is processed through Helm's `tpl` function, so Go template expressions (e.g. `{{ tpl .Values.paths.config . }}`) are evaluated. Override the entire string per environment as needed. |
 
 ---
 

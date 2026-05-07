@@ -46,24 +46,7 @@ data:
   VP_USE_ROUTING_HISTORY: "{{ .Values.skltp.useRoutingHistory }}"
   WSDL_JSON_FILE: "{{ tpl .Values.paths.config . }}/wsdlconfig.json"
   WSDLFILES_DIRECTORY: "{{ tpl .Values.paths.base . }}/wsdl/"
-  JAVA_OPTS: >-
-              -Dlog4j2.formatMsgNoLookups={{ .Values.javaOpts.systemProperties.log4j2FormatMsgNoLookups }}
-              -Dfile.encoding={{ .Values.javaOpts.systemProperties.fileEncoding }}
-              -Duser.country={{ .Values.javaOpts.systemProperties.userCountry }}
-              -Duser.language={{ .Values.javaOpts.systemProperties.userLanguage }}
-              -Dspring.profiles.active={{ .Values.javaOpts.systemProperties.springProfilesActive }}
-              -Xms{{ .Values.javaOpts.jvm.minHeap }}
-              -Xmx{{ .Values.javaOpts.jvm.maxHeap }}
-              -XX:MaxRAMPercentage={{ .Values.javaOpts.jvm.maxRamPercentage }}
-              -Dlog4j.configurationFile=file://{{ tpl .Values.paths.config . }}/log4j2.xml
-              {{- if .Values.javaOpts.jmx.enabled }}
-              -Dcom.sun.management.jmxremote
-              -Dcom.sun.management.jmxremote.port={{ .Values.javaOpts.jmx.port }}
-              -Dcom.sun.management.jmxremote.rmi.port={{ .Values.javaOpts.jmx.port }}
-              -Dcom.sun.management.jmxremote.local.only={{ .Values.javaOpts.jmx.localOnly }}
-              -Dcom.sun.management.jmxremote.authenticate={{ .Values.javaOpts.jmx.authenticate }}
-              -Dcom.sun.management.jmxremote.ssl={{ .Values.javaOpts.jmx.ssl }}
-              {{- end }}
+  JAVA_OPTS: "{{ tpl .Values.javaOpts . }}"
 
 {{- range .Values.tls.bundles }}
   SPRING_SSL_BUNDLE_PEM_{{ .name | upper }}_KEYSTORE_CERTIFICATE: "{{ tpl $.Values.paths.certs $ }}/{{ .name }}-keystore/tls.crt"
