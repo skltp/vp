@@ -8,6 +8,8 @@ metadata:
   labels:
     {{- include "vp_services.labels" . | nindent 4 }}
 spec:
+  entryPoints:
+    - web
   routes:
     - kind: Rule
       match: "(Host(`{{ .Values.ingressroute.esbHostName }}`) || Host(`{{ .Values.ingressroute.sjunetHostName }}`)) && PathPrefix(`/vp`)"
