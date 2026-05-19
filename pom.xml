@@ -32,26 +32,32 @@
   </distributionManagement>
   <properties>
     <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
-    <lmax_disruptor-version>3.3.6</lmax_disruptor-version>
+    <lmax_disruptor-version>4.0.0</lmax_disruptor-version>
     <java.version>17</java.version>
     <maven.compiler.source>17</maven.compiler.source>
     <argLine.leak>-D_</argLine.leak>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>3.4.3</spring.boot-version>
-    <ecs-logging-java.version>1.5.0</ecs-logging-java.version>
+    <spring.boot-version>3.5.14</spring.boot-version>
+    <ecs-logging-java.version>1.6.0</ecs-logging-java.version>
     <maven.javadoc.skip>true</maven.javadoc.skip>
     <takdatahandler.version>3.3.1</takdatahandler.version>
     <maven.compiler.target>17</maven.compiler.target>
-    <hawtio.spring.boot-version>4.2.0</hawtio.spring.boot-version>
+    <hawtio.spring.boot-version>4.3.0</hawtio.spring.boot-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <camel.version>4.8.5</camel.version>
+    <camel.version>4.18.2</camel.version>
+    <log4j2.version>2.25.4</log4j2.version>
   </properties>
   <dependencyManagement>
     <dependencies>
+      <!-- Override Log4j2 version to fix CVEs -->
       <dependency>
-        <groupId>se.skltp.vp</groupId>
-        <artifactId>utility</artifactId>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-bom</artifactId>
+        <version>${log4j2.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
+      <!-- BOM imports (manage versions for Spring Boot and Camel dependencies) -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -66,66 +72,10 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- Dependencies NOT managed by the imported BOMs -->
       <dependency>
-        <groupId>org.apache.camel.springboot</groupId>
-        <artifactId>camel-observation-starter</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-        <version>${spring.boot-version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-undertow</artifactId>
-        <version>${spring.boot-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-actuator</artifactId>
-        <version>${spring.boot-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-configuration-processor</artifactId>
-        <version>${spring.boot-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel.springboot</groupId>
-        <artifactId>camel-spring-boot-starter</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel.springboot</groupId>
-        <artifactId>camel-spring-boot</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-core-starter</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-stream-starter</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-stream</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel.springboot</groupId>
-        <artifactId>camel-netty-http-starter</artifactId>
-        <version>${camel.version}</version>
+        <groupId>se.skltp.vp</groupId>
+        <artifactId>utility</artifactId>
       </dependency>
       <dependency>
         <groupId>io.hawt</groupId>
@@ -135,13 +85,35 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-security</artifactId>
-        <version>12.0.14</version>
+        <version>12.0.33</version>
       </dependency>
       <dependency>
         <groupId>com.lmax</groupId>
         <artifactId>disruptor</artifactId>
         <version>${lmax_disruptor-version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <version>1.84</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.ws</groupId>
+        <artifactId>jaxws-rt</artifactId>
+        <version>4.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-wsdl</artifactId>
+        <version>4.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20240303</version>
+      </dependency>
+      <!-- Kept for the android-json exclusion -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
@@ -154,66 +126,13 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-test-spring</artifactId>
-        <version>${camel.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-test</artifactId>
-        <version>${camel.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-spring</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk18on</artifactId>
-        <version>1.78.1</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-stax</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-core</artifactId>
-        <version>${camel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.xml.ws</groupId>
-        <artifactId>jaxws-rt</artifactId>
-        <version>4.0.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-wsdl</artifactId>
-        <version>4.0.6</version>
-      </dependency>
-      <dependency>
-        <groupId>io.micrometer</groupId>
-        <artifactId>micrometer-registry-prometheus</artifactId>
-        <version>1.12.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20240303</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>3.1.1</version>
         <configuration>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <tagNameFormat>v@{project.version}</tagNameFormat>
@@ -228,14 +147,14 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.5.2</version>
         <configuration>
           <argLine>-Dfile.encoding=UTF-8 ${argLine.leak}</argLine>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.5.2</version>
         <executions>
           <execution>
             <goals>
@@ -255,7 +174,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>2.7.18</version>
+        <version>${spring.boot-version}</version>
         <executions>
           <execution>
             <goals>
@@ -275,21 +194,6 @@
     </plugins>
   </build>
   <profiles>
-    <profile>
-      <id>lint</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.lewisd</groupId>
-            <artifactId>lint-maven-plugin</artifactId>
-            <version>0.0.11</version>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <argLine.lint>-Xlint:deprecation</argLine.lint>
-      </properties>
-    </profile>
     <profile>
       <id>leak</id>
       <properties>
