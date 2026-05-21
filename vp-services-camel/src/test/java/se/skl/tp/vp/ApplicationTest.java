@@ -11,13 +11,13 @@ import org.springframework.test.annotation.DirtiesContext;
 @SpringBootTest(classes = VpServicesApplication.class)
 @org.apache.camel.test.spring.junit5.EnableRouteCoverage
 @DirtiesContext
-public class ApplicationTest {
+class ApplicationTest {
 
     @Autowired
     private CamelContext camelContext;
 
     @Test
-    public void contextLoads(){
+    void contextLoads(){
 
     }
 

@@ -13,13 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.skl.tp.vp.util.LeakDetectionBaseTest;
 
-public class BaseNettyTest extends CamelTestSupport {
+class BaseNettyTest extends CamelTestSupport {
   protected static final Logger LOG = LoggerFactory.getLogger(BaseNettyTest.class);
 
   private static volatile int port;
 
   @BeforeAll
-  public static void initPort() throws Exception {
+  static void initPort() throws Exception {
     File file = new File("target/nettyport.txt");
 
     if (!file.exists()) {
@@ -36,21 +36,18 @@ public class BaseNettyTest extends CamelTestSupport {
   }
 
   @AfterAll
-  public static void savePort() throws Exception {
+  static void savePort() throws Exception {
     File file = new File("target/nettyport.txt");
 
     // save to file, do not append
-    FileOutputStream fos = new FileOutputStream(file, false);
-    try {
-      fos.write(String.valueOf(port).getBytes());
-    } finally {
-      fos.close();
+    try (FileOutputStream fos = new FileOutputStream(file, false)) {
+        fos.write(String.valueOf(port).getBytes());
     }
     LeakDetectionBaseTest.verifyNoLeaks();
   }
 
   @BeforeEach
-  public void init() throws Exception {
+  void init() throws Exception {
       PropertiesComponent pc = context.getPropertiesComponent();
 		pc.setLocation("ref:prop");
 	    context.getRegistry().bind("properties", pc);	

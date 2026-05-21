@@ -36,7 +36,7 @@ import se.skltp.takcache.TakCache;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = VagvalTestConfiguration.class)
-public class BehorighetProcessorTest  {
+class BehorighetProcessorTest  {
 
     @Autowired
     BehorighetProcessor behorighetProcessor;
@@ -53,7 +53,7 @@ public class BehorighetProcessorTest  {
     BehorigheterCache behorigheterCache;
 
     @BeforeEach
-    public void beforeTest()  {
+    void beforeTest()  {
         URL url = getClass().getClassLoader().getResource("hsacache.xml");
         URL urlHsaRoot = getClass().getClassLoader().getResource("hsacachecomplementary.xml");
 
@@ -64,7 +64,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testAuthorizonIsOk() throws Exception {
+    void testAuthorizonIsOk() throws Exception {
 
         Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
 
@@ -74,7 +74,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testAuthorizonByClimbingHsaTree() throws Exception {
+    void testAuthorizonByClimbingHsaTree() throws Exception {
 
         Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), eq(AUTHORIZED_RECEIVER_IN_HSA_TREE) )).thenReturn(true);
         Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), AdditionalMatchers.not(eq(AUTHORIZED_RECEIVER_IN_HSA_TREE)) )).thenReturn(false);
@@ -86,7 +86,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testAuthorizonByClimbingHsaTreeForDisabledNamespace() throws Exception {
+    void testAuthorizonByClimbingHsaTreeForDisabledNamespace() throws Exception {
 
         Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), eq(AUTHORIZED_RECEIVER_IN_HSA_TREE) )).thenReturn(true);
         Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), AdditionalMatchers.not(eq(AUTHORIZED_RECEIVER_IN_HSA_TREE)) )).thenReturn(false);
@@ -106,7 +106,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testAuthorizonByDefaultRouting() throws Exception {
+    void testAuthorizonByDefaultRouting() throws Exception {
 
         Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(), eq(RECEIVER_2) )).thenReturn(true);
         Mockito.when(behorigheterCache.isAuthorized(anyString(), anyString(),  AdditionalMatchers.not(eq(RECEIVER_2)) )).thenReturn(false);
@@ -127,7 +127,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testNoSenderIdShouldThrowVP002Exception() throws Exception {
+    void testNoSenderIdShouldThrowVP002Exception() throws Exception {
 
         Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
 
@@ -145,7 +145,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testNoLogicalAddressShouldThrowVP003Exception() throws Exception {
+    void testNoLogicalAddressShouldThrowVP003Exception() throws Exception {
 
         Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(true);
 
@@ -163,7 +163,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testNotAuthorizedShouldThrowVP007Exception() throws Exception {
+    void testNotAuthorizedShouldThrowVP007Exception() throws Exception {
 
         Mockito.when(behorigheterCache.isAuthorized(anyString(),anyString(),anyString())).thenReturn(false);
 
@@ -182,7 +182,7 @@ public class BehorighetProcessorTest  {
     }
 
     @Test
-    public void testNotAuthorizedShouldThrowVP008Exception() throws Exception {
+    void testNotAuthorizedShouldThrowVP008Exception() throws Exception {
         Mockito.when(takCache.refresh()).thenReturn(createTakCacheLogFailed());
         takCacheService.refresh();
 
