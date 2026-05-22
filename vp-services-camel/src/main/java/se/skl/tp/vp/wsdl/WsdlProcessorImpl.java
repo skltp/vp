@@ -2,7 +2,7 @@ package se.skl.tp.vp.wsdl;
 
 import static org.apache.camel.Exchange.CONTENT_TYPE;
 import static org.apache.camel.Exchange.HTTP_RESPONSE_CODE;
-import static org.apache.commons.lang.CharEncoding.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static se.skl.tp.vp.wsdl.PathHelper.getPath;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class WsdlProcessorImpl implements WsdlProcessor {
       exchange.getIn().setBody(createErrorMsgWithValidPaths(url));
       exchange.getIn().setHeader(CONTENT_TYPE, "text/plain;UTF-8");
       exchange.getIn().setHeader(HTTP_RESPONSE_CODE, 500);
-      exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
+      exchange.setProperty(Exchange.CHARSET_NAME, UTF_8.name());
       return;
     }
 
@@ -56,7 +56,7 @@ public class WsdlProcessorImpl implements WsdlProcessor {
     String wsdlOrXsd = getWsdlOrXsd(fileName);
     exchange.getIn().setBody(WsdlQueryUrlTransformer.replaceUrlParts(wsdlOrXsd, url));
     exchange.getIn().setHeader(CONTENT_TYPE, "text/xml;UTF-8");
-    exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
+    exchange.setProperty(Exchange.CHARSET_NAME, UTF_8.name());
   }
 
   private String getXsdFileName(Exchange exchange, String wsdlFile) throws WSDLException {

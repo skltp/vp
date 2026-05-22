@@ -1,7 +1,7 @@
 package se.skl.tp.vp.errorhandling;
 
 import org.apache.camel.Exchange;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VPFaultCodeEnum;

@@ -74,6 +74,10 @@
       <artifactId>camel-management</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
@@ -133,13 +137,12 @@
       <artifactId>jaxws-rt</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- Required by TakMockWebService to publish CXF SOAP endpoints in integration tests.
+         Was previously a transitive dependency of takdatahandler, made explicit after upgrade to 3.4.3. -->
     <dependency>
-      <groupId>io.hawt</groupId>
-      <artifactId>hawtio-springboot</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-security</artifactId>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-jetty</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>
