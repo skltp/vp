@@ -26,7 +26,7 @@ import org.mockito.AdditionalMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpSemanticException;
@@ -44,12 +44,12 @@ class BehorighetProcessorTest  {
     @Autowired
     HsaCache hsaCache;
 
-    @MockBean
+    @MockitoBean
     TakCache takCache;
 
     @Autowired
     TakCacheService takCacheService;
-    @MockBean
+    @MockitoBean
     BehorigheterCache behorigheterCache;
 
     @BeforeEach

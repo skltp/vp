@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>se.skltp.vp</groupId>
   <artifactId>vp-parent-camel</artifactId>
   <version>4.8.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
   <name>vp-parent-camel</name>
   <description>SKLTP VP Services byggt med Camel och Spring Boot</description>
+
   <modules>
     <module>vp-wsdl-utils</module>
     <module>vp-services-camel</module>
     <module>report</module>
   </modules>
+
   <scm>
     <connection>scm:git:https://github.com:443/skltp/vp.git</connection>
     <developerConnection>scm:git:https://github.com:443/skltp/vp.git</developerConnection>
@@ -30,26 +33,41 @@
       <url>${snapshot-nexus-url}</url>
     </snapshotRepository>
   </distributionManagement>
+
   <properties>
-    <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
-    <lmax_disruptor-version>4.0.0</lmax_disruptor-version>
+    <!-- TODO: REGULARLY CHECK UPDATES FOR DEPS -#- DEPENDENCIES CHECKED: MAY 2026. -->
+
+    <!-- Core Dependencies and Properties-->
     <java.version>17</java.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <argLine.leak>-D_</argLine.leak>
+    <maven.compiler.release>17</maven.compiler.release>
+    <camel.version>4.18.2</camel.version> <!-- MAR 2026 -->
+    <spring.boot-version>3.5.14</spring.boot-version> <!-- APR 2026 -->
+    <takdatahandler.version>3.4.4</takdatahandler.version> <!-- APR 2026 -->
+    <cxf.version>4.1.5</cxf.version> <!-- FEB 2026 - 4.1.x is aligned to Spring Boot 3, and Jakarta EE10 - 4.2.x exists but is aligned to Spring Boot 4/EE11. -->
+
+    <!-- Supporting Deps -->
+    <jacoco.plugin.version>0.8.14</jacoco.plugin.version> <!-- OCT 2025. Latest as of APR 2026. -->
+    <lmax_disruptor-version>4.0.0</lmax_disruptor-version> <!-- SEP 2023. Latest as of APR 2026. -->
+    <ecs-logging-java.version>1.7.0</ecs-logging-java.version> <!-- APR 2025. Latest as of APR 2026. -->
+    <log4j2.version>2.25.4</log4j2.version> <!-- MAR 2026 -->
+    <dom4j.version>2.1.5</dom4j.version> <!-- JUN 2025, 2.2.0 exists. -->
+    <jaxen.version>1.2.0</jaxen.version> <!-- APR 2019 !!! TODO: Replace or remove. 2026-version exists. -->
+    <jackson-databind.version>2.13.4.2</jackson-databind.version> <!-- OCT 2022 !!! TODO: Replace or upgrade. 2026-versions exists. -->
+    <bouncycastle.version>1.84</bouncycastle.version> <!-- APR 2026 -->
+
+    <!-- Project details -->
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.boot-version>3.5.14</spring.boot-version>
-    <ecs-logging-java.version>1.6.0</ecs-logging-java.version>
     <maven.javadoc.skip>true</maven.javadoc.skip>
-    <takdatahandler.version>3.3.1</takdatahandler.version>
-    <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <camel.version>4.18.2</camel.version>
-    <jetty.version>12.1.6</jetty.version>
-    <log4j2.version>2.25.4</log4j2.version>
+    <argLine.leak>-D_</argLine.leak> <!-- Used in leak detection profile. -->
   </properties>
+
   <dependencyManagement>
     <dependencies>
-      <!-- Override Log4j2 version to fix CVEs -->
+      <!-- Bill of Materials imports.
+                 Order matters: first-declared BOM wins for version conflicts -->
+
+      <!-- Override Log4j2 version to fix CVEs. TODO: Remove this override once Spring Boot or Camel is in phase again. -->
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
@@ -57,7 +75,18 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- BOM imports (manage versions for Spring Boot and Camel dependencies) -->
+
+      <!-- Core BOM imports (manage versions for Spring Boot and Camel dependencies) -->
+      <!-- Release notes for Camel often show inconsistencies regarding whether camel-spring-boot-bom or spring-boot-dependencies should go first.
+           Camel's documentation states that the camel-spring-boot-bom should be first, to get a consistent set of dependencies that Camel has been built and tested for...
+           and then whatever Spring Boot needs can be pulled in thereafter. -->
+      <dependency>
+        <groupId>org.apache.camel.springboot</groupId>
+        <artifactId>camel-spring-boot-dependencies</artifactId> <!-- "camel-spring-boot-dependencies" is broader than "camel-spring-boot-bom" -->
+        <version>${camel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -65,13 +94,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.apache.camel.springboot</groupId>
-        <artifactId>camel-spring-boot-dependencies</artifactId>
-        <version>${camel.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+
       <!-- Dependencies NOT managed by the imported BOMs -->
       <dependency>
         <groupId>se.skltp.vp</groupId>
@@ -84,12 +107,6 @@
         <version>${lmax_disruptor-version}</version>
       </dependency>
       <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk18on</artifactId>
-        <version>1.84</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>com.sun.xml.ws</groupId>
         <artifactId>jaxws-rt</artifactId>
         <version>4.0.3</version>
@@ -97,12 +114,12 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-wsdl</artifactId>
-        <version>4.2.0</version>
+        <version>${cxf.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        <version>4.2.0</version>
+        <version>${cxf.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -125,8 +142,22 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring.boot-version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
         <version>3.1.1</version>
@@ -137,21 +168,24 @@
           <localCheckout>true</localCheckout>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-maven-plugin</artifactId>
         <version>${camel.version}</version>
       </plugin>
+
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.2</version>
+        <version>3.5.5</version>
         <configuration>
           <argLine>-Dfile.encoding=UTF-8 ${argLine.leak}</argLine>
         </configuration>
       </plugin>
+
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.5.2</version>
+        <version>3.5.5</version>
         <executions>
           <execution>
             <goals>
@@ -168,35 +202,18 @@
           <argLine>-Dfile.encoding=UTF-8 ${argLine.leak}</argLine>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${spring.boot-version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>build-info</goal>
-            </goals>
-            <configuration>
-              <additionalProperties>
-                <encoding.source>UTF-8</encoding.source>
-                <encoding.reporting>UTF-8</encoding.reporting>
-                <java.source>${maven.compiler.source}</java.source>
-                <java.target>${maven.compiler.target}</java.target>
-              </additionalProperties>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
+
   <profiles>
+    <!-- Appears to be a debugging profile to detect memory leaks by thread / traffic pools. -->
     <profile>
       <id>leak</id>
       <properties>
         <argLine.leak>-Dio.netty.leakDetectionLevel=paranoid -Dio.netty.leakDetection.maxRecords=32 -Dio.netty.leakDetection.targetRecords=10 -Dspring.profiles.active=leak</argLine.leak>
       </properties>
     </profile>
+
     <profile>
       <id>test-coverage</id>
       <build>
@@ -268,21 +285,6 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>local-debug</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <version>${spring.boot-version}</version>
-            <configuration>
-              <fork>false</fork>
-            </configuration>
           </plugin>
         </plugins>
       </build>

@@ -3,12 +3,14 @@ package se.skl.tp.vp.integrationtests.utils;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponse;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Message;
 import org.apache.camel.component.netty.http.DefaultNettyHttpBinding;
 import org.apache.camel.component.netty.http.NettyHttpConfiguration;
 import org.springframework.stereotype.Component;
 
+@EqualsAndHashCode(callSuper = true)
 @Component
 @Data
 @Log4j2

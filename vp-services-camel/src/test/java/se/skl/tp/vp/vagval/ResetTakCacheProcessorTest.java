@@ -15,7 +15,7 @@ import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.skltp.takcache.TakCache;
 import se.skltp.takcache.TakCacheLog;
 
@@ -25,7 +25,7 @@ public class ResetTakCacheProcessorTest {
     @Autowired
     private ResetTakCacheProcessor processor;
 
-    @MockBean(name = "takCacheImpl")
+    @MockitoBean(name = "takCacheImpl")
     private TakCache takCacheMock;
 
     private List<String> testLog = new ArrayList<>();
