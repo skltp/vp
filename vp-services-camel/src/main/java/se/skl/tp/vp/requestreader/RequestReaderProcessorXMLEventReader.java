@@ -1,6 +1,6 @@
 package se.skl.tp.vp.requestreader;
 
-import static org.apache.commons.lang.CharEncoding.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static se.skl.tp.vp.constants.HttpHeaders.SOAP_ACTION;
 
 import java.io.IOException;
@@ -82,7 +82,7 @@ public class RequestReaderProcessorXMLEventReader implements RequestReaderProces
     } catch (Exception e) {
     	// This will basically handle the case where encoding is UTF-8 but xml prolog is UTF-16
         log.warn("Failed convert payload to XMLStreamReader. Trying with default encoding UTF-8... " + e.getMessage());
-        exchange.setProperty(Exchange.CHARSET_NAME, UTF_8);
+        exchange.setProperty(Exchange.CHARSET_NAME, UTF_8.name());
         body.reset();
     	return new StaxConverter().createXMLStreamReader(body, exchange);
     }

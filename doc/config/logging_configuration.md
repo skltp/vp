@@ -16,7 +16,7 @@ java -jar -Xms256m -Xmx1024m -Dlog4j.configurationFile=file:///opt/vp/config/log
 Här beskrivs två sätt att ändra loggnivåer i runtime (det finns förmodligen fler).
 
  1. Om en extern konfiguration används räcker det att ändra i konfigureringsfilen förutsatt att den är grundkonfigurerad att upptäcka förändringar i runtime. Kontrollera att parametern `monitorInterval="30"` är satt.
- 2. Ändra loggnivåer med Hawtio (eller på annat sätt via jmx)
+ 2. Ändra loggnivåer via JMX
 ### Loggformat
 VP loggar i json-format enligt Elastic Common Schema (ECS) för att underlätta indexering och sökning i logghanteringsverktyg som t.ex. ELK-stack eller Splunk.
 Appenders bör använda `EcsLayout` för att få rätt format. Exempel på konfiguration av console appender med `EcsLayout`:

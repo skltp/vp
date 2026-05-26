@@ -13,7 +13,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.component.netty.http.DefaultNettyHttpBinding;
 import org.apache.camel.component.netty.http.NettyHttpConfiguration;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

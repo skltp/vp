@@ -1,6 +1,6 @@
 package se.skl.tp.vp.charset;
 
-import static org.apache.commons.lang.CharEncoding.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.StringWriter;
 import javax.xml.XMLConstants;
@@ -19,7 +19,7 @@ import se.skl.tp.vp.constants.VPExchangeProperties;
 @Log4j2
 public class ConvertRequestCharset implements Processor {
 
-  private static final String DEFAULT_ENCODING = UTF_8;
+  private static final String DEFAULT_ENCODING = UTF_8.name();
 
   @Override
   public void process(Exchange exchange) throws Exception {
