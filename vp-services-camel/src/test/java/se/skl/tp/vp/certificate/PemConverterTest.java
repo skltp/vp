@@ -1,9 +1,11 @@
 package se.skl.tp.vp.certificate;
 
 import io.undertow.util.FileUtils;
-import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.jce.PrincipalUtil;
-import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
@@ -13,7 +15,6 @@ import java.security.cert.X509Certificate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class PemConverterTest  {
 
@@ -46,8 +47,8 @@ public class PemConverterTest  {
         String pemCertContent = readPemCertificateFile("certs/client.pem");
 
         final X509Certificate certificate = PemConverter.buildCertificate(pemCertContent);
-        final X509Principal issuer = PrincipalUtil.getIssuerX509Principal(certificate);
-        final String cn = (String) issuer.getValues(X509Name.CN).get(0);
+        final X500Name issuer = new JcaX509CertificateHolder(certificate).getIssuer();
+        final String cn = IETFUtils.valueToString(issuer.getRDNs(BCStyle.CN)[0].getFirst().getValue());
 
         assertEquals("SITHS CA v3", cn);
     }
@@ -57,15 +58,15 @@ public class PemConverterTest  {
         String pemCertContent = readPemCertificateFile("certs/client.pem");
 
         final X509Certificate certificate = PemConverter.buildCertificate(pemCertContent);
-        final X509Principal subject = PrincipalUtil.getSubjectX509Principal(certificate);
-        final String organizationalUnitName = (String) subject.getValues(X509Name.OU).get(0);
+        final X500Name subject = new JcaX509CertificateHolder(certificate).getSubject();
+        final String organizationalUnitName = IETFUtils.valueToString(subject.getRDNs(BCStyle.OU)[0].getFirst().getValue());
 
         assertEquals("VP", organizationalUnitName);
     }
 
     private String readPemCertificateFile(String pemFile) {
         URL filePath = PemConverterTest.class.getClassLoader().getResource(pemFile);
-        String pemCertContent = FileUtils.readFile(filePath);
-        return pemCertContent;
+        assertNotNull(filePath);
+        return FileUtils.readFile(filePath);
     }
 }

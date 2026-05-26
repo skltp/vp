@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.skl.tp.vp.constants.HttpHeaders;
 import se.skl.tp.vp.httpheader.SenderIpExtractor;
 import se.skl.tp.vp.logging.MessageLogger;
@@ -55,10 +55,11 @@ public class ProducerTimeoutWithoutConfigTest {
 
   @Autowired CamelContext camelContext;
 
-  @MockBean TakCache takCache;
-  @MockBean
+  @MockitoBean
+  TakCache takCache;
+  @MockitoBean
   BehorigheterCache behorigheterCache;
-  @MockBean
+  @MockitoBean
   VagvalCache vagvalCache;
 
   @Autowired TimeoutConfiguration timeoutConfiguration;

@@ -22,7 +22,7 @@ import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.TestBeanConfiguration;
@@ -39,13 +39,13 @@ import se.skltp.takcache.VagvalCache;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class X_skltp_prt_headerTest {
 
-    @MockBean
+    @MockitoBean
     TakCache takCache;
 
-    @MockBean
+    @MockitoBean
     VagvalCache vagvalCache;
 
-    @MockBean
+    @MockitoBean
     BehorigheterCache behorigheterCache;
 
     @Produce("direct:start")

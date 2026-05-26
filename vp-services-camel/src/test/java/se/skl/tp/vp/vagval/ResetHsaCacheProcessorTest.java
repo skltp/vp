@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.hsa.cache.HsaCacheInitializationException;
 
@@ -23,7 +23,7 @@ public class ResetHsaCacheProcessorTest {
     @Autowired
     ResetHsaCacheProcessor processor;
 
-    @MockBean(name="hsaCacheImpl")
+    @MockitoBean(name="hsaCacheImpl")
     HsaCache hsaCacheMock;
 
     @BeforeEach

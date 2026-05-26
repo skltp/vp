@@ -27,7 +27,7 @@ import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import se.skl.tp.hsa.cache.HsaCache;
 import se.skl.tp.vp.constants.VPExchangeProperties;
 import se.skl.tp.vp.exceptions.VpSemanticException;
@@ -44,9 +44,9 @@ public class VagvalProcessorTest {
   HsaCache hsaCache;
   @Autowired
   TakCacheService takCacheService;
-  @MockBean
+  @MockitoBean
   VagvalCache vagvalCache;
-  @MockBean
+  @MockitoBean
   TakCache takCache;
 
   @BeforeEach

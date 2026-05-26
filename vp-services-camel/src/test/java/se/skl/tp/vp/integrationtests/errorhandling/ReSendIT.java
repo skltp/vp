@@ -20,7 +20,7 @@ import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import se.skl.tp.vp.TestBeanConfiguration;
@@ -44,11 +44,11 @@ public class ReSendIT extends LeakDetectionBaseTest {
   private static boolean isContextStarted = false;
 
 
-  @MockBean TakCache takCache;
+  @MockitoBean TakCache takCache;
 
-  @MockBean VagvalCache vagvalCache;
+  @MockitoBean VagvalCache vagvalCache;
 
-  @MockBean BehorigheterCache behorigheterCache;
+  @MockitoBean BehorigheterCache behorigheterCache;
 
   @Autowired TakCacheService takCacheService;
 
