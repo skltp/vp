@@ -42,8 +42,8 @@
     <maven.compiler.release>17</maven.compiler.release>
     <camel.version>4.18.2</camel.version> <!-- MAR 2026 -->
     <spring.boot-version>3.5.14</spring.boot-version> <!-- APR 2026 -->
-    <takdatahandler.version>3.4.4</takdatahandler.version> <!-- APR 2026 -->
-    <cxf.version>4.1.5</cxf.version> <!-- FEB 2026 - 4.1.x is aligned to Spring Boot 3, and Jakarta EE10 - 4.2.x exists but is aligned to Spring Boot 4/EE11. -->
+    <takdatahandler.version>3.4.5</takdatahandler.version> <!-- MAY 2026 -->
+    <cxf.version>4.1.6</cxf.version> <!-- MAY 2026 - 4.1.x is aligned to Spring Boot 3, and Jakarta EE10 - 4.2.x exists but is aligned to Spring Boot 4/EE11. -->
 
     <!-- Supporting Deps -->
     <jacoco.plugin.version>0.8.14</jacoco.plugin.version> <!-- OCT 2025. Latest as of APR 2026. -->
