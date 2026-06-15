@@ -82,6 +82,7 @@ javaOpts: >-
   -Dcom.sun.management.jmxremote.local.only=false
   -Dcom.sun.management.jmxremote.authenticate=false
   -Dcom.sun.management.jmxremote.ssl=false
+  -Dorg.apache.cxf.stax.maxChildElements=200000
 
 defaultRouting:
   allowedContracts:
