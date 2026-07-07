@@ -2,6 +2,7 @@ package se.skl.tp.vp;
 
 import static org.apache.camel.builder.PredicateBuilder.or;
 
+import io.netty.handler.codec.http.TooLongHttpContentException;
 import io.netty.handler.timeout.ReadTimeoutException;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
@@ -198,7 +199,8 @@ public class VPRouter extends RouteBuilder {
             .onException(ReadTimeoutException.class,
                     NettyHttpOperationFailedException.class,
                     SSLHandshakeException.class,
-                    IOException.class)
+                    IOException.class,
+                    TooLongHttpContentException.class)
                 .to(DIRECT_PRODUCER_ERROR)
                 .handled(true)
             .end()
