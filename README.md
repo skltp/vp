@@ -16,7 +16,11 @@ För att alla VP-funktioner ska fungera måste man konfigurera i properties:
 
 Starta **VP** som Spring-boot applikation
 
-**Configuration:**<br/>
+**Konfiguration:**<br/>
 [Konfiguration av VP Camel](doc/config/configuration.md)<br/>
 [Detaljerad konfiguration](doc/config/detail_config.md)<br/>
 [Logging konfigurering](doc/config/logging_configuration.md)
+
+**Modifiering av Netty:**<br/>
+VP innehåller lokalt modifierade Netty-klasser.<br/>
+[Livscykelhantering av Netty](vp-services-camel/src/main/java/io/netty/handler/codec/http/README.md)
