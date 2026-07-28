@@ -660,7 +660,9 @@ class MtlsAwareSSLContextParametersTest {
     private boolean step(SSLEngine engine, ByteBuffer emptyApp, ByteBuffer outbound,
                          ByteBuffer inbound, ByteBuffer appBuffer) throws Exception {
         boolean progress = false;
-        for (int i = 0; i < MAX_HANDSHAKE_STEPS; i++) {
+        boolean done = false;
+
+        for (int i = 0; i < MAX_HANDSHAKE_STEPS && !done; i++) {
             switch (engine.getHandshakeStatus()) {
                 case NEED_TASK -> {
                     Runnable task;
@@ -670,31 +672,43 @@ class MtlsAwareSSLContextParametersTest {
                     progress = true;
                 }
                 case NEED_WRAP -> {
-                    engine.wrap(emptyApp, outbound);
-                    progress = true;
+                    SSLEngineResult result = engine.wrap(emptyApp, outbound);
+                    // A full outbound buffer must be drained by the peer before we can produce more
+                    done = result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW;
+                    progress |= !done;
                 }
                 case NEED_UNWRAP, NEED_UNWRAP_AGAIN -> {
-                    inbound.flip();
-                    if (!inbound.hasRemaining()) {
-                        inbound.clear();
-                        return progress;
-                    }
-                    engine.unwrap(inbound, appBuffer);
-                    inbound.compact();
-                    progress = true;
+                    // Yield to the peer when it has not produced the data we are waiting for
+                    boolean unwrapped = unwrapAvailableData(engine, inbound, appBuffer);
+                    progress |= unwrapped;
+                    done = !unwrapped;
                 }
                 default -> {
-                    // Consume any remaining post-handshake data from the peer
-                    inbound.flip();
-                    if (inbound.hasRemaining()) {
-                        engine.unwrap(inbound, appBuffer);
-                        progress = true;
-                    }
-                    inbound.compact();
-                    return progress;
+                    // Handshake finished: consume any remaining post-handshake data from the peer
+                    progress |= unwrapAvailableData(engine, inbound, appBuffer);
+                    done = true;
                 }
             }
         }
+
+        assertTrue(done, "TLS handshake step did not terminate within " + MAX_HANDSHAKE_STEPS + " iterations");
         return progress;
+    }
+
+    /**
+     * Unwraps whatever the peer has written to the inbound buffer.
+     *
+     * @return true if data was actually consumed, false if the buffer was empty or held an
+     *         incomplete record
+     */
+    private boolean unwrapAvailableData(SSLEngine engine, ByteBuffer inbound, ByteBuffer appBuffer)
+            throws Exception {
+        inbound.flip();
+        boolean consumed = false;
+        if (inbound.hasRemaining()) {
+            consumed = engine.unwrap(inbound, appBuffer).bytesConsumed() > 0;
+        }
+        inbound.compact();
+        return consumed;
     }
 }
