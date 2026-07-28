@@ -67,7 +67,7 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
         }
 
         // Wrap the SSLContext to intercept SSLEngine creation
-        return new MtlsAwareSSLContext(sslContext, mtlsVerificationEnabled);
+        return new MtlsAwareSSLContext(sslContext);
     }
 
     // Delegate all getter/setter methods to the delegate
@@ -197,9 +197,8 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
      */
     private static class MtlsAwareSSLContext extends SSLContext {
 
-        protected MtlsAwareSSLContext(SSLContext delegate,
-                                      boolean mtlsVerificationEnabled) {
-            super(new MtlsAwareSSLContextSpi(delegate, mtlsVerificationEnabled),
+        protected MtlsAwareSSLContext(SSLContext delegate) {
+            super(new MtlsAwareSSLContextSpi(delegate),
                   delegate.getProvider(),
                   delegate.getProtocol());
         }
@@ -210,31 +209,19 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
      */
     private static class MtlsAwareSSLContextSpi extends SSLContextSpi {
         private final SSLContext delegate;
-        private final boolean mtlsVerificationEnabled;
 
-        public MtlsAwareSSLContextSpi(SSLContext delegate,
-                                      boolean mtlsVerificationEnabled) {
+        public MtlsAwareSSLContextSpi(SSLContext delegate) {
             this.delegate = delegate;
-            this.mtlsVerificationEnabled = mtlsVerificationEnabled;
         }
 
         @Override
         protected SSLEngine engineCreateSSLEngine() {
-            SSLEngine engine = delegate.createSSLEngine();
-            return wrapEngine(engine);
+            return new MtlsVerifyingSSLEngine(delegate.createSSLEngine());
         }
 
         @Override
         protected SSLEngine engineCreateSSLEngine(String host, int port) {
-            SSLEngine engine = delegate.createSSLEngine(host, port);
-            return wrapEngine(engine);
-        }
-
-        private SSLEngine wrapEngine(SSLEngine engine) {
-            if (!mtlsVerificationEnabled) {
-                return engine;
-            }
-            return new MtlsVerifyingSSLEngine(engine);
+            return new MtlsVerifyingSSLEngine(delegate.createSSLEngine(host, port));
         }
 
         @Override
