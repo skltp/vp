@@ -67,7 +67,7 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
         }
 
         // Wrap the SSLContext to intercept SSLEngine creation
-        return new MtlsAwareSSLContext(sslContext, mtlsVerificationEnabled);
+        return new MtlsAwareSSLContext(sslContext);
     }
 
     // Delegate all getter/setter methods to the delegate
@@ -197,9 +197,8 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
      */
     private static class MtlsAwareSSLContext extends SSLContext {
 
-        protected MtlsAwareSSLContext(SSLContext delegate,
-                                      boolean mtlsVerificationEnabled) {
-            super(new MtlsAwareSSLContextSpi(delegate, mtlsVerificationEnabled),
+        protected MtlsAwareSSLContext(SSLContext delegate) {
+            super(new MtlsAwareSSLContextSpi(delegate),
                   delegate.getProvider(),
                   delegate.getProtocol());
         }
@@ -210,31 +209,19 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
      */
     private static class MtlsAwareSSLContextSpi extends SSLContextSpi {
         private final SSLContext delegate;
-        private final boolean mtlsVerificationEnabled;
 
-        public MtlsAwareSSLContextSpi(SSLContext delegate,
-                                      boolean mtlsVerificationEnabled) {
+        public MtlsAwareSSLContextSpi(SSLContext delegate) {
             this.delegate = delegate;
-            this.mtlsVerificationEnabled = mtlsVerificationEnabled;
         }
 
         @Override
         protected SSLEngine engineCreateSSLEngine() {
-            SSLEngine engine = delegate.createSSLEngine();
-            return wrapEngine(engine);
+            return new MtlsVerifyingSSLEngine(delegate.createSSLEngine());
         }
 
         @Override
         protected SSLEngine engineCreateSSLEngine(String host, int port) {
-            SSLEngine engine = delegate.createSSLEngine(host, port);
-            return wrapEngine(engine);
-        }
-
-        private SSLEngine wrapEngine(SSLEngine engine) {
-            if (!mtlsVerificationEnabled) {
-                return engine;
-            }
-            return new MtlsVerifyingSSLEngine(engine);
+            return new MtlsVerifyingSSLEngine(delegate.createSSLEngine(host, port));
         }
 
         @Override
@@ -268,11 +255,31 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
     /**
      * SSLEngine wrapper that monitors handshake completion and verifies mTLS certificate exchange.
      */
-    private static class MtlsVerifyingSSLEngine extends SSLEngine {
+    static class MtlsVerifyingSSLEngine extends SSLEngine {
         public static final String TLS_HANDSHAKE_COMPLETED = "TLS handshake completed for %s - Protocol: %s, Cipher Suite: %s, Local certificates (client): %d sent";
-        public static final String TLS_HANDSHAKE_FAILED = "TLS handshake failed for %s - Protocol: %s, Cipher Suite: %s, NO local certificates (client) sent";
+        public static final String MTLS_NOT_USED = "mTLS not used for %s - TLS handshake completed but NO local certificates (client) were sent - Protocol: %s, Cipher Suite: %s";
+
+        /** Protocol reported by an SSLSession that has not completed a handshake. */
+        private static final String UNNEGOTIATED_PROTOCOL = "NONE";
+        /** Cipher suite reported by an SSLSession that has not completed a handshake. */
+        private static final String UNNEGOTIATED_CIPHER_SUITE = "SSL_NULL_WITH_NULL_NULL";
+
         private final SSLEngine delegate;
+        private boolean handshakeStarted = false;
         private boolean handshakeChecked = false;
+        private Boolean mtlsVerified = null;
+
+        /** Visible for testing: true once the mTLS verification has been performed. */
+        boolean isHandshakeChecked() {
+            return handshakeChecked;
+        }
+
+        /**
+         * Visible for testing: the verification outcome, or null if no verification has been performed yet.
+         */
+        Boolean getMtlsVerified() {
+            return mtlsVerified;
+        }
 
         public MtlsVerifyingSSLEngine(SSLEngine delegate) {
             this.delegate = delegate;
@@ -295,14 +302,40 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
         }
 
         private void checkHandshakeStatus(SSLEngineResult result) {
-            log.trace("Handshake checked: {}. SSLEngine handshake status: {}", handshakeChecked, result.getHandshakeStatus());
-            if (!handshakeChecked && result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
-                handshakeChecked = true;
-                verifyMtls();
+            if (handshakeChecked) {
+                return;
+            }
+
+            SSLEngineResult.HandshakeStatus handshakeStatus = result.getHandshakeStatus();
+            log.trace("Handshake started: {}. SSLEngine status: {}, handshake status: {}",
+                    handshakeStarted, result.getStatus(), handshakeStatus);
+
+            // Any status other than NOT_HANDSHAKING means the engine is (or has been) handshaking.
+            if (handshakeStatus != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
+                handshakeStarted = true;
+            }
+
+            if (result.getStatus() == SSLEngineResult.Status.CLOSED) {
+                return; // Operation closed this side of the SSLEngine, or operation was already closed.
+            }
+
+            // FINISHED, or NOT_HANDSHAKING on a non-closed engine indicates a completed handshake.
+            boolean handshakeCompleted =
+                    handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED ||
+                    (handshakeStarted && handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING);
+
+            if (handshakeCompleted) {
+                handshakeChecked = verifyMtls();
             }
         }
 
-        private void verifyMtls() {
+        /**
+         * Verifies whether a client certificate was sent during the TLS handshake and logs the outcome.
+         *
+         * @return true if the session was established and the verification was performed, false if the
+         *         session is not (yet) negotiated and the verification should be retried later.
+         */
+        private boolean verifyMtls() {
             try {
                 SSLSession session = delegate.getSession();
 
@@ -310,18 +343,20 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
                     logCertificateDetails(session);
                 }
 
-                if (session == null || session.getPeerHost() == null || session.getProtocol() == null || session.getCipherSuite() == null) {
-                    log.debug("SSLSession is null or incomplete, cannot verify mTLS");
-                    return;
+                if (!isSessionEstablished(session)) {
+                    log.debug("SSLSession is not established, cannot verify mTLS yet");
+                    return false;
                 }
 
                 Certificate[] localCerts = session.getLocalCertificates();
                 boolean mtlsUsed = localCerts != null && localCerts.length > 0;
                 int certCount = localCerts != null ? localCerts.length : 0;
+                String peerHost = resolvePeerHost(session);
+                mtlsVerified = mtlsUsed;
 
                 var builder = new EcsTlsLogEntry.Builder(EcsTlsLogEntry.ACTION_TLS_HANDSHAKE_COMPLETE)
                         .withHandshakeDetails(
-                                session.getPeerHost(),
+                                peerHost,
                                 session.getProtocol(),
                                 session.getCipherSuite(),
                                 certCount);
@@ -330,7 +365,7 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
                     log.info(
                         builder
                             .withMessage(String.format(TLS_HANDSHAKE_COMPLETED,
-                                session.getPeerHost(),
+                                peerHost,
                                 session.getProtocol(),
                                 session.getCipherSuite(),
                                 certCount))
@@ -339,16 +374,41 @@ public class MtlsAwareSSLContextParameters extends SSLContextParameters {
                 } else {
                     log.error(
                         builder
-                            .withMessage(String.format(TLS_HANDSHAKE_FAILED,
-                                session.getPeerHost(),
+                            .withMessage(String.format(MTLS_NOT_USED,
+                                peerHost,
                                 session.getProtocol(),
                                 session.getCipherSuite()))
                             .build()
                     );
                 }
+                return true;
             } catch (Exception e) {
                 log.error("Error during mTLS verification: {}", e.getMessage(), e);
+                return true;
             }
+        }
+
+        private String resolvePeerHost(SSLSession session) {
+            String peerHost = session.getPeerHost();
+            if (peerHost == null) {
+                peerHost = delegate.getPeerHost();
+            }
+            return peerHost != null ? peerHost : "unknown";
+        }
+
+        /**
+         * A session that has not completed a handshake reports the placeholder protocol {@code NONE} and
+         * cipher suite {@code SSL_NULL_WITH_NULL_NULL} instead of null, so those values must be checked
+         * explicitly to avoid reporting a missing client certificate for an unnegotiated session.
+         */
+        private static boolean isSessionEstablished(SSLSession session) {
+            if (session == null) {
+                return false;
+            }
+            String protocol = session.getProtocol();
+            String cipherSuite = session.getCipherSuite();
+            return protocol != null && !UNNEGOTIATED_PROTOCOL.equalsIgnoreCase(protocol)
+                    && cipherSuite != null && !UNNEGOTIATED_CIPHER_SUITE.equalsIgnoreCase(cipherSuite);
         }
 
         /**

@@ -8,10 +8,21 @@ import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLSession;
+import java.nio.ByteBuffer;
+
+import se.skl.tp.vp.sslcontext.MtlsAwareSSLContextParameters.MtlsVerifyingSSLEngine;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class MtlsAwareSSLContextParametersTest {
+
+    private static final int MAX_HANDSHAKE_STEPS = 50;
 
     private CamelContext camelContext;
     private SSLContextParameters baseParams;
@@ -462,5 +473,242 @@ class MtlsAwareSSLContextParametersTest {
 
         SSLContext sslContext2 = mtlsParamsPermissive.createSSLContext(camelContext);
         assertNotNull(sslContext2);
+    }
+
+    @Test
+    void testNoMtlsVerificationBeforeHandshakeHasStarted() throws Exception {
+        MtlsVerifyingSSLEngine engine = createClientEngine();
+
+        // Netty may call wrap/unwrap before the handshake has actually started. The engine then
+        // reports NOT_HANDSHAKING, which must not be interpreted as a completed handshake.
+        ByteBuffer emptyNetworkData = ByteBuffer.allocate(0);
+        ByteBuffer appBuffer = ByteBuffer.allocate(engine.getSession().getApplicationBufferSize());
+        engine.unwrap(emptyNetworkData, appBuffer);
+
+        assertFalse(engine.isHandshakeChecked(), "mTLS must not be verified before the handshake started");
+        assertNull(engine.getMtlsVerified());
+    }
+
+    @Test
+    void testNotHandshakingBeforeHandshakeStartedDoesNotTriggerVerification() throws Exception {
+        SSLEngine delegate = mockEngineWithUnnegotiatedSession(
+            new SSLEngineResult(SSLEngineResult.Status.BUFFER_UNDERFLOW,
+                SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0));
+
+        MtlsVerifyingSSLEngine engine = new MtlsVerifyingSSLEngine(delegate);
+        engine.unwrap(ByteBuffer.allocate(0), new ByteBuffer[]{ByteBuffer.allocate(1024)}, 0, 1);
+
+        assertFalse(engine.isHandshakeChecked(),
+            "NOT_HANDSHAKING before the handshake started must not be treated as a completed handshake");
+        assertNull(engine.getMtlsVerified());
+    }
+
+    @Test
+    void testNotHandshakingWithUnnegotiatedSessionDoesNotTriggerVerification() throws Exception {
+        SSLEngine delegate = mockEngineWithUnnegotiatedSession(
+            new SSLEngineResult(SSLEngineResult.Status.OK,
+                SSLEngineResult.HandshakeStatus.NEED_UNWRAP, 0, 0),
+            new SSLEngineResult(SSLEngineResult.Status.OK,
+                SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0));
+
+        MtlsVerifyingSSLEngine engine = new MtlsVerifyingSSLEngine(delegate);
+        engine.unwrap(ByteBuffer.allocate(0), new ByteBuffer[]{ByteBuffer.allocate(1024)}, 0, 1);
+        engine.unwrap(ByteBuffer.allocate(0), new ByteBuffer[]{ByteBuffer.allocate(1024)}, 0, 1);
+
+        assertFalse(engine.isHandshakeChecked(),
+            "An unnegotiated session must not be reported as missing a client certificate");
+        assertNull(engine.getMtlsVerified());
+    }
+
+    private SSLEngine mockEngineWithUnnegotiatedSession(SSLEngineResult first, SSLEngineResult... rest)
+            throws Exception {
+        SSLSession unnegotiatedSession = mock(SSLSession.class);
+        when(unnegotiatedSession.getPeerHost()).thenReturn("producer.example.org");
+        when(unnegotiatedSession.getProtocol()).thenReturn("NONE");
+        when(unnegotiatedSession.getCipherSuite()).thenReturn("SSL_NULL_WITH_NULL_NULL");
+
+        SSLEngine delegate = mock(SSLEngine.class);
+        when(delegate.getSession()).thenReturn(unnegotiatedSession);
+        when(delegate.unwrap(any(ByteBuffer.class), any(ByteBuffer[].class), anyInt(), anyInt()))
+            .thenReturn(first, rest);
+        return delegate;
+    }
+
+    @Test
+    void testNoMtlsVerificationWhenEngineIsClosedBeforeHandshake() throws Exception {
+        MtlsVerifyingSSLEngine engine = createClientEngine();
+
+        engine.closeOutbound();
+        ByteBuffer netBuffer = ByteBuffer.allocate(engine.getSession().getPacketBufferSize());
+        engine.wrap(ByteBuffer.allocate(0), netBuffer);
+
+        assertFalse(engine.isHandshakeChecked(), "A closed engine must not trigger mTLS verification");
+        assertNull(engine.getMtlsVerified());
+    }
+
+    @Test
+    void testMtlsVerifiedAsUsedWhenClientCertificateIsSent() throws Exception {
+        MtlsVerifyingSSLEngine client = createClientEngine();
+        SSLEngine server = createServerEngine(true);
+
+        doHandshake(client, server);
+
+        assertTrue(client.isHandshakeChecked(), "mTLS should have been verified after a completed handshake");
+        assertEquals(Boolean.TRUE, client.getMtlsVerified());
+    }
+
+    @Test
+    void testMtlsVerifiedAsNotUsedWhenNoClientCertificateIsRequested() throws Exception {
+        MtlsVerifyingSSLEngine client = createClientEngine();
+        SSLEngine server = createServerEngine(false);
+
+        doHandshake(client, server);
+
+        assertTrue(client.isHandshakeChecked(), "mTLS should have been verified after a completed handshake");
+        assertEquals(Boolean.FALSE, client.getMtlsVerified());
+    }
+
+    private MtlsVerifyingSSLEngine createClientEngine() throws Exception {
+        MtlsAwareSSLContextParameters mtlsParams = new MtlsAwareSSLContextParameters(
+            createHandshakeSSLContextParameters(), true);
+        SSLContext sslContext = mtlsParams.createSSLContext(camelContext);
+        // The host/port are only advisory hints used for session caching - no socket is opened and no
+        // port is bound. All handshake data is exchanged in memory through wrap/unwrap below.
+        SSLEngine engine = sslContext.createSSLEngine("localhost", 443);
+        engine.setUseClientMode(true);
+        return assertInstanceOf(MtlsVerifyingSSLEngine.class, engine);
+    }
+
+    private SSLEngine createServerEngine(boolean needClientAuth) throws Exception {
+        SSLContext sslContext = createHandshakeSSLContextParameters().createSSLContext(camelContext);
+        SSLEngine engine = sslContext.createSSLEngine();
+        engine.setUseClientMode(false);
+        engine.setNeedClientAuth(needClientAuth);
+        return engine;
+    }
+
+    /**
+     * The legacy test certificates in tp.jks use a 1024-bit DSA key which modern JDKs refuse to use for
+     * a TLS handshake. mtls-test.jks holds a self-signed RSA 2048/SHA256withRSA key pair (generated with
+     * keytool, valid until 2046) that is used both as key material and as trust anchor for the
+     * in-memory handshake tests.
+     */
+    private SSLContextParameters createHandshakeSSLContextParameters() {
+        SSLContextParameters params = new SSLContextParameters();
+
+        KeyStoreParameters keyStoreParams = new KeyStoreParameters();
+        keyStoreParams.setResource("classpath:certs/mtls-test.jks");
+        keyStoreParams.setPassword("password");
+
+        KeyManagersParameters keyManagers = new KeyManagersParameters();
+        keyManagers.setKeyStore(keyStoreParams);
+        keyManagers.setKeyPassword("password");
+        params.setKeyManagers(keyManagers);
+
+        TrustManagersParameters trustManagers = new TrustManagersParameters();
+        trustManagers.setKeyStore(keyStoreParams);
+        params.setTrustManagers(trustManagers);
+
+        return params;
+    }
+
+    /**
+     * Runs a complete in-memory TLS handshake between the two engines.
+     */
+    private void doHandshake(SSLEngine client, SSLEngine server) throws Exception {
+        SSLSession session = client.getSession();
+        ByteBuffer clientToServer = ByteBuffer.allocate(session.getPacketBufferSize());
+        ByteBuffer serverToClient = ByteBuffer.allocate(session.getPacketBufferSize());
+        ByteBuffer clientApp = ByteBuffer.allocate(session.getApplicationBufferSize());
+        ByteBuffer serverApp = ByteBuffer.allocate(session.getApplicationBufferSize());
+        ByteBuffer empty = ByteBuffer.allocate(0);
+
+        client.beginHandshake();
+        server.beginHandshake();
+
+        for (int i = 0; i < MAX_HANDSHAKE_STEPS; i++) {
+            boolean progress = step(client, empty, clientToServer, serverToClient, clientApp);
+            progress |= step(server, empty, serverToClient, clientToServer, serverApp);
+
+            if (isHandshakeDone(client) && isHandshakeDone(server)) {
+                // TLS 1.3 sends post-handshake messages (client certificate, session tickets) that
+                // must be consumed before the local certificates are available on the session.
+                step(client, empty, clientToServer, serverToClient, clientApp);
+                step(server, empty, serverToClient, clientToServer, serverApp);
+                return;
+            }
+            if (!progress) {
+                fail("TLS handshake made no progress");
+            }
+        }
+        fail("TLS handshake did not complete");
+    }
+
+    private boolean isHandshakeDone(SSLEngine engine) {
+        SSLEngineResult.HandshakeStatus status = engine.getHandshakeStatus();
+        return status == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING
+            || status == SSLEngineResult.HandshakeStatus.FINISHED;
+    }
+
+    /**
+     * Performs one wrap/unwrap/task step for the given engine.
+     *
+     * @param outbound buffer that the engine writes encrypted data to
+     * @param inbound  buffer holding encrypted data written by the peer
+     * @return true if the engine made any progress
+     */
+    private boolean step(SSLEngine engine, ByteBuffer emptyApp, ByteBuffer outbound,
+                         ByteBuffer inbound, ByteBuffer appBuffer) throws Exception {
+        boolean progress = false;
+        boolean done = false;
+
+        for (int i = 0; i < MAX_HANDSHAKE_STEPS && !done; i++) {
+            switch (engine.getHandshakeStatus()) {
+                case NEED_TASK -> {
+                    Runnable task;
+                    while ((task = engine.getDelegatedTask()) != null) {
+                        task.run();
+                    }
+                    progress = true;
+                }
+                case NEED_WRAP -> {
+                    SSLEngineResult result = engine.wrap(emptyApp, outbound);
+                    // A full outbound buffer must be drained by the peer before we can produce more
+                    done = result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW;
+                    progress |= !done;
+                }
+                case NEED_UNWRAP, NEED_UNWRAP_AGAIN -> {
+                    // Yield to the peer when it has not produced the data we are waiting for
+                    boolean unwrapped = unwrapAvailableData(engine, inbound, appBuffer);
+                    progress |= unwrapped;
+                    done = !unwrapped;
+                }
+                default -> {
+                    // Handshake finished: consume any remaining post-handshake data from the peer
+                    progress |= unwrapAvailableData(engine, inbound, appBuffer);
+                    done = true;
+                }
+            }
+        }
+
+        assertTrue(done, "TLS handshake step did not terminate within " + MAX_HANDSHAKE_STEPS + " iterations");
+        return progress;
+    }
+
+    /**
+     * Unwraps whatever the peer has written to the inbound buffer.
+     *
+     * @return true if data was actually consumed, false if the buffer was empty or held an
+     *         incomplete record
+     */
+    private boolean unwrapAvailableData(SSLEngine engine, ByteBuffer inbound, ByteBuffer appBuffer)
+            throws Exception {
+        inbound.flip();
+        boolean consumed = false;
+        if (inbound.hasRemaining()) {
+            consumed = engine.unwrap(inbound, appBuffer).bytesConsumed() > 0;
+        }
+        inbound.compact();
+        return consumed;
     }
 }
